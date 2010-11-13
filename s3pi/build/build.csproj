@@ -79,7 +79,7 @@
       <Project>{7314C38A-1519-4C58-998E-C88E4DA91086}</Project>
       <Name>CustomForms</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\s3pi Extras\DemoPlugins\DemoPlugins.csproj">
+    <ProjectReference Include="..\..\s3pi Extras\Helpers\DemoPlugins.csproj">
       <Project>{D9B63641-D3BE-4120-9115-7D67B1238FBF}</Project>
       <Name>DemoPlugins</Name>
     </ProjectReference>
