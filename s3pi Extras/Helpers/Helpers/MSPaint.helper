@@ -1,0 +1,6 @@
+; jpg
+ResourceType: 0x2F7D0002
+Label: Paint
+Command: mspaint
+Arguments: "{}"
+Desc: Edit a JPEG with MSPaint
