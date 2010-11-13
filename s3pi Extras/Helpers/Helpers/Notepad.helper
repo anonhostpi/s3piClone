@@ -1,7 +1,0 @@
-// Text/(pure) XML files 
-Wrapper: TextResource
-Label: Notepad
-// Windows notepad is in the standard Windows PATH, so you don't need to say where it is:
-Command: notepad
-Arguments: "{}"
-Desc: Edit a Text file with Notepad
