@@ -19,7 +19,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "build", "build\build.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extensions", "..\s3pi Extras\Extensions\Extensions.csproj", "{9B4C57BA-E09F-4439-98B4-B9B535A4ABF6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helpers", "..\s3pi Extras\Helpers\DemoPlugins.csproj", "{D9B63641-D3BE-4120-9115-7D67B1238FBF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helpers", "..\s3pi Extras\Helpers\Helpers.csproj", "{D9B63641-D3BE-4120-9115-7D67B1238FBF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CS System Classes", "..\CS System Classes\CS System Classes.csproj", "{00200E76-C245-42A7-B567-5C30EDBCE977}"
 EndProject
