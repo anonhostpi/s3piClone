@@ -33,22 +33,25 @@ namespace s3pi.GenericRCOLResource
         uint version = 4;
         EntryList entryList;
         byte tc02 = 0x02;
-        float[] boundingBox = new float[6];
+        BoundingBox bounds;
         byte[] unused = new byte[4];
         byte modular;
         int ftptIndex;
         AResource.TGIBlockList tgiBlockList;
         #endregion
 
+        #region Constructors
+        public VPXY(int APIversion, EventHandler handler) : base(APIversion, handler, null) { }
         public VPXY(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler, s) { }
         public VPXY(int APIversion, EventHandler handler, VPXY basis)
             : this(APIversion, handler,
-            basis.version, basis.entryList, basis.tc02, basis.boundingBox, basis.unused, basis.modular, basis.ftptIndex, basis.tgiBlockList) { }
+            basis.version, basis.entryList, basis.tc02, basis.bounds, basis.unused, basis.modular, basis.ftptIndex,
+            basis.tgiBlockList) { }
         public VPXY(int APIversion, EventHandler handler,
-            uint version, EntryList entryList, byte tc02, float[] boundingBox, byte[] unused, byte modular, int ftptIndex, IList<AResource.TGIBlock> tgiBlockList)
-            : base(APIversion, null, null)
+            uint version, IEnumerable<Entry> entryList, byte tc02, BoundingBox bounds, byte[] unused, byte modular, int ftptIndex,
+            IEnumerable<AResource.TGIBlock> tgiBlockList)
+            : base(APIversion, handler, null)
         {
-            this.handler = handler;
             this.version = version;
             if (checking) if (version != 4)
                     throw new ArgumentException(String.Format("Invalid Version: 0x{0:X8}; expected 0x00000004", version));
@@ -56,7 +59,7 @@ namespace s3pi.GenericRCOLResource
             this.tc02 = tc02;
             if (checking) if (tc02 != 0x02)
                     throw new ArgumentException(String.Format("Invalid TC02: 0x{0:X2}; expected 0x02", tc02));
-            this.boundingBox = (float[])boundingBox.Clone();
+            this.bounds = new BoundingBox(requestedApiVersion, handler, bounds);
             this.unused = (byte[])unused.Clone();
             if (checking) if (unused.Length != 4)
                     throw new ArgumentLengthException("Unused", 4);
@@ -65,13 +68,7 @@ namespace s3pi.GenericRCOLResource
                 this.ftptIndex = ftptIndex;
             this.tgiBlockList = new AResource.TGIBlockList(OnRCOLChanged, tgiBlockList);
         }
-        public VPXY(int APIversion, EventHandler handler)
-            : base(APIversion, null, null)
-        {
-            this.handler = handler;
-            entryList = new EntryList(OnRCOLChanged);
-            tgiBlockList = new AResource.TGIBlockList(OnRCOLChanged);
-        }
+        #endregion
 
         #region ARCOLBlock
         public override string Tag { get { return "VPXY"; } }
@@ -95,7 +92,7 @@ namespace s3pi.GenericRCOLResource
             tc02 = r.ReadByte();
             if (checking) if (tc02 != 2)
                     throw new InvalidDataException(String.Format("Invalid TC02 read: 0x{0:X2}; expected 0x02; at 0x{1:X8}", tc02, s.Position));
-            for (int i = 0; i < boundingBox.Length; i++) boundingBox[i] = r.ReadSingle();
+            bounds = new BoundingBox(requestedApiVersion, handler, s);
             unused = r.ReadBytes(4);
             if (checking) if (unused.Length != 4)
                     throw new EndOfStreamException(String.Format("Unused: expected 4 bytes, read {0}.", unused.Length));
@@ -124,7 +121,10 @@ namespace s3pi.GenericRCOLResource
             entryList.UnParse(ms);
 
             w.Write(tc02);
-            foreach (float f in boundingBox) w.Write(f);
+
+            if (bounds == null) bounds = new BoundingBox(requestedApiVersion, handler);
+            bounds.UnParse(ms);
+
             w.Write(unused);
             w.Write(modular);
             if (modular != 0)
@@ -140,19 +140,18 @@ namespace s3pi.GenericRCOLResource
         #endregion
 
         #region Sub-types
-        public class IntList : AResource.SimpleList<Int32>
+        public class IntList : SimpleList<Int32>
         {
-            static string fmt = "0x{1:X8}; ";
             #region Constructors
-            public IntList(EventHandler handler) : base(handler, ReadInt32, WriteInt32, fmt, byte.MaxValue, ReadListCount, WriteListCount) { }
-            public IntList(EventHandler handler, Stream s) : base(handler, s, ReadInt32, WriteInt32, fmt, byte.MaxValue, ReadListCount, WriteListCount) { }
-            public IntList(EventHandler handler, IList<HandlerElement<Int32>> ltgi) : base(handler, ltgi, ReadInt32, WriteInt32, fmt, byte.MaxValue, ReadListCount, WriteListCount) { }
-            public IntList(EventHandler handler, IList<Int32> ltgi) : base(handler, ltgi, ReadInt32, WriteInt32, fmt, byte.MaxValue, ReadListCount, WriteListCount) { }
+            public IntList(EventHandler handler) : base(handler, ReadInt32, WriteInt32, byte.MaxValue, ReadListCount, WriteListCount) { }
+            public IntList(EventHandler handler, Stream s) : base(handler, s, ReadInt32, WriteInt32, byte.MaxValue, ReadListCount, WriteListCount) { }
+            public IntList(EventHandler handler, IEnumerable<HandlerElement<Int32>> ltgi) : base(handler, ltgi, ReadInt32, WriteInt32, byte.MaxValue, ReadListCount, WriteListCount) { }
+            public IntList(EventHandler handler, IEnumerable<Int32> ltgi) : base(handler, ltgi, ReadInt32, WriteInt32, byte.MaxValue, ReadListCount, WriteListCount) { }
             #endregion
 
             #region Data I/O
-            static uint ReadListCount(Stream s) { return (new BinaryReader(s)).ReadByte(); }
-            static void WriteListCount(Stream s, uint count) { (new BinaryWriter(s)).Write((byte)count); }
+            static int ReadListCount(Stream s) { return (new BinaryReader(s)).ReadByte(); }
+            static void WriteListCount(Stream s, int count) { (new BinaryWriter(s)).Write((byte)count); }
             static int ReadInt32(Stream s) { return new BinaryReader(s).ReadInt32(); }
             static void WriteInt32(Stream s, int value) { new BinaryWriter(s).Write(value); }
             #endregion
@@ -203,9 +202,9 @@ namespace s3pi.GenericRCOLResource
 
             public Entry00(int APIversion, EventHandler handler, Entry00 basis)
                 : this(APIversion, handler, 0, basis.entryID, basis.tgiIndexes) { }
-            public Entry00(int APIversion, EventHandler handler, byte entryType, byte entryID, IList<HandlerElement<int>> tgiIndexes)
+            public Entry00(int APIversion, EventHandler handler, byte entryType, byte entryID, IEnumerable<HandlerElement<int>> tgiIndexes)
                 : base(APIversion, handler) { this.entryID = entryID; this.tgiIndexes = new IntList(handler, tgiIndexes); }
-            public Entry00(int APIversion, EventHandler handler, byte entryType, byte entryID, IList<int> tgiIndexes)
+            public Entry00(int APIversion, EventHandler handler, byte entryType, byte entryID, IEnumerable<int> tgiIndexes)
                 : base(APIversion, handler) { this.entryID = entryID; this.tgiIndexes = new IntList(handler, tgiIndexes); }
 
             internal override void UnParse(Stream s)
@@ -233,7 +232,10 @@ namespace s3pi.GenericRCOLResource
             {
                 get
                 {
-                    return "EntryID: 0x" + entryID.ToString("X2") + "; TGIIndexes: " + tgiIndexes.Value;
+                    string s = "EntryID: 0x" + entryID.ToString("X2") + String.Format("; TGIIndexes ({0:X}): ", tgiIndexes.Count);
+                    string fmt = "[{0:X" + tgiIndexes.Count.ToString("X").Length + "}]: 0x{1:X8}; ";
+                    for (int i = 0; i < tgiIndexes.Count; i++) s += String.Format(fmt, i, tgiIndexes[i]);
+                    return s.TrimEnd(';', ' ');
                 }
             }
             #endregion
@@ -266,12 +268,12 @@ namespace s3pi.GenericRCOLResource
             #region Constructors
             public EntryList(EventHandler handler) : base(handler, Byte.MaxValue) { }
             public EntryList(EventHandler handler, Stream s) : base(handler, s, Byte.MaxValue) { }
-            public EntryList(EventHandler handler, IList<Entry> le) : base(handler, le, Byte.MaxValue) { }
+            public EntryList(EventHandler handler, IEnumerable<Entry> le) : base(handler, le, Byte.MaxValue) { }
             #endregion
 
             #region Data I/O
-            protected override uint ReadCount(Stream s) { return (new BinaryReader(s)).ReadByte(); }
-            protected override void WriteCount(Stream s, uint count) { (new BinaryWriter(s)).Write((byte)count); }
+            protected override int ReadCount(Stream s) { return (new BinaryReader(s)).ReadByte(); }
+            protected override void WriteCount(Stream s, int count) { (new BinaryWriter(s)).Write((byte)count); }
 
             protected override Entry CreateElement(Stream s) { return Entry.CreateEntry(0, elementHandler, s); }
 
@@ -298,13 +300,12 @@ namespace s3pi.GenericRCOLResource
         public uint Version { get { return version; } /*set { if (version != value) { version = value; OnRCOLChanged(this, EventArgs.Empty); } }/**/ }
         public EntryList Entries { get { return entryList; } set { if (entryList != value) { entryList = new EntryList(OnRCOLChanged, value); OnRCOLChanged(this, EventArgs.Empty); } } }
         public byte TC02 { get { return tc02; } /*set { if (tc02 != value) { tc02 = value; OnRCOLChanged(this, EventArgs.Empty); } }/**/ }
-        public float[] BoundingBox
+        public BoundingBox Bounds
         {
-            get { return (float[])boundingBox.Clone(); }
+            get { return bounds; }
             set
             {
-                if (value.Length != this.boundingBox.Length) throw new ArgumentLengthException("BoundingBox", this.boundingBox.Length);
-                if (!ArrayCompare(boundingBox, value)) { boundingBox = value == null ? null : (float[])value.Clone(); OnRCOLChanged(this, EventArgs.Empty); }
+                if (bounds != value) { bounds = new BoundingBox(requestedApiVersion, handler, value); OnRCOLChanged(this, EventArgs.Empty); }
             }
         }
         public byte[] Unused
@@ -332,22 +333,28 @@ namespace s3pi.GenericRCOLResource
         {
             get
             {
+                string fmt;
                 string s = "";
                 s += "Tag: 0x" + tag.ToString("X8");
                 s += "\nVersion: 0x" + version.ToString("X8");
 
-                s += "\n--\nEntry List:";
-                for (int i = 0; i < entryList.Count; i++)
-                    s += "\n[" + i + "]: " + entryList[i].Value;
+                s += String.Format("\nEntry List ({0:X}):", entryList.Count);
+                fmt = "\n  [{0:X" + entryList.Count.ToString("X").Length + "}]: {1}";
+                for (int i = 0; i < entryList.Count; i++) s += String.Format(fmt, i, entryList[i].Value);
+                s += "\n----";
 
                 s += "\nTC02: 0x" + tc02.ToString("X2");
-                s += "\nBoundingBox: " + this["BoundingBox"];
+                s += "\nBounds: " + bounds.Value;
                 s += "\nUnused: " + this["Unused"];
                 s += "\nModular: " + modular;
                 if (Modular)
                     s += "\n" + "FTPTIndex: 0x" + ftptIndex.ToString("X8");
 
-                s += "\n--TGI Blocks:\n" + tgiBlockList.Value + "--";
+                s += String.Format("\nTGI Blocks ({0:X}):", tgiBlockList.Count);
+                fmt = "\n  [{0:X" + tgiBlockList.Count.ToString("X").Length + "}]: {1}";
+                for (int i = 0; i < tgiBlockList.Count; i++) s += string.Format(fmt, i, tgiBlockList[i].Value);
+                s += "\n----";
+
                 return s;
             }
         }

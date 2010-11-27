@@ -38,24 +38,19 @@ namespace s3pi.GenericRCOLResource
         ShortSectionList shortSections = null;
         #endregion
 
+        #region Constructors
+        public LITE(int APIversion, EventHandler handler) : base(APIversion, handler, null) { }
         public LITE(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler, s) { }
         public LITE(int APIversion, EventHandler handler, LITE basis)
-            : base(APIversion, null, null)
+            : base(APIversion, handler, null)
         {
-            this.handler = handler;
             this.version = basis.version;
             this.unknown1 = basis.unknown1;
             this.longSections = new LongSectionList(handler, basis.longSections);
             this.shortSections = new ShortSectionList(handler, basis.shortSections);
             this.unknown2 = basis.unknown2;
         }
-        public LITE(int APIversion, EventHandler handler)
-            : base(APIversion, null, null)
-        {
-            this.handler = handler;
-            this.longSections = new LongSectionList(handler);
-            this.shortSections = new ShortSectionList(handler);
-        }
+        #endregion
 
         #region ARCOLBlock
         public override string Tag { get { return TAG; } }
@@ -389,7 +384,7 @@ namespace s3pi.GenericRCOLResource
                     foreach (string field in ContentFields)
                         if (!field.Equals("Value"))
                             s += "\n" + field + ": " + this[field];
-                    return s;
+                    return s.TrimStart('\n');
                 }
             }
             #endregion
@@ -397,17 +392,17 @@ namespace s3pi.GenericRCOLResource
 
         public class LongSectionList : AResource.DependentList<LongSection>
         {
-            uint count;
+            int count;
 
             #region Constructors
             public LongSectionList(EventHandler handler) : base(handler, Byte.MaxValue) { }
-            public LongSectionList(EventHandler handler, uint count, Stream s) : base(null, Byte.MaxValue) { this.count = count; elementHandler = handler; Parse(s); this.handler = handler; }
-            public LongSectionList(EventHandler handler, IList<LongSection> llp) : base(handler, llp, Byte.MaxValue) { }
+            public LongSectionList(EventHandler handler, int count, Stream s) : base(null, Byte.MaxValue) { this.count = count; elementHandler = handler; Parse(s); this.handler = handler; }
+            public LongSectionList(EventHandler handler, IEnumerable<LongSection> llp) : base(handler, llp, Byte.MaxValue) { }
             #endregion
 
             #region Data I/O
-            protected override uint ReadCount(Stream s) { return count; }
-            protected override void WriteCount(Stream s, uint count) { }
+            protected override int ReadCount(Stream s) { return count; }
+            protected override void WriteCount(Stream s, int count) { }
 
             protected override LongSection CreateElement(Stream s) { return new LongSection(0, elementHandler, s); }
 
@@ -502,7 +497,7 @@ namespace s3pi.GenericRCOLResource
                     foreach (string field in ContentFields)
                         if (!field.Equals("Value"))
                             s += "\n" + field + ": " + this[field];
-                    return s;
+                    return s.TrimStart('\n');
                 }
             }
             #endregion
@@ -510,17 +505,17 @@ namespace s3pi.GenericRCOLResource
 
         public class ShortSectionList : AResource.DependentList<ShortSection>
         {
-            uint count;
+            int count;
 
             #region Constructors
             public ShortSectionList(EventHandler handler) : base(handler, Byte.MaxValue) { }
-            public ShortSectionList(EventHandler handler, uint count, Stream s) : base(null, Byte.MaxValue) { this.count = count; elementHandler = handler; Parse(s); this.handler = handler; }
-            public ShortSectionList(EventHandler handler, IList<ShortSection> lss) : base(handler, lss, Byte.MaxValue) { }
+            public ShortSectionList(EventHandler handler, int count, Stream s) : base(null, Byte.MaxValue) { this.count = count; elementHandler = handler; Parse(s); this.handler = handler; }
+            public ShortSectionList(EventHandler handler, IEnumerable<ShortSection> lss) : base(handler, lss, Byte.MaxValue) { }
             #endregion
 
             #region Data I/O
-            protected override uint ReadCount(Stream s) { return count; }
-            protected override void WriteCount(Stream s, uint count) { }
+            protected override int ReadCount(Stream s) { return count; }
+            protected override void WriteCount(Stream s, int count) { }
 
             protected override ShortSection CreateElement(Stream s) { return new ShortSection(0, elementHandler, s); }
 
@@ -553,11 +548,15 @@ namespace s3pi.GenericRCOLResource
                 s += "\nUnknown1: 0x" + unknown1.ToString("X8");
                 s += "\nUnknown2: 0x" + unknown1.ToString("X4");
 
-                s += "\nLong Sections (" + longSections.Count + ")" + (longSections.Count > 0 ? ":" : "");
-                for (int i = 0; i < longSections.Count; i++) s += "\n---LongSections[" + i + "]---" + longSections[i].Value + "\n";
+                string fmt;
+                s += String.Format("\nLong Sections ({0:X}):", longSections.Count);
+                fmt = "\n--[{0:X" + longSections.Count.ToString("X").Length + "}]--\n{1}\n--";
+                for (int i = 0; i < longSections.Count; i++) s += String.Format(fmt, i, longSections[i].Value);
+                s += "\n----";
 
-                s += "\nShort Sections (" + shortSections.Count + ")" + (shortSections.Count > 0 ? ":" : "");
-                for (int i = 0; i < shortSections.Count; i++) s += "\n---ShortSections[" + i + "]---" + shortSections[i].Value + "\n";
+                s += String.Format("\nShort Sections ({0:X}):", shortSections.Count);
+                fmt = "\n--[{0:X" + shortSections.Count.ToString("X").Length + "}]--\n{1}\n--";
+                for (int i = 0; i < shortSections.Count; i++) s += String.Format(fmt, i, shortSections[i].Value);
 
                 return s;
             }

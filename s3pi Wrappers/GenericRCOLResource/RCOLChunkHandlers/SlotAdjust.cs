@@ -40,7 +40,7 @@ namespace s3pi.GenericRCOLResource
         public SlotAdjust(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler, s) { }
         public SlotAdjust(int APIversion, EventHandler handler, SlotAdjust basis)
             : this(APIversion, handler, basis.version, basis.adjustments) { }
-        public SlotAdjust(int APIversion, EventHandler handler, uint version, AdjustmentList adjustments)
+        public SlotAdjust(int APIversion, EventHandler handler, uint version, IEnumerable<Adjustment> adjustments)
             : base(APIversion, handler, null)
         {
             this.version = version;
@@ -212,8 +212,8 @@ namespace s3pi.GenericRCOLResource
                 get
                 {
                     string s = "";
-                    foreach (string var in ContentFields) if (var != "Value") s += var + ": " + this[var] + "\n";
-                    return s;
+                    foreach (string var in ContentFields) if (var != "Value") s += "\n" + var + ": " + this[var];
+                    return s.TrimStart('\n');
                 }
             }
             #endregion
@@ -223,7 +223,7 @@ namespace s3pi.GenericRCOLResource
         {
             public AdjustmentList(EventHandler handler) : base(handler) { }
             public AdjustmentList(EventHandler handler, Stream s) : base(handler, s) { }
-            public AdjustmentList(EventHandler handler, IList<Adjustment> lsbp) : base(handler, lsbp) { }
+            public AdjustmentList(EventHandler handler, IEnumerable<Adjustment> lsbp) : base(handler, lsbp) { }
 
             protected override Adjustment CreateElement(Stream s) { return new Adjustment(0, elementHandler, s); }
             protected override void WriteElement(Stream s, Adjustment element) { element.UnParse(s); }
@@ -245,9 +245,10 @@ namespace s3pi.GenericRCOLResource
                 string s = "";
                 //s += "Tag: 0x" + tag.ToString("X8");
                 s += "Version: 0x" + version.ToString("X8");
-                s += "\n---Adjustments:---";
-                for (int i = 0; i < adjustments.Count; i++) s += "\n--[" + i + "]--\n" + adjustments[i].Value;
-                s += "\n---";
+                s += String.Format("\nAdjustments ({0:X}):", adjustments.Count);
+                string fmt = "\n--[{0:X" + adjustments.Count.ToString("X").Length + "}]--\n{1}";
+                for (int i = 0; i < adjustments.Count; i++) s += String.Format(fmt, i, adjustments[i].Value);
+                s += "\n----";
                 return s;
             }
         }

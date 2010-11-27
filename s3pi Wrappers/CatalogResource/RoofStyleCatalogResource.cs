@@ -1,5 +1,5 @@
 ﻿/***************************************************************************
- *  Copyright (C) 2009 by Peter L Jones                                    *
+ *  Copyright (C) 2010 by Peter L Jones                                    *
  *  pljones@users.sf.net                                                   *
  *                                                                         *
  *  This file is part of the Sims 3 Package Interface (s3pi)               *
@@ -27,55 +27,36 @@ namespace CatalogResource
     public class RoofStyleCatalogResource : CatalogResourceTGIBlockList
     {
         #region Attributes
-        uint unknown2;
-        byte unknown3;
-        uint unknown4;
-        byte unknown5;
-        byte unknown6;
-        uint unknown7;
-        uint unknown8;
+        Roof roofType;
         uint catalogRoofPattern;
         uint catalogWallStyle;
-        float unknown9;
-        uint unknown10;
+        float defaultSlope;
+        RoofStyle roofStyleFlags;//roofStyleFlags
         #endregion
 
         #region Constructors
         public RoofStyleCatalogResource(int APIversion, Stream s) : base(APIversion, s) { }
         public RoofStyleCatalogResource(int APIversion, Stream unused, RoofStyleCatalogResource basis)
-            : base(APIversion, basis.version, basis.list)
+            : base(APIversion, basis.version, basis.common, basis.list)
         {
             this.common = new Common(requestedApiVersion, OnResourceChanged, basis.common);
-            this.unknown2 = basis.unknown2;
-            this.unknown3 = basis.unknown3;
-            this.unknown4 = basis.unknown4;
-            this.unknown5 = basis.unknown5;
-            this.unknown6 = basis.unknown6;
-            this.unknown7 = basis.unknown7;
-            this.unknown8 = basis.unknown8;
+            this.roofType = basis.roofType;
             this.catalogRoofPattern = basis.catalogRoofPattern;
             this.catalogWallStyle = basis.catalogWallStyle;
-            this.unknown9 = basis.unknown9;
-            this.unknown10 = basis.unknown10;
+            this.defaultSlope = basis.defaultSlope;
+            this.roofStyleFlags = basis.roofStyleFlags;
         }
-        public RoofStyleCatalogResource(int APIversion, uint version, Common common,
-            uint unknown2, byte unknown3, uint unknown4, byte unknown5, byte unknown6, uint unknown7, uint unknown8,
-            uint catalogRoofStyle, uint catalogWallStyle, float unknown9, uint unknown10,
+        public RoofStyleCatalogResource(int APIversion, uint version,
+            Common common, Roof roofType, uint catalogRoofStyle, uint catalogWallStyle, float defaultSlope, RoofStyle roofStyleFlags,
             TGIBlockList ltgib)
-            : base(APIversion, version, ltgib)
+            : base(APIversion, version, common, ltgib)
         {
             this.common = new Common(requestedApiVersion, OnResourceChanged, common);
-            this.unknown2 = unknown2;
-            this.unknown3 = unknown3;
-            this.unknown4 = unknown4;
-            this.unknown5 = unknown5;
-            this.unknown6 = unknown6;
-            this.unknown7 = unknown7;
-            this.unknown8 = unknown8;
+            this.roofType = roofType;
             this.catalogRoofPattern = catalogRoofStyle;
             this.catalogWallStyle = catalogWallStyle;
-            this.unknown9 = unknown9;
-            this.unknown10 = unknown10;
+            this.defaultSlope = defaultSlope;
+            this.roofStyleFlags = roofStyleFlags;
         }
         #endregion
 
@@ -85,17 +66,11 @@ namespace CatalogResource
             BinaryReader r = new BinaryReader(s);
             base.Parse(s);
             this.common = new Common(requestedApiVersion, OnResourceChanged, s);
-            this.unknown2 = r.ReadUInt32();
-            this.unknown3 = r.ReadByte();
-            this.unknown4 = r.ReadUInt32();
-            this.unknown5 = r.ReadByte();
-            this.unknown6 = r.ReadByte();
-            this.unknown7 = r.ReadUInt32();
-            this.unknown8 = r.ReadUInt32();
+            this.roofType = (Roof)r.ReadUInt32();
             this.catalogRoofPattern = r.ReadUInt32();
             this.catalogWallStyle = r.ReadUInt32();
-            this.unknown9 = r.ReadSingle();
-            this.unknown10 = r.ReadUInt32();
+            this.defaultSlope = r.ReadSingle();
+            this.roofStyleFlags = (RoofStyle)r.ReadUInt32();
 
             list = new TGIBlockList(OnResourceChanged, s, tgiPosn, tgiSize);
 
@@ -112,17 +87,11 @@ namespace CatalogResource
             if (common == null) common = new Common(requestedApiVersion, OnResourceChanged);
             common.UnParse(s);
 
-            w.Write(unknown2);
-            w.Write(unknown3);
-            w.Write(unknown4);
-            w.Write(unknown5);
-            w.Write(unknown6);
-            w.Write(unknown7);
-            w.Write(unknown8);
+            w.Write((uint)roofType);
             w.Write(catalogRoofPattern);
             w.Write(catalogWallStyle);
-            w.Write(unknown9);
-            w.Write(unknown10);
+            w.Write(defaultSlope);
+            w.Write((uint)roofStyleFlags);
 
             base.UnParse(s);
 
@@ -132,29 +101,62 @@ namespace CatalogResource
         }
         #endregion
 
+        #region Sub-Types
+        public enum Roof : uint
+        {
+            Gable = 0x00000001,
+            TallGable = 0x00000002,
+            HalfGable = 0x00000003,
+            Mansard = 0x00000004,
+            Hipped = 0x00000005,
+            HalfHipped = 0x00000006,
+            Conical = 0x00000007,
+            Dome = 0x00000008,
+            Octagonal = 0x00000009,
+            DiagonalGable = 0x0000000A,
+            DiagonalTallGable = 0x0000000B,
+            DiagonalHalfGable = 0x0000000C,
+            DiagonalHipped = 0x0000000D,
+            DiagonalHalfHipped = 0x0000000E,
+            Dormer = 0x0000000F,
+            Flat = 0x00000010,
+            DiagonalMansard = 0x00000011,
+            PagodaGable = 0x00000012,
+            PagodaTallGable = 0x00000013,
+            PagodaHalfGable = 0x00000014,
+            PagodaHipped = 0x00000015,
+            PagodaOctagonal = 0x00000016,
+            DiagonalPagodaGable = 0x00000017,
+            DiagonalPagodaTallGable = 0x00000018,
+            DiagonalPagodaHalfGable = 0x00000019,
+            DiagonalPagodaHipped = 0x0000001A,
+            PagodaMansard = 0x0000001B,
+            DiagonalPagodaMansard = 0x0000001C,
+            PagodaOctagonalMansard = 0x0000001D,
+            OctagonalMansard = 0x0000001E,
+        }
+
+        public enum RoofStyle : uint
+        {
+            Dormer = 0x0000001,
+            Diagonal = 0x00000002,
+        }
+        #endregion
+
         #region Content Fields
-        [ElementPriority(21)]
-        public uint Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(22)]
-        public byte Unknown3 { get { return unknown3; } set { if (unknown3 != value) { unknown3 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(23)]
-        public uint Unknown4 { get { return unknown4; } set { if (unknown4 != value) { unknown4 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(24)]
-        public byte Unknown5 { get { return unknown5; } set { if (unknown5 != value) { unknown5 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(25)]
-        public byte Unknown6 { get { return unknown6; } set { if (unknown6 != value) { unknown6 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(26)]
-        public uint Unknown7 { get { return unknown7; } set { if (unknown7 != value) { unknown7 = value; OnResourceChanged(this, new EventArgs()); } } }
+        //--insert Version: ElementPriority(1)
+        //--insert CommonBlock: ElementPriority(11)
         [ElementPriority(27)]
-        public uint Unknown8 { get { return unknown8; } set { if (unknown8 != value) { unknown8 = value; OnResourceChanged(this, new EventArgs()); } } }
+        public Roof RoofType { get { return roofType; } set { if (roofType != value) { roofType = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(28), TGIBlockListContentField("TGIBlocks")]
         public uint CatalogRoofPattern { get { return catalogRoofPattern; } set { if (catalogRoofPattern != value) { catalogRoofPattern = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(29), TGIBlockListContentField("TGIBlocks")]
         public uint CatalogWallStyle { get { return catalogWallStyle; } set { if (catalogWallStyle != value) { catalogWallStyle = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(30)]
-        public float Unknown9 { get { return unknown9; } set { if (unknown9 != value) { unknown9 = value; OnResourceChanged(this, new EventArgs()); } } }
+        public float DefaultSlope { get { return defaultSlope; } set { if (defaultSlope != value) { defaultSlope = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(31)]
-        public uint Unknown10 { get { return unknown10; } set { if (unknown10 != value) { unknown10 = value; OnResourceChanged(this, new EventArgs()); } } }
+        public RoofStyle RoofStyleFlags { get { return roofStyleFlags; } set { if (roofStyleFlags != value) { roofStyleFlags = value; OnResourceChanged(this, new EventArgs()); } } }
+        //--insert TGIBlockList: no ElementPriority
         #endregion
     }
 }

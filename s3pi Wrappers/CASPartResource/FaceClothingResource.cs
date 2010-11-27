@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using s3pi.Interfaces;
+using System.Text;
 
 namespace CASPartResource
 {
@@ -51,13 +52,12 @@ namespace CASPartResource
         {
             long tgiPosn, tgiSize;
             BinaryReader r = new BinaryReader(s);
-            BinaryReader r2 = new BinaryReader(s, System.Text.Encoding.BigEndianUnicode);
 
             version = r.ReadUInt32();
             tgiPosn = r.ReadUInt32() + s.Position;
             tgiSize = r.ReadUInt32();
 
-            partName = r2.ReadString();
+            partName = BigEndianUnicodeString.Read(s);
             unknown1 = r.ReadUInt32();
             blendGeometry = new TGIBlock(requestedApiVersion, OnResourceChanged, s);
             casEntries = new CASEntryList(OnResourceChanged, s);
@@ -77,7 +77,7 @@ namespace CASPartResource
             w.Write((uint)0);
             w.Write((uint)0);
 
-            Write7BitStr(s, partName, System.Text.Encoding.BigEndianUnicode);
+            BigEndianUnicodeString.Write(s, partName);
             w.Write(unknown1);
             if (blendGeometry == null) blendGeometry = new TGIBlock(requestedApiVersion, OnResourceChanged);
             blendGeometry.UnParse(s);
@@ -165,7 +165,7 @@ namespace CASPartResource
                     foreach (string field in ContentFields)
                         if (!field.Equals("Value"))
                             s += string.Format("{0}: {1}; ", field, this[field]);
-                    return s.Trim();
+                    return s.TrimEnd(';', ' ');
                 }
             }
             #endregion
@@ -323,7 +323,7 @@ namespace CASPartResource
             #region Constructors
             public CASEntryList(EventHandler handler) : base(handler) { }
             public CASEntryList(EventHandler handler, Stream s) : base(handler, s) { }
-            public CASEntryList(EventHandler handler, IList<CASEntry> le) : base(handler, le) { }
+            public CASEntryList(EventHandler handler, IEnumerable<CASEntry> le) : base(handler, le) { }
             #endregion
 
             #region Data I/O
@@ -361,15 +361,17 @@ namespace CASPartResource
                 s += "\nUnknown1: " + this["Unknown1"];
                 s += "\nBlendGeometry: " + this["BlendGeometry"];
 
-                s += "\n\nCAS Entries:";
-                fmt = "\n-- 0x{0:X" + casEntries.Count.ToString("X").Length + "} --{1}";
+                s += "\nCAS Entries:";
+                fmt = "\n--[{0:X" + casEntries.Count.ToString("X").Length + "}]--{1}";
                 for (int i = 0; i < casEntries.Count; i++)
                     s += String.Format(fmt, i, casEntries[i].Value);
+                s += "\n----";
 
-                s += "\n---\n\nTGI Blocks:";
-                fmt = "\n  [0x{0:X" + tgiBlocks.Count.ToString("X").Length + "}]: {1}";
+                s += "\n--\nTGI Blocks:";
+                fmt = "\n  [{0:X" + tgiBlocks.Count.ToString("X").Length + "}]: {1}";
                 for (int i = 0; i < tgiBlocks.Count; i++)
                     s += String.Format(fmt, i, tgiBlocks[i]);
+                s += "\n----";
 
                 return s;
             }

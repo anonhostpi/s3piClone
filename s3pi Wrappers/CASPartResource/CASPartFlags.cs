@@ -44,6 +44,7 @@ namespace CASPartResource
     {
         None = 0x00000000,
 
+        //Age
         Baby = 0x00000001,
         Toddler = 0x00000002,
         Child = 0x00000004,
@@ -52,7 +53,6 @@ namespace CASPartResource
         YoungAdult = 0x00000010,
         Adult = 0x00000020,
         Elder = 0x00000040,
-        //AgeMask=0x0000007F,
         Unknown07 = 0x00000080,
 
         Unknown08 = 0x00000100,
@@ -60,19 +60,21 @@ namespace CASPartResource
         Unknown0A = 0x00000400,
         Unknown0B = 0x00000800,
 
+        //Gender
         Male = 0x00001000,
         Female = 0x00002000,
-        //GenderMask=0x00003000,
         Unknown0E = 0x00004000,
         Unknown0F = 0x00008000,
 
-        Unknown10 = 0x00010000,
+        //Species
+        Human = 0x00010000,
         Unknown11 = 0x00020000,
         Unknown12 = 0x00040000,
         Unknown13 = 0x00080000,
 
-        Unknown14 = 0x00100000,
-        Unknown15 = 0x00200000,
+        //Handedness
+        LeftHanded = 0x00100000,
+        RightHanded = 0x00200000,
         Unknown16 = 0x00400000,
         Unknown17 = 0x00800000,
 
@@ -101,21 +103,48 @@ namespace CASPartResource
     public enum ClothingCategoryFlags : uint
     {
         None = 0x00000000,
+
         Naked = 0x00000001,
         Everyday = 0x00000002,
         Formalwear = 0x00000004,
         Sleepwear = 0x00000008,
+
         Swimwear = 0x00000010,
         Athletic = 0x00000020,
         Singed = 0x00000040,
-        Career = 0x00000100,
-        //CategoryMask = 0x000007FF,
-        //All = 0x0000FFFF,
+        MartialArts = 0x00000080,
 
+        Career = 0x00000100,
+        FireFighting = 0x00000200,
+        Makeover = 0x00000400,
+        SkinnyDippingTowel = 0x00000800,
+
+        Unknown0C = 0x00001000,
+        Unknown0D = 0x00002000,
+        Unknown0E = 0x00004000,
+        Unknown0F = 0x00008000,
+
+        Unknown10 = 0x00010000,
+        Unknown11 = 0x00020000,
+        Unknown12 = 0x00040000,
+        //CategoryMask = 0x0007FFFF,
+        Unknown13 = 0x00080000,
+
+        //"Extended" flags
+        ValidForMaternity = 0x00100000,
         ValidForRandom = 0x00200000,
         IsHat = 0x00400000,
-        ValidForMaternity = 0x00800000,
+        IsRevealing = 0x00800000,
+
         IsHiddenInCAS = 0x01000000,
+        Unknown19 = 0x02000000,
+        Unknown1A = 0x04000000,
+        Unknown1B = 0x08000000,
+
+        Unknown1C = 0x10000000,
+        Unknown1D = 0x20000000,
+        Unknown1E = 0x40000000,
+        Unknown1F = 0x80000000,
     }
 
     [Flags]

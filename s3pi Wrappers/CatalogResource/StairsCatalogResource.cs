@@ -1,5 +1,5 @@
 ﻿/***************************************************************************
- *  Copyright (C) 2009 by Peter L Jones                                    *
+ *  Copyright (C) 2010 by Peter L Jones                                    *
  *  pljones@users.sf.net                                                   *
  *                                                                         *
  *  This file is part of the Sims 3 Package Interface (s3pi)               *
@@ -28,15 +28,9 @@ namespace CatalogResource
     {
         #region Attributes
         MaterialList materialList = null;
-        uint unknown2;
-        byte unknown3;
-        uint unknown4;
-        byte unknown5;
-        uint unknown6;
-        byte unknown7;
-        uint vpxy_index1;
-        uint vpxy_index2;
-        uint vpxy_index3;
+        uint steps4xModelVPXYIndex;
+        uint steps1xModelVPXYIndex;
+        uint wallCapModelVPXYIndex;
         uint catalogRailing;
         uint catalogWall;
         uint catalogWallFloorPattern;
@@ -46,50 +40,45 @@ namespace CatalogResource
         #region Constructors
         public StairsCatalogResource(int APIversion, Stream s) : base(APIversion, s) { }
         public StairsCatalogResource(int APIversion, Stream unused, StairsCatalogResource basis)
-            : base(APIversion, basis.version, basis.list)
+            : base(APIversion, basis.version, basis.common, basis.list)
         {
             this.materialList = (basis.version >= 0x00000003) ? new MaterialList(OnResourceChanged, basis.materialList) : null;
             this.common = new Common(requestedApiVersion, OnResourceChanged, basis.common);
-            this.unknown2 = basis.unknown2;
-            this.unknown3 = basis.unknown3;
-            this.unknown4 = basis.unknown4;
-            this.unknown5 = basis.unknown5;
-            this.unknown6 = basis.unknown6;
-            this.unknown7 = basis.unknown7;
-            this.vpxy_index1 = basis.vpxy_index1;
-            this.vpxy_index2 = basis.vpxy_index2;
-            this.vpxy_index3 = basis.vpxy_index3;
+            this.steps4xModelVPXYIndex = basis.steps4xModelVPXYIndex;
+            this.steps1xModelVPXYIndex = basis.steps1xModelVPXYIndex;
+            this.wallCapModelVPXYIndex = basis.wallCapModelVPXYIndex;
             this.catalogRailing = basis.catalogRailing;
             this.catalogWall = basis.catalogWall;
             this.catalogWallFloorPattern = basis.catalogWallFloorPattern;
             this.catalogFence = basis.catalogFence;
         }
-        public StairsCatalogResource(int APIversion, uint version, Common common,
-        uint unknown2, byte unknown3, uint unknown4, byte unknown5, uint unknown6, byte unknown7, uint index1, uint index2, uint index3,
-        uint catalogRailing, uint catalogWall, uint catalogWallFloorPattern, uint catalogFence,
-        TGIBlockList ltgib)
-            : this(APIversion, version, null, common, unknown2, unknown3, unknown4, unknown5, unknown6, unknown7, index1, index2, index3, catalogRailing, catalogWall, catalogWallFloorPattern, catalogFence, ltgib)
+        public StairsCatalogResource(int APIversion, uint version,
+            Common common,
+            uint steps4xModelVPXYIndex, uint steps1xModelVPXYIndex, uint wallCapModelVPXYIndex,
+            uint catalogRailing, uint catalogWall, uint catalogWallFloorPattern, uint catalogFence,
+            TGIBlockList ltgib)
+            : this(APIversion, version,
+            null,
+            common,
+            steps4xModelVPXYIndex, steps1xModelVPXYIndex, wallCapModelVPXYIndex, catalogRailing, catalogWall, catalogWallFloorPattern, catalogFence,
+            ltgib)
         {
             if (checking) if (version >= 0x00000003)
                     throw new InvalidOperationException(String.Format("Constructor requires MaterialList for version {0}", version));
         }
-        public StairsCatalogResource(int APIversion, uint version, MaterialList materialList, Common common,
-            uint unknown2, byte unknown3, uint unknown4, byte unknown5, uint unknown6, byte unknown7, uint index1, uint index2, uint index3,
+        public StairsCatalogResource(int APIversion, uint version,
+            MaterialList materialList,
+            Common common,
+            uint steps4xModelVPXYIndex, uint steps1xModelVPXYIndex, uint wallCapModelVPXYIndex,
             uint catalogRailing, uint catalogWall, uint catalogWallFloorPattern, uint catalogFence,
             TGIBlockList ltgib)
-            : base(APIversion, version, ltgib)
+            : base(APIversion, version, common, ltgib)
         {
             this.materialList = materialList != null ? new MaterialList(OnResourceChanged, materialList) : null;
             this.common = new Common(requestedApiVersion, OnResourceChanged, common);
-            this.unknown2 = unknown2;
-            this.unknown3 = unknown3;
-            this.unknown4 = unknown4;
-            this.unknown5 = unknown5;
-            this.unknown6 = unknown6;
-            this.unknown7 = unknown7;
-            this.vpxy_index1 = index1;
-            this.vpxy_index2 = index2;
-            this.vpxy_index3 = index3;
+            this.steps4xModelVPXYIndex = steps4xModelVPXYIndex;
+            this.steps1xModelVPXYIndex = steps1xModelVPXYIndex;
+            this.wallCapModelVPXYIndex = wallCapModelVPXYIndex;
             this.catalogRailing = catalogRailing;
             this.catalogWall = catalogWall;
             this.catalogWallFloorPattern = catalogWallFloorPattern;
@@ -105,15 +94,9 @@ namespace CatalogResource
 
             this.materialList = (this.version >= 0x00000003) ? new MaterialList(OnResourceChanged, s) : null;
             this.common = new Common(requestedApiVersion, OnResourceChanged, s);
-            this.unknown2 = r.ReadUInt32();
-            this.unknown3 = r.ReadByte();
-            this.unknown4 = r.ReadUInt32();
-            this.unknown5 = r.ReadByte();
-            this.unknown6 = r.ReadUInt32();
-            this.unknown7 = r.ReadByte();
-            this.vpxy_index1 = r.ReadUInt32();
-            this.vpxy_index2 = r.ReadUInt32();
-            this.vpxy_index3 = r.ReadUInt32();
+            this.steps4xModelVPXYIndex = r.ReadUInt32();
+            this.steps1xModelVPXYIndex = r.ReadUInt32();
+            this.wallCapModelVPXYIndex = r.ReadUInt32();
             this.catalogRailing = r.ReadUInt32();
             this.catalogWall = r.ReadUInt32();
             this.catalogWallFloorPattern = r.ReadUInt32();
@@ -136,18 +119,13 @@ namespace CatalogResource
                 if (materialList == null) materialList = new MaterialList(OnResourceChanged);
                 materialList.UnParse(s);
             }
+
             if (common == null) common = new Common(requestedApiVersion, OnResourceChanged);
             common.UnParse(s);
 
-            w.Write(unknown2);
-            w.Write(unknown3);
-            w.Write(unknown4);
-            w.Write(unknown5);
-            w.Write(unknown6);
-            w.Write(unknown7);
-            w.Write(vpxy_index1);
-            w.Write(vpxy_index2);
-            w.Write(vpxy_index3);
+            w.Write(steps4xModelVPXYIndex);
+            w.Write(steps1xModelVPXYIndex);
+            w.Write(wallCapModelVPXYIndex);
             w.Write(catalogRailing);
             w.Write(catalogWall);
             w.Write(catalogWallFloorPattern);
@@ -177,38 +155,29 @@ namespace CatalogResource
         #endregion
 
         #region Content Fields
-        [ElementPriority(1)]
+        //--insert Version: ElementPriority(1)
+        [ElementPriority(2)]
         public MaterialList Materials
         {
             get { if (version < 0x00000003) throw new InvalidOperationException(); return materialList; }
             set { if (version < 0x00000003) throw new InvalidOperationException(); if (materialList != value) { materialList = value == null ? null : new MaterialList(OnResourceChanged, value); } OnResourceChanged(this, new EventArgs()); }
         }
-        [ElementPriority(21)]
-        public uint Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(22)]
-        public byte Unknown3 { get { return unknown3; } set { if (unknown3 != value) { unknown3 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(23)]
-        public uint Unknown4 { get { return unknown4; } set { if (unknown4 != value) { unknown4 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(24)]
-        public byte Unknown5 { get { return unknown5; } set { if (unknown5 != value) { unknown5 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(25)]
-        public uint Unknown6 { get { return unknown6; } set { if (unknown6 != value) { unknown6 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(26)]
-        public byte Unknown7 { get { return unknown7; } set { if (unknown7 != value) { unknown7 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(27), TGIBlockListContentField("TGIBlocks")]
-        public uint VPXYIndex1 { get { return vpxy_index1; } set { if (vpxy_index1 != value) { vpxy_index1 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(28), TGIBlockListContentField("TGIBlocks")]
-        public uint VPXYIndex2 { get { return vpxy_index2; } set { if (vpxy_index2 != value) { vpxy_index2 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(29), TGIBlockListContentField("TGIBlocks")]
-        public uint VPXYIndex3 { get { return vpxy_index3; } set { if (vpxy_index3 != value) { vpxy_index3 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(30), TGIBlockListContentField("TGIBlocks")]
+        //--insert CommonBlock: ElementPriority(11)
+        [ElementPriority(21), TGIBlockListContentField("TGIBlocks")]
+        public uint Steps4xModelVPXYIndex { get { return steps4xModelVPXYIndex; } set { if (steps4xModelVPXYIndex != value) { steps4xModelVPXYIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        [ElementPriority(22), TGIBlockListContentField("TGIBlocks")]
+        public uint Steps1xModelVPXYIndex { get { return steps1xModelVPXYIndex; } set { if (steps1xModelVPXYIndex != value) { steps1xModelVPXYIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        [ElementPriority(23), TGIBlockListContentField("TGIBlocks")]
+        public uint WallCapModelVPXYIndex { get { return wallCapModelVPXYIndex; } set { if (wallCapModelVPXYIndex != value) { wallCapModelVPXYIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        [ElementPriority(34), TGIBlockListContentField("TGIBlocks")]
         public uint CatalogRailingIndex { get { return catalogRailing; } set { if (catalogRailing != value) { catalogRailing = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(31), TGIBlockListContentField("TGIBlocks")]
+        [ElementPriority(35), TGIBlockListContentField("TGIBlocks")]
         public uint CatalogWallIndex { get { return catalogWall; } set { if (catalogWall != value) { catalogWall = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(32), TGIBlockListContentField("TGIBlocks")]
+        [ElementPriority(36), TGIBlockListContentField("TGIBlocks")]
         public uint CatalogWallFloorPatternIndex { get { return catalogWallFloorPattern; } set { if (catalogWallFloorPattern != value) { catalogWallFloorPattern = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(33), TGIBlockListContentField("TGIBlocks")]
+        [ElementPriority(37), TGIBlockListContentField("TGIBlocks")]
         public uint CatalogFenceIndex { get { return catalogFence; } set { if (catalogFence != value) { catalogFence = value; OnResourceChanged(this, new EventArgs()); } } }
+        //--insert TGIBlockList: no ElementPriority
         #endregion
     }
 }

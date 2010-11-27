@@ -1,5 +1,5 @@
 ﻿/***************************************************************************
- *  Copyright (C) 2009 by Peter L Jones                                    *
+ *  Copyright (C) 2010 by Peter L Jones                                    *
  *  pljones@users.sf.net                                                   *
  *                                                                         *
  *  This file is part of the Sims 3 Package Interface (s3pi)               *
@@ -27,63 +27,36 @@ namespace CatalogResource
     public class FireplaceCatalogResource : CatalogResourceTGIBlockList
     {
         #region Attributes
-        uint unknown2;
-        byte unknown3;
-        uint unknown4;
-        byte unknown5;
-        uint unknown6;
-        byte unknown7;
-        byte unknown8;
-        uint index1;
-        uint index2;
-        uint index3;
-        uint index4;
-        uint index5;
-        uint index6;
-        uint index7;
+        byte fireplaceWidth;
+        uint mantle;
+        uint chimneyMantle;
+        uint chimneyFullLevel;
+        uint chimneyGroundLevel;
+        uint chimneyBody;
+        uint chimneyTop;
+        uint chimneyCap;
         #endregion
 
         #region Constructors
         public FireplaceCatalogResource(int APIversion, Stream s) : base(APIversion, s) { }
         public FireplaceCatalogResource(int APIversion, Stream unused, FireplaceCatalogResource basis)
-            : base(APIversion, basis.version, basis.list)
-        {
-            this.common = new Common(requestedApiVersion, OnResourceChanged, basis.common);
-            this.unknown2 = basis.unknown2;
-            this.unknown3 = basis.unknown3;
-            this.unknown4 = basis.unknown4;
-            this.unknown5 = basis.unknown5;
-            this.unknown6 = basis.unknown6;
-            this.unknown7 = basis.unknown7;
-            this.unknown8 = basis.unknown8;
-            this.index1 = basis.index1;
-            this.index2 = basis.index2;
-            this.index3 = basis.index3;
-            this.index4 = basis.index4;
-            this.index5 = basis.index5;
-            this.index6 = basis.index6;
-            this.index7 = basis.index7;
-        }
-        public FireplaceCatalogResource(int APIversion, uint version, Common common, uint unknown2, byte unknown3, uint unknown4, byte unknown5,
-            uint unknown6, byte unknown7, byte unknown8, uint index1, uint index2, uint index3, uint index4, uint index5, uint index6, uint index7,
+            : this(APIversion, basis.version, basis.common,
+            basis.fireplaceWidth, basis.mantle, basis.chimneyMantle, basis.chimneyFullLevel, basis.chimneyGroundLevel, basis.chimneyBody, basis.chimneyTop, basis.chimneyCap,
+            basis.list) { }
+        public FireplaceCatalogResource(int APIversion, uint version, Common common,
+            byte fireplaceType, uint mantle, uint chimneyMantle, uint chimneyFullLevel, uint chimneyGroundLevel, uint chimneyBody, uint chimneyTop, uint chimneyCap,
             TGIBlockList ltgib)
-            : base(APIversion, version, ltgib)
+            : base(APIversion, version, common, ltgib)
         {
             this.common = new Common(requestedApiVersion, OnResourceChanged, common);
-            this.unknown2 = unknown2;
-            this.unknown3 = unknown3;
-            this.unknown4 = unknown4;
-            this.unknown5 = unknown5;
-            this.unknown6 = unknown6;
-            this.unknown7 = unknown7;
-            this.unknown8 = unknown8;
-            this.index1 = index1;
-            this.index2 = index2;
-            this.index3 = index3;
-            this.index4 = index4;
-            this.index5 = index5;
-            this.index6 = index6;
-            this.index7 = index7;
+            this.fireplaceWidth = fireplaceType;
+            this.mantle = mantle;
+            this.chimneyMantle = chimneyMantle;
+            this.chimneyFullLevel = chimneyFullLevel;
+            this.chimneyGroundLevel = chimneyGroundLevel;
+            this.chimneyBody = chimneyBody;
+            this.chimneyTop = chimneyTop;
+            this.chimneyCap = chimneyCap;
         }
         #endregion
 
@@ -93,20 +66,14 @@ namespace CatalogResource
             BinaryReader r = new BinaryReader(s);
             base.Parse(s);
             this.common = new Common(requestedApiVersion, OnResourceChanged, s);
-            this.unknown2 = r.ReadUInt32();
-            this.unknown3 = r.ReadByte();
-            this.unknown4 = r.ReadUInt32();
-            this.unknown5 = r.ReadByte();
-            this.unknown6 = r.ReadUInt32();
-            this.unknown7 = r.ReadByte();
-            this.unknown8 = r.ReadByte();
-            this.index1 = r.ReadUInt32();
-            this.index2 = r.ReadUInt32();
-            this.index3 = r.ReadUInt32();
-            this.index4 = r.ReadUInt32();
-            this.index5 = r.ReadUInt32();
-            this.index6 = r.ReadUInt32();
-            this.index7 = r.ReadUInt32();
+            this.fireplaceWidth = r.ReadByte();
+            this.mantle = r.ReadUInt32();
+            this.chimneyMantle = r.ReadUInt32();
+            this.chimneyFullLevel = r.ReadUInt32();
+            this.chimneyGroundLevel = r.ReadUInt32();
+            this.chimneyBody = r.ReadUInt32();
+            this.chimneyTop = r.ReadUInt32();
+            this.chimneyCap = r.ReadUInt32();
 
             list = new TGIBlockList(OnResourceChanged, s, tgiPosn, tgiSize);
 
@@ -123,20 +90,14 @@ namespace CatalogResource
             if (common == null) common = new Common(requestedApiVersion, OnResourceChanged);
             common.UnParse(s);
 
-            w.Write(unknown2);
-            w.Write(unknown3);
-            w.Write(unknown4);
-            w.Write(unknown5);
-            w.Write(unknown6);
-            w.Write(unknown7);
-            w.Write(unknown8);
-            w.Write(index1);
-            w.Write(index2);
-            w.Write(index3);
-            w.Write(index4);
-            w.Write(index5);
-            w.Write(index6);
-            w.Write(index7);
+            w.Write(fireplaceWidth);
+            w.Write(mantle);
+            w.Write(chimneyMantle);
+            w.Write(chimneyFullLevel);
+            w.Write(chimneyGroundLevel);
+            w.Write(chimneyBody);
+            w.Write(chimneyTop);
+            w.Write(chimneyCap);
 
             base.UnParse(s);
 
@@ -147,34 +108,25 @@ namespace CatalogResource
         #endregion
 
         #region Content Fields
+        //--insert Version: ElementPriority(1)
+        //--insert CommonBlock: ElementPriority(11)
         [ElementPriority(21)]
-        public uint Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(22)]
-        public byte Unknown3 { get { return unknown3; } set { if (unknown3 != value) { unknown3 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(23)]
-        public uint Unknown4 { get { return unknown4; } set { if (unknown4 != value) { unknown4 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(24)]
-        public byte Unknown5 { get { return unknown5; } set { if (unknown5 != value) { unknown5 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(25)]
-        public uint Unknown6 { get { return unknown6; } set { if (unknown6 != value) { unknown6 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(26)]
-        public byte Unknown7 { get { return unknown7; } set { if (unknown7 != value) { unknown7 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(27)]
-        public byte Unknown8 { get { return unknown8; } set { if (unknown8 != value) { unknown8 = value; OnResourceChanged(this, new EventArgs()); } } }
+        public byte FireplaceWidth { get { return fireplaceWidth; } set { if (fireplaceWidth != value) { fireplaceWidth = value; OnResourceChanged(this, new EventArgs()); } } }
+        [ElementPriority(22), TGIBlockListContentField("TGIBlocks")]
+        public uint MantleOBJDIndex { get { return mantle; } set { if (mantle != value) { mantle = value; OnResourceChanged(this, new EventArgs()); } } }
+        [ElementPriority(23), TGIBlockListContentField("TGIBlocks")]
+        public uint ChimneyMantleOBJDIndex { get { return chimneyMantle; } set { if (chimneyMantle != value) { chimneyMantle = value; OnResourceChanged(this, new EventArgs()); } } }
+        [ElementPriority(24), TGIBlockListContentField("TGIBlocks")]
+        public uint ChimneyFullLevelOBJDIndex { get { return chimneyFullLevel; } set { if (chimneyFullLevel != value) { chimneyFullLevel = value; OnResourceChanged(this, new EventArgs()); } } }
+        [ElementPriority(25), TGIBlockListContentField("TGIBlocks")]
+        public uint ChimneyGroundLevelOBJDIndex { get { return chimneyGroundLevel; } set { if (chimneyGroundLevel != value) { chimneyGroundLevel = value; OnResourceChanged(this, new EventArgs()); } } }
+        [ElementPriority(26), TGIBlockListContentField("TGIBlocks")]
+        public uint ChimneyBodyOBJDIndex { get { return chimneyBody; } set { if (chimneyBody != value) { chimneyBody = value; OnResourceChanged(this, new EventArgs()); } } }
+        [ElementPriority(27), TGIBlockListContentField("TGIBlocks")]
+        public uint ChimneyTopOBJDIndex { get { return chimneyTop; } set { if (chimneyTop != value) { chimneyTop = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(28), TGIBlockListContentField("TGIBlocks")]
-        public uint Index1 { get { return index1; } set { if (index1 != value) { index1 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(29), TGIBlockListContentField("TGIBlocks")]
-        public uint Index2 { get { return index2; } set { if (index2 != value) { index2 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(30), TGIBlockListContentField("TGIBlocks")]
-        public uint Index3 { get { return index3; } set { if (index3 != value) { index3 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(31), TGIBlockListContentField("TGIBlocks")]
-        public uint Index4 { get { return index4; } set { if (index4 != value) { index4 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(32), TGIBlockListContentField("TGIBlocks")]
-        public uint Index5 { get { return index5; } set { if (index5 != value) { index5 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(33), TGIBlockListContentField("TGIBlocks")]
-        public uint Index6 { get { return index6; } set { if (index6 != value) { index6 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(34), TGIBlockListContentField("TGIBlocks")]
-        public uint Index7 { get { return index7; } set { if (index7 != value) { index7 = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint ChimneyCapOBJDIndex { get { return chimneyCap; } set { if (chimneyCap != value) { chimneyCap = value; OnResourceChanged(this, new EventArgs()); } } }
+        //--insert TGIBlockList: no ElementPriority
         #endregion
     }
 }

@@ -1,5 +1,5 @@
 ﻿/***************************************************************************
- *  Copyright (C) 2009 by Peter L Jones                                    *
+ *  Copyright (C) 2010 by Peter L Jones                                    *
  *  pljones@users.sf.net                                                   *
  *                                                                         *
  *  This file is part of the Sims 3 Package Interface (s3pi)               *
@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using s3pi.Interfaces;
+using System.Text;
 
 namespace CatalogResource
 {
@@ -28,13 +29,7 @@ namespace CatalogResource
     {
         #region Attributes
         MaterialList materialList = null;
-        string unknown1 = "";//Version>=0x16
-        uint unknown2;
-        byte unknown3;
-        Fire fireType;
-        byte isStealable;
-        byte isReposessable;
-        uint inWorldEditable;
+        string instanceName = "";//Version>=0x16
         uint objkIndex;
         ObjectType objectTypeFlags;
         WallPlacement wallPlacementFlags;
@@ -57,8 +52,8 @@ namespace CatalogResource
         UIntList buildableShellDisplayStateHashes;//Version>=0x18
         uint levelBelowOBJDIndex;//Version>=0x19
         SlotPlacement slotPlacementFlags;
-        string materialGrouping1 = "";
-        string materialGrouping2 = "";
+        string surfaceType = "";
+        string sourceMaterial = "";
         Moodlet moodletGiven;
         int moodletScore;
         uint unknown21;
@@ -69,17 +64,11 @@ namespace CatalogResource
         #region Constructors
         public ObjectCatalogResource(int APIversion, Stream s) : base(APIversion, s) { }
         public ObjectCatalogResource(int APIversion, Stream unused, ObjectCatalogResource basis)
-            : base(APIversion, basis.version, basis.list)
+            : base(APIversion, basis.version, basis.common, basis.list)
         {
-            this.unknown1 = (this.version >= 0x00000016) ? basis.unknown1 : null;
+            this.instanceName = (this.version >= 0x00000016) ? basis.instanceName : null;
             this.materialList = new MaterialList(OnResourceChanged, basis.materialList);
             this.common = new Common(requestedApiVersion, OnResourceChanged, basis.common);
-            this.unknown2 = basis.unknown2;
-            this.unknown3 = basis.unknown3;
-            this.fireType = basis.fireType;
-            this.isStealable = basis.isStealable;
-            this.isReposessable = basis.isReposessable;
-            this.inWorldEditable = basis.inWorldEditable;
             this.objkIndex = basis.objkIndex;
             this.objectTypeFlags = basis.objectTypeFlags;
             this.wallPlacementFlags = basis.wallPlacementFlags;
@@ -97,8 +86,8 @@ namespace CatalogResource
             this.buildCategoryFlags = basis.buildCategoryFlags;
             this.surfaceCutoutDDSIndex = basis.surfaceCutoutDDSIndex;
             this.slotPlacementFlags = basis.slotPlacementFlags;
-            this.materialGrouping1 = basis.materialGrouping1;
-            this.materialGrouping2 = basis.materialGrouping2;
+            this.surfaceType = basis.surfaceType;
+            this.sourceMaterial = basis.sourceMaterial;
             this.moodletGiven = basis.moodletGiven;
             this.moodletScore = basis.moodletScore;
             this.unknown21 = basis.unknown21;
@@ -108,19 +97,17 @@ namespace CatalogResource
 
         // Version <0x16
         public ObjectCatalogResource(int APIversion,
-            uint version, IList<Material> materialList,
-            Common common, uint unknown2, byte unknown3, Fire fireType,
-            byte isStealable, byte isReposessable, uint inWorldEditable, uint objkIndex,
+            uint version, IEnumerable<Material> materialList,
+            Common common, uint objkIndex,
             ObjectType objectTypeFlags, WallPlacement wallPlacementFlags, Movement movementFlags, uint cutoutTilesPerLevel,
-            uint levels, IList<MTDoor> mtDoorList, byte isScriptEnabled, uint diagonalIndex, uint hash,
+            uint levels, IEnumerable<MTDoor> mtDoorList, byte isScriptEnabled, uint diagonalIndex, uint hash,
             uint roomFlags, uint functionCategoryFlags, ulong subFunctionFlags, ulong subRoomFlags, uint buildCategoryFlags, uint sinkDDSIndex,
             uint slotPlacementFlags, string materialGrouping1, string materialGrouping2, Moodlet moodletGiven, int moodletScore, uint unknown21,
             TopicRating[] topicRatings, uint fallbackIndex, TGIBlockList ltgib)
             : this(APIversion,
             version, materialList,
             "",
-            common, unknown2, unknown3, fireType,
-            isStealable, isReposessable, inWorldEditable, objkIndex,
+            common, objkIndex,
             objectTypeFlags, wallPlacementFlags, movementFlags, cutoutTilesPerLevel,
             levels, mtDoorList, isScriptEnabled, diagonalIndex, hash,
             roomFlags, functionCategoryFlags, subFunctionFlags, subRoomFlags, buildCategoryFlags, sinkDDSIndex,
@@ -135,20 +122,18 @@ namespace CatalogResource
         }
         // Version <0x17
         public ObjectCatalogResource(int APIversion,
-            uint version, IList<Material> materialList,
+            uint version, IEnumerable<Material> materialList,
             string unknown1,
-            Common common, uint unknown2, byte unknown3, Fire fireType,
-            byte isStealable, byte isReposessable, uint inWorldEditable, uint objkIndex,
+            Common common, uint objkIndex,
             ObjectType objectTypeFlags, WallPlacement wallPlacementFlags, Movement movementFlags, uint cutoutTilesPerLevel,
-            uint levels, IList<MTDoor> mtDoorList, byte isScriptEnabled, uint diagonalIndex, uint hash,
+            uint levels, IEnumerable<MTDoor> mtDoorList, byte isScriptEnabled, uint diagonalIndex, uint hash,
             uint roomFlags, uint functionCategoryFlags, ulong subFunctionFlags, ulong subRoomFlags, uint buildCategoryFlags, uint sinkDDSIndex,
             uint slotPlacementFlags, string materialGrouping1, string materialGrouping2, Moodlet moodletGiven, int moodletScore, uint unknown21,
             TopicRating[] topicRatings, uint fallbackIndex, TGIBlockList ltgib)
             : this(APIversion,
             version, materialList,
             unknown1,
-            common, unknown2, unknown3, fireType,
-            isStealable, isReposessable, inWorldEditable, objkIndex,
+            common, objkIndex,
             objectTypeFlags, wallPlacementFlags, movementFlags, cutoutTilesPerLevel,
             levels, mtDoorList, isScriptEnabled, diagonalIndex, hash,
             roomFlags, functionCategoryFlags, subFunctionFlags, subRoomFlags, buildCategoryFlags, sinkDDSIndex,
@@ -163,12 +148,11 @@ namespace CatalogResource
         }
         // Version <0x18
         public ObjectCatalogResource(int APIversion,
-            uint version, IList<Material> materialList,
+            uint version, IEnumerable<Material> materialList,
             string unknown1,
-            Common common, uint unknown2, byte unknown3, Fire fireType,
-            byte isStealable, byte isReposessable, uint inWorldEditable, uint objkIndex,
+            Common common, uint objkIndex,
             ObjectType objectTypeFlags, WallPlacement wallPlacementFlags, Movement movementFlags, uint cutoutTilesPerLevel,
-            uint levels, IList<MTDoor> mtDoorList, byte isScriptEnabled, uint diagonalIndex, uint hash,
+            uint levels, IEnumerable<MTDoor> mtDoorList, byte isScriptEnabled, uint diagonalIndex, uint hash,
             uint roomFlags, uint functionCategoryFlags, ulong subFunctionFlags, ulong subRoomFlags, uint buildCategoryFlags, uint sinkDDSIndex,
             uint unknown16, uint unknown17, float unknown18,
             uint slotPlacementFlags, string materialGrouping1, string materialGrouping2, Moodlet moodletGiven, int moodletScore, uint unknown21,
@@ -176,8 +160,7 @@ namespace CatalogResource
             : this(APIversion,
             version, materialList,
             unknown1,
-            common, unknown2, unknown3, fireType,
-            isStealable, isReposessable, inWorldEditable, objkIndex,
+            common, objkIndex,
             objectTypeFlags, wallPlacementFlags, movementFlags, cutoutTilesPerLevel,
             levels, mtDoorList, isScriptEnabled, diagonalIndex, hash,
             roomFlags, functionCategoryFlags, subFunctionFlags, subRoomFlags, buildCategoryFlags, sinkDDSIndex,
@@ -192,12 +175,11 @@ namespace CatalogResource
         }
         // Version <0x19
         public ObjectCatalogResource(int APIversion,
-            uint version, IList<Material> materialList,
+            uint version, IEnumerable<Material> materialList,
             string unknown1,
-            Common common, uint unknown2, byte unknown3, Fire fireType,
-            byte isStealable, byte isReposessable, uint inWorldEditable, uint objkIndex,
+            Common common, uint objkIndex,
             ObjectType objectTypeFlags, WallPlacement wallPlacementFlags, Movement movementFlags, uint cutoutTilesPerLevel,
-            uint levels, IList<MTDoor> mtDoorList, byte isScriptEnabled, uint diagonalIndex, uint hash,
+            uint levels, IEnumerable<MTDoor> mtDoorList, byte isScriptEnabled, uint diagonalIndex, uint hash,
             uint roomFlags, uint functionCategoryFlags, ulong subFunctionFlags, ulong subRoomFlags, uint buildCategoryFlags, uint sinkDDSIndex,
             uint unknown16, uint unknown17, float unknown18,
             UIntList tgiIndexes,
@@ -206,8 +188,7 @@ namespace CatalogResource
             : this(APIversion,
             version, materialList,
             unknown1,
-            common, unknown2, unknown3, fireType,
-            isStealable, isReposessable, inWorldEditable, objkIndex,
+            common, objkIndex,
             objectTypeFlags, wallPlacementFlags, movementFlags, cutoutTilesPerLevel,
             levels, mtDoorList, isScriptEnabled, diagonalIndex, hash,
             roomFlags, functionCategoryFlags, subFunctionFlags, subRoomFlags, buildCategoryFlags, sinkDDSIndex,
@@ -221,29 +202,22 @@ namespace CatalogResource
                     throw new InvalidOperationException(String.Format("Constructor requires IndexV19 for version {0}", version));
         }
         public ObjectCatalogResource(int APIversion,
-            uint version, IList<Material> materialList,
+            uint version, IEnumerable<Material> materialList,
             string unknown1,
-            Common common, uint unknown2, byte unknown3, Fire fireType,
-            byte isStealable, byte isReposessable, uint inWorldEditable, uint objkIndex,
+            Common common, uint objkIndex,
             ObjectType objectTypeFlags, WallPlacement wallPlacementFlags, Movement movementFlags, uint cutoutTilesPerLevel,
-            uint levels, IList<MTDoor> mtDoorList, byte isScriptEnabled, uint diagonalIndex, uint hash,
+            uint levels, IEnumerable<MTDoor> mtDoorList, byte isScriptEnabled, uint diagonalIndex, uint hash,
             uint roomFlags, uint functionCategoryFlags, ulong subFunctionFlags, ulong subRoomFlags, uint buildCategoryFlags, uint sinkDDSIndex,
             uint unknown16, uint unknown17, float unknown18,
             UIntList tgiIndexes,
             uint indexV19,
             uint slotPlacementFlags, string materialGrouping1, string materialGrouping2, Moodlet moodletGiven, int moodletScore, uint unknown21,
             TopicRating[] topicRatings, uint fallbackIndex, TGIBlockList ltgib)
-            : base(APIversion, version, ltgib)
+            : base(APIversion, version, common, ltgib)
         {
             this.materialList = new MaterialList(OnResourceChanged, materialList);
-            this.unknown1 = unknown1;
+            this.instanceName = unknown1;
             this.common = new Common(requestedApiVersion, OnResourceChanged, common);
-            this.unknown2 = unknown2;
-            this.unknown3 = unknown3;
-            this.fireType = fireType;
-            this.isStealable = (byte)(isStealable == 0 ? 0 : 1);
-            this.isReposessable = (byte)(isReposessable == 0 ? 0 : 1);
-            this.inWorldEditable = inWorldEditable;
             this.objkIndex = objkIndex;
             this.objectTypeFlags = objectTypeFlags;
             this.wallPlacementFlags = wallPlacementFlags;
@@ -266,8 +240,8 @@ namespace CatalogResource
             this.buildableShellDisplayStateHashes = new UIntList(OnResourceChanged, tgiIndexes);
             this.levelBelowOBJDIndex = indexV19;
             this.slotPlacementFlags = (SlotPlacement)slotPlacementFlags;
-            this.materialGrouping1 = materialGrouping1;
-            this.materialGrouping2 = materialGrouping2;
+            this.surfaceType = materialGrouping1;
+            this.sourceMaterial = materialGrouping2;
             this.moodletGiven = moodletGiven;
             this.moodletScore = moodletScore;
             this.unknown21 = unknown21;
@@ -282,18 +256,11 @@ namespace CatalogResource
         protected override void Parse(Stream s)
         {
             BinaryReader r = new BinaryReader(s);
-            BinaryReader r2 = new BinaryReader(s, System.Text.Encoding.BigEndianUnicode);
 
             base.Parse(s);
             this.materialList = new MaterialList(OnResourceChanged, s);
-            this.unknown1 = (this.version >= 0x00000016) ? r2.ReadString() : null;
+            this.instanceName = (this.version >= 0x00000016) ? BigEndianUnicodeString.Read(s) : null;
             this.common = new Common(requestedApiVersion, OnResourceChanged, s);
-            this.unknown2 = r.ReadUInt32();
-            this.unknown3 = r.ReadByte();
-            this.fireType = (Fire)r.ReadUInt32();
-            this.isStealable = r.ReadByte();
-            this.isReposessable = r.ReadByte();
-            this.inWorldEditable = r.ReadUInt32();
             this.objkIndex = r.ReadUInt32();
             this.objectTypeFlags = (ObjectType)r.ReadUInt32();
             this.wallPlacementFlags = (WallPlacement)r.ReadUInt32();
@@ -325,8 +292,8 @@ namespace CatalogResource
                 }
             }
             this.slotPlacementFlags = (SlotPlacement)r.ReadUInt32();
-            this.materialGrouping1 = r2.ReadString();
-            this.materialGrouping2 = r2.ReadString();
+            this.surfaceType = BigEndianUnicodeString.Read(s);
+            this.sourceMaterial = BigEndianUnicodeString.Read(s);
             this.moodletGiven = (Moodlet)r.ReadUInt32();
             this.moodletScore = r.ReadInt32();
             this.unknown21 = r.ReadUInt32();
@@ -348,15 +315,9 @@ namespace CatalogResource
 
             if (materialList == null) materialList = new MaterialList(OnResourceChanged);
             materialList.UnParse(s);
-            if (this.version >= 0x00000016) Write7BitStr(s, unknown1, System.Text.Encoding.BigEndianUnicode);
+            if (this.version >= 0x00000016) BigEndianUnicodeString.Write(s, instanceName);
             if (common == null) common = new Common(requestedApiVersion, OnResourceChanged);
             common.UnParse(s);
-            w.Write(unknown2);
-            w.Write(unknown3);
-            w.Write((uint)fireType);
-            w.Write(isStealable);
-            w.Write(isReposessable);
-            w.Write(inWorldEditable);
             w.Write(objkIndex);
             w.Write((uint)objectTypeFlags);
             w.Write((uint)wallPlacementFlags);
@@ -390,8 +351,8 @@ namespace CatalogResource
                 }
             }
             w.Write((uint)slotPlacementFlags);
-            Write7BitStr(s, materialGrouping1, System.Text.Encoding.BigEndianUnicode);
-            Write7BitStr(s, materialGrouping2, System.Text.Encoding.BigEndianUnicode);
+            BigEndianUnicodeString.Write(s, surfaceType);
+            BigEndianUnicodeString.Write(s, sourceMaterial);
             w.Write((uint)moodletGiven);
             w.Write(moodletScore);
             w.Write(unknown21);
@@ -441,13 +402,6 @@ namespace CatalogResource
         #endregion
 
         #region Sub-classes
-        public enum Fire : uint
-        {
-            DoesNotBurn = 0,
-            Chars,
-            AshPile
-        }
-
         [Flags]
         public enum ObjectType : uint
         {
@@ -811,8 +765,10 @@ namespace CatalogResource
 
             Rug = 0x00001000,
             Rock = 0x00002000,
-            Unused15 = 0x00004000,
+            Shell = 0x00004000,
             Landmark = 0x00008000,
+
+            Elevator = 0x00010000,
 
             //
             //
@@ -1098,14 +1054,14 @@ namespace CatalogResource
         {
             #region Constructors
             public MTDoorList(EventHandler handler) : base(handler, Byte.MaxValue) { }
-            public MTDoorList(EventHandler handler, IList<MTDoor> mtDoorList) : base(handler, mtDoorList, Byte.MaxValue) { }
             public MTDoorList(EventHandler handler, Stream s) : base(handler, s, Byte.MaxValue) { }
+            public MTDoorList(EventHandler handler, IEnumerable<MTDoor> mtDoorList) : base(handler, mtDoorList, Byte.MaxValue) { }
             #endregion
 
             #region Data I/O
-            protected override uint ReadCount(Stream s) { return (new BinaryReader(s)).ReadByte(); }
+            protected override int ReadCount(Stream s) { return (new BinaryReader(s)).ReadByte(); }
             protected override MTDoor CreateElement(Stream s) { return new MTDoor(0, elementHandler, s); }
-            protected override void WriteCount(Stream s, uint count) { (new BinaryWriter(s)).Write((byte)count); }
+            protected override void WriteCount(Stream s, int count) { (new BinaryWriter(s)).Write((byte)count); }
             protected override void WriteElement(Stream s, MTDoor element) { element.UnParse(s); }
             #endregion
 
@@ -1115,121 +1071,94 @@ namespace CatalogResource
             public String Value { get { string s = ""; for (int i = 0; i < Count; i++) s += string.Format("\n--{0}--\n", i) + this[i].Value; return s; } }
             #endregion
         }
-
-        public class UIntList : SimpleList<uint>
-        {
-            static string fmt = "0x{1:X8}\n";
-            #region Constructors
-            public UIntList(EventHandler handler, long size = -1) : base(handler, ReadUInt32, WriteUInt32, fmt, size) { }
-            public UIntList(EventHandler handler, IList<HandlerElement<uint>> uintList, long size = -1) : base(handler, uintList, ReadUInt32, WriteUInt32, fmt, size) { }
-            public UIntList(EventHandler handler, Stream s, long size = -1) : base(handler, s, ReadUInt32, WriteUInt32, fmt, size) { }
-            #endregion
-
-            #region Data I/O
-            static UInt32 ReadUInt32(Stream s) { return new BinaryReader(s).ReadUInt32(); }
-            static void WriteUInt32(Stream s, UInt32 value) { new BinaryWriter(s).Write(value); }
-            #endregion
-
-            public override void Add() { this.Add(new HandlerElement<uint>(0, null)); }
-        }
         #endregion
 
         #region Content Fields
+        //--insert Version: ElementPriority(1)
         [ElementPriority(2)]
         public MaterialList Materials { get { return materialList; } set { if (materialList != value) { materialList = value == null ? null : new MaterialList(OnResourceChanged, value); } OnResourceChanged(this, new EventArgs()); } }
         [ElementPriority(3)]
-        public string Unknown1
+        public string InstanceName
         {
-            get { if (version < 0x00000016) throw new InvalidOperationException(); return unknown1; }
-            set { if (version < 0x00000016) throw new InvalidOperationException(); if (unknown1 != value) { unknown1 = value; OnResourceChanged(this, new EventArgs()); } }
+            get { if (version < 0x00000016) throw new InvalidOperationException(); return instanceName; }
+            set { if (version < 0x00000016) throw new InvalidOperationException(); if (instanceName != value) { instanceName = value; OnResourceChanged(this, new EventArgs()); } }
         }
-        [ElementPriority(12)]
-        public uint Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(13)]
-        public byte Unknown3 { get { return unknown3; } set { if (unknown3 != value) { unknown3 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(14)]
-        public Fire FireType { get { return fireType; } set { if (fireType != value) { fireType = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(15)]
-        public bool IsStealable { get { return isStealable != 0; } set { if (IsStealable != value) { isStealable = (byte)(value ? 1 : 0); OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(16)]
-        public bool IsReposessable { get { return isReposessable != 0; } set { if (IsReposessable != value) { isReposessable = (byte)(value ? 1 : 0); OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(17)]
-        public uint InWorldEditable { get { return inWorldEditable; } set { if (inWorldEditable != value) { inWorldEditable = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(18), TGIBlockListContentField("TGIBlocks")]
+        //--insert CommonBlock: ElementPriority(11)
+        [ElementPriority(21), TGIBlockListContentField("TGIBlocks")]
         public uint OBJKIndex { get { return objkIndex; } set { if (objkIndex != value) { objkIndex = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(19)]
-        public ObjectType ObjectTypeFlags { get { return objectTypeFlags; } set { if (objectTypeFlags != value) { objectTypeFlags = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(20)]
-        public WallPlacement WallPlacementFlags { get { return wallPlacementFlags; } set { if (wallPlacementFlags != value) { wallPlacementFlags = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(21)]
-        public Movement MovementFlags { get { return movementFlags; } set { if (movementFlags != value) { movementFlags = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(22)]
-        public uint CutoutTilesPerLevel { get { return cutoutTilesPerLevel; } set { if (cutoutTilesPerLevel != value) { cutoutTilesPerLevel = value; OnResourceChanged(this, new EventArgs()); } } }
+        public ObjectType ObjectTypeFlags { get { return objectTypeFlags; } set { if (objectTypeFlags != value) { objectTypeFlags = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(23)]
-        public uint Levels { get { return levels; } set { if (levels != value) { levels = value; OnResourceChanged(this, new EventArgs()); } } }
+        public WallPlacement WallPlacementFlags { get { return wallPlacementFlags; } set { if (wallPlacementFlags != value) { wallPlacementFlags = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(24)]
-        public MTDoorList MTDoors { get { return mtDoorList; } set { if (mtDoorList != value) { mtDoorList = value == null ? null : new MTDoorList(OnResourceChanged, value); } OnResourceChanged(this, new EventArgs()); } }
+        public Movement MovementFlags { get { return movementFlags; } set { if (movementFlags != value) { movementFlags = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(25)]
+        public uint CutoutTilesPerLevel { get { return cutoutTilesPerLevel; } set { if (cutoutTilesPerLevel != value) { cutoutTilesPerLevel = value; OnResourceChanged(this, new EventArgs()); } } }
+        [ElementPriority(26)]
+        public uint Levels { get { return levels; } set { if (levels != value) { levels = value; OnResourceChanged(this, new EventArgs()); } } }
+        [ElementPriority(27)]
+        public MTDoorList MTDoors { get { return mtDoorList; } set { if (mtDoorList != value) { mtDoorList = value == null ? null : new MTDoorList(OnResourceChanged, value); } OnResourceChanged(this, new EventArgs()); } }
+        [ElementPriority(28)]
         public bool IsScriptEnabled { get { return isScriptEnabled != 0; } set { if (IsScriptEnabled != value) { isScriptEnabled = (byte)(value ? 1 : 0); OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(28), TGIBlockListContentField("TGIBlocks")]
+        [ElementPriority(29), TGIBlockListContentField("TGIBlocks")]
         public uint DiagonalIndex { get { return diagonalIndex; } set { if (diagonalIndex != value) { diagonalIndex = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(29)]
-        public uint AmbienceTypeHash { get { return ambienceTypeHash; } set { if (ambienceTypeHash != value) { ambienceTypeHash = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(30)]
-        public RoomCategory RoomCategoryFlags { get { return roomCategoryFlags; } set { if (roomCategoryFlags != value) { roomCategoryFlags = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint AmbienceTypeHash { get { return ambienceTypeHash; } set { if (ambienceTypeHash != value) { ambienceTypeHash = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(31)]
-        public FunctionCategory FunctionCategoryFlags { get { return functionCategoryFlags; } set { if (functionCategoryFlags != value) { functionCategoryFlags = value; OnResourceChanged(this, new EventArgs()); } } }
+        public RoomCategory RoomCategoryFlags { get { return roomCategoryFlags; } set { if (roomCategoryFlags != value) { roomCategoryFlags = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(32)]
-        public FunctionSubCategory FunctionSubCategoryFlags { get { return functionSubCategoryFlags; } set { if (functionSubCategoryFlags != value) { functionSubCategoryFlags = value; OnResourceChanged(this, new EventArgs()); } } }
+        public FunctionCategory FunctionCategoryFlags { get { return functionCategoryFlags; } set { if (functionCategoryFlags != value) { functionCategoryFlags = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(33)]
-        public RoomSubCategory RoomSubCategoryFlags { get { return roomSubCategoryFlags; } set { if (roomSubCategoryFlags != value) { roomSubCategoryFlags = value; OnResourceChanged(this, new EventArgs()); } } }
+        public FunctionSubCategory FunctionSubCategoryFlags { get { return functionSubCategoryFlags; } set { if (functionSubCategoryFlags != value) { functionSubCategoryFlags = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(34)]
+        public RoomSubCategory RoomSubCategoryFlags { get { return roomSubCategoryFlags; } set { if (roomSubCategoryFlags != value) { roomSubCategoryFlags = value; OnResourceChanged(this, new EventArgs()); } } }
+        [ElementPriority(35)]
         public BuildCategory BuildCategoryFlags { get { return buildCategoryFlags; } set { if (buildCategoryFlags != value) { buildCategoryFlags = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(35), TGIBlockListContentField("TGIBlocks")]
-        public uint SurfaceCutoutDDSIndex { get { return surfaceCutoutDDSIndex; } set { if (surfaceCutoutDDSIndex != value) { surfaceCutoutDDSIndex = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(36), TGIBlockListContentField("TGIBlocks")]
+        public uint SurfaceCutoutDDSIndex { get { return surfaceCutoutDDSIndex; } set { if (surfaceCutoutDDSIndex != value) { surfaceCutoutDDSIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        [ElementPriority(37), TGIBlockListContentField("TGIBlocks")]
         public uint FloorCutoutDDSIndex
         {
             get { if (version < 0x00000017) throw new InvalidOperationException(); return floorCutoutDDSIndex; }
             set { if (version < 0x00000017) throw new InvalidOperationException(); if (floorCutoutDDSIndex != value) { floorCutoutDDSIndex = value; OnResourceChanged(this, new EventArgs()); } }
         }
-        [ElementPriority(37)]
+        [ElementPriority(38)]
         public uint FloorCutoutLevelOffset
         {
             get { if (version < 0x00000017) throw new InvalidOperationException(); return floorCutoutLevelOffset; }
             set { if (version < 0x00000017) throw new InvalidOperationException(); if (floorCutoutLevelOffset != value) { floorCutoutLevelOffset = value; OnResourceChanged(this, new EventArgs()); } }
         }
-        [ElementPriority(38)]
+        [ElementPriority(39)]
         public float FloorCutoutBoundsLength
         {
             get { if (version < 0x00000017) throw new InvalidOperationException(); return floorCutoutBoundsLength; }
             set { if (version < 0x00000017) throw new InvalidOperationException(); if (floorCutoutBoundsLength != value) { floorCutoutBoundsLength = value; OnResourceChanged(this, new EventArgs()); } }
         }
-        [ElementPriority(39)]
+        [ElementPriority(40)]
         public UIntList BuildableShellDisplayStateHashes
         {
             get { if (version < 0x00000018) throw new InvalidOperationException(); return buildableShellDisplayStateHashes; }
             set { if (version < 0x00000018) throw new InvalidOperationException(); if (buildableShellDisplayStateHashes != value) { buildableShellDisplayStateHashes = value == null ? null : new UIntList(OnResourceChanged, value); } OnResourceChanged(this, new EventArgs()); }
         }
-        [ElementPriority(40), TGIBlockListContentField("TGIBlocks")]
+        [ElementPriority(41), TGIBlockListContentField("TGIBlocks")]
         public uint LevelBelowOBJDIndex
         {
             get { if (version < 0x00000019) throw new InvalidOperationException(); return levelBelowOBJDIndex; }
             set { if (version < 0x00000019) throw new InvalidOperationException(); if (levelBelowOBJDIndex != value) { levelBelowOBJDIndex = value; OnResourceChanged(this, new EventArgs()); } }
         }
-        [ElementPriority(41)]
-        public SlotPlacement SlotPlacementFlags { get { return slotPlacementFlags; } set { if (slotPlacementFlags != value) { slotPlacementFlags = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(42)]
-        public string MaterialGrouping1 { get { return materialGrouping1; } set { if (materialGrouping1 != value) { materialGrouping1 = value; OnResourceChanged(this, new EventArgs()); } } }
+        public SlotPlacement SlotPlacementFlags { get { return slotPlacementFlags; } set { if (slotPlacementFlags != value) { slotPlacementFlags = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(43)]
-        public string MaterialGrouping2 { get { return materialGrouping2; } set { if (materialGrouping2 != value) { materialGrouping2 = value; OnResourceChanged(this, new EventArgs()); } } }
+        public string SurfaceType { get { return surfaceType; } set { if (surfaceType != value) { surfaceType = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(44)]
-        public Moodlet MoodletGiven { get { return moodletGiven; } set { if (moodletGiven != value) { moodletGiven = value; OnResourceChanged(this, new EventArgs()); } } }
+        public string SourceMaterial { get { return sourceMaterial; } set { if (sourceMaterial != value) { sourceMaterial = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(45)]
-        public int MoodletScore { get { return moodletScore; } set { if (moodletScore != value) { moodletScore = value; OnResourceChanged(this, new EventArgs()); } } }
+        public Moodlet MoodletGiven { get { return moodletGiven; } set { if (moodletGiven != value) { moodletGiven = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(46)]
-        public uint Unknown21 { get { return unknown21; } set { if (unknown21 != value) { unknown21 = value; OnResourceChanged(this, new EventArgs()); } } }
+        public int MoodletScore { get { return moodletScore; } set { if (moodletScore != value) { moodletScore = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(47)]
+        public uint Unknown21 { get { return unknown21; } set { if (unknown21 != value) { unknown21 = value; OnResourceChanged(this, new EventArgs()); } } }
+        [ElementPriority(48)]
         public TopicRating[] TopicRatings
         {
             get { return topicRatings; }
@@ -1241,6 +1170,7 @@ namespace CatalogResource
         }
         [ElementPriority(49), TGIBlockListContentField("TGIBlocks")]
         public uint FallbackIndex { get { return fallbackIndex; } set { if (fallbackIndex != value) { fallbackIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        //--insert TGIBlockList: no ElementPriority
         #endregion
     }
 }

@@ -1,5 +1,5 @@
 ﻿/***************************************************************************
- *  Copyright (C) 2009 by Peter L Jones                                    *
+ *  Copyright (C) 2010 by Peter L Jones                                    *
  *  pljones@users.sf.net                                                   *
  *                                                                         *
  *  This file is part of the Sims 3 Package Interface (s3pi)               *
@@ -27,72 +27,68 @@ namespace CatalogResource
     public class WallCatalogResource : CatalogResourceTGIBlockList
     {
         #region Attributes
+        //--version
         uint unknown2;
-        uint unknown3;
-        byte unknown4;
-        uint unknown5;
-        byte unknown6;
-        uint unknown7;
-        byte unknown8;
-        uint unknown9;
-        byte[] unknown10 = new byte[4];
-        uint unknown11;
-        uint unknown12;
-        uint unknown13;
-        uint unknown14;
-        uint unknown15;
-        uint unknown16;
-        byte[] unknown17 = new byte[8];
+        //--common
+        Wall wallType;
+        Partition partitionType;
+        PartitionFlagsType partitionFlags;
+        VerticalSpan verticalSpanType;
+        PartitionsBlockedFlagsType partitionsBlockedFlags;
+        PartitionsBlockedFlagsType adjacentPartitionsBlockedFlags;
+        PartitionTool partitionToolMode;
+        ToolUsageFlagsType toolUsageFlags;
+        uint defaultPatternIndex;
+        WallThickness wallThicknessType;
+        //--tgilist
         #endregion
 
         #region Constructors
         public WallCatalogResource(int APIversion, Stream s) : base(APIversion, s) { }
         public WallCatalogResource(int APIversion, Stream unused, WallCatalogResource basis)
-            : base(APIversion, basis.version, basis.list)
-        {
-            this.unknown2 = basis.unknown2;
-            this.common = new Common(requestedApiVersion, OnResourceChanged, basis.common);
-            this.unknown3 = basis.unknown3;
-            this.unknown4 = basis.unknown4;
-            this.unknown5 = basis.unknown5;
-            this.unknown6 = basis.unknown6;
-            this.unknown7 = basis.unknown7;
-            this.unknown8 = basis.unknown8;
-            this.unknown9 = basis.unknown9;
-            this.unknown10 = (byte[])basis.unknown10.Clone();
-            this.unknown11 = basis.unknown11;
-            this.unknown12 = basis.unknown12;
-            this.unknown13 = basis.unknown13;
-            this.unknown14 = basis.unknown14;
-            this.unknown15 = basis.unknown15;
-            this.unknown16 = basis.unknown16;
-            this.unknown17 = (byte[])basis.unknown17.Clone();
-        }
-        public WallCatalogResource(int APIversion, uint version, uint unknown2, Common common,
-            uint unknown3, byte unknown4, uint unknown5, byte unknown6, uint unknown7, byte unknown8, uint unknown9,
-            byte[] unknown10, uint unknown11, uint unknown12, uint unknown13, uint unknown14, uint unknown15, uint unknown16, byte[] unknown17,
+            : this(APIversion,
+            basis.version,
+            basis.unknown2,
+            basis.common,
+            basis.wallType,
+            basis.partitionType,
+            basis.partitionFlags,
+            basis.verticalSpanType,
+            basis.partitionsBlockedFlags,
+            basis.adjacentPartitionsBlockedFlags,
+            basis.partitionToolMode,
+            basis.toolUsageFlags,
+            basis.defaultPatternIndex,
+            basis.wallThicknessType,
+            basis.list) { }
+        public WallCatalogResource(int APIversion,
+            uint version,
+            uint unknown2,
+            Common common,
+            Wall wallType,
+            Partition partitionType,
+            PartitionFlagsType partitionFlags,
+            VerticalSpan verticalSpanType,
+            PartitionsBlockedFlagsType partitionsBlockedFlags,
+            PartitionsBlockedFlagsType adjacentPartitionsBlockedFlags,
+            PartitionTool partitionToolMode,
+            ToolUsageFlagsType toolUsageFlags,
+            uint defaultPatternIndex,
+            WallThickness wallThicknessType,
             TGIBlockList ltgib)
-            : base(APIversion, version, ltgib)
+            : base(APIversion, version, common, ltgib)
         {
             this.unknown2 = unknown2;
-            this.common = new Common(requestedApiVersion, OnResourceChanged, common);
-            this.unknown3 = unknown3;
-            this.unknown4 = unknown4;
-            this.unknown5 = unknown5;
-            this.unknown6 = unknown6;
-            this.unknown7 = unknown7;
-            this.unknown8 = unknown8;
-            this.unknown9 = unknown9;
-            if (unknown10.Length != this.unknown10.Length) throw new ArgumentLengthException("unknown10", this.unknown10.Length);
-            this.unknown10 = (byte[])unknown10.Clone();
-            this.unknown11 = unknown11;
-            this.unknown12 = unknown12;
-            this.unknown13 = unknown13;
-            this.unknown14 = unknown14;
-            this.unknown15 = unknown15;
-            this.unknown16 = unknown16;
-            if (unknown17.Length != this.unknown17.Length) throw new ArgumentLengthException("unknown17", this.unknown17.Length);
-            this.unknown17 = (byte[])unknown17.Clone();
+            this.wallType = wallType;
+            this.partitionType = partitionType;
+            this.partitionFlags = partitionFlags;
+            this.verticalSpanType = verticalSpanType;
+            this.partitionsBlockedFlags = partitionsBlockedFlags;
+            this.adjacentPartitionsBlockedFlags = adjacentPartitionsBlockedFlags;
+            this.partitionToolMode = partitionToolMode;
+            this.toolUsageFlags = toolUsageFlags;
+            this.defaultPatternIndex = defaultPatternIndex;
+            this.wallThicknessType = wallThicknessType;
         }
         #endregion
 
@@ -104,25 +100,16 @@ namespace CatalogResource
 
             this.unknown2 = r.ReadUInt32();
             this.common = new Common(requestedApiVersion, OnResourceChanged, s);
-            this.unknown3 = r.ReadUInt32();
-            this.unknown4 = r.ReadByte();
-            this.unknown5 = r.ReadUInt32();
-            this.unknown6 = r.ReadByte();
-            this.unknown7 = r.ReadUInt32();
-            this.unknown8 = r.ReadByte();
-            this.unknown9 = r.ReadUInt32();
-            this.unknown10 = r.ReadBytes(4);
-            if (checking) if (unknown10.Length != 4)
-                    throw new InvalidDataException(String.Format("unknown10: read {0} bytes; expected 4 at 0x{1:X8}.", unknown10.Length, s.Position));
-            this.unknown11 = r.ReadUInt32();
-            this.unknown12 = r.ReadUInt32();
-            this.unknown13 = r.ReadUInt32();
-            this.unknown14 = r.ReadUInt32();
-            this.unknown15 = r.ReadUInt32();
-            this.unknown16 = r.ReadUInt32();
-            this.unknown17 = r.ReadBytes(8);
-            if (checking) if (unknown17.Length != 8)
-                    throw new InvalidDataException(String.Format("unknown17: read {0} bytes; expected 8 at 0x{1:X8}.", unknown17.Length, s.Position));
+            this.wallType = (Wall)r.ReadUInt32();
+            this.partitionType = (Partition)r.ReadUInt32();
+            this.partitionFlags = (PartitionFlagsType)r.ReadUInt32();
+            this.verticalSpanType = (VerticalSpan)r.ReadUInt32();
+            this.partitionsBlockedFlags = (PartitionsBlockedFlagsType)r.ReadUInt32();
+            this.adjacentPartitionsBlockedFlags = (PartitionsBlockedFlagsType)r.ReadUInt32();
+            this.partitionToolMode = (PartitionTool)r.ReadUInt32();
+            this.toolUsageFlags = (ToolUsageFlagsType)r.ReadUInt32();
+            this.defaultPatternIndex = r.ReadUInt32();
+            this.wallThicknessType = (WallThickness)r.ReadUInt32();
 
             list = new TGIBlockList(OnResourceChanged, s, tgiPosn, tgiSize);
 
@@ -139,21 +126,16 @@ namespace CatalogResource
             w.Write(unknown2);
             if (common == null) common = new Common(requestedApiVersion, OnResourceChanged);
             common.UnParse(s);
-            w.Write(unknown3);
-            w.Write(unknown4);
-            w.Write(unknown5);
-            w.Write(unknown6);
-            w.Write(unknown7);
-            w.Write(unknown8);
-            w.Write(unknown9);
-            w.Write(unknown10);
-            w.Write(unknown11);
-            w.Write(unknown12);
-            w.Write(unknown13);
-            w.Write(unknown14);
-            w.Write(unknown15);
-            w.Write(unknown16);
-            w.Write(unknown17);
+            w.Write((uint)wallType);
+            w.Write((uint)partitionType);
+            w.Write((uint)partitionFlags);
+            w.Write((uint)verticalSpanType);
+            w.Write((uint)partitionsBlockedFlags);
+            w.Write((uint)adjacentPartitionsBlockedFlags);
+            w.Write((uint)partitionToolMode);
+            w.Write((uint)toolUsageFlags);
+            w.Write(defaultPatternIndex);
+            w.Write((uint)wallThicknessType);
 
             base.UnParse(s);
 
@@ -163,55 +145,134 @@ namespace CatalogResource
         }
         #endregion
 
+        #region Sub-classes
+        public enum Wall : uint
+        {
+            None = 0x00000000,
+            Normal = 0x00000001,
+            Attic = 0x00000002,
+            Fence = 0x00000003,
+            DeckSkirt = 0x00000004,
+            DeckRailing = 0x00000005,
+            Foundation = 0x00000006,
+            Pool = 0x00000007,
+            Frieze = 0x00000008,
+            Platform = 0x00000009,
+            Foyer = 0x0000000A,
+            HalfNormal = 0x0000000B,
+            UnderConstruction = 0x000000FF,
+        }
+
+        public enum Partition : uint
+        {
+            Wall = 0x00000000,
+            Fence = 0x00000001,
+            FenceArch = 0x00000002,
+            HalfWall = 0x00000003,
+            PlatformWall = 0x00000004,
+            Unspecified = 0xFFFFFFFF,
+        }
+
+        [Flags]
+        public enum PartitionFlagsType : uint
+        {
+            MayChangeSurface = 0x00000001,
+            MayAttachObjects = 0x00000002,
+            MayCutAway = 0x00000004,
+            RequiresFlatBottom = 0x00000008,
+
+            RequiresFlatTop = 0x00000010,
+            Submersible = 0x00000020,
+            MayPlaceDiagonally = 0x00000040,
+            BlocksLocomotion = 0x00000080,
+
+            BlocksPlacement = 0x00000100,
+            BearsLoad = 0x00000200,
+            BlocksLight = 0x00000400,
+            ShouldRender = 0x00000800,
+
+            RequiresSupportUnderneath = 0x00001000,
+            LitIndoors = 0x00002000,
+            LitOutdoors = 0x00004000,
+            AOMapped = 0x00008000,
+
+            MayCutAwayBelowGround = 0x00010000,
+        }
+
+        public enum VerticalSpan : uint
+        {
+            FixedHeight = 0x00000000,
+            FloorToFloor = 0x00000001,
+            FloorToRoof = 0x00000002,
+            FloorToStairs = 0x00000003,
+            FloorToFloorBasedCeiling = 0x00000004,
+            DoubleFixedHeight = 0x00000005,
+            PlatformHeight = 0x00000006,
+            HalfFixedHeight = 0x00000007,
+            Unspecified = 0xFFFFFFFF,
+        }
+
+        [Flags]
+        public enum PartitionsBlockedFlagsType : uint
+        {
+            BlocksWalls = 0x00000001,
+            BlocksFences = 0x00000002,
+            BlocksArches = 0x00000004,
+            BlocksPlatformWalls = 0x00000010,
+        }
+
+        public enum PartitionTool : uint
+        {
+            Line = 0x00000001,
+            Rectangle = 0x00000002,
+            All = 0x00000003,
+            Unspecified = 0xFFFFFFFF,
+        }
+
+        [Flags]
+        public enum ToolUsageFlagsType : uint
+        {
+            Partition = 0x00000001,
+            Roof = 0x00000002,
+            LevelRoom = 0x00000004,
+            ModularStairs = 0x00000008,
+            WallDrag = 0x00000010,
+        }
+
+        public enum WallThickness : uint
+        {
+            Standard = 0x00000000,
+            None = 0x00000001,
+            Thin = 0x00000002,
+        }
+        #endregion
+
         #region Content Fields
-        [ElementPriority(21)]
+        //--insert Version: ElementPriority(1)
+        [ElementPriority(2)]
         public uint Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnResourceChanged(this, new EventArgs()); } } }
+        //--insert CommonBlock: ElementPriority(11)
+        [ElementPriority(21)]
+        public Wall WallType { get { return wallType; } set { if (wallType != value) { wallType = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(22)]
-        public uint Unknown3 { get { return unknown3; } set { if (unknown3 != value) { unknown3 = value; OnResourceChanged(this, new EventArgs()); } } }
+        public Partition PartitionType { get { return partitionType; } set { if (partitionType != value) { partitionType = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(23)]
-        public byte Unknown4 { get { return unknown4; } set { if (unknown4 != value) { unknown4 = value; OnResourceChanged(this, new EventArgs()); } } }
+        public PartitionFlagsType PartitionFlags { get { return partitionFlags; } set { if (partitionFlags != value) { partitionFlags = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(24)]
-        public uint Unknown5 { get { return unknown5; } set { if (unknown5 != value) { unknown5 = value; OnResourceChanged(this, new EventArgs()); } } }
+        public VerticalSpan VerticalSpanType { get { return verticalSpanType; } set { if (verticalSpanType != value) { verticalSpanType = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(25)]
-        public byte Unknown6 { get { return unknown6; } set { if (unknown6 != value) { unknown6 = value; OnResourceChanged(this, new EventArgs()); } } }
+        public PartitionsBlockedFlagsType PartitionsBlockedFlags { get { return partitionsBlockedFlags; } set { if (partitionsBlockedFlags != value) { partitionsBlockedFlags = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(26)]
-        public uint Unknown7 { get { return unknown7; } set { if (unknown7 != value) { unknown7 = value; OnResourceChanged(this, new EventArgs()); } } }
+        public PartitionsBlockedFlagsType AdjacentPartitionsBlockedFlags { get { return adjacentPartitionsBlockedFlags; } set { if (adjacentPartitionsBlockedFlags != value) { adjacentPartitionsBlockedFlags = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(27)]
-        public byte Unknown8 { get { return unknown8; } set { if (unknown8 != value) { unknown8 = value; OnResourceChanged(this, new EventArgs()); } } }
+        public PartitionTool PartitionToolMode { get { return partitionToolMode; } set { if (partitionToolMode != value) { partitionToolMode = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(28)]
-        public uint Unknown9 { get { return unknown9; } set { if (unknown9 != value) { unknown9 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(29)]
-        public byte[] Unknown10
-        {
-            get { return (byte[])unknown10.Clone(); }
-            set
-            {
-                if (value.Length != this.unknown10.Length) throw new ArgumentLengthException("Unknown10", this.unknown10.Length);
-                if (!ArrayCompare(unknown10, value)) { unknown10 = (byte[])value.Clone(); OnResourceChanged(this, new EventArgs()); }
-            }
-        }
+        public ToolUsageFlagsType ToolUsageFlags { get { return toolUsageFlags; } set { if (toolUsageFlags != value) { toolUsageFlags = value; OnResourceChanged(this, new EventArgs()); } } }
+        [ElementPriority(29), TGIBlockListContentField("TGIBlocks")]
+        public uint DefaultPatternIndex { get { return defaultPatternIndex; } set { if (defaultPatternIndex != value) { defaultPatternIndex = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(30)]
-        public uint Unknown11 { get { return unknown11; } set { if (unknown11 != value) { unknown11 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(31)]
-        public uint Unknown12 { get { return unknown12; } set { if (unknown12 != value) { unknown12 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(32)]
-        public uint Unknown13 { get { return unknown13; } set { if (unknown13 != value) { unknown13 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(33)]
-        public uint Unknown14 { get { return unknown14; } set { if (unknown14 != value) { unknown14 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(34)]
-        public uint Unknown15 { get { return unknown15; } set { if (unknown15 != value) { unknown15 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(35)]
-        public uint Unknown16 { get { return unknown16; } set { if (unknown16 != value) { unknown16 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(36)]
-        public byte[] Unknown17
-        {
-            get { return (byte[])unknown17.Clone(); }
-            set
-            {
-                if (value.Length != this.unknown17.Length) throw new ArgumentLengthException("Unknown17", this.unknown17.Length);
-                if (!ArrayCompare(unknown17, value)) { unknown17 = (byte[])value.Clone(); OnResourceChanged(this, new EventArgs()); }
-            }
-        }
+        public WallThickness WallThicknessType { get { return wallThicknessType; } set { if (wallThicknessType != value) { wallThicknessType = value; OnResourceChanged(this, new EventArgs()); } } }
+        //--insert TGIBlockList: no ElementPriority
         #endregion
     }
 }

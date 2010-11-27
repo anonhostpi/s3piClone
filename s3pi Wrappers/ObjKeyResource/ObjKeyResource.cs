@@ -166,15 +166,15 @@ namespace ObjKeyResource
         {
             #region Constructors
             public ComponentList(EventHandler handler) : base(handler, Byte.MaxValue) { }
-            public ComponentList(EventHandler handler, IList<ComponentElement> luint) : base(handler, luint, Byte.MaxValue) { }
+            public ComponentList(EventHandler handler, IEnumerable<ComponentElement> luint) : base(handler, luint, Byte.MaxValue) { }
             internal ComponentList(EventHandler handler, Stream s) : base(handler, s, Byte.MaxValue) { }
             #endregion
 
             #region Data I/O
-            protected override uint ReadCount(Stream s) { return (new BinaryReader(s)).ReadByte(); }
+            protected override int ReadCount(Stream s) { return (new BinaryReader(s)).ReadByte(); }
             protected override ComponentElement CreateElement(Stream s) { return new ComponentElement(0, elementHandler, (new BinaryReader(s)).ReadUInt32()); }
 
-            protected override void WriteCount(Stream s, uint count) { (new BinaryWriter(s)).Write((byte)count); }
+            protected override void WriteCount(Stream s, int count) { (new BinaryWriter(s)).Write((byte)count); }
             protected override void WriteElement(Stream s, ComponentElement element) { (new BinaryWriter(s)).Write((uint)element.Element); }
             #endregion
 
@@ -412,15 +412,15 @@ namespace ObjKeyResource
         {
             #region Constructors
             public ComponentDataList(EventHandler handler) : base(handler, Byte.MaxValue) { }
-            public ComponentDataList(EventHandler handler, IList<ComponentDataType> luint) : base(handler, luint, Byte.MaxValue) { }
+            public ComponentDataList(EventHandler handler, IEnumerable<ComponentDataType> luint) : base(handler, luint, Byte.MaxValue) { }
             internal ComponentDataList(EventHandler handler, Stream s) : base(handler, s, Byte.MaxValue) { }
             #endregion
 
             #region Data I/O
-            protected override uint ReadCount(Stream s) { return (new BinaryReader(s)).ReadByte(); }
+            protected override int ReadCount(Stream s) { return (new BinaryReader(s)).ReadByte(); }
             protected override ComponentDataType CreateElement(Stream s) { return ComponentDataType.CreateComponentData(0, elementHandler, s); }
 
-            protected override void WriteCount(Stream s, uint count) { (new BinaryWriter(s)).Write((byte)count); }
+            protected override void WriteCount(Stream s, int count) { (new BinaryWriter(s)).Write((byte)count); }
             protected override void WriteElement(Stream s, ComponentDataType element) { element.UnParse(s); }
             #endregion
 

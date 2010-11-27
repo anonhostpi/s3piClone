@@ -64,9 +64,6 @@
     <Content Include="..\..\s3pi\gpl-3.0.txt">
       <Link>gpl-3.0.txt</Link>
     </Content>
-    <Content Include="ComplateResources.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\s3pi\Interfaces\Interfaces.csproj">

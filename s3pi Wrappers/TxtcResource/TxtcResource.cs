@@ -60,7 +60,7 @@ namespace TxtcResource
             unknown1 = r.ReadUInt32();
             unknown2 = r.ReadUInt32();
             unknown3 = r.ReadByte();
-            uint count = r.ReadUInt32();
+            int count = r.ReadInt32();
             if (version >= 8)
                 unknown4 = r.ReadByte();
             entries = new EntryBlockList(OnResourceChanged, count, s);
@@ -149,7 +149,7 @@ namespace TxtcResource
                 unknown2 = r.ReadBytes(10);
                 if (checking) if (unknown2.Length != 10)
                         throw new EndOfStreamException(String.Format("Expected 10 bytes, read {0} at 0x{1:X8}", unknown2.Length, s.Position));
-                uint count = r.ReadUInt32();
+                int count = r.ReadInt32();
                 unknown3 = r.ReadByte();
                 entries = new EntryBlockList(handler, count, s);
                 if (checking) if (offset != s.Position)
@@ -238,12 +238,12 @@ namespace TxtcResource
         {
             public SuperBlockList(EventHandler handler) : base(handler, Byte.MaxValue) { }
             public SuperBlockList(EventHandler handler, Stream s) : base(handler, s, Byte.MaxValue) { }
-            public SuperBlockList(EventHandler handler, IList<SuperBlock> lsb) : base(handler, lsb, Byte.MaxValue) { }
+            public SuperBlockList(EventHandler handler, IEnumerable<SuperBlock> lsb) : base(handler, lsb, Byte.MaxValue) { }
 
-            protected override uint ReadCount(Stream s) { return (new BinaryReader(s)).ReadByte(); }
+            protected override int ReadCount(Stream s) { return (new BinaryReader(s)).ReadByte(); }
             protected override SuperBlock CreateElement(Stream s) { return new SuperBlock(0, elementHandler, s); }
 
-            protected override void WriteCount(Stream s, uint count) { (new BinaryWriter(s)).Write((byte)count); }
+            protected override void WriteCount(Stream s, int count) { (new BinaryWriter(s)).Write((byte)count); }
             protected override void WriteElement(Stream s, SuperBlock element) { element.UnParse(s); }
 
             public override void Add() { this.Add(new SuperBlock(0, null)); }
@@ -794,7 +794,7 @@ namespace TxtcResource
         {
             public EntryList(int APIversion, EventHandler handler, Stream s) : base(null, -1) { elementHandler = handler; Parse(APIversion, s); this.handler = handler; }
             public EntryList(EventHandler handler) : base(handler) { }
-            public EntryList(EventHandler handler, IList<Entry> le) : base(handler, le) { }
+            public EntryList(EventHandler handler, IEnumerable<Entry> le) : base(handler, le) { }
 
             protected void Parse(int requestedApiVersion, Stream s)
             {
@@ -802,10 +802,10 @@ namespace TxtcResource
                     this.Add(e);
             }
 
-            protected override uint ReadCount(Stream s) { throw new InvalidOperationException(); }
+            protected override int ReadCount(Stream s) { throw new InvalidOperationException(); }
             protected override Entry CreateElement(Stream s) { throw new InvalidOperationException(); }
 
-            protected override void WriteCount(Stream s, uint count) { } // List owner must do this, if required
+            protected override void WriteCount(Stream s, int count) { } // List owner must do this, if required
             protected override void WriteElement(Stream s, Entry element) { element.UnParse(s); }
 
             public override void Add() { throw new NotImplementedException(); }
@@ -881,15 +881,15 @@ namespace TxtcResource
 
         public class EntryBlockList : AResource.DependentList<EntryBlock>
         {
-            uint blockCount;
+            int blockCount;
             public EntryBlockList(EventHandler handler) : base(handler) { }
-            public EntryBlockList(EventHandler handler, IList<EntryBlock> leb) : base(handler, leb) { }
-            public EntryBlockList(EventHandler handler, uint blockCount, Stream s) : base(null) { elementHandler = handler; this.blockCount = blockCount; Parse(s); this.handler = handler; }
+            public EntryBlockList(EventHandler handler, int blockCount, Stream s) : base(null) { elementHandler = handler; this.blockCount = blockCount; Parse(s); this.handler = handler; }
+            public EntryBlockList(EventHandler handler, IEnumerable<EntryBlock> leb) : base(handler, leb) { }
 
-            protected override uint ReadCount(Stream s) { return blockCount; }
+            protected override int ReadCount(Stream s) { return blockCount; }
             protected override EntryBlock CreateElement(Stream s) { return new EntryBlock(0, elementHandler, s); }
 
-            protected override void WriteCount(Stream s, uint count) { } // List owner must do this
+            protected override void WriteCount(Stream s, int count) { } // List owner must do this
             protected override void WriteElement(Stream s, EntryBlock element) { element.UnParse(s); }
 
             public override void Add() { this.Add(new EntryBlock(0, null)); }
@@ -943,7 +943,8 @@ namespace TxtcResource
                 s += "\nEntries:\n";
                 s += entries.Value;
                 s += "\nTGI Blocks:\n";
-                s += tgiBlocks.Value;
+                string fmt = "  [{0:X" + tgiBlocks.Count.ToString("X").Length + "}]: {1}\n";
+                for (int i = 0; i < tgiBlocks.Count; i++) s += string.Format(fmt, i, tgiBlocks[i].Value);
                 return s;
             }
         }

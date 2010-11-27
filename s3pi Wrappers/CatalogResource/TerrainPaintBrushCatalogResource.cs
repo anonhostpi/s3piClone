@@ -1,5 +1,5 @@
 ﻿/***************************************************************************
- *  Copyright (C) 2009 by Peter L Jones                                    *
+ *  Copyright (C) 2010 by Peter L Jones                                    *
  *  pljones@users.sf.net                                                   *
  *                                                                         *
  *  This file is part of the Sims 3 Package Interface (s3pi)               *
@@ -28,8 +28,8 @@ namespace CatalogResource
     {
         #region Attributes
         TGIBlock brushTexture = null;
-        uint unknown15;
-        CategoryType category = CategoryType.None;
+        TerrainType terrain;//version>=0x04
+        CategoryType category;//version>=0x04
         #endregion
 
         #region Constructors
@@ -38,27 +38,61 @@ namespace CatalogResource
             : base(APIversion, null, basis)
         {
             this.brushTexture = (TGIBlock)basis.brushTexture.Clone(OnResourceChanged);
-            this.unknown15 = basis.unknown15;
+            this.terrain = basis.terrain;
             this.category = basis.category;
         }
-        public TerrainPaintBrushCatalogResource(int APIversion, uint unknown2, Common common,
-            byte unknown3, byte unknown4, uint unknown5, byte unknown6, byte unknown7, uint unknown8, uint unknown9, uint unknown10,
-            TGIBlock brushShape, byte[] unknown11, float unknown12, float unknown13, byte[] unknown14,
-            TGIBlock brushTexture)
-            : base(APIversion, 2, unknown2, common, unknown3, unknown4, unknown5, unknown6, unknown7, unknown8, unknown9, unknown10,
-            brushShape, unknown11, unknown12, unknown13, unknown14)
+        public TerrainPaintBrushCatalogResource(int APIversion,
+            uint version,
+            uint brushVersion,
+            Common common,
+            BrushOperation normalOperation, BrushOperation oppositeOperation, TGIBlock profileTexture, BrushOrientation orientation,
+            float width, float strength, byte baseTextureValue, float wiggleAmount,
+            TGIBlock brushTexture
+            )
+            : this(APIversion,
+                version,
+                brushVersion,
+                common,
+                normalOperation,
+                oppositeOperation,
+                profileTexture,
+                orientation,
+                width,
+                strength,
+                baseTextureValue,
+                wiggleAmount,
+                brushTexture,
+                0, 0
+            )
         {
-            this.brushTexture = (TGIBlock)brushTexture.Clone(OnResourceChanged);
+            if (checking) if (version >= 0x00000004)
+                    throw new InvalidOperationException(String.Format("Constructor requires terrain and category for version {0}", version));
         }
-        public TerrainPaintBrushCatalogResource(int APIversion, uint unknown2, Common common,
-            byte unknown3, byte unknown4, uint unknown5, byte unknown6, byte unknown7, uint unknown8, uint unknown9, uint unknown10,
-            TGIBlock brushShape, byte[] unknown11, float unknown12, float unknown13, byte[] unknown14,
-            TGIBlock brushTexture, uint unknown15, CategoryType category)
-            : base(APIversion, 4, unknown2, common, unknown3, unknown4, unknown5, unknown6, unknown7, unknown8, unknown9, unknown10,
-            brushShape, unknown11, unknown12, unknown13, unknown14)
+        public TerrainPaintBrushCatalogResource(int APIversion,
+            uint version,
+            uint brushVersion,
+            Common common,
+            BrushOperation normalOperation, BrushOperation oppositeOperation, TGIBlock profileTexture, BrushOrientation orientation,
+            float width, float strength, byte baseTextureValue, float wiggleAmount,
+            TGIBlock brushTexture,
+            TerrainType terrain, CategoryType category
+            )
+            : base(APIversion,
+                version,
+                brushVersion,
+                common,
+                normalOperation,
+                oppositeOperation,
+                profileTexture,
+                orientation,
+                width,
+                strength,
+                baseTextureValue,
+                wiggleAmount
+            )
         {
             this.brushTexture = (TGIBlock)brushTexture.Clone(OnResourceChanged);
-            this.unknown15 = unknown15;
+            this.terrain = terrain;
             this.category = category;
         }
         #endregion
@@ -72,7 +106,7 @@ namespace CatalogResource
             if (version >= 4)
             {
                 BinaryReader r = new BinaryReader(s);
-                this.unknown15 = r.ReadUInt32();
+                this.terrain = (TerrainType)r.ReadUInt32();
                 this.category = (CategoryType)r.ReadUInt32();
             }
 
@@ -84,13 +118,13 @@ namespace CatalogResource
         protected override Stream UnParse()
         {
             Stream s = base.UnParse();
-            if (brushTexture == null) brushTexture = new TGIBlock(requestedApiVersion, OnResourceChanged, 0, 0, 0);
+            if (brushTexture == null) brushTexture = new TGIBlock(requestedApiVersion, OnResourceChanged);
             brushTexture.UnParse(s);
 
             if (version >= 4)
             {
                 BinaryWriter w = new BinaryWriter(s);
-                w.Write(unknown15);
+                w.Write((uint)terrain);
                 w.Write((uint)category);
             }
 
@@ -109,7 +143,7 @@ namespace CatalogResource
                 List<string> res = base.ContentFields;
                 if (this.version < 0x00000004)
                 {
-                    res.Remove("Unknown15");
+                    res.Remove("Terrain");
                     res.Remove("Category");
                 }
                 return res;
@@ -118,6 +152,14 @@ namespace CatalogResource
         #endregion
 
         #region Sub-classes
+        public enum TerrainType : uint
+        {
+            Grass = 0x1,
+            Flowers = 0x2,
+            Rock = 0x3,
+            DirtSand = 0x4,
+            Other = 0x5,
+        }
         public enum CategoryType : uint
         {
             None = 0x00,
@@ -130,15 +172,16 @@ namespace CatalogResource
         #endregion
 
         #region Content Fields
-        [ElementPriority(35)]
+        //--insert Version: CatalogResourceBrush(1)
+        [ElementPriority(41)]
         public TGIBlock BrushTexture
         {
             get { return brushTexture; }
             set { if (brushTexture != value) { brushTexture = new TGIBlock(requestedApiVersion, OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } }
         }
-        [ElementPriority(36)]
-        public uint Unknown15 { get { if (version < 0x00000004) throw new InvalidOperationException(); return unknown15; } set { if (version < 0x00000004) throw new InvalidOperationException(); if (unknown15 != value) { unknown15 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(37)]
+        [ElementPriority(42)]
+        public TerrainType Terrain { get { if (version < 0x00000004) throw new InvalidOperationException(); return terrain; } set { if (version < 0x00000004) throw new InvalidOperationException(); if (terrain != value) { terrain = value; OnResourceChanged(this, new EventArgs()); } } }
+        [ElementPriority(43)]
         public CategoryType Category { get { if (version < 0x00000004) throw new InvalidOperationException(); return category; } set { if (version < 0x00000004) throw new InvalidOperationException(); if (category != value) { category = value; OnResourceChanged(this, new EventArgs()); } } }
         #endregion
     }

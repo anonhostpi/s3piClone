@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using s3pi.Interfaces;
+using System.Text;
 
 namespace CASPartResource
 {
@@ -72,12 +73,11 @@ namespace CASPartResource
             int tgiPosn;
 
             BinaryReader r = new BinaryReader(s);
-            BinaryReader r2 = new BinaryReader(s, System.Text.Encoding.BigEndianUnicode);
 
             version = r.ReadUInt32();
             tgiPosn = r.ReadInt32() + 8;
             xmlEntries = new XMLEntryList(OnResourceChanged, s);
-            unknown1 = r2.ReadString();
+            unknown1 = BigEndianUnicodeString.Read(s);
             sortPriority = r.ReadSingle();
             unknown2 = r.ReadByte();
             clothing = (ClothingType)r.ReadUInt32();
@@ -98,7 +98,7 @@ namespace CASPartResource
             diffuse2Indexes = new ByteEntryList(OnResourceChanged, s);
             specular2Indexes = new ByteEntryList(OnResourceChanged, s);
             bondIndexes = new ByteEntryList(OnResourceChanged, s);
-            unknown4 = r2.ReadString();
+            unknown4 = BigEndianUnicodeString.Read(s);
 
             if (checking) if (tgiPosn != s.Position)
                     throw new InvalidDataException(String.Format("Position of TGIBlock read: 0x{0:X8}, actual: 0x{1:X8}",
@@ -121,7 +121,7 @@ namespace CASPartResource
             if (xmlEntries == null) xmlEntries = new XMLEntryList(OnResourceChanged);
             xmlEntries.UnParse(s);
 
-            Write7BitStr(s, unknown1, System.Text.Encoding.BigEndianUnicode);
+            BigEndianUnicodeString.Write(s, unknown1);
             w.Write(sortPriority);
             w.Write(unknown2);
             w.Write((uint)clothing);
@@ -143,7 +143,7 @@ namespace CASPartResource
             if (diffuse2Indexes == null) diffuse2Indexes = new ByteEntryList(OnResourceChanged); diffuse2Indexes.UnParse(s);
             if (specular2Indexes == null) specular2Indexes = new ByteEntryList(OnResourceChanged); specular2Indexes.UnParse(s);
             if (bondIndexes == null) bondIndexes = new ByteEntryList(OnResourceChanged); bondIndexes.UnParse(s);
-            Write7BitStr(s, unknown4, System.Text.Encoding.BigEndianUnicode);
+            BigEndianUnicodeString.Write(s, unknown4);
 
             tgiPosn = s.Position;
             if (tgiBlocks == null) tgiBlocks = new CountedTGIBlockList(OnResourceChanged, "IGT");
@@ -247,7 +247,7 @@ namespace CASPartResource
             #region Constructors
             public XMLEntryList(EventHandler handler) : base(handler) { }
             public XMLEntryList(EventHandler handler, Stream s) : base(handler, s) { }
-            public XMLEntryList(EventHandler handler, IList<XMLEntry> le) : base(handler, le) { }
+            public XMLEntryList(EventHandler handler, IEnumerable<XMLEntry> le) : base(handler, le) { }
             #endregion
 
             #region Data I/O
@@ -258,18 +258,18 @@ namespace CASPartResource
             public override void Add() { this.Add(new XMLEntry(0, null)); }
         }
 
-        public class ByteEntryList : AResource.SimpleList<byte>
+        public class ByteEntryList : SimpleList<byte>
         {
-            static string fmt = "0x{1:X2}; ";
             #region Constructors
-            public ByteEntryList(EventHandler handler) : base(handler, ReadByte, WriteByte, fmt, byte.MaxValue, ReadListCount, WriteListCount) { }
-            public ByteEntryList(EventHandler handler, Stream s) : base(handler, s, ReadByte, WriteByte, fmt, byte.MaxValue, ReadListCount, WriteListCount) { }
-            public ByteEntryList(EventHandler handler, IList<HandlerElement<byte>> le) : base(handler, le, ReadByte, WriteByte, fmt, byte.MaxValue, ReadListCount, WriteListCount) { }
+            public ByteEntryList(EventHandler handler) : base(handler, ReadByte, WriteByte, byte.MaxValue, ReadListCount, WriteListCount) { }
+            public ByteEntryList(EventHandler handler, Stream s) : base(handler, s, ReadByte, WriteByte, byte.MaxValue, ReadListCount, WriteListCount) { }
+            public ByteEntryList(EventHandler handler, IEnumerable<byte> le) : base(handler, le, ReadByte, WriteByte, byte.MaxValue, ReadListCount, WriteListCount) { }
+            public ByteEntryList(EventHandler handler, IEnumerable<HandlerElement<byte>> le) : base(handler, le, ReadByte, WriteByte, byte.MaxValue, ReadListCount, WriteListCount) { }
             #endregion
 
             #region Data I/O
-            static uint ReadListCount(Stream s) { return new BinaryReader(s).ReadByte(); }
-            static void WriteListCount(Stream s, uint count) { new BinaryWriter(s).Write((byte)count); }
+            static int ReadListCount(Stream s) { return new BinaryReader(s).ReadByte(); }
+            static void WriteListCount(Stream s, int count) { new BinaryWriter(s).Write((byte)count); }
             static byte ReadByte(Stream s) { return new BinaryReader(s).ReadByte(); }
             static void WriteByte(Stream s, byte value) { new BinaryWriter(s).Write(value); }
             #endregion
@@ -346,7 +346,7 @@ namespace CASPartResource
                     foreach (string field in ContentFields)
                         if (!field.Equals("Value"))
                             s += string.Format("{0}: {1}; ", field, this[field]);
-                    return s.Trim();
+                    return s.TrimEnd(';', ' ');
                 }
             }
             #endregion
@@ -356,12 +356,12 @@ namespace CASPartResource
             #region Constructors
             public InnerEntryList(EventHandler handler) : base(handler, Byte.MaxValue) { }
             public InnerEntryList(EventHandler handler, Stream s) : base(handler, s, Byte.MaxValue) { }
-            public InnerEntryList(EventHandler handler, IList<InnerEntry> le) : base(handler, le, Byte.MaxValue) { }
+            public InnerEntryList(EventHandler handler, IEnumerable<InnerEntry> le) : base(handler, le, Byte.MaxValue) { }
             #endregion
 
             #region Data I/O
-            protected override uint ReadCount(Stream s) { return new BinaryReader(s).ReadByte(); }
-            protected override void WriteCount(Stream s, uint count) { new BinaryWriter(s).Write((byte)count); }
+            protected override int ReadCount(Stream s) { return new BinaryReader(s).ReadByte(); }
+            protected override void WriteCount(Stream s, int count) { new BinaryWriter(s).Write((byte)count); }
             protected override InnerEntry CreateElement(Stream s) { return new InnerEntry(0, elementHandler, s); }
             protected override void WriteElement(Stream s, InnerEntry element) { element.UnParse(s); }
             #endregion
@@ -384,7 +384,7 @@ namespace CASPartResource
             public OuterEntry(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
             public OuterEntry(int APIversion, EventHandler handler, OuterEntry basis)
                 : this(APIversion, handler, basis.outerEntryNum, basis.unknown1, basis.innerEntries) { }
-            public OuterEntry(int APIversion, EventHandler handler, byte outerEntryNum, uint unknown1, IList<InnerEntry> le)
+            public OuterEntry(int APIversion, EventHandler handler, byte outerEntryNum, uint unknown1, IEnumerable<InnerEntry> le)
                 : base(APIversion, handler)
             {
                 this.outerEntryNum = outerEntryNum;
@@ -457,12 +457,12 @@ namespace CASPartResource
             #region Constructors
             public OuterEntryList(EventHandler handler) : base(handler, Byte.MaxValue) { }
             public OuterEntryList(EventHandler handler, Stream s) : base(handler, s, Byte.MaxValue) { }
-            public OuterEntryList(EventHandler handler, IList<OuterEntry> le) : base(handler, le, Byte.MaxValue) { }
+            public OuterEntryList(EventHandler handler, IEnumerable<OuterEntry> le) : base(handler, le, Byte.MaxValue) { }
             #endregion
 
             #region Data I/O
-            protected override uint ReadCount(Stream s) { return new BinaryReader(s).ReadByte(); }
-            protected override void WriteCount(Stream s, uint count) { new BinaryWriter(s).Write((byte)count); }
+            protected override int ReadCount(Stream s) { return new BinaryReader(s).ReadByte(); }
+            protected override void WriteCount(Stream s, int count) { new BinaryWriter(s).Write((byte)count); }
             protected override OuterEntry CreateElement(Stream s) { return new OuterEntry(0, elementHandler, s); }
             protected override void WriteElement(Stream s, OuterEntry element) { element.UnParse(s); }
             #endregion
@@ -536,26 +536,33 @@ namespace CASPartResource
                     }
                     else if (field.EndsWith("Indexes"))
                     {
-                        s += "\n" + field + ": " + (this[field].Value as ByteEntryList).Value.TrimEnd(';', ' ');
+                        s += String.Format("\n--\n{0}:", field);
+                        ByteEntryList list = this[field].Value as ByteEntryList;
+                        string fmt = "\n  [{0:X" + list.Count.ToString("X").Length + "}]: 0x{1:X2} ({2})";
+                        for (int i = 0; i < list.Count; i++)
+                            s += String.Format(fmt, i, list[i], tgiBlocks[list[i]]);
+                        s += "\n----";
                     }
                     else if (field.Equals("XmlEntries"))
                     {
                         s += "\n--\nXmlEntries:";
+                        string fmt = "\n  [{0:X" + xmlEntries.Count.ToString("X").Length + "}]: {1}";
                         for (int i = 0; i < xmlEntries.Count; i++)
-                            s += String.Format("\n--{0}--{1}", i, xmlEntries[i].Value);
+                            s += String.Format(fmt, i, xmlEntries[i].Value);
                         s += "\n----";
                     }
                     else if (field.Equals("OuterEntries"))
                     {
                         s += "\n--\nOuterEntries:";
+                        string fmt = "\n--[{0:X" + outerEntries.Count.ToString("X").Length + "}]--{1}";
                         for (int i = 0; i < outerEntries.Count; i++)
-                            s += String.Format("\n--{0}--{1}", i, outerEntries[i].Value);
+                            s += String.Format(fmt, i, outerEntries[i].Value);
                         s += "\n----";
                     }
                     else if (field.Equals("TGIBlocks"))
                     {
                         s += "\n--\nTGIBlocks:";
-                        string fmt = "\n  0x{0:X" + tgiBlocks.Count.ToString("X").Length + "}: {1}";
+                        string fmt = "\n  [{0:X" + tgiBlocks.Count.ToString("X").Length + "}]: {1}";
                         for (int i = 0; i < tgiBlocks.Count; i++)
                             s += String.Format(fmt, i, tgiBlocks[i].Value);
                         s += "\n----";

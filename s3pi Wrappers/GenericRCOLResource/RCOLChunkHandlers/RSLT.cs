@@ -43,11 +43,11 @@ namespace s3pi.GenericRCOLResource
         #endregion
 
         #region Constructors
+        public RSLT(int APIversion, EventHandler handler) : base(APIversion, handler, null) { }
         public RSLT(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler, s) { }
         public RSLT(int APIversion, EventHandler handler, RSLT basis)
-            : base(APIversion, null, null)
+            : base(APIversion, handler, null)
         {
-            this.handler = handler;
             this.version = basis.version;
             this.routes = new PartList(handler, basis.routes);
             this.routeFloats = new SevenFloatsList(handler, basis.routeFloats);
@@ -57,15 +57,6 @@ namespace s3pi.GenericRCOLResource
             this.effectFloats = new SevenFloatsList(handler, basis.effectFloats);
             this.inverseKineticsTargets = new PartList(handler, basis.inverseKineticsTargets);
             this.inverseKineticsTargetFloats = new SevenFloatsList(handler, basis.inverseKineticsTargetFloats);
-        }
-        public RSLT(int APIversion, EventHandler handler)
-            : base(APIversion, null, null)
-        {
-            this.handler = handler;
-            routes = new PartList(handler);
-            containers = new SlottedPartList(handler);
-            effects = new PartList(handler);
-            inverseKineticsTargets = new PartList(handler);
         }
         #endregion
 
@@ -260,13 +251,13 @@ namespace s3pi.GenericRCOLResource
             #region Constructors
             public SevenFloatsList(EventHandler handler) : base(handler, max) { }
             public SevenFloatsList(EventHandler handler, Stream s) : base(null, max) { elementHandler = handler; Parse(s); this.handler = handler; }
-            public SevenFloatsList(EventHandler handler, IList<SevenFloats> lsf) : base(handler, lsf, max) { }
+            public SevenFloatsList(EventHandler handler, IEnumerable<SevenFloats> lsf) : base(handler, lsf, max) { }
             #endregion
 
             #region Data I/O
-            protected override uint ReadCount(Stream s)
+            protected override int ReadCount(Stream s)
             {
-                uint c = base.ReadCount(s);
+                int c = base.ReadCount(s);
                 if (checking) if (c > max)
                     throw new InvalidDataException(String.Format("Read 0x{0:X8}, expect less than 0x{1:X8}; position 0x{2:X16}", c, max, s.Position));
                 return c;
@@ -431,7 +422,7 @@ namespace s3pi.GenericRCOLResource
             #region Constructors
             public PartList(EventHandler handler) : base(handler) { }
             public PartList(EventHandler handler, Stream s, int count) : base(null) { elementHandler = handler; Parse(s, count); this.handler = handler; }
-            public PartList(EventHandler handler, IList<Part> lsb) : base(handler, lsb) { }
+            public PartList(EventHandler handler, IEnumerable<Part> lsb) : base(handler, lsb) { }
             #endregion
 
             #region Data I/O
@@ -539,7 +530,7 @@ namespace s3pi.GenericRCOLResource
             #region Constructors
             public SlottedPartList(EventHandler handler) : base(handler) { }
             public SlottedPartList(EventHandler handler, Stream s, int count) : base(null) { elementHandler = handler; Parse(s, count); this.handler = handler; }
-            public SlottedPartList(EventHandler handler, IList<SlottedPart> lsbp) : base(handler, lsbp) { }
+            public SlottedPartList(EventHandler handler, IEnumerable<SlottedPart> lsbp) : base(handler, lsbp) { }
             #endregion
 
             #region Data I/O
@@ -608,25 +599,39 @@ namespace s3pi.GenericRCOLResource
         {
             get
             {
+                string fmt;
                 string s = "";
                 s += "Tag: 0x" + tag.ToString("X8");
                 s += "\nVersion: 0x" + version.ToString("X8");
-                s += "\n---Routes:---";
-                for (int i = 0; i < routes.Count; i++) s += "\n--[" + i + "]--\n" + routes[i].Value;
-                s += "\n---";
+
+                s += String.Format("\nRoutes ({0:X}):", routes.Count);
+                fmt = "\n--[{0:X" + routes.Count.ToString("X").Length + "}]--\n{1}";
+                for (int i = 0; i < routes.Count; i++) s += String.Format(fmt, i, routes[i].Value);
+                s += "\n----";
+
                 if (routeFloats.Count > 0) s += "\nRouteFloats: " + routeFloats[0].Value;
-                s += "\n---Containers:---";
-                for (int i = 0; i < containers.Count; i++) s += "\n--[" + i + "]--\n" + containers[i].Value;
-                s += "\n---";
+
+                s += String.Format("\nContainers ({0:X}):", containers.Count);
+                fmt = "\n--[{0:X" + containers.Count.ToString("X").Length + "}]--\n{1}";
+                for (int i = 0; i < containers.Count; i++) s += String.Format(fmt, i, containers[i].Value);
+                s += "\n----";
+
                 if (containerFloats.Count > 0) s += "\nContainerFloats: " + containerFloats[0].Value;
-                s += "\n---Effects:---";
-                for (int i = 0; i < effects.Count; i++) s += "\n--[" + i + "]--\n" + effects[i].Value;
-                s += "\n---";
+
+                s += String.Format("\nEffects ({0:X}):", effects.Count);
+                fmt = "\n--[{0:X" + effects.Count.ToString("X").Length + "}]--\n{1}";
+                for (int i = 0; i < effects.Count; i++) s += String.Format(fmt, i, effects[i].Value);
+                s += "\n----";
+
                 if (effectFloats.Count > 0) s += "\nEffectFloats: " + effectFloats[0].Value;
-                s += "\n---InverseKineticsTargets:---";
-                for (int i = 0; i < inverseKineticsTargets.Count; i++) s += "\n--[" + i + "]--\n" + inverseKineticsTargets[i].Value;
-                s += "\n---";
+
+                s += String.Format("\nInverseKineticsTargets ({0:X}):", inverseKineticsTargets.Count);
+                fmt = "\n--[{0:X" + inverseKineticsTargets.Count.ToString("X").Length + "}]--\n{1}";
+                for (int i = 0; i < inverseKineticsTargets.Count; i++) s += String.Format(fmt, i, inverseKineticsTargets[i].Value);
+                s += "\n----";
+
                 if (inverseKineticsTargetFloats.Count > 0) s += "\nInverseKineticsTargetFloats: " + inverseKineticsTargetFloats[0].Value;
+
                 return s;
             }
         }

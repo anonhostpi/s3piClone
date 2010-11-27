@@ -1,5 +1,5 @@
 ﻿/***************************************************************************
- *  Copyright (C) 2009 by Peter L Jones                                    *
+ *  Copyright (C) 2010 by Peter L Jones                                    *
  *  pljones@users.sf.net                                                   *
  *                                                                         *
  *  This file is part of the Sims 3 Package Interface (s3pi)               *
@@ -28,12 +28,6 @@ namespace CatalogResource
     {
         #region Attributes
         MaterialList materialList = null;
-        uint unknown2;
-        byte unknown3;
-        uint unknown4;
-        byte unknown5;
-        uint unknown6;
-        byte unknown7;
         uint modelVPXYIndex;
         uint diagonalVPXYIndex;
         uint postVPXYIndex;
@@ -46,48 +40,59 @@ namespace CatalogResource
         #region Constructors
         public FenceCatalogResource(int APIversion, Stream s) : base(APIversion, s) { }
         public FenceCatalogResource(int APIversion, Stream unused, FenceCatalogResource basis)
-            : base(APIversion, basis.version, basis.list)
+            : base(APIversion, basis.version, basis.common, basis.list)
         {
             this.materialList = (basis.version >= 0x00000007) ? new MaterialList(OnResourceChanged, basis.materialList) : null;
             this.common = new Common(requestedApiVersion, OnResourceChanged, basis.common);
-            this.unknown2 = basis.unknown2;
-            this.unknown3 = basis.unknown3;
-            this.unknown4 = basis.unknown4;
-            this.unknown5 = basis.unknown5;
-            this.unknown6 = basis.unknown6;
-            this.unknown7 = basis.unknown7;
             this.modelVPXYIndex = basis.modelVPXYIndex;
             this.diagonalVPXYIndex = basis.diagonalVPXYIndex;
             this.postVPXYIndex = basis.postVPXYIndex;
             this.tileSpacing = basis.tileSpacing;
             this.canWalkOver = basis.canWalkOver;
+            this.risesAboveWall = basis.risesAboveWall;
+            this.wallIndex = basis.wallIndex;
         }
-        public FenceCatalogResource(int APIversion, uint version, Common common, uint unknown2, byte unknown3, uint unknown4,
-            byte unknown5, uint unknown6, byte unknown7, uint unknown8, uint unknown9, uint unknown10, uint unknown11, byte unknown12,
+        public FenceCatalogResource(int APIversion, uint version,
+            Common common, uint modelVPXYIndex, uint diagonalVPXYIndex, uint postVPXYIndex, uint tileSpacing, byte canWalkOver,
             TGIBlockList ltgib)
-            : this(APIversion, version, null, common, unknown2, unknown3, unknown4, unknown5, unknown6, unknown7, unknown8, unknown9, unknown10, unknown11, unknown12, ltgib)
+            : this(APIversion, version,
+            null,
+            common, modelVPXYIndex, diagonalVPXYIndex, postVPXYIndex, tileSpacing, canWalkOver,
+            0, 0,
+            ltgib)
         {
             if (checking) if (version >= 0x00000007)
-                    throw new InvalidOperationException(String.Format("Constructor requires MaterialList for version {0}", version));
+                    throw new InvalidOperationException(String.Format("Constructor requires materialList for version {0}", version));
         }
-        public FenceCatalogResource(int APIversion, uint version, MaterialList materialList, Common common, uint unknown2, byte unknown3, uint unknown4,
-            byte unknown5, uint unknown6, byte unknown7, uint unknown8, uint unknown9, uint unknown10, uint unknown11, byte unknown12,
+        public FenceCatalogResource(int APIversion, uint version,
+            MaterialList materialList,
+            Common common, uint modelVPXYIndex, uint diagonalVPXYIndex, uint postVPXYIndex, uint tileSpacing, byte canWalkOver,
             TGIBlockList ltgib)
-            : base(APIversion, version, ltgib)
+            : this(APIversion, version,
+            materialList,
+            common, modelVPXYIndex, diagonalVPXYIndex, postVPXYIndex, tileSpacing, canWalkOver,
+            0, 0,
+            ltgib)
+        {
+            if (checking) if (version >= 0x00000008)
+                    throw new InvalidOperationException(String.Format("Constructor requires risesAboveWall and wallIndex for version {0}", version));
+        }
+        public FenceCatalogResource(int APIversion, uint version,
+            MaterialList materialList,
+            Common common, uint unknown8, uint unknown9, uint unknown10, uint unknown11, byte unknown12,
+            byte risesAboveWall, uint wallIndex,
+            TGIBlockList ltgib)
+            : base(APIversion, version, common, ltgib)
         {
             this.materialList = materialList != null ? new MaterialList(OnResourceChanged, materialList) : null;
             this.common = new Common(requestedApiVersion, OnResourceChanged, common);
-            this.unknown2 = unknown2;
-            this.unknown3 = unknown3;
-            this.unknown4 = unknown4;
-            this.unknown5 = unknown5;
-            this.unknown6 = unknown6;
-            this.unknown7 = unknown7;
             this.modelVPXYIndex = unknown8;
             this.diagonalVPXYIndex = unknown9;
             this.postVPXYIndex = unknown10;
             this.tileSpacing = unknown11;
             this.canWalkOver = unknown12;
+            this.risesAboveWall = risesAboveWall;
+            this.wallIndex = wallIndex;
         }
         #endregion
 
@@ -98,12 +103,6 @@ namespace CatalogResource
             base.Parse(s);
             this.materialList = (this.version >= 0x00000007) ? new MaterialList(OnResourceChanged, s) : null;
             this.common = new Common(requestedApiVersion, OnResourceChanged, s);
-            this.unknown2 = r.ReadUInt32();
-            this.unknown3 = r.ReadByte();
-            this.unknown4 = r.ReadUInt32();
-            this.unknown5 = r.ReadByte();
-            this.unknown6 = r.ReadUInt32();
-            this.unknown7 = r.ReadByte();
             this.modelVPXYIndex = r.ReadUInt32();
             this.diagonalVPXYIndex = r.ReadUInt32();
             this.postVPXYIndex = r.ReadUInt32();
@@ -133,12 +132,6 @@ namespace CatalogResource
             }
             if (common == null) common = new Common(requestedApiVersion, OnResourceChanged);
             common.UnParse(s);
-            w.Write(unknown2);
-            w.Write(unknown3);
-            w.Write(unknown4);
-            w.Write(unknown5);
-            w.Write(unknown6);
-            w.Write(unknown7);
             w.Write(modelVPXYIndex);
             w.Write(diagonalVPXYIndex);
             w.Write(postVPXYIndex);
@@ -181,46 +174,37 @@ namespace CatalogResource
         #endregion
 
         #region Content Fields
-        [ElementPriority(1)]
+        //--insert Version: ElementPriority(1)
+        [ElementPriority(2)]
         public MaterialList Materials
         {
             get { if (version < 0x00000007) throw new InvalidOperationException(); return materialList; }
             set { if (version < 0x00000007) throw new InvalidOperationException(); if (materialList != value) { materialList = value == null ? null : new MaterialList(OnResourceChanged, value); } OnResourceChanged(this, new EventArgs()); }
         }
-        [ElementPriority(21)]
-        public uint Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(22)]
-        public byte Unknown3 { get { return unknown3; } set { if (unknown3 != value) { unknown3 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(23)]
-        public uint Unknown4 { get { return unknown4; } set { if (unknown4 != value) { unknown4 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(24)]
-        public byte Unknown5 { get { return unknown5; } set { if (unknown5 != value) { unknown5 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(25)]
-        public uint Unknown6 { get { return unknown6; } set { if (unknown6 != value) { unknown6 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(26)]
-        public byte Unknown7 { get { return unknown7; } set { if (unknown7 != value) { unknown7 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(27), TGIBlockListContentField("TGIBlocks")]
+        //--insert CommonBlock: ElementPriority(11)
+        [ElementPriority(21), TGIBlockListContentField("TGIBlocks")]
         public uint ModelVPXYIndex { get { return modelVPXYIndex; } set { if (modelVPXYIndex != value) { modelVPXYIndex = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(28), TGIBlockListContentField("TGIBlocks")]
+        [ElementPriority(22), TGIBlockListContentField("TGIBlocks")]
         public uint DiagonalVPXYIndex { get { return diagonalVPXYIndex; } set { if (diagonalVPXYIndex != value) { diagonalVPXYIndex = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(29), TGIBlockListContentField("TGIBlocks")]
+        [ElementPriority(23), TGIBlockListContentField("TGIBlocks")]
         public uint PostVPXYIndex { get { return postVPXYIndex; } set { if (postVPXYIndex != value) { postVPXYIndex = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(30)]
+        [ElementPriority(24)]
         public uint TileSpacing { get { return tileSpacing; } set { if (tileSpacing != value) { tileSpacing = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(31)]
+        [ElementPriority(25)]
         public byte CanWalkOver { get { return canWalkOver; } set { if (canWalkOver != value) { canWalkOver = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(32), TGIBlockListContentField("TGIBlocks")]
+        [ElementPriority(26), TGIBlockListContentField("TGIBlocks")]
         public byte RisesAboveWall
         {
             get { if (version < 0x00000008) throw new InvalidOperationException(); return risesAboveWall; }
             set { if (version < 0x00000008) throw new InvalidOperationException(); if (risesAboveWall != value) { risesAboveWall = value; OnResourceChanged(this, new EventArgs()); } }
         }
-        [ElementPriority(33), TGIBlockListContentField("TGIBlocks")]
+        [ElementPriority(27), TGIBlockListContentField("TGIBlocks")]
         public uint WallIndex
         {
             get { if (version < 0x00000008) throw new InvalidOperationException(); return wallIndex; }
             set { if (version < 0x00000008) throw new InvalidOperationException(); if (wallIndex != value) { wallIndex = value; OnResourceChanged(this, new EventArgs()); } }
         }
+        //--insert TGIBlockList: no ElementPriority
         #endregion
     }
 }

@@ -35,6 +35,8 @@ namespace s3pi.GenericRCOLResource
         AreaList slotAreas;
         #endregion
 
+        #region Constructors
+        public FTPT(int APIversion, EventHandler handler) : base(APIversion, handler, null) { }
         public FTPT(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler, s) { }
         public FTPT(int APIversion, EventHandler handler, FTPT basis)
             : base(APIversion, null, null)
@@ -44,13 +46,7 @@ namespace s3pi.GenericRCOLResource
             this.footprintAreas = new AreaList(OnRCOLChanged, basis.footprintAreas, version);
             this.slotAreas = new AreaList(OnRCOLChanged, basis.slotAreas, version);
         }
-        public FTPT(int APIversion, EventHandler handler)
-            : base(APIversion, null, null)
-        {
-            this.handler = handler;
-            this.footprintAreas = new AreaList(OnRCOLChanged, version);
-            this.slotAreas = new AreaList(OnRCOLChanged, version);
-        }
+        #endregion
 
         #region ARCOLBlock
         public override string Tag { get { return "FTPT"; } }
@@ -157,12 +153,12 @@ namespace s3pi.GenericRCOLResource
             #region Constructors
             public PolygonPointList(EventHandler handler) : base(handler, Byte.MaxValue) { }
             public PolygonPointList(EventHandler handler, Stream s) : base(handler, s, Byte.MaxValue) { }
-            public PolygonPointList(EventHandler handler, IList<PolygonPoint> lpp) : base(handler, lpp, Byte.MaxValue) { }
+            public PolygonPointList(EventHandler handler, IEnumerable<PolygonPoint> lpp) : base(handler, lpp, Byte.MaxValue) { }
             #endregion
 
             #region Data I/O
-            protected override uint ReadCount(Stream s) { return (new BinaryReader(s)).ReadByte(); }
-            protected override void WriteCount(Stream s, uint count) { (new BinaryWriter(s)).Write((byte)count); }
+            protected override int ReadCount(Stream s) { return (new BinaryReader(s)).ReadByte(); }
+            protected override void WriteCount(Stream s, int count) { (new BinaryWriter(s)).Write((byte)count); }
 
             protected override PolygonPoint CreateElement(Stream s) { return new PolygonPoint(0, elementHandler, s); }
 
@@ -259,7 +255,7 @@ namespace s3pi.GenericRCOLResource
                 basis.elevationOffset,
                 basis.lowerX, basis.lowerY, basis.upperX, basis.upperY) { }
             public Area(int APIversion, EventHandler handler, uint version,
-                uint name, byte priority, AreaType areaTypeFlags, IList<PolygonPoint> closedPolygon,
+                uint name, byte priority, AreaType areaTypeFlags, IEnumerable<PolygonPoint> closedPolygon,
                 AllowIntersection allowIntersectionFlags, SurfaceType surfaceTypeFlags, SurfaceAttribute surfaceAttributeFlags,
                 byte levelOffset,
                 float lowerX, float lowerY, float upperX, float upperY)
@@ -274,7 +270,7 @@ namespace s3pi.GenericRCOLResource
                         throw new InvalidOperationException(String.Format("Constructor requires ElevationOffset for version {0}", version));
             }
             public Area(int APIversion, EventHandler handler, uint version,
-                uint name, byte priority, AreaType areaTypeFlags, IList<PolygonPoint> closedPolygon,
+                uint name, byte priority, AreaType areaTypeFlags, IEnumerable<PolygonPoint> closedPolygon,
                 AllowIntersection allowIntersectionFlags, SurfaceType surfaceTypeFlags, SurfaceAttribute surfaceAttributeFlags,
                 byte levelOffset,
                 float elevationOffset,
@@ -441,12 +437,12 @@ namespace s3pi.GenericRCOLResource
             #region Constructors
             public AreaList(EventHandler handler, uint version) : base(handler, 255) { this.version = version; }
             public AreaList(EventHandler handler, Stream s, uint version) : base(null, 255) { this.version = version; elementHandler = handler; Parse(s); this.handler = handler; }
-            public AreaList(EventHandler handler, IList<Area> lfpa, uint version) : base(null, 255) { this.version = version; elementHandler = handler; this.AddRange(lfpa); this.handler = handler; }
+            public AreaList(EventHandler handler, IEnumerable<Area> lfpa, uint version) : base(null, 255) { this.version = version; elementHandler = handler; this.AddRange(lfpa); this.handler = handler; }
             #endregion
 
             #region Data I/O
-            protected override uint ReadCount(Stream s) { return (new BinaryReader(s)).ReadByte(); }
-            protected override void WriteCount(Stream s, uint count) { (new BinaryWriter(s)).Write((byte)count); }
+            protected override int ReadCount(Stream s) { return (new BinaryReader(s)).ReadByte(); }
+            protected override void WriteCount(Stream s, int count) { (new BinaryWriter(s)).Write((byte)count); }
 
             protected override Area CreateElement(Stream s) { return new Area(0, elementHandler, s, version); }
 
@@ -466,17 +462,21 @@ namespace s3pi.GenericRCOLResource
         {
             get
             {
+                string fmt;
                 string s = "";
                 s += "Tag: 0x" + tag.ToString("X8");
                 s += "\nVersion: 0x" + version.ToString("X8");
 
-                s += "\n--\nFootprintAreas:";
+                s += String.Format("\nFootprintAreas ({0:X}):", footprintAreas.Count);
+                fmt = "\n--[{0:X" + footprintAreas.Count.ToString("X").Length + "}]--\n{1}\n--";
                 for (int i = 0; i < footprintAreas.Count; i++)
-                    s += "\n-[" + i + "]-\n" + footprintAreas[i].Value;
+                    s += String.Format(fmt, i, footprintAreas[i].Value);
+                s += "\n----";
 
-                s += "\n--\nSlotAreas:";
+                s += String.Format("\nSlotAreas ({0:X}):", slotAreas.Count);
+                fmt = "\n--[{0:X" + slotAreas.Count.ToString("X").Length + "}]--\n{1}\n--";
                 for (int i = 0; i < slotAreas.Count; i++)
-                    s += "\n-[" + i + "]-\n" + slotAreas[i].Value;
+                    s += String.Format(fmt, i, slotAreas[i].Value);
                 return s;
             }
         }

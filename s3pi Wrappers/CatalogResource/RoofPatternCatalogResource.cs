@@ -1,5 +1,5 @@
 ﻿/***************************************************************************
- *  Copyright (C) 2009 by Peter L Jones                                    *
+ *  Copyright (C) 2010 by Peter L Jones                                    *
  *  pljones@users.sf.net                                                   *
  *                                                                         *
  *  This file is part of the Sims 3 Package Interface (s3pi)               *
@@ -27,48 +27,30 @@ namespace CatalogResource
     public class RoofPatternCatalogResource : CatalogResourceTGIBlockList
     {
         #region Attributes
-        uint unknown2;
-        byte unknown3;
-        uint unknown4;
-        byte unknown5;
-        uint unknown6;
-        byte unknown7;
-        uint vpxy_index1;
-        uint vpxy_index2;
-        uint unknown8;
+        uint topMaterialVPXYIndex;//topMaterialVPXYIndex
+        uint undersideMaterialVPXYIndex;//undersideMaterialVPXYIndex
+        uint sideStripsMaterialVPXYIndex;//sideStripsMaterialVPXYIndex
         #endregion
 
         #region Constructors
         public RoofPatternCatalogResource(int APIversion, Stream s) : base(APIversion, s) { }
         public RoofPatternCatalogResource(int APIversion, Stream unused, RoofPatternCatalogResource basis)
-            : base(APIversion, basis.version, basis.list)
+            : base(APIversion, basis.version, basis.common, basis.list)
         {
             this.common = new Common(requestedApiVersion, OnResourceChanged, basis.common);
-            this.unknown2 = basis.unknown2;
-            this.unknown3 = basis.unknown3;
-            this.unknown4 = basis.unknown4;
-            this.unknown5 = basis.unknown5;
-            this.unknown6 = basis.unknown6;
-            this.unknown7 = basis.unknown7;
-            this.vpxy_index1 = basis.vpxy_index1;
-            this.vpxy_index2 = basis.vpxy_index2;
-            this.unknown8 = basis.unknown8;
+            this.topMaterialVPXYIndex = basis.topMaterialVPXYIndex;
+            this.undersideMaterialVPXYIndex = basis.undersideMaterialVPXYIndex;
+            this.sideStripsMaterialVPXYIndex = basis.sideStripsMaterialVPXYIndex;
         }
         public RoofPatternCatalogResource(int APIversion, uint version, Common common,
-            uint unknown2, byte unknown3, uint unknown4, byte unknown5, uint unknown6, byte unknown7, uint index1, uint index2, uint unknown8,
+            uint topMaterialVPXYIndex, uint undersideMaterialVPXYIndex, uint sideStripsMaterialVPXYIndex,
             TGIBlockList ltgib)
-            : base(APIversion, version, ltgib)
+            : base(APIversion, version, common, ltgib)
         {
             this.common = new Common(requestedApiVersion, OnResourceChanged, common);
-            this.unknown2 = unknown2;
-            this.unknown3 = unknown3;
-            this.unknown4 = unknown4;
-            this.unknown5 = unknown5;
-            this.unknown6 = unknown6;
-            this.unknown7 = unknown7;
-            this.vpxy_index1 = index1;
-            this.vpxy_index2 = index2;
-            this.unknown8 = unknown8;
+            this.topMaterialVPXYIndex = topMaterialVPXYIndex;
+            this.undersideMaterialVPXYIndex = undersideMaterialVPXYIndex;
+            this.sideStripsMaterialVPXYIndex = sideStripsMaterialVPXYIndex;
         }
         #endregion
 
@@ -78,15 +60,9 @@ namespace CatalogResource
             BinaryReader r = new BinaryReader(s);
             base.Parse(s);
             this.common = new Common(requestedApiVersion, OnResourceChanged, s);
-            this.unknown2 = r.ReadUInt32();
-            this.unknown3 = r.ReadByte();
-            this.unknown4 = r.ReadUInt32();
-            this.unknown5 = r.ReadByte();
-            this.unknown6 = r.ReadUInt32();
-            this.unknown7 = r.ReadByte();
-            this.vpxy_index1 = r.ReadUInt32();
-            this.vpxy_index2 = r.ReadUInt32();
-            this.unknown8 = r.ReadUInt32();
+            this.topMaterialVPXYIndex = r.ReadUInt32();
+            this.undersideMaterialVPXYIndex = r.ReadUInt32();
+            this.sideStripsMaterialVPXYIndex = r.ReadUInt32();
 
             list = new TGIBlockList(OnResourceChanged, s, tgiPosn, tgiSize);
 
@@ -103,15 +79,9 @@ namespace CatalogResource
             if (common == null) common = new Common(requestedApiVersion, OnResourceChanged);
             common.UnParse(s);
 
-            w.Write(unknown2);
-            w.Write(unknown3);
-            w.Write(unknown4);
-            w.Write(unknown5);
-            w.Write(unknown6);
-            w.Write(unknown7);
-            w.Write(vpxy_index1);
-            w.Write(vpxy_index2);
-            w.Write(unknown8);
+            w.Write(topMaterialVPXYIndex);
+            w.Write(undersideMaterialVPXYIndex);
+            w.Write(sideStripsMaterialVPXYIndex);
 
             base.UnParse(s);
 
@@ -122,24 +92,15 @@ namespace CatalogResource
         #endregion
 
         #region Content Fields
-        [ElementPriority(21)]
-        public uint Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(22)]
-        public byte Unknown3 { get { return unknown3; } set { if (unknown3 != value) { unknown3 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(23)]
-        public uint Unknown4 { get { return unknown4; } set { if (unknown4 != value) { unknown4 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(24)]
-        public byte Unknown5 { get { return unknown5; } set { if (unknown5 != value) { unknown5 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(25)]
-        public uint Unknown6 { get { return unknown6; } set { if (unknown6 != value) { unknown6 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(26)]
-        public byte Unknown7 { get { return unknown7; } set { if (unknown7 != value) { unknown7 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(27), TGIBlockListContentField("TGIBlocks")]
-        public uint VPXYIndex1 { get { return vpxy_index1; } set { if (vpxy_index1 != value) { vpxy_index1 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(28), TGIBlockListContentField("TGIBlocks")]
-        public uint VPXYIndex2 { get { return vpxy_index2; } set { if (vpxy_index2 != value) { vpxy_index2 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(29)]
-        public uint Unknown8 { get { return unknown8; } set { if (unknown8 != value) { unknown8 = value; OnResourceChanged(this, new EventArgs()); } } }
+        //--insert Version: ElementPriority(1)
+        //--insert CommonBlock: ElementPriority(11)
+        [ElementPriority(21), TGIBlockListContentField("TGIBlocks")]
+        public uint TopMaterialVPXYIndex { get { return topMaterialVPXYIndex; } set { if (topMaterialVPXYIndex != value) { topMaterialVPXYIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        [ElementPriority(22), TGIBlockListContentField("TGIBlocks")]
+        public uint UndersideMaterialVPXYIndex { get { return undersideMaterialVPXYIndex; } set { if (undersideMaterialVPXYIndex != value) { undersideMaterialVPXYIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        [ElementPriority(23), TGIBlockListContentField("TGIBlocks")]
+        public uint SideStripsMaterialVPXYIndex { get { return sideStripsMaterialVPXYIndex; } set { if (sideStripsMaterialVPXYIndex != value) { sideStripsMaterialVPXYIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        //--insert TGIBlockList: no ElementPriority
         #endregion
     }
 }

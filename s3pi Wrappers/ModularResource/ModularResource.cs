@@ -76,22 +76,22 @@ namespace ModularResource
         #endregion
 
         #region Sub-classes
-        public class TGIIndexList : AResource.SimpleList<UInt32>
+        public class TGIIndexList : SimpleList<UInt32>
         {
-            static string fmt = "0x{1:X8}\n";
             #region Constructors
-            public TGIIndexList(EventHandler handler) : base(handler, ReadUInt32, WriteUInt32, fmt, ushort.MaxValue, ReadListCount, WriteListCount) { }
-            public TGIIndexList(EventHandler handler, IList<HandlerElement<uint>> ltgii) : base(handler, ltgii, ReadUInt32, WriteUInt32, fmt, ushort.MaxValue, ReadListCount, WriteListCount) { }
-            internal TGIIndexList(EventHandler handler, Stream s) : base(handler, s, ReadUInt32, WriteUInt32, fmt, ushort.MaxValue, ReadListCount, WriteListCount) { }
+            public TGIIndexList(EventHandler handler) : base(handler, ReadUInt32, WriteUInt32, ushort.MaxValue, ReadListCount, WriteListCount) { }
+            internal TGIIndexList(EventHandler handler, Stream s) : base(handler, s, ReadUInt32, WriteUInt32, ushort.MaxValue, ReadListCount, WriteListCount) { }
+            public TGIIndexList(EventHandler handler, IEnumerable<uint> ltgii) : base(handler, ltgii, ReadUInt32, WriteUInt32, ushort.MaxValue, ReadListCount, WriteListCount) { }
+            public TGIIndexList(EventHandler handler, IEnumerable<HandlerElement<uint>> ltgii) : base(handler, ltgii, ReadUInt32, WriteUInt32, ushort.MaxValue, ReadListCount, WriteListCount) { }
             #endregion
 
             #region Data I/O
-            static uint ReadListCount(Stream s) { return (new BinaryReader(s)).ReadUInt16(); }
-            static void WriteListCount(Stream s, uint count) { (new BinaryWriter(s)).Write((UInt16)count); }
+            static int ReadListCount(Stream s) { return (new BinaryReader(s)).ReadUInt16(); }
+            static void WriteListCount(Stream s, int count) { (new BinaryWriter(s)).Write((UInt16)count); }
             static UInt32 ReadUInt32(Stream s) { return (new BinaryReader(s)).ReadUInt32(); }
             static void WriteUInt32(Stream s, UInt32 value) { (new BinaryWriter(s)).Write(value); }
             #endregion
-        }
+       }
         #endregion
 
         #region Content Fields
@@ -104,13 +104,21 @@ namespace ModularResource
         {
             get
             {
-                string h = "\n---------\n---------\n{0}: {1}\n---------\n";
-                string t = "---------\n";
                 string s = "";
+                string fmt;
+
                 s += "Unknown1: 0x" + unknown1.ToString("X4");
                 s += "\nUnknown2: 0x" + unknown2.ToString("X4");
-                s += String.Format(h, "TGIIndexList", "TGIIndexes") + tgiIndexes.Value + t;
-                s += String.Format(h, "TGIBlockList", "TGIBlocks") + tgiBlocks.Value + t;
+
+                s += "\nTGIIndexes:";
+                fmt = "\n  [{0:X" + tgiIndexes.Count.ToString("X").Length + "}]: {1:X8}";
+                for (int i = 0; i < tgiIndexes.Count; i++) s += string.Format(fmt, i, tgiIndexes[i]);
+                s += "\n--";
+
+                s += "\nTGIBlocks:";
+                fmt = "\n  [{0:X" + tgiBlocks.Count.ToString("X").Length + "}]: {1}";
+                for (int i = 0; i < tgiBlocks.Count; i++) s += string.Format(fmt, i, tgiBlocks[i].Value);
+                s += "\n--";
                 return s;
             }
         }

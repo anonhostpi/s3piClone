@@ -55,6 +55,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FoundationCatalogResource.cs" />
     <Compile Include="Properties\AssemblyVersion.cs" />
     <Compile Include="CatalogResource.cs" />
     <Compile Include="FenceCatalogResource.cs" />

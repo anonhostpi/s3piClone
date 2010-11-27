@@ -39,46 +39,61 @@ namespace s3pi.GenericRCOLResource
         MTNF mtnf = null;
         #endregion
 
+        #region Constructors
         public MATD(int APIversion, EventHandler handler) : base(APIversion, handler, null) { }
         public MATD(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler, s) { }
         public MATD(int APIversion, EventHandler handler, MATD basis)
-            : base(APIversion, null, null)
+            : base(APIversion, handler, null)
         {
-            this.handler = handler;
             this.version = basis.version;
             this.materialNameHash = basis.materialNameHash;
             this.shader = basis.shader;
-            if (basis.mtrl != null) mtrl = new MTRL(requestedApiVersion, OnRCOLChanged, basis.mtrl);
-            this.unknown1 = basis.unknown1;
-            this.unknown2 = basis.unknown2;
-            if (basis.mtnf != null) mtnf = new MTNF(requestedApiVersion, OnRCOLChanged, basis.mtnf);
+            if (version < 0x00000103)
+            {
+                mtrl = basis.mtrl != null
+                    ? new MTRL(requestedApiVersion, OnRCOLChanged, basis.mtrl)
+                    : new MTRL(requestedApiVersion, OnRCOLChanged);
+            }
+            else
+            {
+                this.unknown1 = basis.unknown1;
+                this.unknown2 = basis.unknown2;
+                mtnf = basis.mtnf != null
+                    ? new MTNF(requestedApiVersion, OnRCOLChanged, basis.mtnf)
+                    : new MTNF(requestedApiVersion, OnRCOLChanged);
+            }
         }
+
         public MATD(int APIversion, EventHandler handler,
             uint version, uint materialNameHash, ShaderType shader, MTRL mtrl)
-            : base(APIversion, null, null)
+            : base(APIversion, handler, null)
         {
-            this.handler = handler;
-            if (checking) if (version >= 0x00000103)
-                    throw new ArgumentException("version must be <= 0x0103 for MTRLs");
             this.version = version;
             this.materialNameHash = materialNameHash;
             this.shader = shader;
-            this.mtrl = mtrl == null ? null : new MTRL(requestedApiVersion, OnRCOLChanged, mtrl);
+            if (checking) if (version >= 0x00000103)
+                    throw new ArgumentException("version must be < 0x0103 for MTRLs");
+            this.mtrl = mtrl != null
+                ? new MTRL(requestedApiVersion, OnRCOLChanged, mtrl)
+                : new MTRL(requestedApiVersion, OnRCOLChanged);
         }
+
         public MATD(int APIversion, EventHandler handler,
             uint version, uint materialNameHash, ShaderType shader, uint unknown1, uint unknown2, MTNF mtnf)
-            : base(APIversion, null, null)
+            : base(APIversion, handler, null)
         {
-            this.handler = handler;
-            if (checking) if (version < 0x00000103)
-                    throw new ArgumentException("version must be <= 0x0103 for MTNFs");
             this.version = version;
             this.materialNameHash = materialNameHash;
             this.shader = shader;
+            if (checking) if (version < 0x00000103)
+                    throw new ArgumentException("version must be >= 0x0103 for MTNFs");
             this.unknown1 = unknown1;
             this.unknown2 = unknown2;
-            this.mtnf = mtnf == null ? null : new MTNF(requestedApiVersion, OnRCOLChanged, mtnf);
+            this.mtnf = mtnf != null
+                ? new MTNF(requestedApiVersion, OnRCOLChanged, mtnf)
+                : new MTNF(requestedApiVersion, OnRCOLChanged);
         }
+        #endregion
 
         #region ARCOLBlock
         public override string Tag { get { return "MATD"; } }
@@ -446,8 +461,11 @@ namespace s3pi.GenericRCOLResource
                     s += "MTRLUnknown1: 0x" + mtrlUnknown1.ToString("X8");
                     s += "\nMTRLUnknown2: 0x" + mtrlUnknown2.ToString("X4");
                     s += "\nMTRLUnknown3: 0x" + mtrlUnknown3.ToString("X4");
+
+                    s += String.Format("\nSData ({0:X}):", sdList.Count);
+                    string fmt = "\n  [{0:X" + sdList.Count.ToString("X").Length + "}]: {{{1}}}";
                     for (int i = 0; i < sdList.Count; i++)
-                        s += "\n--Data[" + i + "]: {" + sdList[i].Value + "}";
+                        s += String.Format(fmt, i, sdList[i].Value);
                     return s;
                 }
             }
@@ -523,8 +541,11 @@ namespace s3pi.GenericRCOLResource
                 {
                     string s = "";
                     s += "MTNFUnknown1: 0x" + mtnfUnknown1.ToString("X8");
+
+                    s += String.Format("\nSData ({0:X}):", sdList.Count);
+                    string fmt = "\n  [{0:X" + sdList.Count.ToString("X").Length + "}]: {{{1}}}";
                     for (int i = 0; i < sdList.Count; i++)
-                        s += "\n--Data[" + i + "]: {" + sdList[i].Value + "}";
+                        s += String.Format(fmt, i, sdList[i].Value);
                     return s;
                 }
             }
@@ -660,17 +681,17 @@ namespace s3pi.GenericRCOLResource
         public class EntryList : AResource.DependentList<Entry>
         {
             DataType type = 0;
-            uint count = 0;
+            int count = 0;
 
             #region Constructors
             public EntryList(EventHandler handler, DataType type) : base(handler) { this.type = type; }
-            public EntryList(EventHandler handler, DataType type, uint count, Stream s) : base(null) { this.type = type; this.count = count; elementHandler = handler; Parse(s); this.handler = handler; }
-            public EntryList(EventHandler handler, DataType type, IList<Entry> le) : base(handler, le) { this.type = type; }
+            public EntryList(EventHandler handler, DataType type, int count, Stream s) : base(null) { this.type = type; this.count = count; elementHandler = handler; Parse(s); this.handler = handler; }
+            public EntryList(EventHandler handler, DataType type, IEnumerable<Entry> le) : base(handler, le) { this.type = type; }
             #endregion
 
             #region Data I/O
-            protected override uint ReadCount(Stream s) { return count; }
-            protected override void WriteCount(Stream s, uint count) { }
+            protected override int ReadCount(Stream s) { return count; }
+            protected override void WriteCount(Stream s, int count) { }
 
             protected override Entry CreateElement(Stream s) { return Entry.CreateEntry(0, elementHandler, type, s); }
 
@@ -711,7 +732,7 @@ namespace s3pi.GenericRCOLResource
 
             FieldType field = 0;
             DataType sdType = 0;
-            uint count = 0;
+            int count = 0;
             uint offset = 0;
             long offsetPos = -1;
             EntryList sdData = null;
@@ -721,7 +742,7 @@ namespace s3pi.GenericRCOLResource
             public ShaderData(int APIversion, EventHandler handler, ShaderData basis)
                 : this(APIversion, handler, basis.field, basis.sdType, basis.sdData) { }
             public ShaderData(int APIversion, EventHandler handler) : base(APIversion, handler) { }
-            public ShaderData(int APIversion, EventHandler handler, FieldType field, DataType sdType, uint count, Stream s)
+            public ShaderData(int APIversion, EventHandler handler, FieldType field, DataType sdType, int count, Stream s)
                 : base(APIversion, handler)
             {
                 this.field = field;
@@ -743,7 +764,7 @@ namespace s3pi.GenericRCOLResource
                 BinaryReader r = new BinaryReader(s);
                 field = (FieldType)r.ReadUInt32();
                 sdType = (DataType)r.ReadUInt32();
-                count = r.ReadUInt32();
+                count = r.ReadInt32();
                 offset = r.ReadUInt32();
             }
 
@@ -802,9 +823,9 @@ namespace s3pi.GenericRCOLResource
                 get
                 {
                     string s = "";
-                    s += "Field: " + new TypedValue(typeof(FieldType), field, "X");
-                    s += "; Entries: "; foreach (var e in sdData) s += e["Data"] + ", "; s = s.TrimEnd(',', ' ');
-                    return s;
+                    s += this["Field"] + " {";
+                    foreach (var e in sdData) s += " " + e["Data"] + ",";
+                    return s.TrimEnd(',') + " }";
                 }
             }
             #endregion
@@ -816,14 +837,14 @@ namespace s3pi.GenericRCOLResource
             #region Constructors
             public ShaderDataList(EventHandler handler) : base(handler) { }
             public ShaderDataList(EventHandler handler, Stream s, int dataLen, long start) : base(null) { this.dataLen = dataLen; elementHandler = handler; Parse(s, start); this.handler = handler; }
-            public ShaderDataList(EventHandler handler, IList<ShaderData> lsd) : base(handler, lsd) { }
+            public ShaderDataList(EventHandler handler, IEnumerable<ShaderData> lsd) : base(handler, lsd) { }
             #endregion
 
             #region Data I/O
             protected override void Parse(Stream s) { throw new NotSupportedException(); }
             internal void Parse(Stream s, long start)
             {
-                for (uint i = ReadCount(s); i > 0; i--) this.Add(s);
+                for (int i = ReadCount(s); i > 0; i--) this.Add(s);
                 long pos = s.Position;
                 foreach (var i in this) i.ReadEntryList(start, s);
                 if (checking) if (dataLen >= 0 && dataLen != s.Position - pos)
@@ -833,7 +854,7 @@ namespace s3pi.GenericRCOLResource
             public override void UnParse(Stream s) { throw new NotSupportedException(); }
             internal void UnParse(Stream s, long start)
             {
-                WriteCount(s, (uint)Count);
+                WriteCount(s, Count);
                 foreach (var element in this) element.UnParse(s);
                 dataPos = s.Position;
                 foreach (var element in this) element.WriteEntryList(start, s);

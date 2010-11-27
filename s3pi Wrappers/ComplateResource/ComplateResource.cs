@@ -80,19 +80,14 @@ namespace ComplateResource
         #endregion
 
         #region Content Fields
-        /// <summary>
-        /// Return the resource stream as a string (resetting stream position)
-        /// </summary>
-        [MinimumVersion(1)]
-        [MaximumVersion(recommendedApiVersion)]
         public string Value
         {
             get
             {
                 string s = "";
-                s += String.Format("{0}: {1}\n", "Unknown1", Unknown1);
-                s += String.Format("{0}: {1}\n", "UnicodeString", UnicodeString);
-                s += String.Format("{0}: {1}\n", "Unknown2", Unknown2);
+                s += "Unknown1: " + this["Unknown1"];
+                s += "\nUnicodeString:\n" + UnicodeString;
+                s += "\nUnknown2: " + this["Unknown2"];
                 return s;
             }
         }
@@ -128,29 +123,13 @@ namespace ComplateResource
 
     public class ComplateResourceHandler : AResourceHandler
     {
-        #region Read config file
-        static List<string> resourceTypes = null;
-        static ComplateResourceHandler()
-        {
-            string path = Path.GetDirectoryName(typeof(ComplateResource).Assembly.Location);
-            StreamReader sr = new StreamReader(Path.Combine(path, "ComplateResources.txt"));
-            resourceTypes = new List<string>();
-            string s;
-            while ((s = sr.ReadLine()) != null)
-            {
-                string[] t = s.Split(new char[] { ' ' }, 2);
-                resourceTypes.Add(t[0]);
-            }
-        }
-        #endregion
-
         /// <summary>
         /// Create the content of the Dictionary.
         /// List of resource types is read once from a configuration file in the same folder as this assembly.
         /// </summary>
         public ComplateResourceHandler()
         {
-            this.Add(typeof(ComplateResource), new List<string>(resourceTypes.ToArray()));
+            this.Add(typeof(ComplateResource), new List<string>(new string[] { "0x044AE110", }));
         }
     }
 }
