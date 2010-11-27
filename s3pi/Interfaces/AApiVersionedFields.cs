@@ -290,26 +290,6 @@ namespace s3pi.Interfaces
         // Random helper functions that should live somewhere...
 
         /// <summary>
-        /// Write a 7BITSTR value to a stream
-        /// </summary>
-        /// <param name="s">Stream to write to</param>
-        /// <param name="value">String to write, prefixed by length, seven bits at a time</param>
-        /// <param name="enc">encoding to use on the <see cref="System.IO.BinaryWriter(System.IO.Stream, System.Text.Encoding)"/></param>
-        public static void Write7BitStr(System.IO.Stream s, string value, System.Text.Encoding enc)
-        {
-            byte[] bytes = enc.GetBytes(value);
-            System.IO.BinaryWriter w = new System.IO.BinaryWriter(s, enc);
-            for (int i = bytes.Length; true; ) { w.Write((byte)((i & 0x7F) | (i > 0x7F ? 0x80 : 0))); i = i >> 7; if (i == 0) break; }
-            w.Write(bytes);
-        }
-        /// <summary>
-        /// Write a 7BITSTR value to a stream with Default encoding
-        /// </summary>
-        /// <param name="s">Stream to write to</param>
-        /// <param name="value">String to write, prefixed by length, seven bits at a time</param>
-        public static void Write7BitStr(System.IO.Stream s, string value) { Write7BitStr(s, value, System.Text.Encoding.Default); }
-
-        /// <summary>
         /// Convert a string (up to 8 characters) to a UInt64
         /// </summary>
         /// <param name="s">String to convert</param>
@@ -396,10 +376,10 @@ namespace s3pi.Interfaces
     /// An extension to <see cref="AHandlerElement"/>, for simple data types (such as <see cref="UInt32"/>).
     /// </summary>
     /// <typeparam name="T">A simple data type (such as <see cref="UInt32"/>).</typeparam>
-    /// <remarks>For an example of use, see <see cref="AResource.SimpleList{T}"/>.</remarks>
-    /// <seealso cref="AResource.SimpleList{T}"/>
+    /// <remarks>For an example of use, see <see cref="SimpleList{T}"/>.</remarks>
+    /// <seealso cref="SimpleList{T}"/>
     public class HandlerElement<T> : AHandlerElement, IEquatable<HandlerElement<T>>
-        where T : struct, IEquatable<T>
+        where T : struct, IComparable, IConvertible, IEquatable<T>, IComparable<T>
     {
         const int recommendedApiVersion = 1;
         T val;
@@ -419,6 +399,15 @@ namespace s3pi.Interfaces
         /// <param name="basis">Initial value for instance.</param>
         public HandlerElement(int APIversion, EventHandler handler, T basis) : base(APIversion, handler) { val = basis; }
 
+        /// <summary>
+        /// Initialize a new instance with an initial value from <paramref name="basis"/>.
+        /// </summary>
+        /// <param name="APIversion">The requested API version.</param>
+        /// <param name="handler">The <see cref="EventHandler"/> delegate to invoke if the <see cref="AHandlerElement"/> changes.</param>
+        /// <param name="basis">Element containing the initial value for instance.</param>
+        public HandlerElement(int APIversion, EventHandler handler, HandlerElement<T> basis) : base(APIversion, handler) { val = basis.val; }
+
+        #region AHandlerElement
         /// <summary>
         /// Get a copy of the HandlerElement but with a new change <see cref="EventHandler"/>.
         /// </summary>
@@ -441,6 +430,16 @@ namespace s3pi.Interfaces
         /// The list of available field names on this API object.
         /// </summary>
         public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
+        #endregion
+
+        #region IEquatable<HandlerElement<T>>
+        /// <summary>
+        /// Indicates whether the current object is equal to another object of the same type.
+        /// </summary>
+        /// <param name="other">An object to compare with this object.</param>
+        /// <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
+        public bool Equals(HandlerElement<T> other) { return val.Equals(other.val); }
+        #endregion
 
         /// <summary>
         /// The value of the object.
@@ -448,10 +447,17 @@ namespace s3pi.Interfaces
         public T Val { get { return val; } set { if (!val.Equals(value)) { val = value; OnElementChanged(); } } }
 
         /// <summary>
-        /// Indicates whether the current object is equal to another object of the same type.
+        /// Implicit cast from <see cref="HandlerElement{T}"/> to <typeparamref name="T"/>.
         /// </summary>
-        /// <param name="other">An object to compare with this object.</param>
-        /// <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
-        public bool Equals(HandlerElement<T> other) { return val.Equals(other.val); }
+        /// <param name="value">Value to cast.</param>
+        /// <returns>Cast value.</returns>
+        public static implicit operator T(HandlerElement<T> value) { return value.val; }
+        //// <summary>
+        //// Implicit cast from <typeparamref name="T"/> to <see cref="HandlerElement{T}"/>.
+        //// </summary>
+        //// <param name="value">Value to cast.</param>
+        //// <returns>Cast value.</returns>
+        //--do not want to accidentally disrupt the content of lists through this cast!
+        //public static implicit operator HandlerElement<T>(T value) { return new HandlerElement<T>(0, null, value); }
     }
 }
