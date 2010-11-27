@@ -53,11 +53,11 @@ namespace System.Collections.Generic
         /// filled with the content of <paramref name="ilt"/>.
         /// </summary>
         /// <param name="handler">The <see cref="EventHandler"/> to call on changes to the list.</param>
-        /// <param name="ilt">The <see cref="IList{T}"/> to use as the initial content of the list.</param>
+        /// <param name="ilt">The <see cref="IEnumerable{T}"/> to use as the initial content of the list.</param>
         /// <param name="size">Optional; -1 for unlimited size, otherwise the maximum number of elements in the list.</param>
         /// <remarks>Does not throw an exception if <paramref name="ilt"/>.Count is greater than <paramref name="size"/>.
         /// An exception will be thrown on any attempt to add further items unless the Count is reduced first.</remarks>
-        protected AHandlerList(EventHandler handler, IList<T> ilt, long size = -1) : base(ilt) { this.handler = handler; this.maxSize = size; }
+        protected AHandlerList(EventHandler handler, IEnumerable<T> ilt, long size = -1) : base(ilt) { this.handler = handler; this.maxSize = size; }
         #endregion
 
         #region List<T> Members
@@ -114,7 +114,7 @@ namespace System.Collections.Generic
         /// <summary>
         /// Removes the all the elements that match the conditions defined by the specified predicate.
         /// </summary>
-        /// <param name="match">The System.Predicate&lt;T&gt; delegate that defines the conditions of the elements to remove.</param>
+        /// <param name="match">The System.Predicate{T} delegate that defines the conditions of the elements to remove.</param>
         /// <returns>The number of elements removed from the <see cref="AHandlerList{T}"/>.</returns>
         /// <exception cref="System.ArgumentNullException"><paramref name="match"/> is null.</exception>
         /// <exception cref="System.NotSupportedException">The <see cref="AHandlerList{T}"/> is read-only.</exception>

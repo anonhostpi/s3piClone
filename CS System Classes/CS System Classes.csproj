@@ -69,15 +69,13 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ADependentList.cs" />
     <Compile Include="ArgumentLengthException.cs" />
     <Compile Include="AHandlerList.cs" />
+    <Compile Include="SevenBitString.cs" />
     <Compile Include="Sims3PackCRC.cs" />
     <Compile Include="FNVHash.cs" />
     <Compile Include="Properties\AssemblyVersion.cs" />
     <Compile Include="Boolset.cs" />
-    <Compile Include="ICloneableWithParent.cs" />
-    <Compile Include="IDependentList.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
