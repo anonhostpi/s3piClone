@@ -75,7 +75,6 @@
     <Compile Include="Sims3PackCRC.cs" />
     <Compile Include="FNVHash.cs" />
     <Compile Include="Properties\AssemblyVersion.cs" />
-    <Compile Include="Boolset.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
