@@ -8,8 +8,8 @@
     <ProjectGuid>{D9B63641-D3BE-4120-9115-7D67B1238FBF}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DemoPlugins</RootNamespace>
-    <AssemblyName>s3pi.DemoPlugins</AssemblyName>
+    <RootNamespace>s3pi.Helpers</RootNamespace>
+    <AssemblyName>s3pi.Helpers</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>false</SignAssembly>

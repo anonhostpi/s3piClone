@@ -23,7 +23,7 @@ using System.IO;
 using s3pi.Interfaces;
 using System.Windows.Forms;
 
-namespace s3pi.DemoPlugins
+namespace s3pi.Helpers
 {
     public interface IRunHelper
     {
