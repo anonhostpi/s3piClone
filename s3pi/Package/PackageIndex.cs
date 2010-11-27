@@ -32,7 +32,7 @@ namespace s3pi.Package
     {
         const int numFields = 9;
 
-        Boolset indextype = (UInt32)0;
+        UInt32 indextype;
         public UInt32 Indextype { get { return indextype; } }
 
         int Hdrsize
@@ -40,7 +40,7 @@ namespace s3pi.Package
             get
             {
                 int hc = 1;
-                for (int i = 0; i < indextype.Length; i++) if (indextype[i]) hc++;
+                for (int i = 0; i < sizeof(uint); i++) if ((indextype & (1 << i)) != 0) hc++;
                 return hc;
             }
         }
@@ -59,7 +59,7 @@ namespace s3pi.Package
             Int32[] hdr = new Int32[Hdrsize];
             Int32[] entry = new Int32[numFields - Hdrsize];
 
-            hdr[0] = indextype;
+            hdr[0] = (int)indextype;
             for (int i = 1; i < hdr.Length; i++)
                 hdr[i] = r.ReadInt32();
 
@@ -100,18 +100,18 @@ namespace s3pi.Package
             }
             
             r.BaseStream.Position = 4;
-            w.Write((int)indextype);
-            if (indextype[0]) w.Write(r.ReadUInt32()); else r.BaseStream.Position += 4;
-            if (indextype[1]) w.Write(r.ReadUInt32()); else r.BaseStream.Position += 4;
-            if (indextype[2]) w.Write(r.ReadUInt32()); else r.BaseStream.Position += 4;
+            w.Write(indextype);
+            if ((indextype & 0x01) != 0) w.Write(r.ReadUInt32()); else r.BaseStream.Position += 4;
+            if ((indextype & 0x02) != 0) w.Write(r.ReadUInt32()); else r.BaseStream.Position += 4;
+            if ((indextype & 0x04) != 0) w.Write(r.ReadUInt32()); else r.BaseStream.Position += 4;
 
             foreach (IResourceIndexEntry ie in this)
             {
                 r = new BinaryReader(ie.Stream);
                 r.BaseStream.Position = 4;
-                if (!indextype[0]) w.Write(r.ReadUInt32()); else r.BaseStream.Position += 4;
-                if (!indextype[1]) w.Write(r.ReadUInt32()); else r.BaseStream.Position += 4;
-                if (!indextype[2]) w.Write(r.ReadUInt32()); else r.BaseStream.Position += 4;
+                if ((indextype & 0x01) == 0) w.Write(r.ReadUInt32()); else r.BaseStream.Position += 4;
+                if ((indextype & 0x02) == 0) w.Write(r.ReadUInt32()); else r.BaseStream.Position += 4;
+                if ((indextype & 0x04) == 0) w.Write(r.ReadUInt32()); else r.BaseStream.Position += 4;
                 w.Write(r.ReadBytes((int)(ie.Stream.Length - ie.Stream.Position)));
             }
         }

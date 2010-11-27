@@ -205,10 +205,10 @@ namespace s3pi.Package
 
             int hc = 1;// header[0] is indexType, already written!
             int ec = 0;
-            Boolset IhGT = (uint)header[0];
-            w.Write(IhGT[0] ? header[hc++] : entry[ec++]);
-            w.Write(IhGT[1] ? header[hc++] : entry[ec++]);
-            w.Write(IhGT[2] ? header[hc++] : entry[ec++]);
+            uint IhGT = (uint)header[0];
+            w.Write((IhGT & 0x01) != 0 ? header[hc++] : entry[ec++]);
+            w.Write((IhGT & 0x02) != 0 ? header[hc++] : entry[ec++]);
+            w.Write((IhGT & 0x04) != 0 ? header[hc++] : entry[ec++]);
 
             for (; hc < header.Length - 1; hc++)
                 w.Write(header[hc]);

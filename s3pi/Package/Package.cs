@@ -281,44 +281,25 @@ namespace s3pi.Package
         [MaximumVersion(recommendedApiVersion)]
         public override IList<IResourceIndexEntry> GetResourceList { get { return Index; } }
 
-        class FlagMatch
+        static bool FlagMatch(uint flags, IResourceIndexEntry values, IResourceIndexEntry target)
         {
-            Boolset flags;
-            IResourceIndexEntry values;
-            public FlagMatch(Boolset flags, IResourceIndexEntry values)
-            {
-                if (flags.Length > values.ContentFields.Count) throw new ArgumentLengthException("flags", values.ContentFields.Count);
-                this.flags = flags;
-                this.values = values;
-            }
-            public bool Match(IResourceIndexEntry rie)
-            {
-                if (flags == 0) return true;
+            if (flags == 0) return true;
 
-                for (int i = 0; i < flags.Length; i++)
-                {
-                    if (!flags[i]) continue;
-                    string f = values.ContentFields[i];
-                    if (!values[f].Equals(rie[f])) return false;
-                }
-                return true;
+            for (int i = 0; i < sizeof(uint); i++)
+            {
+                uint j = (uint)(1 << i);
+                if ((flags & j) == 0) continue;
+                string f = values.ContentFields[i];
+                if (!target.ContentFields.Contains(f)) return false;
+                if (!values[f].Equals(target[f])) return false;
             }
+            return true;
         }
 
-        class NameMatch
+        static bool NameMatch(string[] names, TypedValue[] values, IResourceIndexEntry target)
         {
-            string[] names;
-            TypedValue[] values;
-            public NameMatch(string[] names, TypedValue[] values)
-            {
-                foreach (string n in names) if (!GetContentFields(0, typeof(ResourceIndexEntry)).Contains(n)) throw new ArgumentOutOfRangeException("names", String.Format("'{0}' is an invalid IResourceIndexEntry ContentField", n));
-                this.names = names; this.values = values;
-            }
-            public bool Match(IResourceIndexEntry rie)
-            {
-                for (int i = 0; i < names.Length; i++) if (!values[i].Equals(rie[names[i]])) return false;
-                return true;
-            }
+            for (int i = 0; i < names.Length; i++) if (!target.ContentFields.Contains(names[i]) || !values[i].Equals(target[names[i]])) return false;
+            return true;
         }
 
         /// <summary>
@@ -330,7 +311,7 @@ namespace s3pi.Package
         /// <returns>The first match, if any; otherwise null.</returns>
         [MinimumVersion(1)]
         [MaximumVersion(recommendedApiVersion)]
-        public override IResourceIndexEntry Find(uint flags, IResourceIndexEntry values) { return Index.Find((new FlagMatch(flags, values)).Match); }
+        public override IResourceIndexEntry Find(uint flags, IResourceIndexEntry values) { return Index.Find(x => !x.IsDeleted && FlagMatch(flags, values, x)); }
 
         /// <summary>
         /// Searches for an element that matches the conditions defined by <paramref name="names"/> and <paramref name="values"/>,
@@ -341,7 +322,7 @@ namespace s3pi.Package
         /// <returns>The first match, if any; otherwise null.</returns>
         [MinimumVersion(1)]
         [MaximumVersion(recommendedApiVersion)]
-        public override IResourceIndexEntry Find(string[] names, TypedValue[] values) { return Index.Find((new NameMatch(names, values)).Match); }
+        public override IResourceIndexEntry Find(string[] names, TypedValue[] values) { return Index.Find(x => !x.IsDeleted && NameMatch(names, values, x)); }
 
         /// <summary>
         /// Searches the entire <see cref="IPackage"/>
@@ -364,7 +345,7 @@ namespace s3pi.Package
         /// <returns>An <c>IList&lt;IResourceIndexEntry&gt;</c> of zero or more matches.</returns>
         [MinimumVersion(1)]
         [MaximumVersion(recommendedApiVersion)]
-        public override IList<IResourceIndexEntry> FindAll(uint flags, IResourceIndexEntry values) { return Index.FindAll((new FlagMatch(flags, values)).Match); }
+        public override IList<IResourceIndexEntry> FindAll(uint flags, IResourceIndexEntry values) { return Index.FindAll(x => !x.IsDeleted && FlagMatch(flags, values, x)); }
 
         /// <summary>
         /// Searches the entire <see cref="IPackage"/>
@@ -376,7 +357,7 @@ namespace s3pi.Package
         /// <returns>An <c>IList&lt;IResourceIndexEntry&gt;</c> of zero or more matches.</returns>
         [MinimumVersion(1)]
         [MaximumVersion(recommendedApiVersion)]
-        public override IList<IResourceIndexEntry> FindAll(string[] names, TypedValue[] values) { return Index.FindAll((new NameMatch(names, values)).Match); }
+        public override IList<IResourceIndexEntry> FindAll(string[] names, TypedValue[] values) { return Index.FindAll(x => !x.IsDeleted && NameMatch(names, values, x)); }
 
         /// <summary>
         /// Searches the entire <see cref="IPackage"/>
