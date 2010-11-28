@@ -79,13 +79,13 @@
       <Project>{7314C38A-1519-4C58-998E-C88E4DA91086}</Project>
       <Name>CustomForms</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\s3pi Extras\Helpers\Helpers.csproj">
-      <Project>{D9B63641-D3BE-4120-9115-7D67B1238FBF}</Project>
-      <Name>DemoPlugins</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\s3pi Extras\Extensions\Extensions.csproj">
       <Project>{9B4C57BA-E09F-4439-98B4-B9B535A4ABF6}</Project>
       <Name>Extensions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\s3pi Extras\Helpers\Helpers.csproj">
+      <Project>{D9B63641-D3BE-4120-9115-7D67B1238FBF}</Project>
+      <Name>Helpers</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\s3pi Wrappers\CASPartResource\CASPartResource.csproj">
       <Project>{38D21F02-C139-43C8-8B74-D84E22B89F50}</Project>
