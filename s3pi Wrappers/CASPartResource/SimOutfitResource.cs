@@ -200,6 +200,7 @@ namespace CASPartResource
             {
                 BinaryWriter w = new BinaryWriter(s);
                 w.Write(unknown1);
+                if (xml == null) xml = "";
                 w.Write(xml.Length);
                 w.Write(System.Text.Encoding.Unicode.GetBytes(xml));
             }
