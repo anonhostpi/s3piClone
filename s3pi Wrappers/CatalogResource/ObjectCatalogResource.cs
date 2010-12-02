@@ -392,7 +392,7 @@ namespace CatalogResource
                             res.Remove("FloorCutoutLevelOffset");
                             res.Remove("FloorCutoutBoundsLength");
                             if (this.version < 0x00000016)
-                                res.Remove("Unknown1");
+                                res.Remove("InstanceName");
                         }
                     }
                 }
