@@ -43,6 +43,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -52,6 +53,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -101,8 +103,6 @@ echo /*"*/ [assembly: AssemblyVersion(%25version%25)] /*"*/
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ARCOLBlock.cs" />
-    <None Include="RCOLChunkHandlers\MODL.cs" />
-    <None Include="RCOLChunkHandlers\MLOD.cs" />
     <Compile Include="RCOLChunkHandlers\SlotAdjust.cs" />
     <Compile Include="RCOLChunkHandlers\RSLT.cs" />
     <Compile Include="RCOLChunkHandlers\LITE.cs" />
