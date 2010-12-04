@@ -233,7 +233,7 @@ namespace s3pi.GenericRCOLResource
             #region Data I/O
             void Parse(Stream s) { this.chunkReference = new BinaryReader(s).ReadUInt32(); }
 
-            internal void UnParse(Stream s) { new BinaryWriter(s).Write(chunkReference); }
+            public void UnParse(Stream s) { new BinaryWriter(s).Write(chunkReference); }
             #endregion
 
             #region AHandlerElement Members
