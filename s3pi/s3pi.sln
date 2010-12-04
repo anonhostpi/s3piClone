@@ -51,6 +51,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CASPartResource", "..\s3pi 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helpers", "..\s3pi Extras\Helpers\Helpers.csproj", "{D9B63641-D3BE-4120-9115-7D67B1238FBF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pjMODLMLODchunks", "..\s3pi Wrappers\pjMODLMLODchunks\pjMODLMLODchunks.csproj", "{5C3CA429-65DD-436A-8D2A-162FFD45B246}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -145,6 +147,10 @@ Global
 		{D9B63641-D3BE-4120-9115-7D67B1238FBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D9B63641-D3BE-4120-9115-7D67B1238FBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D9B63641-D3BE-4120-9115-7D67B1238FBF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C3CA429-65DD-436A-8D2A-162FFD45B246}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C3CA429-65DD-436A-8D2A-162FFD45B246}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C3CA429-65DD-436A-8D2A-162FFD45B246}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C3CA429-65DD-436A-8D2A-162FFD45B246}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
