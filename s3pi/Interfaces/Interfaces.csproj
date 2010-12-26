@@ -82,6 +82,7 @@
     <Compile Include="IResourceIndexEntry.cs" />
     <Compile Include="IResourceHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TGIBlock.cs" />
     <Compile Include="TGIBlockListContentFieldAttribute.cs" />
     <Compile Include="TypedValue.cs" />
     <Compile Include="VersionAttribute.cs" />
