@@ -51,18 +51,18 @@ namespace System.Windows.Forms.TGIBlockListEditorForm
         /// <summary>
         /// The list of TGIBlocks to edit
         /// </summary>
-        public IList<AResource.TGIBlock> Items
+        public IList<TGIBlock> Items
         {
             get { return items; }
             set
             {
                 if (items == value) return;
                 items = new AResource.TGIBlockList(null);
-                foreach (IResourceKey rk in value) items.Add(new AResource.TGIBlock(0, null, rk));
+                foreach (IResourceKey rk in value) items.Add(new TGIBlock(0, null, rk));
 
                 listView1.Items.Clear();
 
-                foreach (AResource.TGIBlock tgib in items)
+                foreach (TGIBlock tgib in items)
                 {
                     ListViewItem lvi = CreateListViewItem(tgib);
                     lvi.Tag = tgib;
@@ -74,7 +74,7 @@ namespace System.Windows.Forms.TGIBlockListEditorForm
                 btnDelete.Enabled = listView1.SelectedItems.Count > 0;
             }
         }
-        private ListViewItem CreateListViewItem(AResource.TGIBlock tgib)
+        private ListViewItem CreateListViewItem(TGIBlock tgib)
         {
             ListViewItem lvi = new ListViewItem();
             lvi.Text = s3pi.Extensions.ExtList.Ext.ContainsKey("0x" + tgib.ResourceType.ToString("X8"))
@@ -121,7 +121,7 @@ namespace System.Windows.Forms.TGIBlockListEditorForm
             }
             else
             {
-                AResource.TGIBlock item = listView1.SelectedItems[0].Tag as AResource.TGIBlock;
+                TGIBlock item = listView1.SelectedItems[0].Tag as TGIBlock;
                 cbType.Value = item.ResourceType;
                 tbGroup.Text = "0x" + item.ResourceGroup.ToString("X8");
                 tbInstance.Text = "0x" + item.Instance.ToString("X16");
@@ -227,7 +227,7 @@ namespace System.Windows.Forms
         /// </summary>
         /// <param name="ltgi">an AResource.DependentList&lt;AResource.TGIBlock&gt; object.</param>
         /// <returns>the DialogResult</returns>
-        public static DialogResult Show(AResource.DependentList<AResource.TGIBlock> ltgi)
+        public static DialogResult Show(AResource.DependentList<TGIBlock> ltgi)
         {
             return Show(OwningForm, ltgi);
         }
@@ -238,7 +238,7 @@ namespace System.Windows.Forms
         /// and represents the top-level window that will own this form.</param>
         /// <param name="ltgi">an AResource.DependentList&lt;AResource.TGIBlock&gt; object.</param>
         /// <returns>the DialogResult</returns>
-        public static DialogResult Show(IWin32Window owner, AResource.DependentList<AResource.TGIBlock> ltgi)
+        public static DialogResult Show(IWin32Window owner, AResource.DependentList<TGIBlock> ltgi)
         {
             TGIBlockListEditorForm.MainForm theForm = new System.Windows.Forms.TGIBlockListEditorForm.MainForm();
             theForm.Items = ltgi;

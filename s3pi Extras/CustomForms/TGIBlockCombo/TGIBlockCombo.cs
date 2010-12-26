@@ -34,18 +34,18 @@ namespace System.Windows.Forms
             InitializeComponent();
         }
 
-        public TGIBlockCombo(AResource.DependentList<AResource.TGIBlock> tgiBlocks) : this(tgiBlocks, -1, true) { }
-        public TGIBlockCombo(AResource.DependentList<AResource.TGIBlock> tgiBlocks, int index) : this(tgiBlocks, index, true) { }
-        public TGIBlockCombo(AResource.DependentList<AResource.TGIBlock> tgiBlocks, int index, bool showEdit) : this() { TGIBlocks = tgiBlocks; SelectedIndex = index; ShowEdit = showEdit; }
+        public TGIBlockCombo(AResource.DependentList<TGIBlock> tgiBlocks) : this(tgiBlocks, -1, true) { }
+        public TGIBlockCombo(AResource.DependentList<TGIBlock> tgiBlocks, int index) : this(tgiBlocks, index, true) { }
+        public TGIBlockCombo(AResource.DependentList<TGIBlock> tgiBlocks, int index, bool showEdit) : this() { TGIBlocks = tgiBlocks; SelectedIndex = index; ShowEdit = showEdit; }
 
-        AResource.DependentList<AResource.TGIBlock> tgiBlocks;
-        public AResource.DependentList<AResource.TGIBlock> TGIBlocks
+        AResource.DependentList<TGIBlock> tgiBlocks;
+        public AResource.DependentList<TGIBlock> TGIBlocks
         {
             get { return tgiBlocks; }
             set
             {
                 if (tgiBlocks == value) return;
-                AResource.TGIBlock tgib = tgiBlocks == null ? null : cbTGIBlocks.SelectedIndex >= 0 && cbTGIBlocks.SelectedIndex < cbTGIBlocks.Items.Count ? tgiBlocks[cbTGIBlocks.SelectedIndex] : null;
+                TGIBlock tgib = tgiBlocks == null ? null : cbTGIBlocks.SelectedIndex >= 0 && cbTGIBlocks.SelectedIndex < cbTGIBlocks.Items.Count ? tgiBlocks[cbTGIBlocks.SelectedIndex] : null;
                 string selectedItem = tgib == null ? "(null)" : MakeItem(tgib);
                 tgiBlocks = value;
                 FillList(selectedItem);
@@ -56,7 +56,7 @@ namespace System.Windows.Forms
             int index = -1;
             cbTGIBlocks.Items.Clear();
             if (tgiBlocks != null)
-                foreach (AResource.TGIBlock tgib in tgiBlocks)
+                foreach (TGIBlock tgib in tgiBlocks)
                 {
                     string s = MakeItem(tgib);
                     if (s == item) index = cbTGIBlocks.Items.Count;
@@ -66,7 +66,7 @@ namespace System.Windows.Forms
             cbTGIBlocks.SelectedIndex = index;
             btnTGIBlockListEditor.Enabled = tgiBlocks != null;
         }
-        string MakeItem(AResource.TGIBlock tgib)
+        string MakeItem(TGIBlock tgib)
         {
             string s = "";
             if (ExtList.Ext.ContainsKey("0x" + tgib.ResourceType.ToString("X8")))
@@ -88,7 +88,7 @@ namespace System.Windows.Forms
 
         public override void Refresh()
         {
-            AResource.TGIBlock tgib = tgiBlocks == null ? null : cbTGIBlocks.SelectedIndex >= 0 && cbTGIBlocks.SelectedIndex < tgiBlocks.Count ? tgiBlocks[cbTGIBlocks.SelectedIndex] : null;
+            TGIBlock tgib = tgiBlocks == null ? null : cbTGIBlocks.SelectedIndex >= 0 && cbTGIBlocks.SelectedIndex < tgiBlocks.Count ? tgiBlocks[cbTGIBlocks.SelectedIndex] : null;
             string selectedItem = tgib == null ? "(null)" : MakeItem(tgib);
             FillList(selectedItem);
 
@@ -104,7 +104,7 @@ namespace System.Windows.Forms
             DialogResult dr = TGIBlockListEditor.Show(tgiBlocksCopy);
             if (dr != DialogResult.OK) return;
 
-            AResource.TGIBlock tgib = tgiBlocks == null ? null : cbTGIBlocks.SelectedIndex >= 0 && cbTGIBlocks.SelectedIndex < tgiBlocks.Count ? tgiBlocks[cbTGIBlocks.SelectedIndex] : null;
+            TGIBlock tgib = tgiBlocks == null ? null : cbTGIBlocks.SelectedIndex >= 0 && cbTGIBlocks.SelectedIndex < tgiBlocks.Count ? tgiBlocks[cbTGIBlocks.SelectedIndex] : null;
             string selectedItem = tgib == null ? "(null)" : MakeItem(tgib);
             tgiBlocks.Clear();
             tgiBlocks.AddRange(tgiBlocksCopy.ToArray());

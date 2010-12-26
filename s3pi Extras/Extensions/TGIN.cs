@@ -39,7 +39,7 @@ namespace s3pi.Extensions
             res.ResInstance = value.Instance;
             return res;
         }
-        public static implicit operator AResourceKey(TGIN value) { return new AResource.TGIBlock(0, null, value.ResType, value.ResGroup, value.ResInstance); }
+        public static implicit operator AResourceKey(TGIN value) { return new TGIBlock(0, null, value.ResType, value.ResGroup, value.ResInstance); }
 
         public static implicit operator TGIN(string value)
         {
