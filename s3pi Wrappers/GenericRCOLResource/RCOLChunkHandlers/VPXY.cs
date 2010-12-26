@@ -49,7 +49,7 @@ namespace s3pi.GenericRCOLResource
             basis.tgiBlockList) { }
         public VPXY(int APIversion, EventHandler handler,
             uint version, IEnumerable<Entry> entryList, byte tc02, BoundingBox bounds, byte[] unused, byte modular, int ftptIndex,
-            IEnumerable<AResource.TGIBlock> tgiBlockList)
+            IEnumerable<TGIBlock> tgiBlockList)
             : base(APIversion, handler, null)
         {
             this.version = version;

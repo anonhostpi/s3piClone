@@ -153,7 +153,7 @@ namespace ObjKeyResource
                 System.Reflection.PropertyInfo pi = cd.GetType().GetProperty("Data");
                 if (pi == null || !pi.CanRead) return null;
                 if (element == Component.Footprint || element == Component.Model || element == Component.Tree)
-                    return new TypedValue(typeof(AResource.TGIBlock), tgiBlocks[(int)pi.GetValue(cd, null)], "X");
+                    return new TypedValue(typeof(TGIBlock), tgiBlocks[(int)pi.GetValue(cd, null)], "X");
                 else
                     return new TypedValue(pi.PropertyType, pi.GetValue(cd, null), "X");
             }

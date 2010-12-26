@@ -124,16 +124,16 @@ namespace s3pi.GenericRCOLResource
             const Int32 recommendedApiVersion = 1;
 
             #region Attributes
-            AResource.TGIBlock tgiBlock;
+            TGIBlock tgiBlock;
             ARCOLBlock rcolBlock;
             #endregion
 
             public ChunkEntry(int APIversion, EventHandler handler, ChunkEntry basis)
                 : this(APIversion, handler, basis.tgiBlock, basis.rcolBlock) { }
-            public ChunkEntry(int APIversion, EventHandler handler, AResource.TGIBlock tgiBlock, ARCOLBlock rcolBlock)
+            public ChunkEntry(int APIversion, EventHandler handler, TGIBlock tgiBlock, ARCOLBlock rcolBlock)
                 : base(APIversion, handler)
             {
-                this.tgiBlock = (AResource.TGIBlock)tgiBlock.Clone(handler);
+                this.tgiBlock = (TGIBlock)tgiBlock.Clone(handler);
                 this.rcolBlock = (ARCOLBlock)rcolBlock.Clone(handler);
             }
 
@@ -151,7 +151,7 @@ namespace s3pi.GenericRCOLResource
 
             #endregion
 
-            public AResource.TGIBlock TGIBlock { get { return tgiBlock; } set { if (tgiBlock != value) { tgiBlock = new TGIBlock(0, handler, value); OnElementChanged(); } } }
+            public TGIBlock TGIBlock { get { return tgiBlock; } set { if (tgiBlock != value) { tgiBlock = new TGIBlock(0, handler, value); OnElementChanged(); } } }
             public ARCOLBlock RCOLBlock { get { return rcolBlock; } set { if (rcolBlock != value) { rcolBlock = (ARCOLBlock)rcolBlock.Clone(handler); OnElementChanged(); } } }
 
             public string Value
