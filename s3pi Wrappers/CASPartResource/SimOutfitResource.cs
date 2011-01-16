@@ -245,15 +245,12 @@ namespace CASPartResource
             {
                 get
                 {
-                    string s = "";
-                    s += "Unknown1: " + this["Unknown1"];
-                    s += "\nXml: " + (xml.Length > 160 ? xml.Substring(0, 157) + "..." : xml);
-                    return s;
+                    return "Unknown1: " + this["Unknown1"] + "\nXml: " + (xml.Length > 160 ? xml.Substring(0, 157) + "..." : xml);
                 }
             }
             #endregion
         }
-        public class XMLEntryList : AResource.DependentList<XMLEntry>
+        public class XMLEntryList : DependentList<XMLEntry>
         {
             #region Constructors
             public XMLEntryList(EventHandler handler) : base(handler) { }
@@ -321,7 +318,7 @@ namespace CASPartResource
             public string Value { get { return string.Format("{0}: {1}; {2}: {3}", "TXTC1Index", this["TXTC1Index"], "TXTC2Index", this["TXTC2Index"]); } }
             #endregion
         }
-        public class IndexPairList : AResource.DependentList<IndexPair>
+        public class IndexPairList : DependentList<IndexPair>
         {
             #region Constructors
             public IndexPairList(EventHandler handler) : base(handler) { }
@@ -406,25 +403,26 @@ namespace CASPartResource
             {
                 get
                 {
-                    string s = "";
+                    System.Text.StringBuilder sb = new System.Text.StringBuilder();
                     foreach (string field in ContentFields)
                         if (field.Equals("Value")) continue;
                         else if (field.Equals("TXTCIndexes"))
                         {
-                            s += "\n--\nTXTCIndexes";
+                            sb.Append("\n--- TXTCIndexes (" + txtcIndexes.Count.ToString("X") + ") ---");
                             string fmt = "\n" + "  [{0:X" + txtcIndexes.Count.ToString("X").Length + "}]: {1}";
                             for (int i = 0; i < txtcIndexes.Count; i++)
-                                s += String.Format(fmt, i, txtcIndexes[i]["Value"]);
-                            s += "\n----";
+                                sb.Append(String.Format(fmt, i, txtcIndexes[i]["Value"]));
+                            sb.Append("\n---");
                         }
                         else
-                            s += string.Format("{0}: {1}; ", field, this[field]);
-                    return s.Trim();
+                            sb.Append(string.Format("{0}: {1}; ", field, this[field]));
+                    return sb.ToString().Trim();
+                    /**/
                 }
             }
             #endregion
         }
-        public class CASEntryList : AResource.DependentList<CASEntry>
+        public class CASEntryList : DependentList<CASEntry>
         {
             #region Constructors
             public CASEntryList(EventHandler handler) : base(handler, Byte.MaxValue) { }
@@ -507,7 +505,7 @@ namespace CASPartResource
             public string Value { get { return string.Format("FaceIndex: {0}; Unknown1: {1}", this["FaceIndex"], unknown1); } }
             #endregion
         }
-        public class FaceEntryList : AResource.DependentList<FaceEntry>
+        public class FaceEntryList : DependentList<FaceEntry>
         {
             #region Constructors
             public FaceEntryList(EventHandler handler) : base(handler, Byte.MaxValue) { }
@@ -596,6 +594,8 @@ namespace CASPartResource
         {
             get
             {
+                return ValueBuilder;
+                /*
                 string s = "";
 
                 foreach (string field in ContentFields)
@@ -640,6 +640,7 @@ namespace CASPartResource
                     }
 
                 return s;
+                /**/
             }
         }
         #endregion

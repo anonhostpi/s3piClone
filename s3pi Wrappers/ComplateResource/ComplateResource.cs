@@ -84,11 +84,14 @@ namespace ComplateResource
         {
             get
             {
+                return ValueBuilder;
+                /*
                 string s = "";
                 s += "Unknown1: " + this["Unknown1"];
                 s += "\nUnicodeString:\n" + UnicodeString;
                 s += "\nUnknown2: " + this["Unknown2"];
                 return s;
+                /**/
             }
         }
 

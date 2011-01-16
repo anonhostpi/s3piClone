@@ -57,6 +57,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FountainPoolCatalogResource.cs" />
     <Compile Include="FoundationCatalogResource.cs" />
     <Compile Include="Properties\AssemblyVersion.cs" />
     <Compile Include="CatalogResource.cs" />

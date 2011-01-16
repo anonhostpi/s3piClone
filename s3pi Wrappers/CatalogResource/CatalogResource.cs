@@ -360,19 +360,7 @@ namespace CatalogResource
                 set { if (version < 0x0000000F) throw new InvalidOperationException(); if (productNameHash != value) { productNameHash = value; OnElementChanged(); } }
             }
 
-            public String Value
-            {
-                get
-                {
-                    string s = "";
-                    foreach (string f in this.ContentFields)
-                    {
-                        if (f.Equals("Value")) continue;
-                        s += String.Format("{0}: {1}\n", f, "" + this[f]);
-                    }
-                    return s;
-                }
-            }
+            public String Value { get { return ValueBuilder; } }
             #endregion
         }
 
@@ -782,7 +770,7 @@ namespace CatalogResource
             public bool Unknown1 { get { return unknown1 != 0; } set { if (Unknown1 != value) { unknown1 = (byte)(value ? 0x01 : 0x00); OnElementChanged(); } } }
         }
 
-        public class ComplateList : AResource.DependentList<ComplateElement>
+        public class ComplateList : DependentList<ComplateElement>
         {
             #region Constructors
             public ComplateList(EventHandler handler) : base(handler) { }
@@ -984,7 +972,7 @@ namespace CatalogResource
             #endregion
         }
 
-        public class MaterialBlockList : AResource.DependentList<MaterialBlock>
+        public class MaterialBlockList : DependentList<MaterialBlock>
         {
             #region Constructors
             public MaterialBlockList(EventHandler handler) : base(handler) { }
@@ -1163,32 +1151,11 @@ namespace CatalogResource
             [ElementPriority(6)]
             public uint Unknown3 { get { return unknown3; } set { if (unknown3 != value) { unknown3 = value; OnElementChanged(); } } }
 
-            public String Value
-            {
-                get
-                {
-                    string s = "";
-                    foreach (string f in this.ContentFields)
-                    {
-                        if (f.Equals("Value")) continue;
-                        TypedValue tv = this[f];
-                        if (typeof(MaterialBlock).IsAssignableFrom(tv.Type)) s += f + ":\n" + mb.Value + "\n--\n";
-                        else if (typeof(TGIBlockList).IsAssignableFrom(tv.Type))
-                        {
-                            s += f + ":\n";
-                            string fmt = "  [{0:X" + list.Count.ToString("X").Length + "}]: {1}\n";
-                            for (int i = 0; i < list.Count; i++) s += string.Format(fmt, i, list[i].Value);
-                            s += "--\n";
-                        }
-                        else s += string.Format("{0}: {1}\n", f, "" + tv);
-                    }
-                    return s;
-                }
-            }
+            public String Value { get { return ValueBuilder; } }
             #endregion
         }
 
-        public class MaterialList : AResource.DependentList<Material>
+        public class MaterialList : DependentList<Material>
         {
             #region Constructors
             internal MaterialList(EventHandler handler) : base(handler) { }
@@ -1421,53 +1388,7 @@ namespace CatalogResource
         [ElementPriority(11)]
         public Common CommonBlock { get { return common; } set { if (common != value) { common = new Common(requestedApiVersion, OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
 
-        public virtual String Value
-        {
-            get
-            {
-                string s = "";
-                string hdr = "\n---------\n---------\n{0}: {1}\n---------\n";
-                string t = "---------\n";
-                s += String.Format(hdr, "Common", "CommonBlock") + this.CommonBlock.Value + t;
-                foreach (string f in this.ContentFields)
-                {
-                    if (f.Equals("Value") || f.Equals("Stream") || f.Equals("AsBytes")) continue;
-                    TypedValue tv = this[f];
-                    string h = String.Format(hdr, tv.Type.Name, f);
-                    if (tv.Type.HasElementType && typeof(AApiVersionedFields).IsAssignableFrom(tv.Type.GetElementType())) // it's an array
-                            s += h + tv + "\n" + t;
-                    else if (typeof(Common).IsAssignableFrom(tv.Type)) { }
-                    else if (typeof(WallFloorPatternCatalogResource.WallFloorPatternMaterialList).IsAssignableFrom(tv.Type)) s += h + (tv.Value as WallFloorPatternCatalogResource.WallFloorPatternMaterialList).Value + t;
-                    else if (typeof(MaterialList).IsAssignableFrom(tv.Type))
-                    {
-                        MaterialList ml = tv.Value as MaterialList;
-                        s += h;
-                        string fmt = "--[{0:X" + ml.Count.ToString("X").Length + "}]--\n{1}\n";
-                        for (int i = 0; i < ml.Count; i++) s += string.Format(fmt, i, ml[i].Value);
-                        s += t;
-                    }
-                    else if (typeof(TGIBlockList).IsAssignableFrom(tv.Type))
-                    {
-                        TGIBlockList tgiBlocks = tv.Value as TGIBlockList;
-                        s += h;
-                        string fmt = "  [{0:X" + tgiBlocks.Count.ToString("X").Length + "}]: {1}\n";
-                        for (int i = 0; i < tgiBlocks.Count; i++) s += string.Format(fmt, i, tgiBlocks[i].Value);
-                        s += t;
-                    }
-                    else if (typeof(ObjectCatalogResource.MTDoorList).IsAssignableFrom(tv.Type)) s += h + (tv.Value as ObjectCatalogResource.MTDoorList).Value + t;
-                    else if (typeof(UIntList).IsAssignableFrom(tv.Type))
-                    {
-                        UIntList uintList = tv.Value as UIntList;
-                        s += h;
-                        string fmt = "  [{0:X" + uintList.Count.ToString("X").Length + "}]: {1:X8}\n";
-                        for (int i = 0; i < uintList.Count; i++) s += string.Format(fmt, i, uintList[i]);
-                        s += t;
-                    }
-                    else s += string.Format("{0}: {1}\n", f, "" + tv);
-                }
-                return s;
-            }
-        }
+        public virtual String Value { get { return ValueBuilder; } }
         #endregion
     }
 
@@ -1529,6 +1450,7 @@ namespace CatalogResource
             this.Add(typeof(FireplaceCatalogResource), new List<string>(new string[] { "0x04F3CC01" }));
             this.Add(typeof(FoundationCatalogResource), new List<string>(new string[] { "0x316C78F2" }));
             this.Add(typeof(ObjectCatalogResource), new List<string>(new string[] { "0x319E4F1D" }));
+            this.Add(typeof(FountainPoolCatalogResource), new List<string>(new string[] { "0x0A36F07A" }));
             this.Add(typeof(ProxyProductCatalogResource), new List<string>(new string[] { "0x04AC5D93" }));
             this.Add(typeof(RailingCatalogResource), new List<string>(new string[] { "0x04C58103" }));
             this.Add(typeof(RoofPatternCatalogResource), new List<string>(new string[] { "0xF1EDBD86" }));
@@ -1538,7 +1460,6 @@ namespace CatalogResource
             this.Add(typeof(TerrainPaintBrushCatalogResource), new List<string>(new string[] { "0x04ED4BB2" }));
             this.Add(typeof(WallCatalogResource), new List<string>(new string[] { "0x9151E6BC" }));
             this.Add(typeof(WallFloorPatternCatalogResource), new List<string>(new string[] { "0x515CA4CD" }));
-
         }
     }
 }

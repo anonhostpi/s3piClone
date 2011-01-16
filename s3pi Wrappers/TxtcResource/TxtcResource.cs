@@ -31,7 +31,22 @@ namespace TxtcResource
     {
         const int recommendedApiVersion = 1;
         public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
-        public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
+        public override List<string> ContentFields
+        {
+            get
+            {
+                List<string> res = GetContentFields(requestedApiVersion, this.GetType());
+                if (version < 8)
+                {
+                    res.Remove("Unknown4");
+                    if (version < 7)
+                    {
+                        res.Remove("SuperBlocks");
+                    }
+                }
+                return res;
+            }
+        }
 
         static bool checking = s3pi.Settings.Settings.Checking;
 
@@ -220,6 +235,8 @@ namespace TxtcResource
             {
                 get
                 {
+                    return ValueBuilder;
+                    /*
                     string s = "";
                     s += "ID: 0x" + id.ToString("X2");
                     s += "\nUnknown1: 0x" + unknown1.ToString("X8");
@@ -229,12 +246,13 @@ namespace TxtcResource
                     s += entries.Value;
                     s += "\nUnknown4: 0x" + unknown4.ToString("X8");
                     return s;
+                    /**/
                 }
             }
             #endregion
         }
 
-        public class SuperBlockList : AResource.DependentList<SuperBlock>
+        public class SuperBlockList : DependentList<SuperBlock>
         {
             public SuperBlockList(EventHandler handler) : base(handler, Byte.MaxValue) { }
             public SuperBlockList(EventHandler handler, Stream s) : base(handler, s, Byte.MaxValue) { }
@@ -353,11 +371,10 @@ namespace TxtcResource
             {
                 get
                 {
-                    string s = this.GetType().Name;
-                    s += ": Property: 0x" + ((uint)property).ToString("X8") + (enumType != null ? (Enum.IsDefined(enumType, property) ? " (" + Enum.GetName(enumType, property) + ")" : "(undefined)") : "");
-                    s += "; Unknown: 0x" + unknown.ToString("X2");
+                    return this.GetType().Name +
+                      ": Property: 0x" + ((uint)property).ToString("X8") + (enumType != null ? (Enum.IsDefined(enumType, property) ? " (" + Enum.GetName(enumType, property) + ")" : "(undefined)") : "") +
+                      "; Unknown: 0x" + unknown.ToString("X2");
                     //s += "; DataType: 0x" + dataType.ToString("X2");
-                    return s;
                 }
             }
             #endregion
@@ -607,10 +624,11 @@ namespace TxtcResource
             {
                 get
                 {
-                    string s = base.Value + "; Data: 0x" + data.ToString("X8");
-                    if (property == (uint)UInt32Properties.ID)
-                        s += " (" + ((Enum.IsDefined(typeof(ID), data)) ? Enum.GetName(typeof(ID), data) : "undefined") + ")";
-                    return s;
+                    return base.Value + "; Data: 0x" + data.ToString("X8") +
+                      ((property == (uint)UInt32Properties.ID)
+                        ? " (" + ((Enum.IsDefined(typeof(ID), data)) ? Enum.GetName(typeof(ID), data) : "undefined") + ")"
+                        : ""
+                      );
                 }
             }
         }
@@ -790,7 +808,7 @@ namespace TxtcResource
             public override string Value { get { return base.Value + "; Data: \"" + data + "\""; } }
         }
 
-        public class EntryList : AResource.DependentList<Entry>
+        public class EntryList : DependentList<Entry>
         {
             public EntryList(int APIversion, EventHandler handler, Stream s) : base(null, -1) { elementHandler = handler; Parse(APIversion, s); this.handler = handler; }
             public EntryList(EventHandler handler) : base(handler) { }
@@ -876,10 +894,12 @@ namespace TxtcResource
 
             #region Content Fields
             public EntryList Entries { get { return theList; } set { if (theList != value) { theList = new EntryList(handler, value); OnElementChanged(); } } }
+
+            public string Value { get { return ValueBuilder; } }
             #endregion
         }
 
-        public class EntryBlockList : AResource.DependentList<EntryBlock>
+        public class EntryBlockList : DependentList<EntryBlock>
         {
             int blockCount;
             public EntryBlockList(EventHandler handler) : base(handler) { }
@@ -894,34 +914,46 @@ namespace TxtcResource
 
             public override void Add() { this.Add(new EntryBlock(0, null)); }
 
+            /*
             public string Value
             {
                 get
                 {
-                    string s = "";
+                    System.Text.StringBuilder sb = new System.Text.StringBuilder();
                     for (int i = 0; i < Count; i++)
                     {
-                        s += "--" + i + "--";
+                        sb.Append("--" + i + "--");
                         for (int j = 0; j < this[i].Entries.Count; j++)
-                            s += "\n[" + j + "] " + this[i].Entries[j].Value;
-                        s += "\n";
+                            sb.Append("\n[" + j + "] " + this[i].Entries[j].Value);
+                        sb.Append("\n");
                     }
-                    return s;
+                    return sb.ToString();
                 }
             }
+            /**/
         }
         #endregion
 
         #region Content Fields
         public uint Version { get { return version; } set { if (version != value) { version = value; OnResourceChanged(this, EventArgs.Empty); } } }
-        public SuperBlockList SuperBlocks { get { return superBlocks; } set { if (superBlocks != value) { superBlocks = new SuperBlockList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
+        public SuperBlockList SuperBlocks
+        {
+            get { if (version < 0x00000007) throw new InvalidOperationException(); return superBlocks; }
+            set { if (version < 0x00000007) throw new InvalidOperationException(); if (superBlocks != value) { superBlocks = new SuperBlockList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } }
+        }
         public uint Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnResourceChanged(this, EventArgs.Empty); } } }
         public uint Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnResourceChanged(this, EventArgs.Empty); } } }
         public byte Unknown3 { get { return unknown3; } set { if (unknown3 != value) { unknown3 = value; OnResourceChanged(this, EventArgs.Empty); } } }
-        public byte Unknown4 { get { return unknown4; } set { if (unknown4 != value) { unknown4 = value; OnResourceChanged(this, EventArgs.Empty); } } }
+        public byte Unknown4
+        {
+            get { if (version < 0x00000008) throw new InvalidOperationException(); return unknown4; }
+            set { if (version < 0x00000008) throw new InvalidOperationException(); if (unknown4 != value) { unknown4 = value; OnResourceChanged(this, EventArgs.Empty); } }
+        }
         public EntryBlockList Entries { get { return entries; } set { if (entries != value) { entries = new EntryBlockList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
         public CountedTGIBlockList TGIBlocks { get { return tgiBlocks; } set { if (tgiBlocks != value) { tgiBlocks = new CountedTGIBlockList(OnResourceChanged, "IGT", value); OnResourceChanged(this, EventArgs.Empty); } } }
 
+        public string Value { get { return ValueBuilder; } }
+        /*
         public string Value
         {
             get
@@ -931,9 +963,7 @@ namespace TxtcResource
                 if (version >= 7)
                     for (int i = 0; i < superBlocks.Count; i++)
                     {
-                        s += "\n--SuperBlock " + i + "--";
-                        s += superBlocks[i].Value;
-                        s += "\n----";
+                        s += "\n--SuperBlock " + i + "--" + superBlocks[i].Value + "\n----";
                     }
                 s += "\nUnknown1: 0x" + unknown1.ToString("X8");
                 s += "\nUnknown2: 0x" + unknown2.ToString("X8");
@@ -948,6 +978,7 @@ namespace TxtcResource
                 return s;
             }
         }
+        /**/
         #endregion
     }
 

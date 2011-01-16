@@ -196,7 +196,7 @@ namespace CatalogResource
             #endregion
         }
 
-        public class WallFloorPatternMaterialList : AResource.DependentList<WallFloorPatternMaterial>
+        public class WallFloorPatternMaterialList : DependentList<WallFloorPatternMaterial>
         {
             #region Constructors
             internal WallFloorPatternMaterialList(EventHandler handler) : base(handler) { }
@@ -212,7 +212,7 @@ namespace CatalogResource
             public override void Add() { this.Add(new WallFloorPatternMaterial(0, null)); }
 
             #region Content Fields
-            public String Value { get { string s = ""; for (int i = 0; i < Count; i++) s += string.Format("\n--{0}--\n", i) + this[i].Value; return s; } }
+            //public String Value { get { string s = ""; for (int i = 0; i < Count; i++) s += string.Format("\n--{0}--\n", i) + this[i].Value; return s; } }
             #endregion
         }
 
@@ -298,7 +298,7 @@ namespace CatalogResource
 
         #region Content Fields
         //--insert Version: ElementPriority(1)
-        [ElementPriority(2)]
+        [ElementPriority(12)]
         public WallFloorPatternMaterialList Materials { get { return materialList; } set { if (materialList != value) { materialList = value == null ? null : new WallFloorPatternMaterialList(OnResourceChanged, value); } OnResourceChanged(this, new EventArgs()); } }
         //--insert CommonBlock: ElementPriority(11)
         [ElementPriority(21)]

@@ -47,8 +47,10 @@ namespace s3pi.GenericRCOLResource
         #endregion
 
         #region ARCOLBlock
+        [ElementPriority(2)]
         public override string Tag { get { return TAG; } }
 
+        [ElementPriority(3)]
         public override uint ResourceType { get { return 0x01D10F34; } }
 
         protected override void Parse(Stream s)
@@ -376,6 +378,8 @@ namespace s3pi.GenericRCOLResource
             {
                 get
                 {
+                    return ValueBuilder;
+                    /*
                     string s = "";
                     foreach (string f in this.ContentFields)
                     {
@@ -406,12 +410,13 @@ namespace s3pi.GenericRCOLResource
                         else s += "\n" + f + ": " + tv;
                     }
                     return s.TrimStart('\n');
+                    /**/
                 }
             }
             #endregion
         }
 
-        public class LODGroupList : AResource.DependentList<LODGroup>
+        public class LODGroupList : DependentList<LODGroup>
         {
             uint mlodVersion;
             #region Constructors
@@ -528,6 +533,8 @@ namespace s3pi.GenericRCOLResource
             {
                 get
                 {
+                    return ValueBuilder;
+                    /*
                     string s = "";
                     s += "StateNameHash: 0x" + stateNameHash.ToString("X8");
                     s += "\nFirstIbufNum: 0x" + firstIbufNum.ToString("X8");
@@ -535,12 +542,13 @@ namespace s3pi.GenericRCOLResource
                     s += "\nIbufCount: 0x" + ibufCount.ToString("X8");
                     s += "\nVbufCount: 0x" + vbufCount.ToString("X8");
                     return s;
+                    /**/
                 }
             }
             #endregion
         }
 
-        public class GeoStateList : AResource.DependentList<GeoState>
+        public class GeoStateList : DependentList<GeoState>
         {
             #region Constructors
             public GeoStateList(EventHandler handler) : base(handler) { }
@@ -567,6 +575,8 @@ namespace s3pi.GenericRCOLResource
         {
             get
             {
+                return ValueBuilder;
+                /*
                 string s = "";
                 s += "Tag: 0x" + tag.ToString("X8");
                 s += "\nVersion: 0x" + version.ToString("X8");
@@ -576,6 +586,7 @@ namespace s3pi.GenericRCOLResource
                 s += "\n----";
 
                 return s;
+                /**/
             }
         }
         #endregion

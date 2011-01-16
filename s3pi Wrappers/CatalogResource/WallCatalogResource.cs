@@ -249,7 +249,7 @@ namespace CatalogResource
 
         #region Content Fields
         //--insert Version: ElementPriority(1)
-        [ElementPriority(2)]
+        [ElementPriority(12)]
         public uint Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnResourceChanged(this, new EventArgs()); } } }
         //--insert CommonBlock: ElementPriority(11)
         [ElementPriority(21)]

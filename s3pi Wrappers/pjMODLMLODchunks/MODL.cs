@@ -81,8 +81,10 @@ namespace s3pi.GenericRCOLResource
         #endregion
 
         #region ARCOLBlock
+        [ElementPriority(2)]
         public override string Tag { get { return TAG; } }
 
+        [ElementPriority(3)]
         public override uint ResourceType { get { return 0x01661233; } }
 
         protected override void Parse(Stream s)
@@ -246,6 +248,8 @@ namespace s3pi.GenericRCOLResource
             {
                 get
                 {
+                    return ValueBuilder;
+                    /*
                     string s = "";
                     s += "MLODIndex: " + mlodIndex.Value;
                     s += "\nUnknown1: 0x" + unknown1.ToString("X8");
@@ -253,12 +257,13 @@ namespace s3pi.GenericRCOLResource
                     s += "\nVector1: 0x" + vector1.ToString("X8");
                     s += "\nVector2: 0x" + vector2.ToString("X8");
                     return s;
+                    /**/
                 }
             }
             #endregion
         }
 
-        public class MLODReferenceList : AResource.DependentList<MLODReference>
+        public class MLODReferenceList : DependentList<MLODReference>
         {
             int outerCount;
 
@@ -279,7 +284,7 @@ namespace s3pi.GenericRCOLResource
             public override void Add() { this.Add(new MLODReference(0, null)); }
         }
 
-        public class BoundingBoxList : AResource.DependentList<BoundingBox>
+        public class BoundingBoxList : DependentList<BoundingBox>
         {
             #region Constructors
             public BoundingBoxList(EventHandler handler) : base(handler) { }
@@ -314,6 +319,8 @@ namespace s3pi.GenericRCOLResource
         {
             get
             {
+                return ValueBuilder;
+                /*
                 string fmt;
                 string s = "";
                 s += "Tag: 0x" + tag.ToString("X8");
@@ -337,6 +344,7 @@ namespace s3pi.GenericRCOLResource
                 s += "\n----";
 
                 return s;
+                /**/
             }
         }
         #endregion

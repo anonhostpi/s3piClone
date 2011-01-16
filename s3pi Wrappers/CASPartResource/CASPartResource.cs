@@ -234,15 +234,13 @@ namespace CASPartResource
             {
                 get
                 {
-                    string s = "";
-                    s += "Xml: " + (xml.Length > 160 ? xml.Substring(0, 157) + "..." : xml);
-                    s += "\nUnknown1: " + this["Unknown1"];
-                    return s;
+                    return "Xml: " + (xml.Length > 160 ? xml.Substring(0, 157) + "..." : xml) +
+                        "\nUnknown1: " + this["Unknown1"];
                 }
             }
             #endregion
         }
-        public class XMLEntryList : AResource.DependentList<XMLEntry>
+        public class XMLEntryList : DependentList<XMLEntry>
         {
             #region Constructors
             public XMLEntryList(EventHandler handler) : base(handler) { }
@@ -342,16 +340,16 @@ namespace CASPartResource
             {
                 get
                 {
-                    string s = "";
+                    System.Text.StringBuilder sb = new StringBuilder();
                     foreach (string field in ContentFields)
                         if (!field.Equals("Value"))
-                            s += string.Format("{0}: {1}; ", field, this[field]);
-                    return s.TrimEnd(';', ' ');
+                            sb.Append(string.Format("{0}: {1}; ", field, this[field]));
+                    return sb.ToString().TrimEnd(';', ' ');
                 }
             }
             #endregion
         }
-        public class InnerEntryList : AResource.DependentList<InnerEntry>
+        public class InnerEntryList : DependentList<InnerEntry>
         {
             #region Constructors
             public InnerEntryList(EventHandler handler) : base(handler, Byte.MaxValue) { }
@@ -443,16 +441,19 @@ namespace CASPartResource
             {
                 get
                 {
+                    return ValueBuilder;
+                    /*
                     string s = "";
                     s += string.Format("OuterEntryNum: {0}; Unknown1: {1}; InnerEntries:", outerEntryNum, unknown1);
                     for (int i = 0; i < innerEntries.Count; i++)
                         s += string.Format("\n  [{0}]: {1}", i, innerEntries[i].Value);
                     return s;
+                    /**/
                 }
             }
             #endregion
         }
-        public class OuterEntryList : AResource.DependentList<OuterEntry>
+        public class OuterEntryList : DependentList<OuterEntry>
         {
             #region Constructors
             public OuterEntryList(EventHandler handler) : base(handler, Byte.MaxValue) { }
@@ -526,6 +527,8 @@ namespace CASPartResource
         {
             get
             {
+                return ValueBuilder;
+                /*
                 string s = "";
 
                 foreach (string field in ContentFields)
@@ -573,6 +576,7 @@ namespace CASPartResource
                     }
 
                 return s;
+                /**/
             }
         }
         #endregion

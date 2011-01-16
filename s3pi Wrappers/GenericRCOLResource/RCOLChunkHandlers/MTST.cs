@@ -33,7 +33,7 @@ namespace s3pi.GenericRCOLResource
         uint version = 0x00000200;
 
         uint fnv32 = 0;
-        uint index = 0;
+        GenericRCOLResource.ChunkReference index;
         EntryList list = null;
         #endregion
 
@@ -41,19 +41,21 @@ namespace s3pi.GenericRCOLResource
         public MTST(int APIversion, EventHandler handler) : base(APIversion, handler, null) { }
         public MTST(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler, s) { }
         public MTST(int APIversion, EventHandler handler, MTST basis)
-            : this(APIversion, handler, basis.index, basis.fnv32, basis.list) { }
-        public MTST(int APIversion, EventHandler handler, uint fnv32, uint index, IEnumerable<Entry> list)
+            : this(APIversion, handler, basis.fnv32, basis.index, basis.list) { }
+        public MTST(int APIversion, EventHandler handler, uint fnv32, GenericRCOLResource.ChunkReference index, IEnumerable<Entry> list)
             : base(APIversion, handler, null)
         {
             this.fnv32 = fnv32;
-            this.index = index;
+            this.index = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, index);
             this.list = new EntryList(OnRCOLChanged, list);
         }
         #endregion
 
         #region ARCOLBlock
+        [ElementPriority(2)]
         public override string Tag { get { return "MTST"; } }
 
+        [ElementPriority(3)]
         public override uint ResourceType { get { return 0x02019972; } }
 
         protected override void Parse(Stream s)
@@ -66,8 +68,8 @@ namespace s3pi.GenericRCOLResource
             if (checking) if (version != 0x00000200)
                     throw new InvalidDataException(String.Format("Invalid Version read: 0x{0:X8}; expected 0x00000200; at 0x{1:X8}", version, s.Position));
 
-            index = r.ReadUInt32();
             fnv32 = r.ReadUInt32();
+            index = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, s);
             list = new EntryList(OnRCOLChanged, s);
         }
 
@@ -80,7 +82,8 @@ namespace s3pi.GenericRCOLResource
             w.Write(version);
 
             w.Write(fnv32);
-            w.Write(index);
+            if (index == null) this.index = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, 0);
+            index.UnParse(ms);
             if (list == null) this.list = new EntryList(OnRCOLChanged);
             list.UnParse(ms);
 
@@ -96,7 +99,7 @@ namespace s3pi.GenericRCOLResource
             const int recommendedApiVersion = 1;
 
             #region Attributes
-            uint index = 0;
+            GenericRCOLResource.ChunkReference index;
             uint fnv32 = 0;
             #endregion
 
@@ -104,13 +107,17 @@ namespace s3pi.GenericRCOLResource
             public Entry(int APIversion, EventHandler handler) : base(APIversion, handler) { }
             public Entry(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
             public Entry(int APIversion, EventHandler handler, Entry basis) : this(APIversion, handler, basis.index, basis.fnv32) { }
-            public Entry(int APIversion, EventHandler handler, uint index, uint fnv32) : base(APIversion, handler) { this.index = index; this.fnv32 = fnv32; }
+            public Entry(int APIversion, EventHandler handler, GenericRCOLResource.ChunkReference index, uint fnv32) : base(APIversion, handler)
+            {
+                this.index = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, index);
+                this.fnv32 = fnv32;
+            }
             #endregion
 
             #region Data I/O
-            void Parse(Stream s) { BinaryReader r = new BinaryReader(s); index = r.ReadUInt32(); fnv32 = r.ReadUInt32(); }
+            void Parse(Stream s) { index = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, s); fnv32 = new BinaryReader(s).ReadUInt32(); }
 
-            internal void UnParse(Stream s) { BinaryWriter w = new BinaryWriter(s); w.Write(index); w.Write(fnv32); }
+            internal void UnParse(Stream s) { index.UnParse(s); new BinaryWriter(s).Write(fnv32); }
             #endregion
 
             #region AHandlerElement Members
@@ -131,13 +138,15 @@ namespace s3pi.GenericRCOLResource
             #endregion
 
             #region Content Fields
-            public UInt32 Index { get { return index; } set { if (index != value) { index = value; OnElementChanged(); } } }
+            [ElementPriority(1)]
+            public GenericRCOLResource.ChunkReference Index { get { return index; } set { if (index != value) { new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, value); OnElementChanged(); } } }
+            [ElementPriority(2)]
             public UInt32 FNV32 { get { return fnv32; } set { if (fnv32 != value) { fnv32 = value; OnElementChanged(); } } }
 
-            public string Value { get { return String.Format("Index: 0x{0:X8}; FNV32: 0x{1:X8}", index, fnv32); } }
+            public string Value { get { return String.Format("Index: {0}; FNV32: 0x{1:X8}", index.Value, fnv32); } }
             #endregion
         }
-        public class EntryList : AResource.DependentList<Entry>
+        public class EntryList : DependentList<Entry>
         {
             #region Constructors
             public EntryList(EventHandler handler) : base(handler) { }
@@ -155,17 +164,21 @@ namespace s3pi.GenericRCOLResource
         #endregion
 
         #region Content Fields
+        [ElementPriority(11)]
         public uint Version { get { return version; } set { if (version != value) { version = value; OnRCOLChanged(this, EventArgs.Empty); } } }
-
-        public uint Index { get { return index; } set { if (index != value) { index = value; OnRCOLChanged(this, EventArgs.Empty); } } }
+        [ElementPriority(12)]
+        public GenericRCOLResource.ChunkReference Index { get { return index; } set { if (index != value) { new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
+        [ElementPriority(13)]
         public uint FNV32 { get { return fnv32; } set { if (fnv32 != value) { fnv32 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
-
+        [ElementPriority(14)]
         public EntryList Entries { get { return list; } set { if (list != value) { list = new EntryList(OnRCOLChanged, value); OnRCOLChanged(this, EventArgs.Empty); } } }
 
         public string Value
         {
             get
             {
+                return ValueBuilder;
+                /*
                 string s = "";
                 s += "Tag: 0x" + tag.ToString("X8");
                 s += "\nVersion: 0x" + version.ToString("X8");
@@ -178,6 +191,7 @@ namespace s3pi.GenericRCOLResource
                 s += "\n--";
 
                 return s;
+                /**/
             }
         }
         #endregion

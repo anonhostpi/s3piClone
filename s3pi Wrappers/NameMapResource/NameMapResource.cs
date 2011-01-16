@@ -86,25 +86,7 @@ namespace NameMapResource
         [MaximumVersion(recommendedApiVersion)]
         public uint Version { get { return version; } set { if (Version == value) return; version = value; OnResourceChanged(this, new EventArgs()); } }
 
-        [MinimumVersion(1)]
-        [MaximumVersion(recommendedApiVersion)]
-        public string Value
-        {
-            get
-            {
-                string s = "";
-                string fmt = "\n0x{0:X" + Count.ToString("X").Length + "}: 0x{1:X16} {2}";
-
-                s = "Version: " + Version;
-                s += String.Format("\nCount: 0x{0:X8}", this.Count);
-
-                int i = 0;
-                foreach(KeyValuePair<ulong, string> kvp in this)
-                    s += String.Format(fmt, i++, kvp.Key, kvp.Value);
-
-                return s;
-            }
-        }
+        public String Value { get { return ValueBuilder; } }
 
         #region IDictionary<ulong,string> Members
 

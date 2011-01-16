@@ -940,20 +940,17 @@ namespace CatalogResource
             {
                 get
                 {
-                    string s = "";
                     if (topic == TopicCategory.EndOfTopics)
-                        s = "--- " + topic + " ---";
+                        return "--- " + topic + " ---";
                     else
                     {
-                        s += topic;
-                        if (rating != 0)
+                        if (rating == 0) return "" + topic;
+                        else
                         {
-                            if (rating == 11) s = "+ " + s;
-                            else
-                                s += ": " + rating;
+                            if (rating == 11) return "+ " + topic;
+                            else return topic + ": " + rating;
                         }
                     }
-                    return s;
                 }
             }
             #endregion
@@ -1033,24 +1030,11 @@ namespace CatalogResource
             [ElementPriority(3)]
             public uint WallMaskIndex { get { return wallMaskIndex; } set { if (wallMaskIndex != value) { wallMaskIndex = value; OnElementChanged(); } } }
 
-            public String Value
-            {
-                get
-                {
-                    string s = "";
-                    foreach (string f in this.ContentFields)
-                    {
-                        if (f.Equals("Value")) continue;
-                        if (f.Equals("Unknown1")) { for (int i = 0; i < unknown1.Length; i++)s += string.Format("{0}[{1}]: {2}\n", f, "" + i, "" + unknown1[i]); }
-                        else s += String.Format("{0}: {1}\n", f, "" + this[f]);
-                    }
-                    return s;
-                }
-            }
+            public String Value { get { return ValueBuilder; } }
             #endregion
         }
 
-        public class MTDoorList : AResource.DependentList<MTDoor>
+        public class MTDoorList : DependentList<MTDoor>
         {
             #region Constructors
             public MTDoorList(EventHandler handler) : base(handler, Byte.MaxValue) { }
@@ -1066,18 +1050,14 @@ namespace CatalogResource
             #endregion
 
             public override void Add() { this.Add(new MTDoor(0, null)); }
-
-            #region Content Fields
-            public String Value { get { string s = ""; for (int i = 0; i < Count; i++) s += string.Format("\n--{0}--\n", i) + this[i].Value; return s; } }
-            #endregion
         }
         #endregion
 
         #region Content Fields
         //--insert Version: ElementPriority(1)
-        [ElementPriority(2)]
+        [ElementPriority(12)]
         public MaterialList Materials { get { return materialList; } set { if (materialList != value) { materialList = value == null ? null : new MaterialList(OnResourceChanged, value); } OnResourceChanged(this, new EventArgs()); } }
-        [ElementPriority(3)]
+        [ElementPriority(13)]
         public string InstanceName
         {
             get { if (version < 0x00000016) throw new InvalidOperationException(); return instanceName; }

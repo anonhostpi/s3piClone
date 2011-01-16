@@ -30,32 +30,20 @@ namespace s3pi.GenericRCOLResource
 
         // This ARCOLBlock does not support CreateRCOLBlock
         public DefaultRCOL(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler, s) { }
-        public DefaultRCOL(int APIversion, EventHandler handler, DefaultRCOL basis)
-            : base(APIversion, null, null)
-        {
-                this.handler = handler;
-                data = (byte[])basis.data.Clone();
-        }
+        public DefaultRCOL(int APIversion, EventHandler handler, DefaultRCOL basis) : base(APIversion, null, null) { this.handler = handler; data = (byte[])basis.data.Clone(); }
 
         protected override void Parse(System.IO.Stream s) { data = new byte[s.Length]; s.Read(data, 0, (int)s.Length); }
 
         public override AHandlerElement Clone(EventHandler handler) { return new DefaultRCOL(requestedApiVersion, handler, this); }
 
+        [ElementPriority(2)]
         public override string Tag { get { return "*"; } } // For RCOLDealer
 
+        [ElementPriority(3)]
         public override uint ResourceType { get { return 0xFFFFFFFF; } }
 
         public override System.IO.Stream UnParse() { MemoryStream ms = new MemoryStream(); ms.Write(data, 0, data.Length); return ms; }
 
-        public string Value
-        {
-            get
-            {
-                string s = "";
-                s += "Tag: " + FOURCC(BitConverter.ToUInt32(data, 0));
-                s += "\nLength: " + data.Length;
-                return s;
-            }
-        }
+        public string Value { get { return "Tag: " + FOURCC(BitConverter.ToUInt32(data, 0)) + "\nLength: " + data.Length; } }
     }
 }

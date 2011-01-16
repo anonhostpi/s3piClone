@@ -48,7 +48,6 @@ namespace StblResource
         void Parse(Stream s)
         {
             BinaryReader r = new BinaryReader(s);
-            BinaryReader r2 = new BinaryReader(s, System.Text.Encoding.Unicode);
 
             uint magic = r.ReadUInt32();
             if (checking) if (magic != FOURCC("STBL"))
@@ -70,7 +69,7 @@ namespace StblResource
             for (int i = 0; i < count; i++)
             {
                 ulong key = r.ReadUInt64();
-                string value = new string(r2.ReadChars(r.ReadInt32()));
+                string value = System.Text.Encoding.Unicode.GetString(r.ReadBytes(r.ReadInt32() * 2));
                 if (entries.ContainsKey(key)) continue; // Patch 1.6 has problems in the STBLs (World Adventures sneaked into the DeltaBuild0 file)
                 entries.Add(key, value);
             }
@@ -81,7 +80,6 @@ namespace StblResource
             MemoryStream ms = new MemoryStream();
 
             BinaryWriter w = new BinaryWriter(ms);
-            BinaryWriter w2 = new BinaryWriter(ms, System.Text.Encoding.Unicode);
 
             w.Write((uint)FOURCC("STBL"));
             w.Write((byte)0x02);
@@ -98,7 +96,7 @@ namespace StblResource
             {
                 w.Write(kvp.Key);
                 w.Write(kvp.Value.Length);
-                w2.Write(kvp.Value.ToCharArray());
+                w.Write(System.Text.Encoding.Unicode.GetBytes(kvp.Value));
             }
 
             return ms;
@@ -192,19 +190,7 @@ namespace StblResource
         public ushort Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnResourceChanged(this, EventArgs.Empty); } } }
         public uint Unknown3 { get { return unknown3; } set { if (unknown3 != value) { unknown3 = value; OnResourceChanged(this, EventArgs.Empty); } } }
 
-        public string Value
-        {
-            get
-            {
-                string s = "";
-                s += "Unknown1: 0x" + unknown1.ToString("X4");
-                s += "\nUnknown2: 0x" + unknown2.ToString("X4");
-                s += "\nUnknown3: 0x" + unknown3.ToString("X8");
-                foreach (var kvp in entries)
-                    s += String.Format("\nKey: 0x{0:X16} = Value: '{1}'", kvp.Key, kvp.Value);
-                return s;
-            }
-        }
+        public String Value { get { return ValueBuilder; } }
         #endregion
     }
 

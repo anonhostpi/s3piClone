@@ -41,6 +41,21 @@ namespace s3pi.Interfaces
 
         protected abstract void Parse(Stream s);
 
+        #region AApiVersionedFields
+        protected override string ValueBuilder
+        {
+            get
+            {
+                extraBanlist.AddRange(new string[] {
+                    "Tag",
+                    "ResourceType",
+                    "Data",
+                });
+                return base.ValueBuilder;
+            }
+        }
+        #endregion
+
         #region AHandlerElement
         /// <summary>
         /// The list of available field names on this API object
@@ -53,7 +68,9 @@ namespace s3pi.Interfaces
         #endregion
 
         #region IRCOLBlock Members
+        [ElementPriority(2)]
         public abstract string Tag { get; }
+        [ElementPriority(3)]
         public abstract uint ResourceType { get; }
         public abstract Stream UnParse();
         #endregion

@@ -175,7 +175,7 @@ namespace CatalogResource
 
         #region Content Fields
         //--insert Version: ElementPriority(1)
-        [ElementPriority(2)]
+        [ElementPriority(12)]
         public MaterialList Materials
         {
             get { if (version < 0x00000007) throw new InvalidOperationException(); return materialList; }

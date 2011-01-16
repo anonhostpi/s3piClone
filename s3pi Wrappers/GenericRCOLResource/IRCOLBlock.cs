@@ -28,11 +28,13 @@ namespace s3pi.Interfaces
         /// <summary>
         /// The four byte tag for the RCOL block, may be null if none present
         /// </summary>
+        [ElementPriority(2)]
         string Tag { get; }
 
         /// <summary>
         /// The ResourceType for the RCOL block, used to determine which specific RCOL handlers are available
         /// </summary>
+        [ElementPriority(3)]
         uint ResourceType { get; }
 
         /// <summary>

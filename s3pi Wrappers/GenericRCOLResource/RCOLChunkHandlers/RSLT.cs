@@ -61,8 +61,10 @@ namespace s3pi.GenericRCOLResource
         #endregion
 
         #region ARCOLBlock
+        [ElementPriority(2)]
         public override string Tag { get { return TAG; } }
 
+        [ElementPriority(3)]
         public override uint ResourceType { get { return 0xD3044521; } }
 
         protected override void Parse(Stream s)
@@ -244,7 +246,7 @@ namespace s3pi.GenericRCOLResource
             }
             #endregion
         }
-        public class SevenFloatsList : AResource.DependentList<SevenFloats>
+        public class SevenFloatsList : DependentList<SevenFloats>
         {
             const int max = 1; // This implements the boolean nature of the list count
 
@@ -406,6 +408,8 @@ namespace s3pi.GenericRCOLResource
             {
                 get
                 {
+                    return ValueBuilder;
+                    /*
                     string s = "";
                     s += "SlotName: 0x" + slotName.ToString("X8");
                     s += "\nBoneName: 0x" + boneName.ToString("X8");
@@ -413,11 +417,12 @@ namespace s3pi.GenericRCOLResource
                     s += "\nY: " + tY.Value;
                     s += "\nZ: " + tZ.Value;
                     return s;
+                    /**/
                 }
             }
             #endregion
         }
-        public class PartList : AResource.DependentList<Part>
+        public class PartList : DependentList<Part>
         {
             #region Constructors
             public PartList(EventHandler handler) : base(handler) { }
@@ -515,17 +520,22 @@ namespace s3pi.GenericRCOLResource
 
             [ElementPriority(3)]
             public SlotPlacement SlotPlacementFlags { get { return slotPlacementFlags; } set { if (slotPlacementFlags != value) { slotPlacementFlags = value; OnElementChanged(); } } }
+
+            /*
             public override string Value
             {
                 get
                 {
+                    return ValueBuilder;
                     string s = base.Value;
                     s += "\nSlotPlacementFlags: " + this["SlotPlacementFlags"];
                     return s;
+                    /**
                 }
             }
+            /**/
         }
-        public class SlottedPartList : AResource.DependentList<SlottedPart>
+        public class SlottedPartList : DependentList<SlottedPart>
         {
             #region Constructors
             public SlottedPartList(EventHandler handler) : base(handler) { }
@@ -572,33 +582,31 @@ namespace s3pi.GenericRCOLResource
         #endregion
 
         #region Content Fields
-        [ElementPriority(0)]
+        [ElementPriority(11)]
         public uint Version { get { return version; } set { if (version != value) { version = value; OnRCOLChanged(this, EventArgs.Empty); } } }
-        [ElementPriority(1)]
+        [ElementPriority(12)]
         public PartList Routes { get { return routes; } set { if (routes != value) { routes = new PartList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
-        [ElementPriority(2)]
-        [DataGridExpandable]
+        [ElementPriority(13), DataGridExpandable]
         public SevenFloatsList RouteFloats { get { return routeFloats; } set { if (routeFloats != value) { routeFloats = new SevenFloatsList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
-        [ElementPriority(3)]
+        [ElementPriority(14)]
         public SlottedPartList Containers { get { return containers; } set { if (containers != value) { containers = new SlottedPartList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
-        [ElementPriority(4)]
-        [DataGridExpandable]
+        [ElementPriority(15), DataGridExpandable]
         public SevenFloatsList ContainerFloats { get { return containerFloats; } set { if (containerFloats != value) { containerFloats = new SevenFloatsList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
-        [ElementPriority(5)]
+        [ElementPriority(16)]
         public PartList Effects { get { return effects; } set { if (effects != value) { effects = new PartList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
-        [ElementPriority(6)]
-        [DataGridExpandable]
+        [ElementPriority(17), DataGridExpandable]
         public SevenFloatsList EffectFloats { get { return effectFloats; } set { if (effectFloats != value) { effectFloats = new SevenFloatsList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
-        [ElementPriority(7)]
+        [ElementPriority(18)]
         public PartList InverseKineticsTargets { get { return inverseKineticsTargets; } set { if (inverseKineticsTargets != value) { inverseKineticsTargets = new PartList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
-        [ElementPriority(8)]
-        [DataGridExpandable]
+        [ElementPriority(19), DataGridExpandable]
         public SevenFloatsList InverseKineticsTargetFloats { get { return inverseKineticsTargetFloats; } set { if (inverseKineticsTargetFloats != value) { inverseKineticsTargetFloats = new SevenFloatsList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
 
         public string Value
         {
             get
             {
+                return ValueBuilder;
+                /*
                 string fmt;
                 string s = "";
                 s += "Tag: 0x" + tag.ToString("X8");
@@ -633,6 +641,7 @@ namespace s3pi.GenericRCOLResource
                 if (inverseKineticsTargetFloats.Count > 0) s += "\nInverseKineticsTargetFloats: " + inverseKineticsTargetFloats[0].Value;
 
                 return s;
+                /**/
             }
         }
         #endregion

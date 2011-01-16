@@ -162,7 +162,7 @@ namespace ObjKeyResource
             public string Value { get { return "0x" + ((uint)element).ToString("X8") + " (" + (Enum.IsDefined(typeof(Component), element) ? element + "" : "undefined") + ")"; } }
         }
 
-        public class ComponentList : AResource.DependentList<ComponentElement>
+        public class ComponentList : DependentList<ComponentElement>
         {
             #region Constructors
             public ComponentList(EventHandler handler) : base(handler, Byte.MaxValue) { }
@@ -408,7 +408,7 @@ namespace ObjKeyResource
             public override string Value { get { return base.Value + "; Data: " + "0x" + data.ToString("X8"); } }
         }
 
-        public class ComponentDataList : AResource.DependentList<ComponentDataType>
+        public class ComponentDataList : DependentList<ComponentDataType>
         {
             #region Constructors
             public ComponentDataList(EventHandler handler) : base(handler, Byte.MaxValue) { }
@@ -470,6 +470,8 @@ namespace ObjKeyResource
         {
             get
             {
+                return ValueBuilder;
+                /*
                 string s = "";
                 s += String.Format("Format: 0x{0:X8}", format);
 
@@ -492,6 +494,7 @@ namespace ObjKeyResource
                 for (int i = 0; i < tgiBlocks.Count; i++)
                     s += "\n  [0x" + i.ToString("X8") + "]: " + tgiBlocks[i];
                 return s;
+                /**/
             }
         }
         #endregion

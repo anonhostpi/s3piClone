@@ -37,7 +37,7 @@ namespace s3pi.GenericRCOLResource
         byte[] unused = new byte[4];
         byte modular;
         int ftptIndex;
-        AResource.TGIBlockList tgiBlockList;
+        TGIBlockList tgiBlockList;
         #endregion
 
         #region Constructors
@@ -66,13 +66,15 @@ namespace s3pi.GenericRCOLResource
             this.modular = modular;
             if (modular != 0)
                 this.ftptIndex = ftptIndex;
-            this.tgiBlockList = new AResource.TGIBlockList(OnRCOLChanged, tgiBlockList);
+            this.tgiBlockList = new TGIBlockList(OnRCOLChanged, tgiBlockList);
         }
         #endregion
 
         #region ARCOLBlock
+        [ElementPriority(2)]
         public override string Tag { get { return "VPXY"; } }
 
+        [ElementPriority(3)]
         public override uint ResourceType { get { return 0x736884F1; } }
 
         protected override void Parse(Stream s)
@@ -102,7 +104,7 @@ namespace s3pi.GenericRCOLResource
             else
                 ftptIndex = 0;
 
-            tgiBlockList = new AResource.TGIBlockList(OnRCOLChanged, s, tgiPosn, tgiSize);
+            tgiBlockList = new TGIBlockList(OnRCOLChanged, s, tgiPosn, tgiSize);
         }
 
         public override Stream UnParse()
@@ -130,7 +132,7 @@ namespace s3pi.GenericRCOLResource
             if (modular != 0)
                 w.Write(ftptIndex);
 
-            if (tgiBlockList == null) tgiBlockList = new AResource.TGIBlockList(OnRCOLChanged);
+            if (tgiBlockList == null) tgiBlockList = new TGIBlockList(OnRCOLChanged);
             tgiBlockList.UnParse(ms, pos);
 
             return ms;
@@ -232,10 +234,11 @@ namespace s3pi.GenericRCOLResource
             {
                 get
                 {
-                    string s = "EntryID: 0x" + entryID.ToString("X2") + String.Format("; TGIIndexes ({0:X}): ", tgiIndexes.Count);
+                    System.Text.StringBuilder sb = new System.Text.StringBuilder();
+                    sb.Append("EntryID: 0x" + entryID.ToString("X2") + String.Format("; TGIIndexes ({0:X}): ", tgiIndexes.Count));
                     string fmt = "[{0:X" + tgiIndexes.Count.ToString("X").Length + "}]: 0x{1:X8}; ";
-                    for (int i = 0; i < tgiIndexes.Count; i++) s += String.Format(fmt, i, tgiIndexes[i]);
-                    return s.TrimEnd(';', ' ');
+                    for (int i = 0; i < tgiIndexes.Count; i++) sb.Append(String.Format(fmt, i, tgiIndexes[i]));
+                    return sb.ToString().TrimEnd(';', ' ');
                 }
             }
             #endregion
@@ -263,7 +266,7 @@ namespace s3pi.GenericRCOLResource
             #endregion
         }
 
-        public class EntryList : AResource.DependentList<Entry>
+        public class EntryList : DependentList<Entry>
         {
             #region Constructors
             public EntryList(EventHandler handler) : base(handler, Byte.MaxValue) { }
@@ -297,9 +300,13 @@ namespace s3pi.GenericRCOLResource
         #endregion
 
         #region Content Fields
+        [ElementPriority(11)]
         public uint Version { get { return version; } /*set { if (version != value) { version = value; OnRCOLChanged(this, EventArgs.Empty); } }/**/ }
+        [ElementPriority(12)]
         public EntryList Entries { get { return entryList; } set { if (entryList != value) { entryList = new EntryList(OnRCOLChanged, value); OnRCOLChanged(this, EventArgs.Empty); } } }
+        [ElementPriority(13)]
         public byte TC02 { get { return tc02; } /*set { if (tc02 != value) { tc02 = value; OnRCOLChanged(this, EventArgs.Empty); } }/**/ }
+        [ElementPriority(14)]
         public BoundingBox Bounds
         {
             get { return bounds; }
@@ -308,6 +315,7 @@ namespace s3pi.GenericRCOLResource
                 if (bounds != value) { bounds = new BoundingBox(requestedApiVersion, handler, value); OnRCOLChanged(this, EventArgs.Empty); }
             }
         }
+        [ElementPriority(15)]
         public byte[] Unused
         {
             get { return (byte[])unused.Clone(); }
@@ -317,22 +325,26 @@ namespace s3pi.GenericRCOLResource
                 if (!ArrayCompare(unused, value)) { unused = value == null ? null : (byte[])value.Clone(); OnRCOLChanged(this, EventArgs.Empty); }
             }
         }
+        [ElementPriority(16)]
         public bool Modular { get { return modular != 0; } set { if (Modular != value) { modular = (byte)(value ? 0x01 : 0x00); OnRCOLChanged(this, EventArgs.Empty); } } }
+        [ElementPriority(17)]
         public int FTPTIndex
         {
             get { return ftptIndex; }
             set { if (modular == 0) throw new InvalidOperationException(); if (ftptIndex != value) { ftptIndex = value; OnRCOLChanged(this, EventArgs.Empty); } }
         }
-        public AResource.TGIBlockList TGIBlocks
+        public TGIBlockList TGIBlocks
         {
             get { return tgiBlockList; }
-            set { if (tgiBlockList != value) { tgiBlockList = new AResource.TGIBlockList(OnRCOLChanged, value); OnRCOLChanged(this, EventArgs.Empty); } }
+            set { if (tgiBlockList != value) { tgiBlockList = new TGIBlockList(OnRCOLChanged, value); OnRCOLChanged(this, EventArgs.Empty); } }
         }
 
         public string Value
         {
             get
             {
+                return ValueBuilder;
+                /*
                 string fmt;
                 string s = "";
                 s += "Tag: 0x" + tag.ToString("X8");
@@ -356,6 +368,7 @@ namespace s3pi.GenericRCOLResource
                 s += "\n----";
 
                 return s;
+                /**/
             }
         }
         #endregion

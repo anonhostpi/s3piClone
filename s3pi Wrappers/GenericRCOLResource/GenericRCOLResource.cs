@@ -151,24 +151,22 @@ namespace s3pi.GenericRCOLResource
 
             #endregion
 
+            [ElementPriority(1)]
             public TGIBlock TGIBlock { get { return tgiBlock; } set { if (tgiBlock != value) { tgiBlock = new TGIBlock(0, handler, value); OnElementChanged(); } } }
+            [ElementPriority(2)]
             public ARCOLBlock RCOLBlock { get { return rcolBlock; } set { if (rcolBlock != value) { rcolBlock = (ARCOLBlock)rcolBlock.Clone(handler); OnElementChanged(); } } }
 
             public string Value
             {
                 get
                 {
-                    string s = "";
-                    s += "--- " + tgiBlock + ((rcolBlock.Equals("*")) ? "" : " - " + rcolBlock.Tag) + " ---";
-                    if (AApiVersionedFields.GetContentFields(0, rcolBlock.GetType()).Contains("Value"))
-                        s += "\n" + rcolBlock["Value"];
-                    else foreach (string field in AApiVersionedFields.GetContentFields(0, rcolBlock.GetType()))
-                        {
-                            if (!(new List<string>(new string[] { "ResourceType", "Tag", "Value", "Stream", "AsBytes", })).Contains(field))
-                                s += "\n  " + field + ": " + rcolBlock[field];
-                        }
-                    s += "\n----";
-                    return s;
+                    System.Text.StringBuilder sb = new System.Text.StringBuilder();
+                    sb.Append("--- " + tgiBlock + ((rcolBlock.Equals("*")) ? "" : " - " + rcolBlock.Tag) + " ---");
+                    if (AApiVersionedFields.GetContentFields(0, rcolBlock.GetType()).Contains("Value") &&
+                            typeof(string).IsAssignableFrom(AApiVersionedFields.GetContentFieldTypes(requestedApiVersion, rcolBlock.GetType())["Value"]))
+                        sb.Append("\n" + (string)rcolBlock["Value"].Value);
+                    sb.Append("\n----");
+                    return sb.ToString();
                 }
             }
         }
@@ -271,16 +269,23 @@ namespace s3pi.GenericRCOLResource
         #endregion
 
         #region Content Fields
+        [ElementPriority(1)]
         public uint Version { get { return version; } set { if (version != value) { version = value; OnResourceChanged(this, EventArgs.Empty); } } }
+        [ElementPriority(2)]
         public uint DataType { get { return dataType; } set { if (dataType != value) { dataType = value; OnResourceChanged(this, EventArgs.Empty); } } }
+        [ElementPriority(3)]
         public uint Unused { get { return unused; } set { if (unused != value) { unused = value; OnResourceChanged(this, EventArgs.Empty); } } }
+        [ElementPriority(4)]
         public CountedTGIBlockList Resources { get { return resources; } set { if (resources != value) { resources = new CountedTGIBlockList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
+        [ElementPriority(5)]
         public ChunkEntryList ChunkEntries { get { return blockList; } set { if (blockList != value) { blockList = new ChunkEntryList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
 
         public string Value
         {
             get
             {
+                return ValueBuilder;
+                /*
                 string s = "";
                 s += "Version: 0x" + version.ToString("X8");
                 s += "\nDataType: 0x" + dataType.ToString("X8");
@@ -293,6 +298,7 @@ namespace s3pi.GenericRCOLResource
                 for (int i = 0; i < blockList.Count; i++)
                     s += "\n[" + i + "] " + blockList[i].Value;
                 return s;
+                /**/
             }
         }
         #endregion

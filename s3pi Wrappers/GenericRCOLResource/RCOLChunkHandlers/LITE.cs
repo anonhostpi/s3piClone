@@ -53,8 +53,10 @@ namespace s3pi.GenericRCOLResource
         #endregion
 
         #region ARCOLBlock
+        [ElementPriority(2)]
         public override string Tag { get { return TAG; } }
 
+        [ElementPriority(3)]
         public override uint ResourceType { get { return 0x03B4C61D; } }
 
         protected override void Parse(Stream s)
@@ -356,23 +358,39 @@ namespace s3pi.GenericRCOLResource
             public float F14_unknown { get { return width; } set { if (width != value) { width = value; OnElementChanged(); } } }
             [ElementPriority(15)]
             public float Height { get { return height; } set { if (height != value) { height = value; OnElementChanged(); } } }
-            [ElementPriority(15)]
+            [ElementPriority(16)]
             public float F15_unknown { get { return height; } set { if (height != value) { height = value; OnElementChanged(); } } }
+            [ElementPriority(17)]
             public float F16_unknown { get { return floats16_31_unknown[0]; } set { setFloatN(0, value); } }
+            [ElementPriority(18)]
             public float F17_unknown { get { return floats16_31_unknown[1]; } set { setFloatN(1, value); } }
+            [ElementPriority(19)]
             public float F18_unknown { get { return floats16_31_unknown[2]; } set { setFloatN(2, value); } }
+            [ElementPriority(20)]
             public float F19_unknown { get { return floats16_31_unknown[3]; } set { setFloatN(3, value); } }
+            [ElementPriority(21)]
             public float F20_unknown { get { return floats16_31_unknown[4]; } set { setFloatN(4, value); } }
+            [ElementPriority(22)]
             public float F21_unknown { get { return floats16_31_unknown[5]; } set { setFloatN(5, value); } }
+            [ElementPriority(23)]
             public float F22_unknown { get { return floats16_31_unknown[6]; } set { setFloatN(6, value); } }
+            [ElementPriority(24)]
             public float F23_unknown { get { return floats16_31_unknown[7]; } set { setFloatN(7, value); } }
+            [ElementPriority(25)]
             public float F24_unknown { get { return floats16_31_unknown[8]; } set { setFloatN(8, value); } }
+            [ElementPriority(26)]
             public float F25_unknown { get { return floats16_31_unknown[9]; } set { setFloatN(9, value); } }
+            [ElementPriority(27)]
             public float F26_unknown { get { return floats16_31_unknown[10]; } set { setFloatN(10, value); } }
+            [ElementPriority(28)]
             public float F27_unknown { get { return floats16_31_unknown[11]; } set { setFloatN(11, value); } }
+            [ElementPriority(29)]
             public float F28_unknown { get { return floats16_31_unknown[12]; } set { setFloatN(12, value); } }
+            [ElementPriority(30)]
             public float F29_unknown { get { return floats16_31_unknown[13]; } set { setFloatN(13, value); } }
+            [ElementPriority(31)]
             public float F30_unknown { get { return floats16_31_unknown[14]; } set { setFloatN(14, value); } }
+            [ElementPriority(32)]
             public float F31_unknown { get { return floats16_31_unknown[15]; } set { setFloatN(15, value); } }
             void setFloatN(int n, float value) { if (floats16_31_unknown[n] != value) { floats16_31_unknown[n] = value; OnElementChanged(); } }
 
@@ -380,17 +398,20 @@ namespace s3pi.GenericRCOLResource
             {
                 get
                 {
+                    return ValueBuilder;
+                    /*
                     string s = "";
                     foreach (string field in ContentFields)
                         if (!field.Equals("Value"))
                             s += "\n" + field + ": " + this[field];
                     return s.TrimStart('\n');
+                    /**/
                 }
             }
             #endregion
         }
 
-        public class LongSectionList : AResource.DependentList<LongSection>
+        public class LongSectionList : DependentList<LongSection>
         {
             int count;
 
@@ -474,18 +495,31 @@ namespace s3pi.GenericRCOLResource
             #region Content Fields
             [ElementPriority(0)]
             public uint Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnElementChanged(); } } }
+            [ElementPriority(1)]
             public float F01_unknown { get { return floats1_13_unknown[0]; } set { setFloatN(0, value); } }
+            [ElementPriority(2)]
             public float F02_unknown { get { return floats1_13_unknown[1]; } set { setFloatN(1, value); } }
+            [ElementPriority(3)]
             public float F03_unknown { get { return floats1_13_unknown[2]; } set { setFloatN(2, value); } }
+            [ElementPriority(4)]
             public float F04_unknown { get { return floats1_13_unknown[3]; } set { setFloatN(3, value); } }
+            [ElementPriority(5)]
             public float F05_unknown { get { return floats1_13_unknown[4]; } set { setFloatN(4, value); } }
+            [ElementPriority(6)]
             public float F06_unknown { get { return floats1_13_unknown[5]; } set { setFloatN(5, value); } }
+            [ElementPriority(7)]
             public float F07_unknown { get { return floats1_13_unknown[6]; } set { setFloatN(6, value); } }
+            [ElementPriority(8)]
             public float F08_unknown { get { return floats1_13_unknown[7]; } set { setFloatN(7, value); } }
+            [ElementPriority(9)]
             public float F09_unknown { get { return floats1_13_unknown[8]; } set { setFloatN(8, value); } }
+            [ElementPriority(10)]
             public float F10_unknown { get { return floats1_13_unknown[9]; } set { setFloatN(9, value); } }
+            [ElementPriority(11)]
             public float F11_unknown { get { return floats1_13_unknown[10]; } set { setFloatN(10, value); } }
+            [ElementPriority(12)]
             public float F12_unknown { get { return floats1_13_unknown[11]; } set { setFloatN(11, value); } }
+            [ElementPriority(13)]
             public float F13_unknown { get { return floats1_13_unknown[12]; } set { setFloatN(12, value); } }
             void setFloatN(int n, float value) { if (floats1_13_unknown[n] != value) { floats1_13_unknown[n] = value; OnElementChanged(); } }
 
@@ -493,17 +527,20 @@ namespace s3pi.GenericRCOLResource
             {
                 get
                 {
+                    return ValueBuilder;
+                    /*
                     string s = "";
                     foreach (string field in ContentFields)
                         if (!field.Equals("Value"))
                             s += "\n" + field + ": " + this[field];
                     return s.TrimStart('\n');
+                    /**/
                 }
             }
             #endregion
         }
 
-        public class ShortSectionList : AResource.DependentList<ShortSection>
+        public class ShortSectionList : DependentList<ShortSection>
         {
             int count;
 
@@ -527,21 +564,23 @@ namespace s3pi.GenericRCOLResource
         #endregion
 
         #region Content Fields
-        [ElementPriority(0)]
+        [ElementPriority(11)]
         public uint Version { get { return version; } set { if (version != value) { version = value; OnRCOLChanged(this, EventArgs.Empty); } } }
-        [ElementPriority(1)]
+        [ElementPriority(12)]
         public uint Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
-        [ElementPriority(2)]
+        [ElementPriority(13)]
         public ushort Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
-        [ElementPriority(3)]
+        [ElementPriority(14)]
         public LongSectionList LongSections { get { return longSections; } set { if (longSections != value) { longSections = new LongSectionList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
-        [ElementPriority(4)]
+        [ElementPriority(15)]
         public ShortSectionList ShortSections { get { return shortSections; } set { if (shortSections != value) { shortSections = new ShortSectionList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
 
         public string Value
         {
             get
             {
+                return ValueBuilder;
+                /*
                 string s = "";
                 s += "Tag: 0x" + tag.ToString("X8");
                 s += "\nVersion: 0x" + version.ToString("X8");
@@ -559,6 +598,7 @@ namespace s3pi.GenericRCOLResource
                 for (int i = 0; i < shortSections.Count; i++) s += String.Format(fmt, i, shortSections[i].Value);
 
                 return s;
+                /**/
             }
         }
         #endregion

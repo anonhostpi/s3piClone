@@ -96,8 +96,10 @@ namespace s3pi.GenericRCOLResource
         #endregion
 
         #region ARCOLBlock
+        [ElementPriority(2)]
         public override string Tag { get { return "MATD"; } }
 
+        [ElementPriority(3)]
         public override uint ResourceType { get { return 0x01D0E75D; } }
 
         protected override void Parse(Stream s)
@@ -377,7 +379,7 @@ namespace s3pi.GenericRCOLResource
             HaloBlur = 0xc3ad4f50,
             HaloHighColor = 0xd4043258,
         }
-        public enum DataType
+        public enum DataType : uint
         {
             dtUnknown = 0,
             dtFloat = 1,
@@ -457,6 +459,8 @@ namespace s3pi.GenericRCOLResource
             {
                 get
                 {
+                    return ValueBuilder;
+                    /*
                     string s = "";
                     s += "MTRLUnknown1: 0x" + mtrlUnknown1.ToString("X8");
                     s += "\nMTRLUnknown2: 0x" + mtrlUnknown2.ToString("X4");
@@ -467,6 +471,7 @@ namespace s3pi.GenericRCOLResource
                     for (int i = 0; i < sdList.Count; i++)
                         s += String.Format(fmt, i, sdList[i].Value);
                     return s;
+                    /**/
                 }
             }
             #endregion
@@ -539,6 +544,8 @@ namespace s3pi.GenericRCOLResource
             {
                 get
                 {
+                    return ValueBuilder;
+                    /*
                     string s = "";
                     s += "MTNFUnknown1: 0x" + mtnfUnknown1.ToString("X8");
 
@@ -547,6 +554,7 @@ namespace s3pi.GenericRCOLResource
                     for (int i = 0; i < sdList.Count; i++)
                         s += String.Format(fmt, i, sdList[i].Value);
                     return s;
+                    /**/
                 }
             }
             #endregion
@@ -678,7 +686,7 @@ namespace s3pi.GenericRCOLResource
             public override string Value { get { return "Data: " + data.ToString(); } }
             #endregion
         }
-        public class EntryList : AResource.DependentList<Entry>
+        public class EntryList : DependentList<Entry>
         {
             DataType type = 0;
             int count = 0;
@@ -686,7 +694,7 @@ namespace s3pi.GenericRCOLResource
             #region Constructors
             public EntryList(EventHandler handler, DataType type) : base(handler) { this.type = type; }
             public EntryList(EventHandler handler, DataType type, int count, Stream s) : base(null) { this.type = type; this.count = count; elementHandler = handler; Parse(s); this.handler = handler; }
-            public EntryList(EventHandler handler, DataType type, IEnumerable<Entry> le) : base(handler, le) { this.type = type; }
+            public EntryList(EventHandler handler, DataType type, IEnumerable<Entry> le) : base(null) { this.type = type; elementHandler = handler; foreach (var e in le) this.Add(e); this.handler = handler; }
             #endregion
 
             #region Data I/O
@@ -707,7 +715,7 @@ namespace s3pi.GenericRCOLResource
                     case DataType.dtUInt32_1:
                     case DataType.dtUInt32_2: this.Add(new ElementUInt32(0, null)); break;
                     default:
-                        throw new InvalidOperationException(String.Format("Unknown DataType 0x{0:X8}", type));
+                        throw new InvalidOperationException(String.Format("Unknown DataType 0x{0:X8}", (uint)type));
                 }
             }
             protected override Type GetElementType(params object[] fields)
@@ -718,7 +726,7 @@ namespace s3pi.GenericRCOLResource
                     case DataType.dtUInt32_1:
                     case DataType.dtUInt32_2: return typeof(ElementUInt32);
                     default:
-                        throw new InvalidOperationException(String.Format("Unknown DataType 0x{0:X8}", type));
+                        throw new InvalidOperationException(String.Format("Unknown DataType 0x{0:X8}", (uint)type));
                 }
             }
             #endregion
@@ -822,15 +830,15 @@ namespace s3pi.GenericRCOLResource
             {
                 get
                 {
-                    string s = "";
-                    s += this["Field"] + " {";
-                    foreach (var e in sdData) s += " " + e["Data"] + ",";
-                    return s.TrimEnd(',') + " }";
+                    System.Text.StringBuilder sb = new System.Text.StringBuilder();
+                    sb.Append(this["Field"] + " {");
+                    foreach (var e in sdData) sb.Append(" " + e["Data"] + ",");
+                    return sb.ToString().TrimEnd(',') + " }";
                 }
             }
             #endregion
         }
-        public class ShaderDataList : AResource.DependentList<ShaderData>
+        public class ShaderDataList : DependentList<ShaderData>
         {
             int dataLen = -1;
             internal long dataPos = -1;
@@ -869,25 +877,27 @@ namespace s3pi.GenericRCOLResource
         #endregion
 
         #region Content Fields
-        [ElementPriority(1)]
+        [ElementPriority(11)]
         public uint Version { get { return version; } set { if (version != value) { version = value; OnRCOLChanged(this, EventArgs.Empty); } } }
-        [ElementPriority(2)]
+        [ElementPriority(12)]
         public uint MaterialNameHash { get { return materialNameHash; } set { if (materialNameHash != value) { materialNameHash = value; OnRCOLChanged(this, EventArgs.Empty); } } }
-        [ElementPriority(3)]
+        [ElementPriority(13)]
         public ShaderType Shader { get { return shader; } set { if (shader != value) { shader = value; OnRCOLChanged(this, EventArgs.Empty); } } }
-        [ElementPriority(4)]
+        [ElementPriority(14)]
         public MTRL Mtrl { get { return mtrl; } set { if (mtrl != value) { mtrl = new MTRL(requestedApiVersion, handler, mtrl); OnRCOLChanged(this, EventArgs.Empty); } } }
-        [ElementPriority(4)]
+        [ElementPriority(15)]
         public uint Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
-        [ElementPriority(5)]
+        [ElementPriority(16)]
         public uint Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
-        [ElementPriority(6)]
+        [ElementPriority(17)]
         public MTNF Mtnf { get { return mtnf; } set { if (mtnf != value) { mtnf = new MTNF(requestedApiVersion, handler, mtnf); OnRCOLChanged(this, EventArgs.Empty); } } }
 
         public string Value
         {
             get
             {
+                return ValueBuilder;
+                /*
                 string s = "";
                 s += "Tag: 0x" + tag.ToString("X8");
                 s += "\nVersion: 0x" + version.ToString("X8");
@@ -905,6 +915,7 @@ namespace s3pi.GenericRCOLResource
                 }
 
                 return s;
+                /**/
             }
         }
         #endregion

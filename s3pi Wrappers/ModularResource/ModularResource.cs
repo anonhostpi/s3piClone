@@ -95,15 +95,21 @@ namespace ModularResource
         #endregion
 
         #region Content Fields
+        [ElementPriority(1)]
         public ushort Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnResourceChanged(this, EventArgs.Empty); } } }
+        [ElementPriority(2)]
         public ushort Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnResourceChanged(this, EventArgs.Empty); } } }
+        [ElementPriority(3)]
         public TGIIndexList TGIIndexes { get { return tgiIndexes; } set { if (tgiIndexes != value) { tgiIndexes = new TGIIndexList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
+        [ElementPriority(4)]
         public TGIBlockList TGIBlocks { get { return tgiBlocks; } set { if (tgiBlocks != value) { tgiBlocks = new TGIBlockList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
 
         public String Value
         {
             get
             {
+                return ValueBuilder;
+                /*
                 string s = "";
                 string fmt;
 
@@ -120,6 +126,7 @@ namespace ModularResource
                 for (int i = 0; i < tgiBlocks.Count; i++) s += string.Format(fmt, i, tgiBlocks[i].Value);
                 s += "\n--";
                 return s;
+                /**/
             }
         }
         #endregion

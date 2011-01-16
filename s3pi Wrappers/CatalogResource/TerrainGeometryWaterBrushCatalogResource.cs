@@ -146,7 +146,7 @@ namespace CatalogResource
 
         #region Content Fields
         //--insert Version: ElementPriority(1)
-        [ElementPriority(2)]
+        [ElementPriority(12)]
         public uint BrushVersion { get { return brushVersion; } set { if (brushVersion != value) { brushVersion = value; OnResourceChanged(this, EventArgs.Empty); } } }
         //--insert CommonBlock: ElementPriority(11)
         [ElementPriority(21)]

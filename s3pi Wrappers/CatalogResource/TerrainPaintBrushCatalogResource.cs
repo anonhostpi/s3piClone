@@ -172,7 +172,7 @@ namespace CatalogResource
         #endregion
 
         #region Content Fields
-        //--insert Version: CatalogResourceBrush(1)
+        //--insert TerrainGeometryWaterBrushCatalogResource
         [ElementPriority(41)]
         public TGIBlock BrushTexture
         {
