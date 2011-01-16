@@ -167,14 +167,13 @@ namespace s3pi.Interfaces
         /// otherwise the value of the ElementPriorityAttribute Priority field.</returns>
         public static Int32 GetPriority(Type t, string index)
         {
-            Int32 priority = Int32.MaxValue;
             System.Reflection.PropertyInfo pi = t.GetProperty(index);
 
             if (pi != null)
                 foreach (var attr in pi.GetCustomAttributes(typeof(ElementPriorityAttribute), true))
-                    priority = (attr as ElementPriorityAttribute).Priority;
+                    return (attr as ElementPriorityAttribute).Priority;
 
-            return priority;
+            return Int32.MaxValue;
         }
 
         class PriorityComparer : IComparer<string>
@@ -186,6 +185,117 @@ namespace s3pi.Interfaces
                 int res = GetPriority(t, x).CompareTo(GetPriority(t, y));
                 if (res == 0) res = x.CompareTo(y);
                 return res;
+            }
+        }
+
+        /// <summary>
+        /// List of ContentFields ValueBuilder ignores
+        /// </summary>
+        protected List<string> extraBanlist = new List<string>(new string[] {
+                    "Value", "Stream", "AsBytes",
+                });
+
+        /// <summary>
+        /// Returns a string representing the value of the field (and any contained sub-fields)
+        /// </summary>
+        protected virtual string ValueBuilder
+        {
+            get
+            {
+                if (typeof(System.Collections.IDictionary).IsAssignableFrom(this.GetType()))
+                    extraBanlist.AddRange(new string[] { "Keys", "Values", "Count", "IsReadOnly", "IsFixedSize", "IsSynchronized", "SyncRoot", });
+
+                System.Text.StringBuilder sb = new System.Text.StringBuilder();
+
+                foreach (string f in this.ContentFields)
+                {
+                    if (banlist.Contains(f) || extraBanlist.Contains(f)) continue;
+
+                    TypedValue tv = this[f];
+
+                    if (typeof(AApiVersionedFields).IsAssignableFrom(tv.Type))
+                    {
+                        AApiVersionedFields apiObj = tv.Value as AApiVersionedFields;
+                        if (apiObj.ContentFields.Contains("Value") &&
+                            typeof(string).IsAssignableFrom(AApiVersionedFields.GetContentFieldTypes(requestedApiVersion, tv.Type)["Value"]))
+                        {
+                            string elem = (string)apiObj["Value"].Value;
+                            if (elem.Contains("\n"))
+                                sb.Append("\n--- " + tv.Type.Name + ": " + f + "\n" + (string)apiObj["Value"].Value);
+                            else
+                                sb.Append("\n" + f + ": " + elem);
+                        }
+                    }
+                    else if (tv.Type.BaseType.Name.Contains("SimpleList`"))
+                    {
+                        System.Collections.IList l = (System.Collections.IList)tv.Value;
+                        string fmt = "\n   [{0:X" + l.Count.ToString("X").Length + "}]: {1}";
+                        int i = 0;
+
+                        sb.Append("\n--- " + tv.Type.Name + ": " + f + " (0x" + l.Count.ToString("X") + ") ---");
+                        foreach (AHandlerElement v in l)
+                        {
+                            sb.Append(String.Format(fmt, i++, v["Val"].ToString()));
+                        }
+                        sb.Append("\n---");
+                    }
+                    else if (typeof(DependentList<TGIBlock>).IsAssignableFrom(tv.Type))
+                    {
+                        DependentList<TGIBlock> l = (DependentList<TGIBlock>)tv.Value;
+                        string fmt = "\n   [{0:X" + l.Count.ToString("X").Length + "}]: {1}";
+                        int i = 0;
+
+                        sb.Append("\n--- " + tv.Type.Name + ": " + f + " (0x" + l.Count.ToString("X") + ") ---");
+                        foreach (TGIBlock v in l)
+                            sb.Append(String.Format(fmt, i++, v.ToString()));
+                        sb.Append("\n---");
+                    }
+                    else if (tv.Type.BaseType.Name.Contains("DependentList`"))
+                    {
+                        System.Collections.IList l = (System.Collections.IList)tv.Value;
+                        string fmtLong = "\n--- {0}[{1:X" + l.Count.ToString("X").Length + "}] ---\n   ";
+                        string fmtShort = "\n   [{0:X" + l.Count.ToString("X").Length + "}]: {1}";
+                        int i = 0;
+
+                        sb.Append("\n--- " + tv.Type.Name + ": " + f + " (0x" + l.Count.ToString("X") + ") ---");
+                        foreach (AHandlerElement v in l)
+                        {
+                            if (v.ContentFields.Contains("Value") &&
+                                typeof(string).IsAssignableFrom(AApiVersionedFields.GetContentFieldTypes(requestedApiVersion, v.GetType())["Value"]))
+                            {
+                                string elem = (string)v["Value"].Value;
+                                if (elem.Contains("\n"))
+                                    sb.Append(String.Format(fmtLong, f, i++) + elem.Replace("\n", "\n   ").TrimEnd());
+                                else
+                                    sb.Append(String.Format(fmtShort, i++, elem));
+                            }
+                        }
+                        sb.Append("\n---");
+                    }
+                    else if (tv.Type.HasElementType && typeof(AApiVersionedFields).IsAssignableFrom(tv.Type.GetElementType())) // it's an AApiVersionedFields array, slightly glossy...
+                    {
+                        sb.Append("\n--- " + tv.Type.Name + ": " + f + " (0x" + ((Array)tv.Value).Length.ToString("X") + ") ---\n   " + tv.ToString().Replace("\n", "\n   ").TrimEnd() + "\n---");
+                    }
+                    else
+                    {
+                        sb.Append("\n" + f + ": " + tv);
+                    }
+                }
+
+                if (typeof(System.Collections.IDictionary).IsAssignableFrom(this.GetType()))
+                {
+                    System.Collections.IDictionary l = (System.Collections.IDictionary)this;
+                    string fmt = "\n   [{0:X" + l.Count.ToString("X").Length + "}] {1}: {2}";
+                    int i = 0;
+                    sb.Append("\n--- (0x" + l.Count.ToString("X") + ") ---");
+                    foreach (var key in l.Keys)
+                        sb.Append(String.Format(fmt, i++,
+                            new TypedValue(key.GetType(), key, "X").ToString(),
+                            new TypedValue(l[key].GetType(), l[key], "X").ToString()));
+                    sb.Append("\n---");
+                }
+
+                return sb.ToString().Trim('\n');
             }
         }
 

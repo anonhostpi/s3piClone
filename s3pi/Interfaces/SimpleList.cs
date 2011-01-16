@@ -25,7 +25,7 @@ using System.Reflection;
 namespace s3pi.Interfaces
 {
     /// <summary>
-    /// A flexible generic list that implements <see cref="AResource.DependentList{T}"/> for
+    /// A flexible generic list that implements <see cref="DependentList{T}"/> for
     /// a simple data type (such as <see cref="UInt32"/>).
     /// </summary>
     /// <typeparam name="T">A simple data type (such as <see cref="UInt32"/>).</typeparam>
@@ -62,7 +62,7 @@ namespace s3pi.Interfaces
     /// </code>
     /// </example>
     /// <seealso cref="HandlerElement{T}"/>
-    public class SimpleList<T> : AResource.DependentList<HandlerElement<T>>
+    public class SimpleList<T> : DependentList<HandlerElement<T>>
         where T : struct, IComparable, IConvertible, IEquatable<T>, IComparable<T>
     {
         #region Attributes
@@ -922,6 +922,13 @@ namespace s3pi.Interfaces
         /// <param name="handler">Event handler.</param>
         /// <param name="size">Optional list size.</param>
         public UIntList(EventHandler handler, long size = -1) : base(handler, ReadUInt32, WriteUInt32, size) { }
+        /// <summary>
+        /// Create a UIntList populated from an existing set of values.
+        /// </summary>
+        /// <param name="handler">Event handler.</param>
+        /// <param name="basis">Basis on which to populate the list.</param>
+        /// <param name="size">Optional list size.</param>
+        public UIntList(EventHandler handler, IEnumerable<uint> basis, long size = -1) : base(handler, basis, ReadUInt32, WriteUInt32, size) { }
         /// <summary>
         /// Create a UIntList populated from an existing set of values.
         /// </summary>

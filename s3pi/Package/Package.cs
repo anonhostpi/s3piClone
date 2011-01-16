@@ -250,7 +250,7 @@ namespace s3pi.Package
         /// </summary>
         [MinimumVersion(1)]
         [MaximumVersion(recommendedApiVersion)]
-        public override int Indexposition { get { headerReader.BaseStream.Position = 64; return headerReader.ReadInt32(); } }
+        public override int Indexposition { get { headerReader.BaseStream.Position = 64; int i = headerReader.ReadInt32(); return i != 0 ? i : BitConverter.ToInt32(Unknown2, 0); } }
         /// <summary>
         /// Package header: unused
         /// </summary>
@@ -482,7 +482,7 @@ namespace s3pi.Package
         void setIndexcount(BinaryWriter w, int c) { w.BaseStream.Position = 36; w.Write(c); }
         void setIndexsize(BinaryWriter w, int c) { w.BaseStream.Position = 44; w.Write(c); }
         void setIndexversion(BinaryWriter w) { w.BaseStream.Position = 60; w.Write(3); }
-        void setIndexposition(BinaryWriter w, int c) { w.BaseStream.Position = 64; w.Write(c); }
+        void setIndexposition(BinaryWriter w, int c) { w.BaseStream.Position = 40; w.Write(c); w.BaseStream.Position = 64; w.Write(c); }
 
         void CheckHeader()
         {

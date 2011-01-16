@@ -68,6 +68,7 @@
     <Compile Include="AResourceHandler.cs" />
     <Compile Include="AResourceKey.cs" />
     <Compile Include="BoundingBox.cs" />
+    <Compile Include="DependentList.cs" />
     <Compile Include="SimpleList.cs" />
     <Compile Include="ConstructorParametersAttribute.cs" />
     <Compile Include="DataGridExpandableAttribute.cs" />

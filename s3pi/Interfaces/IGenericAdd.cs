@@ -27,7 +27,7 @@ namespace s3pi.Interfaces
     /// an empty parameter list or
     /// the list of arguments to a generic class&apos; constructor.
     /// </summary>
-    /// <seealso cref="AResource.DependentList{T}"/>
+    /// <seealso cref="DependentList{T}"/>
     public interface IGenericAdd : IList
     {
         /// <summary>
@@ -35,7 +35,7 @@ namespace s3pi.Interfaces
         /// </summary>
         /// <exception cref="NotImplementedException">Lists of abstract classes will fail
         /// with a NotImplementedException.</exception>
-        /// <seealso cref="AResource.DependentList{T}"/>
+        /// <seealso cref="DependentList{T}"/>
         void Add();
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace s3pi.Interfaces
         /// Either the object to add or the generic type&apos;s constructor arguments.
         /// </param>
         /// <returns>True on success</returns>
-        /// <seealso cref="AResource.DependentList{T}"/>
+        /// <seealso cref="DependentList{T}"/>
         bool Add(params object[] fields);
     }
 }
