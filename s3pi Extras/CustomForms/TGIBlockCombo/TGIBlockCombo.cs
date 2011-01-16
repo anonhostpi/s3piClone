@@ -34,12 +34,12 @@ namespace System.Windows.Forms
             InitializeComponent();
         }
 
-        public TGIBlockCombo(AResource.DependentList<TGIBlock> tgiBlocks) : this(tgiBlocks, -1, true) { }
-        public TGIBlockCombo(AResource.DependentList<TGIBlock> tgiBlocks, int index) : this(tgiBlocks, index, true) { }
-        public TGIBlockCombo(AResource.DependentList<TGIBlock> tgiBlocks, int index, bool showEdit) : this() { TGIBlocks = tgiBlocks; SelectedIndex = index; ShowEdit = showEdit; }
+        public TGIBlockCombo(DependentList<TGIBlock> tgiBlocks) : this(tgiBlocks, -1, true) { }
+        public TGIBlockCombo(DependentList<TGIBlock> tgiBlocks, int index) : this(tgiBlocks, index, true) { }
+        public TGIBlockCombo(DependentList<TGIBlock> tgiBlocks, int index, bool showEdit) : this() { TGIBlocks = tgiBlocks; SelectedIndex = index; ShowEdit = showEdit; }
 
-        AResource.DependentList<TGIBlock> tgiBlocks;
-        public AResource.DependentList<TGIBlock> TGIBlocks
+        DependentList<TGIBlock> tgiBlocks;
+        public DependentList<TGIBlock> TGIBlocks
         {
             get { return tgiBlocks; }
             set
@@ -100,7 +100,7 @@ namespace System.Windows.Forms
 
         private void btnTGIBlockListEditor_Click(object sender, EventArgs e)
         {
-            AResource.CountedTGIBlockList tgiBlocksCopy = new AResource.CountedTGIBlockList(null, tgiBlocks);
+            CountedTGIBlockList tgiBlocksCopy = new CountedTGIBlockList(null, tgiBlocks);
             DialogResult dr = TGIBlockListEditor.Show(tgiBlocksCopy);
             if (dr != DialogResult.OK) return;
 

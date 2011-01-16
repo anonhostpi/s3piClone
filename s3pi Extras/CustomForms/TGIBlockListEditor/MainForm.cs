@@ -47,7 +47,7 @@ namespace System.Windows.Forms.TGIBlockListEditorForm
             cbType.Enabled = tbGroup.Enabled = tbInstance.Enabled = false;
         }
 
-        AResource.TGIBlockList items;
+        TGIBlockList items;
         /// <summary>
         /// The list of TGIBlocks to edit
         /// </summary>
@@ -57,7 +57,7 @@ namespace System.Windows.Forms.TGIBlockListEditorForm
             set
             {
                 if (items == value) return;
-                items = new AResource.TGIBlockList(null);
+                items = new TGIBlockList(null);
                 foreach (IResourceKey rk in value) items.Add(new TGIBlock(0, null, rk));
 
                 listView1.Items.Clear();
@@ -227,7 +227,7 @@ namespace System.Windows.Forms
         /// </summary>
         /// <param name="ltgi">an AResource.DependentList&lt;AResource.TGIBlock&gt; object.</param>
         /// <returns>the DialogResult</returns>
-        public static DialogResult Show(AResource.DependentList<TGIBlock> ltgi)
+        public static DialogResult Show(DependentList<TGIBlock> ltgi)
         {
             return Show(OwningForm, ltgi);
         }
@@ -238,7 +238,7 @@ namespace System.Windows.Forms
         /// and represents the top-level window that will own this form.</param>
         /// <param name="ltgi">an AResource.DependentList&lt;AResource.TGIBlock&gt; object.</param>
         /// <returns>the DialogResult</returns>
-        public static DialogResult Show(IWin32Window owner, AResource.DependentList<TGIBlock> ltgi)
+        public static DialogResult Show(IWin32Window owner, DependentList<TGIBlock> ltgi)
         {
             TGIBlockListEditorForm.MainForm theForm = new System.Windows.Forms.TGIBlockListEditorForm.MainForm();
             theForm.Items = ltgi;
