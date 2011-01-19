@@ -35,7 +35,7 @@ namespace s3pi.GenericRCOLResource
 
         #region Attributes
         uint version;
-        uint dataType;
+        int publicChunks;
         uint unused;
         ChunkEntryList blockList;
         CountedTGIBlockList resources;
@@ -51,7 +51,7 @@ namespace s3pi.GenericRCOLResource
             BinaryReader r = new BinaryReader(s);
 
             version = r.ReadUInt32();
-            dataType = r.ReadUInt32();
+            publicChunks = r.ReadInt32();
             unused = r.ReadUInt32();
             int countResources = r.ReadInt32();
             int countChunks = r.ReadInt32();
@@ -73,7 +73,7 @@ namespace s3pi.GenericRCOLResource
             BinaryWriter w = new BinaryWriter(ms);
 
             w.Write(version);
-            w.Write(dataType);
+            w.Write(publicChunks);
             w.Write(unused);
             if (resources == null) resources = new CountedTGIBlockList(OnResourceChanged, "ITG");
             w.Write(resources.Count);
@@ -256,6 +256,55 @@ namespace s3pi.GenericRCOLResource
 
             #endregion
 
+            public static IResourceKey GetKey(GenericRCOLResource rcol, ChunkReference reference)
+            {
+                switch (reference.RefType)
+                {
+                    case ReferenceType.Public:
+                        return rcol.ChunkEntries[reference.TGIBlockIndex].TGIBlock;
+                    case ReferenceType.Private:
+                        return rcol.ChunkEntries[reference.TGIBlockIndex + rcol.PublicChunks].TGIBlock;
+                    case ReferenceType.Delayed:
+                        return rcol.resources[reference.TGIBlockIndex];
+                }
+                throw new NotImplementedException(String.Format("Reference Type {0} is not supported.", reference.RefType));
+            }
+
+            public static IRCOLBlock GetBlock(GenericRCOLResource rcol, ChunkReference reference)
+            {
+                if (reference.chunkReference == 0)
+                    return null;
+
+                switch (reference.RefType)
+                {
+                    case ReferenceType.Public:
+                        return rcol.ChunkEntries[reference.TGIBlockIndex].RCOLBlock;
+                    case ReferenceType.Private:
+                        return rcol.ChunkEntries[reference.TGIBlockIndex + rcol.PublicChunks].RCOLBlock;
+                    default:
+                        throw new ArgumentException("Reference must be Public, Private or unset.");
+                }
+            }
+
+            public static ChunkReference CreateReference(GenericRCOLResource rcol, IResourceKey rk)
+            {
+                return new ChunkReference(0, null, CreateReferenceHelper(rcol, rk));
+            }
+            static uint CreateReferenceHelper(GenericRCOLResource rcol, IResourceKey rk)
+            {
+                int i = rcol.ChunkEntries.FindIndex(x => x.TGIBlock.Equals(rk));
+                if (i < 0)
+                {
+                    i = rcol.Resources.FindIndex(x => x.Equals(rk));
+                    return i < 0 ? 0 : (uint)(i + 1) | 0x30000000;
+                }
+                else
+                {
+                    i++;
+                    return i < rcol.publicChunks ? (uint)i : (uint)i | 0x10000000;
+                }
+            }
+
             #region Content Fields
             [ElementPriority(1)]
             public int TGIBlockIndex { get { return (int)(chunkReference & 0x0FFFFFFF) - 1; } set { if (TGIBlockIndex != value) { if (value == -1) chunkReference = 0; else chunkReference = (chunkReference & 0xF0000000) | (uint)((value + 1) & 0x0FFFFFFF); OnElementChanged(); } } }
@@ -272,7 +321,7 @@ namespace s3pi.GenericRCOLResource
         [ElementPriority(1)]
         public uint Version { get { return version; } set { if (version != value) { version = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(2)]
-        public uint DataType { get { return dataType; } set { if (dataType != value) { dataType = value; OnResourceChanged(this, EventArgs.Empty); } } }
+        public int PublicChunks { get { return publicChunks; } set { if (publicChunks != value) { publicChunks = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(3)]
         public uint Unused { get { return unused; } set { if (unused != value) { unused = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(4)]
