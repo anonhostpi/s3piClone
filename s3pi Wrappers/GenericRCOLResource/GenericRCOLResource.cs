@@ -258,6 +258,9 @@ namespace s3pi.GenericRCOLResource
 
             public static IResourceKey GetKey(GenericRCOLResource rcol, ChunkReference reference)
             {
+                if (reference.chunkReference == 0)
+                    return null;
+
                 switch (reference.RefType)
                 {
                     case ReferenceType.Public:
@@ -281,9 +284,8 @@ namespace s3pi.GenericRCOLResource
                         return rcol.ChunkEntries[reference.TGIBlockIndex].RCOLBlock;
                     case ReferenceType.Private:
                         return rcol.ChunkEntries[reference.TGIBlockIndex + rcol.PublicChunks].RCOLBlock;
-                    default:
-                        throw new ArgumentException("Reference must be Public, Private or unset.");
                 }
+                throw new NotImplementedException(String.Format("Reference Type {0} is not supported.", reference.RefType));
             }
 
             public static ChunkReference CreateReference(GenericRCOLResource rcol, IResourceKey rk)
