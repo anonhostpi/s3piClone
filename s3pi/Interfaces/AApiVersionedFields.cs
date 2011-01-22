@@ -221,7 +221,7 @@ namespace s3pi.Interfaces
                         {
                             string elem = (string)apiObj["Value"].Value;
                             if (elem.Contains("\n"))
-                                sb.Append("\n--- " + tv.Type.Name + ": " + f + "\n" + (string)apiObj["Value"].Value);
+                                sb.Append("\n--- " + tv.Type.Name + ": " + f + " ---\n" + elem + "\n---");
                             else
                                 sb.Append("\n" + f + ": " + elem);
                         }
