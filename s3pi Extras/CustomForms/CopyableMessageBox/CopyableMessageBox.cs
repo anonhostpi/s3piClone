@@ -53,6 +53,8 @@ namespace System.Windows.Forms
 
             // To calculate the text box size, we get an autosize label to tell us how big it should be
             Size winSize = CopyableMessageBox.OwningForm != null ? CopyableMessageBox.OwningForm.Size : Screen.PrimaryScreen.WorkingArea.Size;
+            if (winSize.Width < Screen.PrimaryScreen.WorkingArea.Size.Width / 4) winSize.Width = Screen.PrimaryScreen.WorkingArea.Size.Width;
+            if (winSize.Height < Screen.PrimaryScreen.WorkingArea.Size.Height / 4) winSize.Height = Screen.PrimaryScreen.WorkingArea.Size.Height;
             lb.MaximumSize = new Size((int)(winSize.Width * .8) - (formWidth + tbPadding + iconWidth),
                 (int)(winSize.Height * .8) - (formHeight + buttonHeight + tbPadding));
             lb.AutoSize = true;
@@ -253,16 +255,17 @@ namespace System.Windows.Forms
         public static void IssueException(Exception ex, string caption) { IssueException(ex, "", caption); }
         public static void IssueException(Exception ex, string prefix, string caption)
         {
-            string s = prefix;
+            System.Text.StringBuilder sb = new Text.StringBuilder();
+            sb.Append(prefix);
             for (Exception inex = ex; inex != null; inex = inex.InnerException)
             {
-                s += "\nSource: " + inex.Source;
-                s += "\nAssembly: " + inex.TargetSite.DeclaringType.Assembly.FullName;
-                s += "\n" + inex.Message;
-                s += "\n" + inex.StackTrace;
-                s += "\n-----";
+                sb.Append("\nSource: " + inex.Source);
+                sb.Append("\nAssembly: " + inex.TargetSite.DeclaringType.Assembly.FullName);
+                sb.Append("\n" + inex.Message);
+                sb.Append("\n" + inex.StackTrace);
+                sb.Append("\n-----");
             }
-            CopyableMessageBox.Show(s, caption, CopyableMessageBoxButtons.OK, CopyableMessageBoxIcon.Stop);
+            CopyableMessageBox.Show(sb.ToString(), caption, CopyableMessageBoxButtons.OK, CopyableMessageBoxIcon.Stop);
         }
 
     }
