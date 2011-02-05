@@ -140,6 +140,7 @@ namespace s3pi.Interfaces
         /// </summary>
         /// <param name="Match"><c>Predicate&lt;IResourceIndexEntry&gt;</c> defining matching conditions.</param>
         /// <returns>The first matching <see cref="IResourceIndexEntry"/>, if any; otherwise null.</returns>
+        /// <remarks>Note that entries marked as deleted will not be returned.</remarks>
         IResourceIndexEntry Find(Predicate<IResourceIndexEntry> Match);
 
         /// <summary>
@@ -169,6 +170,7 @@ namespace s3pi.Interfaces
         /// </summary>
         /// <param name="Match"><c>Predicate&lt;IResourceIndexEntry&gt;</c> defining matching conditions.</param>
         /// <returns>Zero or more matches.</returns>
+        /// <remarks>Note that entries marked as deleted will not be returned.</remarks>
         IList<IResourceIndexEntry> FindAll(Predicate<IResourceIndexEntry> Match);
         #endregion
 

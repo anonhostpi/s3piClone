@@ -331,6 +331,7 @@ namespace s3pi.Package
         /// </summary>
         /// <param name="Match"><c>Predicate&lt;IResourceIndexEntry&gt;</c> defining matching conditions.</param>
         /// <returns>The first matching <see cref="IResourceIndexEntry"/>, if any; otherwise null.</returns>
+        /// <remarks>Note that entries marked as deleted will not be returned.</remarks>
         [MinimumVersion(1)]
         [MaximumVersion(recommendedApiVersion)]
         public override IResourceIndexEntry Find(Predicate<IResourceIndexEntry> Match) { return Index.Find(x => !x.IsDeleted && Match(x)); }
@@ -366,6 +367,7 @@ namespace s3pi.Package
         /// </summary>
         /// <param name="Match"><c>Predicate&lt;IResourceIndexEntry&gt;</c> defining matching conditions.</param>
         /// <returns>Zero or more matches.</returns>
+        /// <remarks>Note that entries marked as deleted will not be returned.</remarks>
         [MinimumVersion(1)]
         [MaximumVersion(recommendedApiVersion)]
         public override IList<IResourceIndexEntry> FindAll(Predicate<IResourceIndexEntry> Match) { return Index.FindAll(x => !x.IsDeleted && Match(x)); }
