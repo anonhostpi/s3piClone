@@ -262,7 +262,6 @@ namespace CASPartResource
             public ByteEntryList(EventHandler handler) : base(handler, ReadByte, WriteByte, byte.MaxValue, ReadListCount, WriteListCount) { }
             public ByteEntryList(EventHandler handler, Stream s) : base(handler, s, ReadByte, WriteByte, byte.MaxValue, ReadListCount, WriteListCount) { }
             public ByteEntryList(EventHandler handler, IEnumerable<byte> le) : base(handler, le, ReadByte, WriteByte, byte.MaxValue, ReadListCount, WriteListCount) { }
-            public ByteEntryList(EventHandler handler, IEnumerable<HandlerElement<byte>> le) : base(handler, le, ReadByte, WriteByte, byte.MaxValue, ReadListCount, WriteListCount) { }
             #endregion
 
             #region Data I/O

@@ -147,7 +147,6 @@ namespace s3pi.GenericRCOLResource
             #region Constructors
             public IntList(EventHandler handler) : base(handler, ReadInt32, WriteInt32, byte.MaxValue, ReadListCount, WriteListCount) { }
             public IntList(EventHandler handler, Stream s) : base(handler, s, ReadInt32, WriteInt32, byte.MaxValue, ReadListCount, WriteListCount) { }
-            public IntList(EventHandler handler, IEnumerable<HandlerElement<Int32>> ltgi) : base(handler, ltgi, ReadInt32, WriteInt32, byte.MaxValue, ReadListCount, WriteListCount) { }
             public IntList(EventHandler handler, IEnumerable<Int32> ltgi) : base(handler, ltgi, ReadInt32, WriteInt32, byte.MaxValue, ReadListCount, WriteListCount) { }
             #endregion
 
@@ -204,8 +203,6 @@ namespace s3pi.GenericRCOLResource
 
             public Entry00(int APIversion, EventHandler handler, Entry00 basis)
                 : this(APIversion, handler, 0, basis.entryID, basis.tgiIndexes) { }
-            public Entry00(int APIversion, EventHandler handler, byte entryType, byte entryID, IEnumerable<HandlerElement<int>> tgiIndexes)
-                : base(APIversion, handler) { this.entryID = entryID; this.tgiIndexes = new IntList(handler, tgiIndexes); }
             public Entry00(int APIversion, EventHandler handler, byte entryType, byte entryID, IEnumerable<int> tgiIndexes)
                 : base(APIversion, handler) { this.entryID = entryID; this.tgiIndexes = new IntList(handler, tgiIndexes); }
 

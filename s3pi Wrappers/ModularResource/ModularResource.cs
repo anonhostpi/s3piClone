@@ -82,7 +82,6 @@ namespace ModularResource
             public TGIIndexList(EventHandler handler) : base(handler, ReadUInt32, WriteUInt32, ushort.MaxValue, ReadListCount, WriteListCount) { }
             internal TGIIndexList(EventHandler handler, Stream s) : base(handler, s, ReadUInt32, WriteUInt32, ushort.MaxValue, ReadListCount, WriteListCount) { }
             public TGIIndexList(EventHandler handler, IEnumerable<uint> ltgii) : base(handler, ltgii, ReadUInt32, WriteUInt32, ushort.MaxValue, ReadListCount, WriteListCount) { }
-            public TGIIndexList(EventHandler handler, IEnumerable<HandlerElement<uint>> ltgii) : base(handler, ltgii, ReadUInt32, WriteUInt32, ushort.MaxValue, ReadListCount, WriteListCount) { }
             #endregion
 
             #region Data I/O
