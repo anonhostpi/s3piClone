@@ -380,14 +380,16 @@ namespace s3pi.GenericRCOLResource
                     Type[] types = dotNetDll.GetTypes();
                     foreach (Type t in types)
                     {
+                        if (t.IsAbstract) continue;
                         if (!t.IsSubclassOf(typeof(ARCOLBlock))) continue;
 
                         //Protect instantiating class
                         try
                         {
-                            ARCOLBlock arb = (ARCOLBlock)t.GetConstructor(new Type[] { typeof(int), typeof(EventHandler), typeof(Stream), }).Invoke(new object[] { 0, null, null });
-                            if (arb == null) continue;
+                            ConstructorInfo ctor = t.GetConstructor(new Type[] { typeof(int), typeof(EventHandler), typeof(Stream), });
+                            if (ctor == null) continue;
 
+                            ARCOLBlock arb = (ARCOLBlock)ctor.Invoke(new object[] { 0, null, null });
                             if (!typeRegistry.ContainsKey(arb.ResourceType)) typeRegistry.Add(arb.ResourceType, arb.GetType());
                             if (!tagRegistry.ContainsKey(arb.Tag)) tagRegistry.Add(arb.Tag, arb.GetType());
                         }
