@@ -62,7 +62,7 @@ namespace s3pi.Interfaces
     /// </code>
     /// </example>
     /// <seealso cref="HandlerElement{T}"/>
-    public class SimpleList<T> : DependentList<HandlerElement<T>>
+    public class SimpleList<T> : DependentList<HandlerElement<T>>, IEnumerable<T>
         where T : struct, IComparable, IConvertible, IEquatable<T>, IComparable<T>
     {
         #region Attributes
@@ -71,6 +71,35 @@ namespace s3pi.Interfaces
         ReadCountMethod readCount;
         WriteCountMethod writeCount;
         #endregion
+
+        Enumerator<T> enumerator = null;
+
+        /// <summary>
+        /// Supports a simple iteration over a generic collection.
+        /// </summary>
+        /// <typeparam name="U">The type of objects to enumerate.</typeparam>
+        public class Enumerator<U> : IEnumerator<U>
+            where U : struct, IComparable, IConvertible, IEquatable<U>, IComparable<U>
+        {
+            DependentList<HandlerElement<U>> list;
+            DependentList<HandlerElement<U>>.Enumerator enumerator;
+
+            public Enumerator(DependentList<HandlerElement<U>> list) { this.list = list; Reset(); }
+
+            public U Current { get { return enumerator.Current; } }
+
+            public void Dispose()
+            {
+                enumerator.Dispose();
+                list = null;
+            }
+
+            object System.Collections.IEnumerator.Current { get { return enumerator.Current; } }
+
+            public bool MoveNext() { return enumerator.MoveNext(); }
+
+            public void Reset() { enumerator = list.GetEnumerator(); }
+        }
 
         #region Constructors
         /// <summary>
@@ -118,7 +147,7 @@ namespace s3pi.Interfaces
         /// <param name="size">Optional maximum number of elements in the list.</param>
         /// <param name="readCount">Optional; default is to read a <see cref="Int32"/> from the <see cref="Stream"/>.</param>
         /// <param name="writeCount">Optional; default is to write a <see cref="Int32"/> to the <see cref="Stream"/>.</param>
-        protected SimpleList(EventHandler handler, IEnumerable<HandlerElement<T>> collection, CreateElementMethod createElement = null, WriteElementMethod writeElement = null, long size = -1, ReadCountMethod readCount = null, WriteCountMethod writeCount = null) : this(null, createElement, writeElement, size, readCount, writeCount) { elementHandler = handler; base.AddRange(collection); this.handler = handler; }
+        private SimpleList(EventHandler handler, IEnumerable<HandlerElement<T>> collection, CreateElementMethod createElement = null, WriteElementMethod writeElement = null, long size = -1, ReadCountMethod readCount = null, WriteCountMethod writeCount = null) : this(null, createElement, writeElement, size, readCount, writeCount) { elementHandler = handler; base.AddRange(collection); this.handler = handler; }
         #endregion
 
         #region Data I/O
@@ -908,6 +937,19 @@ namespace s3pi.Interfaces
         /// <exception cref="System.NotSupportedException">The <see cref="SimpleList{T}"/> is read-only.</exception>
         public virtual void Insert(int index, T item) { base.Insert(index, new HandlerElement<T>(0, elementHandler, item)); }
         #endregion
+
+        #region IEnumerable<T>
+        /// <summary>
+        /// Returns an enumerator that iterates through the collection.
+        /// </summary>
+        /// <returns>A <see cref="System.Collections.Generic.IEnumerator{T}"/> that can be used to iterate through the collection.</returns>
+        public new IEnumerator<T> GetEnumerator()
+        {
+            if (enumerator == null)
+                enumerator = new Enumerator<T>(this);
+            return enumerator;
+        }
+        #endregion
     }
 
     /// <summary>
@@ -935,7 +977,7 @@ namespace s3pi.Interfaces
         /// <param name="handler">Event handler.</param>
         /// <param name="basis">Basis on which to populate the list.</param>
         /// <param name="size">Optional list size.</param>
-        public UIntList(EventHandler handler, IEnumerable<HandlerElement<uint>> basis, long size = -1) : base(handler, basis, ReadUInt32, WriteUInt32, size) { }
+        //public UIntList(EventHandler handler, IEnumerable<HandlerElement<uint>> basis, long size = -1) : base(handler, basis, ReadUInt32, WriteUInt32, size) { }
         /// <summary>
         /// Create a UIntList populated from a <see cref="Stream"/>.
         /// </summary>
@@ -948,6 +990,40 @@ namespace s3pi.Interfaces
         #region Data I/O
         static UInt32 ReadUInt32(Stream s) { return new BinaryReader(s).ReadUInt32(); }
         static void WriteUInt32(Stream s, UInt32 value) { new BinaryWriter(s).Write(value); }
+        #endregion
+    }
+
+    /// <summary>
+    /// Commonly used simple list.  The list count is an integer stored immediately before the list.  The elements are Int32.
+    /// </summary>
+    public class IntList : SimpleList<int>
+    {
+        #region Constructors
+        /// <summary>
+        /// Create an empty IntList.
+        /// </summary>
+        /// <param name="handler">Event handler.</param>
+        /// <param name="size">Optional list size.</param>
+        public IntList(EventHandler handler, long size = -1) : base(handler, ReadInt32, WriteInt32, size) { }
+        /// <summary>
+        /// Create an IntList populated from an existing set of values.
+        /// </summary>
+        /// <param name="handler">Event handler.</param>
+        /// <param name="basis">Basis on which to populate the list.</param>
+        /// <param name="size">Optional list size.</param>
+        public IntList(EventHandler handler, IEnumerable<int> basis, long size = -1) : base(handler, basis, ReadInt32, WriteInt32, size) { }
+        /// <summary>
+        /// Create an IntList populated from a <see cref="Stream"/>.
+        /// </summary>
+        /// <param name="handler">Event handler.</param>
+        /// <param name="s"><see cref="Stream"/> from which to read elements.</param>
+        /// <param name="size">Optional list size.</param>
+        public IntList(EventHandler handler, Stream s, long size = -1) : base(handler, s, ReadInt32, WriteInt32, size) { }
+        #endregion
+
+        #region Data I/O
+        static Int32 ReadInt32(Stream s) { return new BinaryReader(s).ReadInt32(); }
+        static void WriteInt32(Stream s, Int32 value) { new BinaryWriter(s).Write(value); }
         #endregion
     }
 }
