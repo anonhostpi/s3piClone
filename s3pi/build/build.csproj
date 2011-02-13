@@ -113,6 +113,10 @@
       <Project>{AD53972B-D73E-4935-A4AD-3EBE0E3516F2}</Project>
       <Name>ImageResource</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\s3pi Wrappers\JazzResource\JazzResource.csproj">
+      <Project>{7AFF0D94-4F70-4A1B-842C-24EA613807B7}</Project>
+      <Name>JazzResource</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\s3pi Wrappers\ModularResource\ModularResource.csproj">
       <Project>{4C8EEE00-88BB-4A22-BEB2-68245D98CB78}</Project>
       <Name>ModularResource</Name>
