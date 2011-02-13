@@ -226,7 +226,7 @@ namespace s3pi.Interfaces
                                 sb.Append("\n" + f + ": " + elem);
                         }
                     }
-                    else if (tv.Type.BaseType.Name.Contains("SimpleList`"))
+                    else if (tv.Type.BaseType != null && tv.Type.BaseType.Name.Contains("SimpleList`"))
                     {
                         System.Collections.IList l = (System.Collections.IList)tv.Value;
                         string fmt = "\n   [{0:X" + l.Count.ToString("X").Length + "}]: {1}";
@@ -250,7 +250,7 @@ namespace s3pi.Interfaces
                             sb.Append(String.Format(fmt, i++, v.ToString()));
                         sb.Append("\n---");
                     }
-                    else if (tv.Type.BaseType.Name.Contains("DependentList`"))
+                    else if (tv.Type.BaseType != null && tv.Type.BaseType.Name.Contains("DependentList`"))
                     {
                         System.Collections.IList l = (System.Collections.IList)tv.Value;
                         string fmtLong = "\n--- {0}[{1:X" + l.Count.ToString("X").Length + "}] ---\n   ";
