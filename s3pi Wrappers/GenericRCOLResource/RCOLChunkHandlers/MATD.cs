@@ -383,8 +383,8 @@ namespace s3pi.GenericRCOLResource
         {
             dtUnknown = 0,
             dtFloat = 1,
-            dtUInt32_1 = 2,
-            dtUInt32_2 = 4,
+            dtInt = 2,
+            dtTexture = 4,
         }
 
         public class MTRL : AHandlerElement, IEquatable<MTRL>
@@ -396,7 +396,8 @@ namespace s3pi.GenericRCOLResource
             ushort mtrlUnknown3;
             ShaderDataList sdList = null;
 
-            public MTRL(int APIversion, EventHandler handler, MTRL basis) : base(APIversion, handler)
+            public MTRL(int APIversion, EventHandler handler, MTRL basis)
+                : base(APIversion, handler)
             {
                 this.mtrlUnknown1 = basis.mtrlUnknown1;
                 this.mtrlUnknown2 = basis.mtrlUnknown2;
@@ -417,7 +418,7 @@ namespace s3pi.GenericRCOLResource
                 mtrlUnknown1 = r.ReadUInt32();
                 mtrlUnknown2 = r.ReadUInt16();
                 mtrlUnknown3 = r.ReadUInt16();
-                this.sdList = new ShaderDataList(handler, s, -1, start);
+                this.sdList = new ShaderDataList(handler, s, start, -1);
             }
 
             internal void UnParse(Stream s)
@@ -501,7 +502,7 @@ namespace s3pi.GenericRCOLResource
                 if (checking) if (mtnfTag != (uint)FOURCC("MTNF"))
                         throw new InvalidDataException(String.Format("Invalid mtnfTag read: '{0}'; expected: 'MTNF'; at 0x{1:X8}", FOURCC(mtnfTag), s.Position));
                 mtnfUnknown1 = r.ReadUInt32();
-                this.sdList = new ShaderDataList(handler, s, r.ReadInt32(), start);
+                this.sdList = new ShaderDataList(handler, s, start, r.ReadInt32());
             }
 
             internal void UnParse(Stream s)
@@ -540,45 +541,118 @@ namespace s3pi.GenericRCOLResource
             [ElementPriority(2)]
             public ShaderDataList SData { get { return sdList; } set { if (sdList != value) { sdList = new ShaderDataList(handler, value); OnElementChanged(); } } }
 
-            public string Value
-            {
-                get
-                {
-                    return ValueBuilder;
-                    /*
-                    string s = "";
-                    s += "MTNFUnknown1: 0x" + mtnfUnknown1.ToString("X8");
-
-                    s += String.Format("\nSData ({0:X}):", sdList.Count);
-                    string fmt = "\n  [{0:X" + sdList.Count.ToString("X").Length + "}]: {{{1}}}";
-                    for (int i = 0; i < sdList.Count; i++)
-                        s += String.Format(fmt, i, sdList[i].Value);
-                    return s;
-                    /**/
-                }
-            }
+            public string Value { get { return ValueBuilder; } }
             #endregion
         }
 
-        public abstract class Entry : AHandlerElement, IEquatable<Entry>
+        public abstract class ShaderData : AHandlerElement, IEquatable<ShaderData>
         {
             const int recommendedApiVersion = 1;
 
-            #region Constructors
-            protected Entry(int APIversion, EventHandler handler) : base(APIversion, handler) { }
+            protected FieldType field;
+            long offsetPos = -1;
 
-            public static Entry CreateEntry(int APIversion, EventHandler handler, DataType entryType, Stream s)
+            #region Constructors
+            protected ShaderData(int APIversion, EventHandler handler, FieldType field) : base(APIversion, handler) { this.field = field; }
+            #endregion
+
+            public static ShaderData CreateEntry(int APIversion, EventHandler handler, Stream s, long start)
             {
                 BinaryReader r = new BinaryReader(s);
-                if (entryType == DataType.dtFloat) return new ElementSingle(APIversion, handler, r.ReadSingle());
-                if (entryType == DataType.dtUInt32_1) return new ElementUInt32(APIversion, handler, r.ReadUInt32());
-                if (entryType == DataType.dtUInt32_2) return new ElementUInt32(APIversion, handler, r.ReadUInt32());
-                throw new InvalidDataException(String.Format("Unknown DataType 0x{0:X8} at 0x{1:X8}", entryType, s.Position));
+                FieldType field = (FieldType)r.ReadUInt32();
+                DataType sdType = (DataType)r.ReadUInt32();
+                int count = r.ReadInt32();
+                uint offset = r.ReadUInt32();
+                long pos = s.Position;
+                s.Position = start + offset;
+                try
+                {
+                    #region Determine entry type
+                    switch (sdType)
+                    {
+                        case DataType.dtFloat:
+                            switch (count)
+                            {
+                                case 1: return new ElementFloat(APIversion, handler, field, s);
+                                case 2: return new ElementFloat2(APIversion, handler, field, s);
+                                case 3: return new ElementFloat3(APIversion, handler, field, s);
+                                case 4: return new ElementFloat4(APIversion, handler, field, s);
+                            }
+                            throw new InvalidDataException(String.Format("Invalid count #{0}' for DataType 0x{1:X8} at 0x{2:X8}", count, sdType, s.Position));
+                        case DataType.dtInt:
+                            switch (count)
+                            {
+                                case 1: return new ElementInt(APIversion, handler, field, s);
+                            }
+                            throw new InvalidDataException(String.Format("Invalid count #{0}' for DataType 0x{1:X8} at 0x{2:X8}", count, sdType, s.Position));
+                        case DataType.dtTexture:
+                            switch (count)
+                            {
+                                case 4: return new ElementTextureRef(APIversion, handler, field, s);
+                                case 5: return new ElementTextureKey(APIversion, handler, field, s);
+                            }
+                            throw new InvalidDataException(String.Format("Invalid count #{0}' for DataType 0x{1:X8} at 0x{2:X8}", count, sdType, s.Position));
+                    }
+                    throw new InvalidDataException(String.Format("Unknown DataType 0x{0:X8} at 0x{1:X8}", sdType, s.Position));
+                    #endregion
+                }
+                finally { s.Position = pos; }
             }
-            #endregion
+            public static ShaderData CreateEntry(int APIversion, EventHandler handler, ShaderData basis)
+            {
+                if (basis is ElementFloat) return new ElementFloat(APIversion, handler, basis as ElementFloat);
+                if (basis is ElementFloat2) return new ElementFloat2(APIversion, handler, basis as ElementFloat2);
+                if (basis is ElementFloat3) return new ElementFloat3(APIversion, handler, basis as ElementFloat3);
+                if (basis is ElementFloat4) return new ElementFloat4(APIversion, handler, basis as ElementFloat4);
+                if (basis is ElementInt) return new ElementInt(APIversion, handler, basis as ElementInt);
+                if (basis is ElementTextureRef) return new ElementTextureRef(APIversion, handler, basis as ElementTextureRef);
+                if (basis is ElementTextureKey) return new ElementTextureKey(APIversion, handler, basis as ElementTextureKey);
+                throw new ArgumentException("Unknown element type.");
+            }
+            public static Type GetElementType(params object[] fields)
+            {
+                Type[] types = new Type[2 + fields.Length];
+                types[0] = typeof(int);
+                types[1] = typeof(EventHandler);
+                for (int i = 0; i < types.Length; i++) types[i] = fields[2 + i].GetType();
+                if (typeof(ElementFloat).GetConstructor(types) != null) return typeof(ElementFloat);
+                if (typeof(ElementFloat2).GetConstructor(types) != null) return typeof(ElementFloat2);
+                if (typeof(ElementFloat3).GetConstructor(types) != null) return typeof(ElementFloat3);
+                if (typeof(ElementFloat4).GetConstructor(types) != null) return typeof(ElementFloat4);
+                if (typeof(ElementInt).GetConstructor(types) != null) return typeof(ElementInt);
+                if (typeof(ElementTextureRef).GetConstructor(types) != null) return typeof(ElementTextureRef);
+                if (typeof(ElementTextureKey).GetConstructor(types) != null) return typeof(ElementTextureKey);
+                return null;
+            }
 
             #region Data I/O
-            internal abstract void UnParse(Stream s);
+            internal void UnParseHeader(Stream s)
+            {
+                BinaryWriter w = new BinaryWriter(s);
+                w.Write((uint)field);
+                w.Write((uint)DataTypeFromType);
+                w.Write(CountFromType);
+                offsetPos = s.Position;
+                w.Write((uint)0);
+            }
+
+            internal void UnParseData(Stream s, long start)
+            {
+                if (checking) if (offsetPos < 0)
+                        throw new InvalidOperationException();
+                long pos = s.Position;
+                s.Position = offsetPos;
+                new BinaryWriter(s).Write((uint)(pos - start));
+                s.Position = pos;
+                UnParse(s);
+            }
+
+            protected abstract DataType DataTypeFromType { get; }
+            protected abstract int CountFromType { get; }
+            protected abstract void UnParse(Stream s);
+
+            protected void ReadZeros(Stream s, int length) { while (length-- > 0) if (s.ReadByte() != 0) throw new InvalidDataException("Non-zero padding at 0x" + s.Position.ToString("X8")); }
+            protected void WriteZeros(Stream s, int length) { while (length-- > 0) s.WriteByte(0); }
             #endregion
 
             #region AHandlerElement Members
@@ -592,57 +666,17 @@ namespace s3pi.GenericRCOLResource
 
             #region IEquatable<Entry> Members
 
-            public abstract bool Equals(Entry other);
+            public abstract bool Equals(ShaderData other);
 
             #endregion
 
-            public abstract string Value { get; }
+            [ElementPriority(1)]
+            public FieldType Field { get { return field; } set { if (field != value) { field = value; OnElementChanged(); } } }
+
+            public string Value { get { return ValueBuilder.Replace("\n", "; "); } }
         }
-        public class ElementUInt32 : Entry
-        {
-            const int recommendedApiVersion = 1;
-
-            #region Attributes
-            UInt32 data;
-            #endregion
-
-            #region Constructors
-            public ElementUInt32(int APIversion, EventHandler handler) : base(APIversion, handler) { }
-            public ElementUInt32(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
-            public ElementUInt32(int APIversion, EventHandler handler, ElementUInt32 basis) : this(APIversion, handler, basis.data) { }
-            public ElementUInt32(int APIversion, EventHandler handler, UInt32 data) : base(APIversion, handler) { this.data = data; }
-            #endregion
-
-            #region Data I/O
-            void Parse(Stream s) { data = new BinaryReader(s).ReadUInt32(); }
-
-            internal override void UnParse(Stream s) { new BinaryWriter(s).Write(data); }
-            #endregion
-
-            #region AHandlerElement Members
-            public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
-
-            /// <summary>
-            /// The list of available field names on this API object
-            /// </summary>
-            public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
-
-            public override AHandlerElement Clone(EventHandler handler) { return new ElementUInt32(requestedApiVersion, handler, this); }
-            #endregion
-
-            #region IEquatable<Entry> Members
-
-            public override bool Equals(Entry other) { return this.GetType().Equals(other.GetType()) && this.data == ((ElementUInt32)other).data; }
-
-            #endregion
-
-            #region Content Fields
-            public UInt32 Data { get { return data; } set { if (data != value) { data = value; OnElementChanged(); } } }
-
-            public override string Value { get { return "Data: 0x" + data.ToString("X8"); } }
-            #endregion
-        }
-        public class ElementSingle : Entry
+        [ConstructorParameters(new object[] { (FieldType)0, 0f, })]
+        public class ElementFloat : ShaderData
         {
             const int recommendedApiVersion = 1;
 
@@ -651,221 +685,302 @@ namespace s3pi.GenericRCOLResource
             #endregion
 
             #region Constructors
-            public ElementSingle(int APIversion, EventHandler handler) : base(APIversion, handler) { }
-            public ElementSingle(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
-            public ElementSingle(int APIversion, EventHandler handler, ElementSingle basis) : this(APIversion, handler, basis.data) { }
-            public ElementSingle(int APIversion, EventHandler handler, Single data) : base(APIversion, handler) { this.data = data; }
+            public ElementFloat(int APIversion, EventHandler handler, FieldType field, Stream s) : base(APIversion, handler, field) { Parse(s); }
+            public ElementFloat(int APIversion, EventHandler handler, ElementFloat basis) : this(APIversion, handler, basis.field, basis.data) { }
+            public ElementFloat(int APIversion, EventHandler handler, FieldType field, Single data) : base(APIversion, handler, field) { this.data = data; }
             #endregion
 
             #region Data I/O
             void Parse(Stream s) { data = new BinaryReader(s).ReadSingle(); }
 
-            internal override void UnParse(Stream s) { new BinaryWriter(s).Write(data); }
+            protected override void UnParse(Stream s) { new BinaryWriter(s).Write(data); }
+            protected override DataType DataTypeFromType { get { return DataType.dtFloat; } }
+            protected override int CountFromType { get { return 1; } }
             #endregion
 
-            #region AHandlerElement Members
-            public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
-
-            /// <summary>
-            /// The list of available field names on this API object
-            /// </summary>
-            public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
-
-            public override AHandlerElement Clone(EventHandler handler) { return new ElementSingle(requestedApiVersion, handler, this); }
-            #endregion
+            public override AHandlerElement Clone(EventHandler handler) { return new ElementFloat(requestedApiVersion, handler, this); }
 
             #region IEquatable<Entry> Members
 
-            public override bool Equals(Entry other) { return this.GetType().Equals(other.GetType()) && this.data == ((ElementSingle)other).data; }
+            public override bool Equals(ShaderData other) { return this.GetType().Equals(other.GetType()) && this.data == ((ElementFloat)other).data; }
 
             #endregion
 
             #region Content Fields
+            [ElementPriority(11)]
             public Single Data { get { return data; } set { if (data != value) { data = value; OnElementChanged(); } } }
-
-            public override string Value { get { return "Data: " + data.ToString(); } }
             #endregion
         }
-        public class EntryList : DependentList<Entry>
-        {
-            DataType type = 0;
-            int count = 0;
-
-            #region Constructors
-            public EntryList(EventHandler handler, DataType type) : base(handler) { this.type = type; }
-            public EntryList(EventHandler handler, DataType type, int count, Stream s) : base(null) { this.type = type; this.count = count; elementHandler = handler; Parse(s); this.handler = handler; }
-            public EntryList(EventHandler handler, DataType type, IEnumerable<Entry> le) : base(null) { this.type = type; elementHandler = handler; foreach (var e in le) this.Add(e); this.handler = handler; }
-            #endregion
-
-            #region Data I/O
-            protected override int ReadCount(Stream s) { return count; }
-            protected override void WriteCount(Stream s, int count) { }
-
-            protected override Entry CreateElement(Stream s) { return Entry.CreateEntry(0, elementHandler, type, s); }
-
-            protected override void WriteElement(Stream s, Entry element) { element.UnParse(s); }
-            #endregion
-
-            #region DependentList<Entry>
-            public override void Add()
-            {
-                switch (type)
-                {
-                    case DataType.dtFloat: this.Add(new ElementSingle(0, null)); break;
-                    case DataType.dtUInt32_1:
-                    case DataType.dtUInt32_2: this.Add(new ElementUInt32(0, null)); break;
-                    default:
-                        throw new InvalidOperationException(String.Format("Unknown DataType 0x{0:X8}", (uint)type));
-                }
-            }
-            protected override Type GetElementType(params object[] fields)
-            {
-                switch (type)
-                {
-                    case DataType.dtFloat: return typeof(ElementSingle);
-                    case DataType.dtUInt32_1:
-                    case DataType.dtUInt32_2: return typeof(ElementUInt32);
-                    default:
-                        throw new InvalidOperationException(String.Format("Unknown DataType 0x{0:X8}", (uint)type));
-                }
-            }
-            #endregion
-
-            internal DataType SDType { get { return type; } }
-        }
-
-        public class ShaderData : AHandlerElement, IEquatable<ShaderData>
+        [ConstructorParameters(new object[] { (FieldType)0, 0f, 0f, })]
+        public class ElementFloat2 : ShaderData
         {
             const int recommendedApiVersion = 1;
 
-            FieldType field = 0;
-            DataType sdType = 0;
-            int count = 0;
-            uint offset = 0;
-            long offsetPos = -1;
-            EntryList sdData = null;
+            #region Attributes
+            Single data0;
+            Single data1;
+            #endregion
 
             #region Constructors
-            public ShaderData(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
-            public ShaderData(int APIversion, EventHandler handler, ShaderData basis)
-                : this(APIversion, handler, basis.field, basis.sdType, basis.sdData) { }
-            public ShaderData(int APIversion, EventHandler handler) : base(APIversion, handler) { }
-            public ShaderData(int APIversion, EventHandler handler, FieldType field, DataType sdType, int count, Stream s)
-                : base(APIversion, handler)
-            {
-                this.field = field;
-                this.sdType = sdType;
-                this.sdData = new EntryList(handler, sdType, count, s);
-            }
-            public ShaderData(int APIversion, EventHandler handler, FieldType field, DataType sdType, EntryList sdData)
-                : base(APIversion, handler)
-            {
-                this.field = field;
-                this.sdType = sdType;
-                this.sdData = new EntryList(handler, sdType, sdData);
-            }
+            public ElementFloat2(int APIversion, EventHandler handler, FieldType field, Stream s) : base(APIversion, handler, field) { Parse(s); }
+            public ElementFloat2(int APIversion, EventHandler handler, ElementFloat2 basis) : this(APIversion, handler, basis.field, basis.data0, basis.data1) { }
+            public ElementFloat2(int APIversion, EventHandler handler, FieldType field, Single data0, Single data1) : base(APIversion, handler, field) { this.data0 = data0; this.data1 = data1; }
             #endregion
 
             #region Data I/O
-            private void Parse(Stream s)
-            {
-                BinaryReader r = new BinaryReader(s);
-                field = (FieldType)r.ReadUInt32();
-                sdType = (DataType)r.ReadUInt32();
-                count = r.ReadInt32();
-                offset = r.ReadUInt32();
-            }
+            void Parse(Stream s) { BinaryReader r = new BinaryReader(s); data0 = r.ReadSingle(); data1 = r.ReadSingle(); }
 
-            internal void ReadEntryList(long start, Stream s)
-            {
-                if (checking) if (s.Position - start != offset)
-                        throw new InvalidDataException(String.Format("Unexpected offset 0x{0:X8} read; expected 0x{1:X8}; entry position 0x{2:X8}",
-                            offset, s.Position - start, s.Position));
-                this.sdData = new EntryList(handler, sdType, count, s);
-            }
-
-            internal void UnParse(Stream s)
-            {
-                BinaryWriter w = new BinaryWriter(s);
-                w.Write((uint)field);
-                w.Write((uint)sdType);
-                w.Write(sdData == null ? (int)0 : sdData.Count);
-                offsetPos = s.Position;
-                w.Write((uint)0);
-            }
-
-            internal void WriteEntryList(long start, Stream s)
-            {
-                if (checking) if (offsetPos < 0)
-                        throw new InvalidOperationException();
-                long pos = s.Position;
-                s.Position = offsetPos;
-                new BinaryWriter(s).Write((uint)(pos - start));
-                s.Position = pos;
-                this.sdData.UnParse(s);
-            }
+            protected override void UnParse(Stream s) { BinaryWriter w = new BinaryWriter(s); w.Write(data0); w.Write(data1); }
+            protected override DataType DataTypeFromType { get { return DataType.dtFloat; } }
+            protected override int CountFromType { get { return 2; } }
             #endregion
 
-            #region AHandlerElement
-            public override AHandlerElement Clone(EventHandler handler) { return new ShaderData(requestedApiVersion, handler, this); }
+            public override AHandlerElement Clone(EventHandler handler) { return new ElementFloat2(requestedApiVersion, handler, this); }
 
-            public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
+            #region IEquatable<Entry> Members
 
-            public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
-            #endregion
-
-            #region IEquatable<ShaderData> Members
-
-            public bool Equals(ShaderData other) { return field == other.field && sdData == other.sdData; }
+            public override bool Equals(ShaderData other) { return this.GetType().Equals(other.GetType())
+                && this.data0 == ((ElementFloat2)other).data0
+                && this.data1 == ((ElementFloat2)other).data1
+                ; }
 
             #endregion
 
             #region Content Fields
-            [ElementPriority(1)]
-            public FieldType Field { get { return field; } set { if (field != value) { field = value; OnElementChanged(); } } }
-            [ElementPriority(2), DataGridExpandable]
-            public EntryList Entries { get { return sdData; } set { if (sdData != value) { sdData = new EntryList(handler, sdType, value); OnElementChanged(); } } }
-
-            public string Value
-            {
-                get
-                {
-                    System.Text.StringBuilder sb = new System.Text.StringBuilder();
-                    sb.Append(this["Field"] + " {");
-                    foreach (var e in sdData) sb.Append(" " + e["Data"] + ",");
-                    return sb.ToString().TrimEnd(',') + " }";
-                }
-            }
+            [ElementPriority(11)]
+            public Single Data0 { get { return data0; } set { if (data0 != value) { data0 = value; OnElementChanged(); } } }
+            [ElementPriority(12)]
+            public Single Data1 { get { return data1; } set { if (data1 != value) { data1 = value; OnElementChanged(); } } }
             #endregion
         }
+        [ConstructorParameters(new object[] { (FieldType)0, 0f, 0f, 0f, })]
+        public class ElementFloat3 : ShaderData
+        {
+            const int recommendedApiVersion = 1;
+
+            #region Attributes
+            Single data0;
+            Single data1;
+            Single data2;
+            #endregion
+
+            #region Constructors
+            public ElementFloat3(int APIversion, EventHandler handler, FieldType field, Stream s) : base(APIversion, handler, field) { Parse(s); }
+            public ElementFloat3(int APIversion, EventHandler handler, ElementFloat3 basis) : this(APIversion, handler, basis.field, basis.data0, basis.data1, basis.data2) { }
+            public ElementFloat3(int APIversion, EventHandler handler, FieldType field, Single data0, Single data1, Single data2) : base(APIversion, handler, field) { this.data0 = data0; this.data1 = data1; this.data2 = data2; }
+            #endregion
+
+            #region Data I/O
+            void Parse(Stream s) { BinaryReader r = new BinaryReader(s); data0 = r.ReadSingle(); data1 = r.ReadSingle(); data2 = r.ReadSingle(); }
+
+            protected override void UnParse(Stream s) { BinaryWriter w = new BinaryWriter(s); w.Write(data0); w.Write(data1); w.Write(data2); }
+            protected override DataType DataTypeFromType { get { return DataType.dtFloat; } }
+            protected override int CountFromType { get { return 3; } }
+            #endregion
+
+            public override AHandlerElement Clone(EventHandler handler) { return new ElementFloat3(requestedApiVersion, handler, this); }
+
+            #region IEquatable<Entry> Members
+
+            public override bool Equals(ShaderData other) { return this.GetType().Equals(other.GetType())
+                && this.data0 == ((ElementFloat3)other).data0
+                && this.data1 == ((ElementFloat3)other).data1
+                && this.data2 == ((ElementFloat3)other).data2
+                ; }
+
+            #endregion
+
+            #region Content Fields
+            [ElementPriority(11)]
+            public Single Data0 { get { return data0; } set { if (data0 != value) { data0 = value; OnElementChanged(); } } }
+            [ElementPriority(12)]
+            public Single Data1 { get { return data1; } set { if (data1 != value) { data1 = value; OnElementChanged(); } } }
+            [ElementPriority(13)]
+            public Single Data2 { get { return data2; } set { if (data2 != value) { data2 = value; OnElementChanged(); } } }
+            #endregion
+        }
+        [ConstructorParameters(new object[] { (FieldType)0, 0f, 0f, 0f, 0f, })]
+        public class ElementFloat4 : ShaderData
+        {
+            const int recommendedApiVersion = 1;
+
+            #region Attributes
+            Single data0;
+            Single data1;
+            Single data2;
+            Single data3;
+            #endregion
+
+            #region Constructors
+            public ElementFloat4(int APIversion, EventHandler handler, FieldType field, Stream s) : base(APIversion, handler, field) { Parse(s); }
+            public ElementFloat4(int APIversion, EventHandler handler, ElementFloat4 basis) : this(APIversion, handler, basis.field, basis.data0, basis.data1, basis.data2, basis.data3) { }
+            public ElementFloat4(int APIversion, EventHandler handler, FieldType field, Single data0, Single data1, Single data2, Single data3) : base(APIversion, handler, field) { this.data0 = data0; this.data1 = data1; this.data2 = data2; this.data3 = data3; }
+            #endregion
+
+            #region Data I/O
+            void Parse(Stream s) { BinaryReader r = new BinaryReader(s); data0 = r.ReadSingle(); data1 = r.ReadSingle(); data2 = r.ReadSingle(); data3 = r.ReadSingle(); }
+
+            protected override void UnParse(Stream s) { BinaryWriter w = new BinaryWriter(s); w.Write(data0); w.Write(data1); w.Write(data2); w.Write(data3); }
+            protected override DataType DataTypeFromType { get { return DataType.dtFloat; } }
+            protected override int CountFromType { get { return 4; } }
+            #endregion
+
+            public override AHandlerElement Clone(EventHandler handler) { return new ElementFloat4(requestedApiVersion, handler, this); }
+
+            #region IEquatable<Entry> Members
+
+            public override bool Equals(ShaderData other) { return this.GetType().Equals(other.GetType())
+                && this.data0 == ((ElementFloat4)other).data0
+                && this.data1 == ((ElementFloat4)other).data1
+                && this.data2 == ((ElementFloat4)other).data2
+                && this.data3 == ((ElementFloat4)other).data3
+                ; }
+
+            #endregion
+
+            #region Content Fields
+            [ElementPriority(11)]
+            public Single Data0 { get { return data0; } set { if (data0 != value) { data0 = value; OnElementChanged(); } } }
+            [ElementPriority(12)]
+            public Single Data1 { get { return data1; } set { if (data1 != value) { data1 = value; OnElementChanged(); } } }
+            [ElementPriority(13)]
+            public Single Data2 { get { return data2; } set { if (data2 != value) { data2 = value; OnElementChanged(); } } }
+            [ElementPriority(14)]
+            public Single Data3 { get { return data3; } set { if (data3 != value) { data3 = value; OnElementChanged(); } } }
+            #endregion
+        }
+        [ConstructorParameters(new object[] { (FieldType)0, (int)0, })]
+        public class ElementInt : ShaderData
+        {
+            const int recommendedApiVersion = 1;
+
+            #region Attributes
+            Int32 data;
+            #endregion
+
+            #region Constructors
+            public ElementInt(int APIversion, EventHandler handler, FieldType field, Stream s) : base(APIversion, handler, field) { Parse(s); }
+            public ElementInt(int APIversion, EventHandler handler, ElementInt basis) : this(APIversion, handler, basis.field, basis.data) { }
+            public ElementInt(int APIversion, EventHandler handler, FieldType field, Int32 data) : base(APIversion, handler, field) { this.data = data; }
+            #endregion
+
+            #region Data I/O
+            void Parse(Stream s) { data = new BinaryReader(s).ReadInt32(); }
+
+            protected override void UnParse(Stream s) { new BinaryWriter(s).Write(data); }
+            protected override DataType DataTypeFromType { get { return DataType.dtInt; } }
+            protected override int CountFromType { get { return 1; } }
+            #endregion
+
+            public override AHandlerElement Clone(EventHandler handler) { return new ElementInt(requestedApiVersion, handler, this); }
+
+            #region IEquatable<Entry> Members
+
+            public override bool Equals(ShaderData other) { return this.GetType().Equals(other.GetType()) && this.data == ((ElementInt)other).data; }
+
+            #endregion
+
+            #region Content Fields
+            [ElementPriority(11)]
+            public Int32 Data { get { return data; } set { if (data != value) { data = value; OnElementChanged(); } } }
+            #endregion
+        }
+        [ConstructorParameters(new object[] { (FieldType)0, (GenericRCOLResource.ChunkReference)null, })]
+        public class ElementTextureRef : ShaderData
+        {
+            const int recommendedApiVersion = 1;
+
+            #region Attributes
+            GenericRCOLResource.ChunkReference data;
+            #endregion
+
+            #region Constructors
+            public ElementTextureRef(int APIversion, EventHandler handler, FieldType field, Stream s) : base(APIversion, handler, field) { Parse(s); }
+            public ElementTextureRef(int APIversion, EventHandler handler, ElementTextureRef basis) : this(APIversion, handler, basis.field, basis.data) { }
+            public ElementTextureRef(int APIversion, EventHandler handler, FieldType field, GenericRCOLResource.ChunkReference data) : base(APIversion, handler, field) { this.data = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, data); }
+            #endregion
+
+            #region Data I/O
+            void Parse(Stream s) { data = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, s); ReadZeros(s, 12); }
+
+            protected override void UnParse(Stream s) { if (data == null) data = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, 0); data.UnParse(s); WriteZeros(s, 12); }
+            protected override DataType DataTypeFromType { get { return DataType.dtTexture; } }
+            protected override int CountFromType { get { return 4; } }
+            #endregion
+
+            public override AHandlerElement Clone(EventHandler handler) { return new ElementTextureRef(requestedApiVersion, handler, this); }
+
+            #region IEquatable<Entry> Members
+
+            public override bool Equals(ShaderData other) { return this.GetType().Equals(other.GetType()) && this.data == ((ElementTextureRef)other).data; }
+
+            #endregion
+
+            #region Content Fields
+            [ElementPriority(11)]
+            public GenericRCOLResource.ChunkReference Data { get { return data; } set { if (data != value) { data = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, value); OnElementChanged(); } } }
+            #endregion
+        }
+        [ConstructorParameters(new object[] { (FieldType)0, (IResourceKey)null, })]
+        public class ElementTextureKey : ShaderData
+        {
+            const int recommendedApiVersion = 1;
+
+            #region Attributes
+            TGIBlock data;
+            #endregion
+
+            #region Constructors
+            public ElementTextureKey(int APIversion, EventHandler handler, FieldType field, Stream s) : base(APIversion, handler, field) { Parse(s); }
+            public ElementTextureKey(int APIversion, EventHandler handler, ElementTextureKey basis) : this(APIversion, handler, basis.field, basis.data) { }
+            public ElementTextureKey(int APIversion, EventHandler handler, FieldType field, IResourceKey data) : base(APIversion, handler, field) { this.data = new TGIBlock(requestedApiVersion, handler, data); }
+            #endregion
+
+            #region Data I/O
+            void Parse(Stream s) { data = new TGIBlock(requestedApiVersion, handler, s); ReadZeros(s, 4); }
+
+            protected override void UnParse(Stream s) { if (data == null) data = new TGIBlock(requestedApiVersion, handler, 0); data.UnParse(s); WriteZeros(s, 4); }
+            protected override DataType DataTypeFromType { get { return DataType.dtTexture; } }
+            protected override int CountFromType { get { return 5; } }
+            #endregion
+
+            public override AHandlerElement Clone(EventHandler handler) { return new ElementTextureKey(requestedApiVersion, handler, this); }
+
+            #region IEquatable<Entry> Members
+
+            public override bool Equals(ShaderData other) { return this.GetType().Equals(other.GetType()) && this.data == ((ElementTextureKey)other).data; }
+
+            #endregion
+
+            #region Content Fields
+            [ElementPriority(11)]
+            public IResourceKey Data { get { return data; } set { if (data != value) { data = new TGIBlock(requestedApiVersion, handler, value); OnElementChanged(); } } }
+            #endregion
+        }
+
         public class ShaderDataList : DependentList<ShaderData>
         {
-            int dataLen = -1;
             internal long dataPos = -1;
             #region Constructors
             public ShaderDataList(EventHandler handler) : base(handler) { }
-            public ShaderDataList(EventHandler handler, Stream s, int dataLen, long start) : base(null) { this.dataLen = dataLen; elementHandler = handler; Parse(s, start); this.handler = handler; }
+            public ShaderDataList(EventHandler handler, Stream s, long start, int dataLen) : base(null) { elementHandler = handler; Parse(s, start, dataLen); this.handler = handler; }
             public ShaderDataList(EventHandler handler, IEnumerable<ShaderData> lsd) : base(handler, lsd) { }
             #endregion
 
             #region Data I/O
             protected override void Parse(Stream s) { throw new NotSupportedException(); }
-            internal void Parse(Stream s, long start)
+            internal void Parse(Stream s, long start, int dataLen)
             {
-                for (int i = ReadCount(s); i > 0; i--) this.Add(s);
-                long pos = s.Position;
-                foreach (var i in this) i.ReadEntryList(start, s);
-                if (checking) if (dataLen >= 0 && dataLen != s.Position - pos)
-                        throw new InvalidDataException(string.Format("Data length invalid.  Read 0x{0:X8} bytes; expected 0x{1:X8} bytes at 0x{2:X8}",
-                            s.Position - pos, dataLen, s.Position));
+                for (int i = ReadCount(s); i > 0; i--) this.Add(ShaderData.CreateEntry(0, elementHandler, s, start));
+                s.Position += dataLen;
             }
             public override void UnParse(Stream s) { throw new NotSupportedException(); }
             internal void UnParse(Stream s, long start)
             {
                 WriteCount(s, Count);
-                foreach (var element in this) element.UnParse(s);
+                foreach (var element in this) element.UnParseHeader(s);
                 dataPos = s.Position;
-                foreach (var element in this) element.WriteEntryList(start, s);
+                foreach (var element in this) element.UnParseData(s, start);
             }
 
             protected override ShaderData CreateElement(Stream s) { throw new NotImplementedException(); }
@@ -873,6 +988,11 @@ namespace s3pi.GenericRCOLResource
             #endregion
 
             public override void Add() { throw new NotSupportedException(); }
+            protected override Type GetElementType(params object[] fields)
+            {
+                if (fields.Length == 1 && typeof(ShaderData).IsAssignableFrom(fields[0].GetType())) return fields[0].GetType();
+                return ShaderData.GetElementType(fields);
+            }
         }
         #endregion
 
@@ -892,32 +1012,7 @@ namespace s3pi.GenericRCOLResource
         [ElementPriority(17)]
         public MTNF Mtnf { get { return mtnf; } set { if (mtnf != value) { mtnf = new MTNF(requestedApiVersion, handler, mtnf); OnRCOLChanged(this, EventArgs.Empty); } } }
 
-        public string Value
-        {
-            get
-            {
-                return ValueBuilder;
-                /*
-                string s = "";
-                s += "Tag: 0x" + tag.ToString("X8");
-                s += "\nVersion: 0x" + version.ToString("X8");
-                s += "\nMaterialNameHash: 0x" + materialNameHash.ToString("X8"); ;
-                s += "\nShader: " + new TypedValue(typeof(ShaderType), shader, "X");
-                if (version < 0x00000103)
-                {
-                    s += "\n" + mtrl.Value;
-                }
-                else
-                {
-                    s += "\nUnknown1: 0x" + unknown1.ToString("X8");
-                    s += "\nUnknown2: 0x" + unknown2.ToString("X8");
-                    s += "\n" + mtnf.Value;
-                }
-
-                return s;
-                /**/
-            }
-        }
+        public string Value { get { return ValueBuilder; } }
         #endregion
     }
 }
