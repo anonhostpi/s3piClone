@@ -57,23 +57,25 @@ namespace s3pi.Package
             if (!packageStream.CanWrite)
                 throw new InvalidOperationException("Package is read-only");
 
-            string tmpfile = Path.GetTempFileName();
-            SaveAs(tmpfile);
-
-
             // Lock the header while we save to prevent other processes saving concurrently
-            FileStream fs = packageStream as FileStream; // if it's not a file, it's probably safe not to lock it...
-            if (fs != null) fs.Lock(0, header.Length);
+            // if it's not a file, it's probably safe not to lock it...
+            FileStream fs = packageStream as FileStream;
+            string tmpfile = Path.GetTempFileName();
+            try
+            {
+                SaveAs(tmpfile);
 
-            packageStream.Position = 0;
-            BinaryReader r = new BinaryReader(new FileStream(tmpfile, FileMode.Open));
-            BinaryWriter w = new BinaryWriter(packageStream);
-            w.Write(r.ReadBytes((int)r.BaseStream.Length));
-            packageStream.SetLength(packageStream.Position);
-            w.Flush();
+                if (fs != null) fs.Lock(0, header.Length);
 
-            if (fs != null) fs.Unlock(0, header.Length);
-
+                BinaryReader r = new BinaryReader(new FileStream(tmpfile, FileMode.Open));
+                BinaryWriter w = new BinaryWriter(packageStream);
+                packageStream.Position = 0;
+                w.Write(r.ReadBytes((int)r.BaseStream.Length));
+                packageStream.SetLength(packageStream.Position);
+                w.Flush();
+                r.Close();
+            }
+            finally { File.Delete(tmpfile); if (fs != null) fs.Unlock(0, header.Length); }
 
             packageStream.Position = 0;
             header = (new BinaryReader(packageStream)).ReadBytes(header.Length);
@@ -96,7 +98,20 @@ namespace s3pi.Package
             BinaryWriter w = new BinaryWriter(s);
             w.Write(header);
 
-            PackageIndex newIndex = new PackageIndex((uint)((Indextype & 4) > 0 ? 4 : 0));
+            List<uint> lT = new List<uint>();
+            List<uint> lG = new List<uint>();
+            List<uint> lIh = new List<uint>();
+            this.Index.ForEach(x =>
+            {
+                if (!lT.Contains(x.ResourceType)) lT.Add(x.ResourceType);
+                if (!lG.Contains(x.ResourceGroup)) lG.Add(x.ResourceGroup);
+                if (!lIh.Contains((uint)(x.Instance >> 32))) lIh.Add((uint)(x.Instance >> 32));
+            });
+
+            uint indexType = (uint)(lIh.Count <= 1 ? 0x04 : 0x00) | (uint)(lG.Count <= 1 ? 0x02 : 0x00) | (uint)(lT.Count <= 1 ? 0x01 : 0x00);
+
+
+            PackageIndex newIndex = new PackageIndex(indexType);
             foreach (IResourceIndexEntry ie in this.Index)
             {
                 if (ie.IsDeleted) continue;
@@ -194,75 +209,63 @@ namespace s3pi.Package
         /// <summary>
         /// Package header: "DBPF" bytes
         /// </summary>
-        [MinimumVersion(1)]
-        [MaximumVersion(recommendedApiVersion)]
+        [ElementPriority(1)]
         public override byte[] Magic { get { headerReader.BaseStream.Position = 0; return headerReader.ReadBytes(4); } }
         /// <summary>
         /// Package header: 0x00000002
         /// </summary>
-        [MinimumVersion(1)]
-        [MaximumVersion(recommendedApiVersion)]
+        [ElementPriority(2)]
         public override int Major { get { headerReader.BaseStream.Position = 4; return headerReader.ReadInt32(); } }
         /// <summary>
         /// Package header: 0x00000000
         /// </summary>
-        [MinimumVersion(1)]
-        [MaximumVersion(recommendedApiVersion)]
+        [ElementPriority(3)]
         public override int Minor { get { headerReader.BaseStream.Position = 8; return headerReader.ReadInt32(); } }
         /// <summary>
         /// Package header: unused
         /// </summary>
-        [MinimumVersion(1)]
-        [MaximumVersion(recommendedApiVersion)]
+        [ElementPriority(4)]
         public override byte[] Unknown1 { get { headerReader.BaseStream.Position = 12; return headerReader.ReadBytes(24); } }
         /// <summary>
         /// Package header: number of entries in the package index
         /// </summary>
-        [MinimumVersion(1)]
-        [MaximumVersion(recommendedApiVersion)]
+        [ElementPriority(5)]
         public override int Indexcount { get { headerReader.BaseStream.Position = 36; return headerReader.ReadInt32(); } }
         /// <summary>
         /// Package header: unused
         /// </summary>
-        [MinimumVersion(1)]
-        [MaximumVersion(recommendedApiVersion)]
+        [ElementPriority(6)]
         public override byte[] Unknown2 { get { headerReader.BaseStream.Position = 40; return headerReader.ReadBytes(4); } }
         /// <summary>
         /// Package header: index size on disk in bytes
         /// </summary>
-        [MinimumVersion(1)]
-        [MaximumVersion(recommendedApiVersion)]
+        [ElementPriority(7)]
         public override int Indexsize { get { headerReader.BaseStream.Position = 44; return headerReader.ReadInt32(); } }
         /// <summary>
         /// Package header: unused
         /// </summary>
-        [MinimumVersion(1)]
-        [MaximumVersion(recommendedApiVersion)]
+        [ElementPriority(8)]
         public override byte[] Unknown3 { get { headerReader.BaseStream.Position = 48; return headerReader.ReadBytes(12); } }
         /// <summary>
         /// Package header: always 3?
         /// </summary>
-        [MinimumVersion(1)]
-        [MaximumVersion(recommendedApiVersion)]
+        [ElementPriority(9)]
         public override int Indexversion { get { headerReader.BaseStream.Position = 60; return headerReader.ReadInt32(); } }
         /// <summary>
         /// Package header: index position in file
         /// </summary>
-        [MinimumVersion(1)]
-        [MaximumVersion(recommendedApiVersion)]
-        public override int Indexposition { get { headerReader.BaseStream.Position = 64; int i = headerReader.ReadInt32(); return i != 0 ? i : BitConverter.ToInt32(Unknown2, 0); } }
+        [ElementPriority(10)]
+        public override int Indexposition { get { headerReader.BaseStream.Position = 64; int i = headerReader.ReadInt32(); return i /*!= 0 ? i : BitConverter.ToInt32(Unknown2, 0)/**/; } }
         /// <summary>
         /// Package header: unused
         /// </summary>
-        [MinimumVersion(1)]
-        [MaximumVersion(recommendedApiVersion)]
+        [ElementPriority(11)]
         public override byte[] Unknown4 { get { headerReader.BaseStream.Position = 68; return headerReader.ReadBytes(28); } }
 
         /// <summary>
         /// A MemoryStream covering the package header bytes
         /// </summary>
-        [MinimumVersion(1)]
-        [MaximumVersion(recommendedApiVersion)]
+        [ElementPriority(12)]
         public override Stream HeaderStream { get { return headerReader.BaseStream; } }
         #endregion
 
@@ -270,15 +273,13 @@ namespace s3pi.Package
         /// <summary>
         /// Package index: the index format in use
         /// </summary>
-        [MinimumVersion(1)]
-        [MaximumVersion(recommendedApiVersion)]
+        [ElementPriority(13)]
         public override UInt32 Indextype { get { return (GetResourceList as PackageIndex).Indextype; } }
 
         /// <summary>
         /// Package index: the index
         /// </summary>
-        [MinimumVersion(1)]
-        [MaximumVersion(recommendedApiVersion)]
+        [ElementPriority(14)]
         public override IList<IResourceIndexEntry> GetResourceList { get { return Index; } }
 
         static bool FlagMatch(uint flags, IResourceIndexEntry values, IResourceIndexEntry target)
@@ -484,7 +485,7 @@ namespace s3pi.Package
         void setIndexcount(BinaryWriter w, int c) { w.BaseStream.Position = 36; w.Write(c); }
         void setIndexsize(BinaryWriter w, int c) { w.BaseStream.Position = 44; w.Write(c); }
         void setIndexversion(BinaryWriter w) { w.BaseStream.Position = 60; w.Write(3); }
-        void setIndexposition(BinaryWriter w, int c) { w.BaseStream.Position = 40; w.Write(c); w.BaseStream.Position = 64; w.Write(c); }
+        void setIndexposition(BinaryWriter w, int c) { /*w.BaseStream.Position = 40; w.Write(c);/**/ w.BaseStream.Position = 64; w.Write(c); }
 
         void CheckHeader()
         {

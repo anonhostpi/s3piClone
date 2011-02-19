@@ -49,51 +49,63 @@ namespace s3pi.Interfaces
         /// <summary>
         /// Package header: "DBPF" bytes
         /// </summary>
+        [ElementPriority(1)]
         byte[] Magic { get; }
         /// <summary>
         /// Package header: 0x00000002
         /// </summary>
+        [ElementPriority(2)]
         Int32 Major { get; }
         /// <summary>
         /// Package header: 0x00000000
         /// </summary>
+        [ElementPriority(3)]
         Int32 Minor { get; }
         /// <summary>
         /// Package header: unused
         /// </summary>
+        [ElementPriority(4)]
         byte[] Unknown1 { get; }
         /// <summary>
         /// Package header: number of entries in the package index
         /// </summary>
+        [ElementPriority(5)]
         Int32 Indexcount { get; }
         /// <summary>
         /// Package header: unused
         /// </summary>
+        [ElementPriority(6)]
         byte[] Unknown2 { get; }
         /// <summary>
         /// Package header: index size on disk in bytes
         /// </summary>
+        [ElementPriority(7)]
         Int32 Indexsize { get; }
         /// <summary>
         /// Package header: unused
         /// </summary>
+        [ElementPriority(8)]
         byte[] Unknown3 { get; }
         /// <summary>
         /// Package header: always 3?
         /// </summary>
+        [ElementPriority(9)]
         Int32 Indexversion { get; }
         /// <summary>
         /// Package header: index position in file
         /// </summary>
+        [ElementPriority(10)]
         Int32 Indexposition { get; }
         /// <summary>
         /// Package header: unused
         /// </summary>
+        [ElementPriority(11)]
         byte[] Unknown4 { get; }
 
         /// <summary>
         /// A <see cref="MemoryStream"/> covering the package header bytes
         /// </summary>
+        [ElementPriority(12)]
         Stream HeaderStream { get; }
         #endregion
 
@@ -106,11 +118,13 @@ namespace s3pi.Interfaces
         /// <summary>
         /// Package index: the index format in use
         /// </summary>
+        [ElementPriority(13)]
         UInt32 Indextype { get; }
 
         /// <summary>
         /// Package index: the index as a <see cref="IResourceIndexEntry"/> list
         /// </summary>
+        [ElementPriority(14)]
         IList<IResourceIndexEntry> GetResourceList { get; }
 
         /// <summary>

@@ -58,51 +58,63 @@ namespace s3pi.Interfaces
         /// <summary>
         /// Package header: "DBPF" bytes
         /// </summary>
+        [ElementPriority(1)]
         public abstract byte[] Magic { get; }
         /// <summary>
         /// Package header: 0x00000002
         /// </summary>
+        [ElementPriority(2)]
         public abstract int Major { get; }
         /// <summary>
         /// Package header: 0x00000000
         /// </summary>
+        [ElementPriority(3)]
         public abstract int Minor { get; }
         /// <summary>
         /// Package header: unused
         /// </summary>
+        [ElementPriority(4)]
         public abstract byte[] Unknown1 { get; }
         /// <summary>
         /// Package header: number of entries in the package index
         /// </summary>
+        [ElementPriority(5)]
         public abstract int Indexcount { get; }
         /// <summary>
         /// Package header: unused
         /// </summary>
+        [ElementPriority(6)]
         public abstract byte[] Unknown2 { get; }
         /// <summary>
         /// Package header: index size on disk in bytes
         /// </summary>
+        [ElementPriority(7)]
         public abstract int Indexsize { get; }
         /// <summary>
         /// Package header: unused
         /// </summary>
+        [ElementPriority(8)]
         public abstract byte[] Unknown3 { get; }
         /// <summary>
         /// Package header: always 3?
         /// </summary>
+        [ElementPriority(9)]
         public abstract int Indexversion { get; }
         /// <summary>
         /// Package header: index position in file
         /// </summary>
+        [ElementPriority(10)]
         public abstract int Indexposition { get; }
         /// <summary>
         /// Package header: unused
         /// </summary>
+        [ElementPriority(11)]
         public abstract byte[] Unknown4 { get; }
 
         /// <summary>
         /// A MemoryStream covering the package header bytes
         /// </summary>
+        [ElementPriority(12)]
         public abstract Stream HeaderStream { get; }
         #endregion
 
@@ -115,11 +127,13 @@ namespace s3pi.Interfaces
         /// <summary>
         /// Package index: the index format in use
         /// </summary>
+        [ElementPriority(13)]
         public abstract uint Indextype { get; }
 
         /// <summary>
         /// Package index: the index
         /// </summary>
+        [ElementPriority(14)]
         public abstract IList<IResourceIndexEntry> GetResourceList { get; }
 
         /// <summary>
