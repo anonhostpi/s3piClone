@@ -72,8 +72,6 @@ namespace s3pi.Interfaces
         WriteCountMethod writeCount;
         #endregion
 
-        Enumerator<T> enumerator = null;
-
         /// <summary>
         /// Supports a simple iteration over a generic collection.
         /// </summary>
@@ -86,8 +84,14 @@ namespace s3pi.Interfaces
 
             public Enumerator(DependentList<HandlerElement<U>> list) { this.list = list; Reset(); }
 
+            /// <summary>
+            /// Gets the element at the current position of the enumerator.
+            /// </summary>
             public U Current { get { return enumerator.Current; } }
 
+            /// <summary>
+            /// Releases all resources used by the enumerator.
+            /// </summary>
             public void Dispose()
             {
                 enumerator.Dispose();
@@ -96,8 +100,19 @@ namespace s3pi.Interfaces
 
             object System.Collections.IEnumerator.Current { get { return enumerator.Current; } }
 
+            /// Advances the enumerator to the next element of the collection.
+            /// </summary>
+            /// <returns>
+            /// true if the enumerator was successfully advanced to the next element;
+            /// false if the enumerator has passed the end of the collection.
+            /// </returns>
+            /// <exception cref="System.InvalidOperationException">The collection was modified after the enumerator was created.</exception>
             public bool MoveNext() { return enumerator.MoveNext(); }
 
+            /// <summary>
+            /// Sets the enumerator to its initial position, which is before the first element in the collection.
+            /// </summary>
+            /// <exception cref="System.InvalidOperationException">The collection was modified after the enumerator was created.</exception>
             public void Reset() { enumerator = list.GetEnumerator(); }
         }
 
@@ -945,9 +960,7 @@ namespace s3pi.Interfaces
         /// <returns>A <see cref="System.Collections.Generic.IEnumerator{T}"/> that can be used to iterate through the collection.</returns>
         public new IEnumerator<T> GetEnumerator()
         {
-            if (enumerator == null)
-                enumerator = new Enumerator<T>(this);
-            return enumerator;
+            return new Enumerator<T>(this);
         }
         #endregion
     }
