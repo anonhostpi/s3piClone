@@ -600,29 +600,8 @@ namespace s3pi.GenericRCOLResource
             }
             public static ShaderData CreateEntry(int APIversion, EventHandler handler, ShaderData basis)
             {
-                if (basis is ElementFloat) return new ElementFloat(APIversion, handler, basis as ElementFloat);
-                if (basis is ElementFloat2) return new ElementFloat2(APIversion, handler, basis as ElementFloat2);
-                if (basis is ElementFloat3) return new ElementFloat3(APIversion, handler, basis as ElementFloat3);
-                if (basis is ElementFloat4) return new ElementFloat4(APIversion, handler, basis as ElementFloat4);
-                if (basis is ElementInt) return new ElementInt(APIversion, handler, basis as ElementInt);
-                if (basis is ElementTextureRef) return new ElementTextureRef(APIversion, handler, basis as ElementTextureRef);
-                if (basis is ElementTextureKey) return new ElementTextureKey(APIversion, handler, basis as ElementTextureKey);
-                throw new ArgumentException("Unknown element type.");
-            }
-            public static Type GetElementType(params object[] fields)
-            {
-                Type[] types = new Type[2 + fields.Length];
-                types[0] = typeof(int);
-                types[1] = typeof(EventHandler);
-                for (int i = 0; i < types.Length; i++) types[i] = fields[2 + i].GetType();
-                if (typeof(ElementFloat).GetConstructor(types) != null) return typeof(ElementFloat);
-                if (typeof(ElementFloat2).GetConstructor(types) != null) return typeof(ElementFloat2);
-                if (typeof(ElementFloat3).GetConstructor(types) != null) return typeof(ElementFloat3);
-                if (typeof(ElementFloat4).GetConstructor(types) != null) return typeof(ElementFloat4);
-                if (typeof(ElementInt).GetConstructor(types) != null) return typeof(ElementInt);
-                if (typeof(ElementTextureRef).GetConstructor(types) != null) return typeof(ElementTextureRef);
-                if (typeof(ElementTextureKey).GetConstructor(types) != null) return typeof(ElementTextureKey);
-                return null;
+                return (ShaderData)basis.GetType().GetConstructor(new Type[] { typeof(int), typeof(EventHandler), basis.GetType(), })
+                    .Invoke(new object[] { APIversion, handler, basis, });
             }
 
             #region Data I/O
@@ -885,7 +864,7 @@ namespace s3pi.GenericRCOLResource
             public Int32 Data { get { return data; } set { if (data != value) { data = value; OnElementChanged(); } } }
             #endregion
         }
-        [ConstructorParameters(new object[] { (FieldType)0, (GenericRCOLResource.ChunkReference)null, })]
+        [ConstructorParameters(new object[] { (FieldType)0, (uint)0, })]
         public class ElementTextureRef : ShaderData
         {
             const int recommendedApiVersion = 1;
@@ -898,6 +877,7 @@ namespace s3pi.GenericRCOLResource
             public ElementTextureRef(int APIversion, EventHandler handler, FieldType field, Stream s) : base(APIversion, handler, field) { Parse(s); }
             public ElementTextureRef(int APIversion, EventHandler handler, ElementTextureRef basis) : this(APIversion, handler, basis.field, basis.data) { }
             public ElementTextureRef(int APIversion, EventHandler handler, FieldType field, GenericRCOLResource.ChunkReference data) : base(APIversion, handler, field) { this.data = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, data); }
+            public ElementTextureRef(int APIversion, EventHandler handler, FieldType field, uint chunkRef) : base(APIversion, handler, field) { this.data = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, chunkRef); }
             #endregion
 
             #region Data I/O
@@ -921,7 +901,7 @@ namespace s3pi.GenericRCOLResource
             public GenericRCOLResource.ChunkReference Data { get { return data; } set { if (data != value) { data = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, value); OnElementChanged(); } } }
             #endregion
         }
-        [ConstructorParameters(new object[] { (FieldType)0, (IResourceKey)null, })]
+        [ConstructorParameters(new object[] { (FieldType)0, (uint)0, (uint)0, (ulong)0, })]
         public class ElementTextureKey : ShaderData
         {
             const int recommendedApiVersion = 1;
@@ -934,6 +914,7 @@ namespace s3pi.GenericRCOLResource
             public ElementTextureKey(int APIversion, EventHandler handler, FieldType field, Stream s) : base(APIversion, handler, field) { Parse(s); }
             public ElementTextureKey(int APIversion, EventHandler handler, ElementTextureKey basis) : this(APIversion, handler, basis.field, basis.data) { }
             public ElementTextureKey(int APIversion, EventHandler handler, FieldType field, IResourceKey data) : base(APIversion, handler, field) { this.data = new TGIBlock(requestedApiVersion, handler, data); }
+            public ElementTextureKey(int APIversion, EventHandler handler, FieldType field, uint resourceType, uint resourceGroup, ulong instance) : base(APIversion, handler, field) { this.data = new TGIBlock(requestedApiVersion, handler, resourceType, resourceGroup, instance); }
             #endregion
 
             #region Data I/O
@@ -960,7 +941,11 @@ namespace s3pi.GenericRCOLResource
 
         public class ShaderDataList : DependentList<ShaderData>
         {
+            static List<Type> ShaderDataNestedTypes;
+            static ShaderDataList() { ShaderDataNestedTypes = new List<Type>(typeof(ShaderData).DeclaringType.GetNestedTypes()); }
+
             internal long dataPos = -1;
+
             #region Constructors
             public ShaderDataList(EventHandler handler) : base(handler) { }
             public ShaderDataList(EventHandler handler, Stream s, long start, int dataLen) : base(null) { elementHandler = handler; Parse(s, start, dataLen); this.handler = handler; }
@@ -991,7 +976,19 @@ namespace s3pi.GenericRCOLResource
             protected override Type GetElementType(params object[] fields)
             {
                 if (fields.Length == 1 && typeof(ShaderData).IsAssignableFrom(fields[0].GetType())) return fields[0].GetType();
-                return ShaderData.GetElementType(fields);
+
+                List<Type> types = new List<Type>(new Type[] { typeof(int), typeof(EventHandler), });
+                for (int i = 0; i < fields.Length; i++) types.Add(fields[i].GetType());
+
+                return ShaderDataNestedTypes.Find(type =>
+                {
+                    if (!type.IsSubclassOf(typeof(ShaderData))) return false;
+                    System.Reflection.ConstructorInfo ci = type.GetConstructor(types.ToArray());
+                    if (ci == null) return false;
+                    System.Reflection.ParameterInfo[] api = ci.GetParameters();
+                    for (int i = 0; i < types.Count; i++) if (types[i] != api[i].ParameterType) return false;
+                    return true;
+                });
             }
         }
         #endregion
