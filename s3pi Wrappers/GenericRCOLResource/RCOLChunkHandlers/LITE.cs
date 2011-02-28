@@ -34,8 +34,8 @@ namespace s3pi.GenericRCOLResource
         uint version = 4;
         uint unknown1 = 0x84;
         ushort unknown2 = 0;
-        LongSectionList longSections = null;
-        ShortSectionList shortSections = null;
+        LightSourceList lightSources = null;
+        OccluderList occluders = null;
         #endregion
 
         #region Constructors
@@ -46,8 +46,8 @@ namespace s3pi.GenericRCOLResource
         {
             this.version = basis.version;
             this.unknown1 = basis.unknown1;
-            this.longSections = new LongSectionList(handler, basis.longSections);
-            this.shortSections = new ShortSectionList(handler, basis.shortSections);
+            this.lightSources = new LightSourceList(handler, basis.lightSources);
+            this.occluders = new OccluderList(handler, basis.occluders);
             this.unknown2 = basis.unknown2;
         }
         #endregion
@@ -70,8 +70,8 @@ namespace s3pi.GenericRCOLResource
             byte lsCount = r.ReadByte();
             byte ssCount = r.ReadByte();
             unknown2 = r.ReadUInt16();
-            longSections = new LongSectionList(handler, lsCount, s);
-            shortSections = new ShortSectionList(handler, ssCount, s);
+            lightSources = new LightSourceList(handler, lsCount, s);
+            occluders = new OccluderList(handler, ssCount, s);
         }
 
         public override Stream UnParse()
@@ -82,13 +82,13 @@ namespace s3pi.GenericRCOLResource
             w.Write(tag);
             w.Write(version);
             w.Write(unknown1);
-            if (longSections == null) longSections = new LongSectionList(handler);
-            w.Write((byte)longSections.Count);
-            if (shortSections == null) shortSections = new ShortSectionList(handler);
-            w.Write((byte)shortSections.Count);
+            if (lightSources == null) lightSources = new LightSourceList(handler);
+            w.Write((byte)lightSources.Count);
+            if (occluders == null) occluders = new OccluderList(handler);
+            w.Write((byte)occluders.Count);
             w.Write(unknown2);
-            longSections.UnParse(ms);
-            shortSections.UnParse(ms);
+            lightSources.UnParse(ms);
+            occluders.UnParse(ms);
 
             return ms;
         }
@@ -97,127 +97,88 @@ namespace s3pi.GenericRCOLResource
         #endregion
 
         #region Sub-types
-        public class LongSection : AHandlerElement, IEquatable<LongSection>
+        public class LightSource : AHandlerElement, IEquatable<LightSource>
         {
             const int recommendedApiVersion = 1;
 
-            public enum LightSourceType : uint
-            {
-                Unknown = 0x00,
-                Point = 0x03,
-                Spot = 0x04,
-                Window = 0x07,
-                Area = 0x09,
-            }
-
             #region Attributes
             LightSourceType lightSource = LightSourceType.Unknown;
-            float xTiles = 0;
-            float yMetres = 0;
-            float zTiles = 0;
-            float red = 0;
-            float green = 0;
-            float blue = 0;
-            float intensity = 0; // Point, Spot, Area
-            float yRotation = 0; // Spot
-            float zRotation = 0; // Spot
-            float xRotation = 0; // Spot
-            float coneAngle = 0; // Spot
-            float f12_unknown = 0;
-            float f13_unknown = 0;
-            float width = 0; // Window, Area
-            float height = 0; // Window, Area
-            float[] floats16_31_unknown = new float[16];
+            Vertex transform;
+            RGB color;
+            float intensity;
+            protected float[] lightSourceDataArray = new float[24];
+
+            GeneralLightSourceType lightSourceData;
+            SpotLightSourceType spotLightSourceData;
+            LampShadeLightSourceType lampShadeLightSourceData;
+            TubeLightSourceType tubeShadeLightSourceData;
+            SquareWindowLightSourceType squareWindowLightSourceData;
+            CircularWindowLightSourceType circularWindowLightSourceData;
+            SquareWindowLightSourceType squareAreaLightSourceData;
+            CircularWindowLightSourceType discAreaLightSourceData;
             #endregion
 
             #region Constructors
-            public LongSection(int APIversion, EventHandler handler) : base(APIversion, handler) { }
-            public LongSection(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
-            public LongSection(int APIversion, EventHandler handler, LongSection basis)
+            public LightSource(int APIversion, EventHandler handler) : base(APIversion, handler) { PointToLightSourceData(); }
+            public LightSource(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); PointToLightSourceData(); }
+            public LightSource(int APIversion, EventHandler handler, LightSource basis)
                 : this(APIversion, handler, basis.lightSource
-                , basis.xTiles, basis.yMetres, basis.zTiles
-                , basis.red, basis.green, basis.blue, basis.intensity
-                , basis.yRotation, basis.zRotation, basis.xRotation, basis.coneAngle
-                , basis.f12_unknown, basis.f13_unknown, basis.width, basis.height
-                , basis.floats16_31_unknown
+                , basis.transform.X, basis.transform.Y, basis.transform.Z
+                , basis.color.X, basis.color.Y, basis.color.Z, basis.intensity
+                , basis.lightSourceDataArray
                 ) { }
 
-            public LongSection(int APIversion, EventHandler handler, LightSourceType sectionType
-                , float xTiles, float yMetres, float zTiles
-                , float red, float green, float blue, float intensity
-                , float yaw, float roll, float pitch, float aperture
-                , float f12_unknown, float f13_unknown, float width, float height
-                , float[] floats16_31_unknown
+            public LightSource(int APIversion, EventHandler handler, LightSourceType sectionType
+                , float X, float Y, float Z
+                , float R, float G, float B, float intensity
+                , float[] lightSourceData
                 )
                 : base(APIversion, handler)
             {
                 this.lightSource = sectionType;
-                this.xTiles = xTiles;
-                this.yMetres = yMetres;
-                this.zTiles = zTiles;
-                this.red = red;
-                this.green = green;
-                this.blue = blue;
+                this.transform = new Vertex(requestedApiVersion, handler, X, Y, Z);
+                this.color = new RGB(requestedApiVersion, handler, R, G, B);
                 this.intensity = intensity;
-                this.yRotation = yaw;
-                this.zRotation = roll;
-                this.xRotation = pitch;
-                this.coneAngle = aperture;
-                this.f12_unknown = f12_unknown;
-                this.f13_unknown = f13_unknown;
-                this.width = width;
-                this.height = height;
-                if (checking) if (floats16_31_unknown.Length != 16)
-                        throw new ArgumentException("Array length must be 16");
-                this.floats16_31_unknown = (float[])floats16_31_unknown.Clone();
+                if (checking) if (lightSourceData.Length != 24)
+                        throw new ArgumentException("Array length must be 24");
+                this.lightSourceDataArray = (float[])lightSourceData.Clone();
+                PointToLightSourceData();
             }
             #endregion
+
+            void PointToLightSourceData()
+            {
+                lightSourceData = new GeneralLightSourceType(requestedApiVersion, OnElementChanged, lightSourceDataArray);
+                spotLightSourceData = new SpotLightSourceType(requestedApiVersion, OnElementChanged, lightSourceDataArray);
+                lampShadeLightSourceData = new LampShadeLightSourceType(requestedApiVersion, OnElementChanged, lightSourceDataArray);
+                tubeShadeLightSourceData = new TubeLightSourceType(requestedApiVersion, OnElementChanged, lightSourceDataArray);
+                squareWindowLightSourceData = new SquareWindowLightSourceType(requestedApiVersion, OnElementChanged, lightSourceDataArray);
+                circularWindowLightSourceData = new CircularWindowLightSourceType(requestedApiVersion, OnElementChanged, lightSourceDataArray);
+                squareAreaLightSourceData = new SquareWindowLightSourceType(requestedApiVersion, OnElementChanged, lightSourceDataArray);
+                discAreaLightSourceData = new CircularWindowLightSourceType(requestedApiVersion, OnElementChanged, lightSourceDataArray);
+            }
 
             #region Data I/O
             void Parse(Stream s)
             {
                 BinaryReader r = new BinaryReader(s);
                 lightSource = (LightSourceType)r.ReadUInt32();
-                xTiles = r.ReadSingle();
-                yMetres = r.ReadSingle();
-                zTiles = r.ReadSingle();
-                red = r.ReadSingle();
-                green = r.ReadSingle();
-                blue = r.ReadSingle();
+                transform = new Vertex(requestedApiVersion, handler, s);
+                color = new RGB(requestedApiVersion, handler, s);
                 intensity = r.ReadSingle();
-                yRotation = r.ReadSingle();
-                zRotation = r.ReadSingle();
-                xRotation = r.ReadSingle();
-                coneAngle = r.ReadSingle();
-                f12_unknown = r.ReadSingle();
-                f13_unknown = r.ReadSingle();
-                width = r.ReadSingle();
-                height = r.ReadSingle();
-                for (int i = 0; i < floats16_31_unknown.Length; i++)
-                    floats16_31_unknown[i] = r.ReadSingle();
+                for (int i = 0; i < lightSourceDataArray.Length; i++)
+                    lightSourceDataArray[i] = r.ReadSingle();
             }
 
             internal void UnParse(Stream s)
             {
                 BinaryWriter w = new BinaryWriter(s);
                 w.Write((uint)lightSource);
-                w.Write(xTiles);
-                w.Write(yMetres);
-                w.Write(zTiles);
-                w.Write(red);
-                w.Write(green);
-                w.Write(blue);
+                transform.UnParse(s);
+                color.UnParse(s);
                 w.Write(intensity);
-                w.Write(yRotation);
-                w.Write(zRotation);
-                w.Write(xRotation);
-                w.Write(coneAngle);
-                w.Write(f12_unknown);
-                w.Write(f13_unknown);
-                w.Write(width);
-                w.Write(height);
-                for (int i = 0; i < floats16_31_unknown.Length; i++)
-                    w.Write(floats16_31_unknown[i]);
+                for (int i = 0; i < lightSourceDataArray.Length; i++)
+                    w.Write(lightSourceDataArray[i]);
             }
             #endregion
 
@@ -232,228 +193,435 @@ namespace s3pi.GenericRCOLResource
                 get
                 {
                     List<string> res = GetContentFields(requestedApiVersion, this.GetType());
+                    List<string> removals = new List<string>(new string[]{
+                        "LightSourceData",
+                        "SpotLightLightSourceData",
+                        "LampShadeLightSourceData",
+                        "TubeLightLightSourceData",
+                        "SquareWindowLightSourceData",
+                        "CircularWindowLightSourceData",
+                        "SquareAreaLightSourceData",
+                        "DiscAreaLightSourceData",
+                    });
                     switch (lightSource)
                     {
-                        case LightSourceType.Point:
-                            res.Remove("F07_unknown");
-                            res.Remove("YRotation");
-                            res.Remove("ZRotation");
-                            res.Remove("XRotation");
-                            res.Remove("ConeAngle");
-                            res.Remove("Width");
-                            res.Remove("Height");
-                            break;
-                        case LightSourceType.Spot:
-                            res.Remove("F07_unknown");
-                            res.Remove("F08_unknown");
-                            res.Remove("F09_unknown");
-                            res.Remove("F10_unknown");
-                            res.Remove("F11_unknown");
-                            res.Remove("Width");
-                            res.Remove("Height");
-                            break;
-                        case LightSourceType.Window:
-                            res.Remove("Intensity");
-                            res.Remove("YRotation");
-                            res.Remove("ZRotation");
-                            res.Remove("XRotation");
-                            res.Remove("ConeAngle");
-                            res.Remove("F14_unknown");
-                            res.Remove("F15_unknown");
-                            break;
-                        case LightSourceType.Area:
-                            res.Remove("F07_unknown");
-                            res.Remove("YRotation");
-                            res.Remove("ZRotation");
-                            res.Remove("XRotation");
-                            res.Remove("ConeAngle");
-                            res.Remove("F14_unknown");
-                            res.Remove("F15_unknown");
-                            break;
-                        default:
-                            res.Remove("Intensity");
-                            res.Remove("YRotation");
-                            res.Remove("ZRotation");
-                            res.Remove("XRotation");
-                            res.Remove("ConeAngle");
-                            res.Remove("Width");
-                            res.Remove("Height");
-                            break;
+                        case LightSourceType.Spot: removals.Remove("SpotLightLightSourceData"); break;
+                        case LightSourceType.LampShade: removals.Remove("LampShadeLightSourceData"); break;
+                        case LightSourceType.TubeLight: removals.Remove("TubeLightLightSourceData"); break;
+                        case LightSourceType.SquareWindow: removals.Remove("SquareWindowLightSourceData"); break;
+                        case LightSourceType.CircularWindow: removals.Remove("CircularWindowLightSourceData"); break;
+                        case LightSourceType.SquareAreaLight: removals.Remove("SquareAreaLightSourceData"); break;
+                        case LightSourceType.DiscAreaLight: removals.Remove("DiscAreaLightSourceData"); break;
+                        default: removals.Remove("LightSourceData"); break;
                     }
+                    foreach (var rem in removals) res.Remove(rem);
                     return res;
                 }
             }
 
-            public override AHandlerElement Clone(EventHandler handler) { return new LongSection(requestedApiVersion, handler, this); }
+            public override AHandlerElement Clone(EventHandler handler) { return new LightSource(requestedApiVersion, handler, this); }
             #endregion
 
-            #region IEquatable<LongSection> Members
+            #region IEquatable<LightSource> Members
 
-            public bool Equals(LongSection other)
+            public bool Equals(LightSource other)
             {
                 return lightSource.Equals(other.lightSource)
-                    && xTiles.Equals(other.xTiles)
-                    && yMetres.Equals(other.yMetres)
-                    && zTiles.Equals(other.zTiles)
-                    && red.Equals(other.red)
-                    && green.Equals(other.green)
-                    && blue.Equals(other.blue)
+                    && transform.Equals(other.transform)
+                    && color.Equals(other.color)
                     && intensity.Equals(other.intensity)
-                    && yRotation.Equals(other.yRotation)
-                    && zRotation.Equals(other.zRotation)
-                    && xRotation.Equals(other.xRotation)
-                    && coneAngle.Equals(other.coneAngle)
-                    && f12_unknown.Equals(other.f12_unknown)
-                    && f13_unknown.Equals(other.f13_unknown)
-                    && width.Equals(other.width)
-                    && height.Equals(other.height)
-                    && ArrayCompare(floats16_31_unknown, other.floats16_31_unknown)
+                    && ArrayCompare(lightSourceDataArray, other.lightSourceDataArray)
                     ;
             }
 
             #endregion
 
-            #region Content Fields
-            [ElementPriority(0)]
-            public LightSourceType LightSource { get { return lightSource; } set { if (lightSource != value) { lightSource = value; OnElementChanged(); } } }
-            [ElementPriority(1)]
-            public float XOffset { get { return xTiles; } set { if (xTiles != value) { xTiles = value; OnElementChanged(); } } }
-            [ElementPriority(2)]
-            public float YOffset { get { return yMetres; } set { if (yMetres != value) { yMetres = value; OnElementChanged(); } } }
-            [ElementPriority(3)]
-            public float ZOffset { get { return zTiles; } set { if (zTiles != value) { zTiles = value; OnElementChanged(); } } }
-            [ElementPriority(4)]
-            public float Red { get { return red; } set { if (red != value) { red = value; OnElementChanged(); } } }
-            [ElementPriority(5)]
-            public float Green { get { return green; } set { if (green != value) { green = value; OnElementChanged(); } } }
-            [ElementPriority(6)]
-            public float Blue { get { return blue; } set { if (blue != value) { blue = value; OnElementChanged(); } } }
-            [ElementPriority(7)]
-            public float Intensity { get { return intensity; } set { if (intensity != value) { intensity = value; OnElementChanged(); } } }
-            [ElementPriority(7)]
-            public float F07_unknown { get { return intensity; } set { if (intensity != value) { intensity = value; OnElementChanged(); } } }
-            [ElementPriority(8)]
-            public float YRotation { get { return yRotation; } set { if (yRotation != value) { yRotation = value; OnElementChanged(); } } }
-            [ElementPriority(8)]
-            public float F08_unknown { get { return yRotation; } set { if (yRotation != value) { yRotation = value; OnElementChanged(); } } }
-            [ElementPriority(9)]
-            public float ZRotation { get { return zRotation; } set { if (zRotation != value) { zRotation = value; OnElementChanged(); } } }
-            [ElementPriority(9)]
-            public float F09_unknown { get { return zRotation; } set { if (zRotation != value) { zRotation = value; OnElementChanged(); } } }
-            [ElementPriority(10)]
-            public float XRotation { get { return xRotation; } set { if (xRotation != value) { xRotation = value; OnElementChanged(); } } }
-            [ElementPriority(10)]
-            public float F10_unknown { get { return xRotation; } set { if (xRotation != value) { xRotation = value; OnElementChanged(); } } }
-            [ElementPriority(11)]
-            public float ConeAngle { get { return coneAngle; } set { if (coneAngle != value) { coneAngle = value; OnElementChanged(); } } }
-            [ElementPriority(11)]
-            public float F11_unknown { get { return coneAngle; } set { if (coneAngle != value) { coneAngle = value; OnElementChanged(); } } }
-            [ElementPriority(12)]
-            public float F12_unknown { get { return f12_unknown; } set { if (f12_unknown != value) { f12_unknown = value; OnElementChanged(); } } }
-            [ElementPriority(13)]
-            public float F13_unknown { get { return f13_unknown; } set { if (f13_unknown != value) { f13_unknown = value; OnElementChanged(); } } }
-            [ElementPriority(14)]
-            public float Width { get { return width; } set { if (width != value) { width = value; OnElementChanged(); } } }
-            [ElementPriority(14)]
-            public float F14_unknown { get { return width; } set { if (width != value) { width = value; OnElementChanged(); } } }
-            [ElementPriority(15)]
-            public float Height { get { return height; } set { if (height != value) { height = value; OnElementChanged(); } } }
-            [ElementPriority(16)]
-            public float F15_unknown { get { return height; } set { if (height != value) { height = value; OnElementChanged(); } } }
-            [ElementPriority(17)]
-            public float F16_unknown { get { return floats16_31_unknown[0]; } set { setFloatN(0, value); } }
-            [ElementPriority(18)]
-            public float F17_unknown { get { return floats16_31_unknown[1]; } set { setFloatN(1, value); } }
-            [ElementPriority(19)]
-            public float F18_unknown { get { return floats16_31_unknown[2]; } set { setFloatN(2, value); } }
-            [ElementPriority(20)]
-            public float F19_unknown { get { return floats16_31_unknown[3]; } set { setFloatN(3, value); } }
-            [ElementPriority(21)]
-            public float F20_unknown { get { return floats16_31_unknown[4]; } set { setFloatN(4, value); } }
-            [ElementPriority(22)]
-            public float F21_unknown { get { return floats16_31_unknown[5]; } set { setFloatN(5, value); } }
-            [ElementPriority(23)]
-            public float F22_unknown { get { return floats16_31_unknown[6]; } set { setFloatN(6, value); } }
-            [ElementPriority(24)]
-            public float F23_unknown { get { return floats16_31_unknown[7]; } set { setFloatN(7, value); } }
-            [ElementPriority(25)]
-            public float F24_unknown { get { return floats16_31_unknown[8]; } set { setFloatN(8, value); } }
-            [ElementPriority(26)]
-            public float F25_unknown { get { return floats16_31_unknown[9]; } set { setFloatN(9, value); } }
-            [ElementPriority(27)]
-            public float F26_unknown { get { return floats16_31_unknown[10]; } set { setFloatN(10, value); } }
-            [ElementPriority(28)]
-            public float F27_unknown { get { return floats16_31_unknown[11]; } set { setFloatN(11, value); } }
-            [ElementPriority(29)]
-            public float F28_unknown { get { return floats16_31_unknown[12]; } set { setFloatN(12, value); } }
-            [ElementPriority(30)]
-            public float F29_unknown { get { return floats16_31_unknown[13]; } set { setFloatN(13, value); } }
-            [ElementPriority(31)]
-            public float F30_unknown { get { return floats16_31_unknown[14]; } set { setFloatN(14, value); } }
-            [ElementPriority(32)]
-            public float F31_unknown { get { return floats16_31_unknown[15]; } set { setFloatN(15, value); } }
-            void setFloatN(int n, float value) { if (floats16_31_unknown[n] != value) { floats16_31_unknown[n] = value; OnElementChanged(); } }
 
-            public string Value
+            #region Sub-types
+            public enum LightSourceType : uint
             {
-                get
+                Unknown = 0x00,//unused
+                Ambient = 0x01,//unused
+                Directional = 0x02,//unused
+                Point = 0x03,
+                Spot = 0x04,
+                LampShade = 0x05,
+                TubeLight = 0x06,
+                SquareWindow = 0x07,
+                CircularWindow = 0x08,
+                SquareAreaLight = 0x09,
+                DiscAreaLight = 0x0A,
+                WorldLight = 0x0B,
+            }
+
+            public class RGB : Vertex
+            {
+                #region Constructors
+                public RGB(int APIversion, EventHandler handler) : base(APIversion, handler) { }
+                public RGB(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler, s) { }
+                public RGB(int APIversion, EventHandler handler, RGB basis) : base(APIversion, handler, basis.X, basis.Y, basis.Z) { }
+                public RGB(int APIversion, EventHandler handler, float x, float y, float z) : base(APIversion, handler, x, y, z) { }
+                #endregion
+
+                public override AHandlerElement Clone(EventHandler handler) { return new RGB(requestedApiVersion, handler, this); }
+
+                public override List<string> ContentFields
                 {
-                    return ValueBuilder;
-                    /*
-                    string s = "";
-                    foreach (string field in ContentFields)
-                        if (!field.Equals("Value"))
-                            s += "\n" + field + ": " + this[field];
-                    return s.TrimStart('\n');
-                    /**/
+                    get
+                    {
+                        List<string> res = GetContentFields(requestedApiVersion, this.GetType());
+                        res.Remove("X");
+                        res.Remove("Y");
+                        res.Remove("Z");
+                        return res;
+                    }
+                }
+
+                [ElementPriority(1)]
+                public float R { get { return X; } set { X = value; } }
+                [ElementPriority(2)]
+                public float G { get { return Y; } set { Y = value; } }
+                [ElementPriority(3)]
+                public float B { get { return Z; } set { Z = value; } }
+            }
+
+            public class GeneralLightSourceType : AApiVersionedFields
+            {
+                protected ElementChanged handler;
+                protected float[] lightSourceData;
+
+                public GeneralLightSourceType(int APIversion, ElementChanged handler, float[] lightSourceData) { this.handler = handler; this.lightSourceData = lightSourceData; }
+
+                #region AHandlerElement
+                public override int RecommendedApiVersion { get { return 0; } }
+                public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
+                #endregion
+
+                public delegate void ElementChanged();
+
+                protected void setFloatN(int n, float value) { if (lightSourceData[n] != value) { lightSourceData[n] = value; handler(); } }
+                protected void setFloatN(int n, Vertex value)
+                {
+                    if (lightSourceData[n] != value.X || lightSourceData[n + 1] != value.Y || lightSourceData[n + 2] != value.Z)
+                    {
+                        lightSourceData[n] = value.X;
+                        lightSourceData[n + 1] = value.Y;
+                        lightSourceData[n + 2] = value.Z;
+                        handler();
+                    }
+                }
+
+                public string Value { get { return ValueBuilder; } }
+
+                public float Unknown_F01 { get { return lightSourceData[0]; } set { setFloatN(0, value); } }
+                public float Unknown_F02 { get { return lightSourceData[1]; } set { setFloatN(1, value); } }
+                public float Unknown_F03 { get { return lightSourceData[2]; } set { setFloatN(2, value); } }
+                public float Unknown_F04 { get { return lightSourceData[3]; } set { setFloatN(3, value); } }
+                public float Unknown_F05 { get { return lightSourceData[4]; } set { setFloatN(4, value); } }
+                public float Unknown_F06 { get { return lightSourceData[5]; } set { setFloatN(5, value); } }
+                public float Unknown_F07 { get { return lightSourceData[6]; } set { setFloatN(6, value); } }
+                public float Unknown_F08 { get { return lightSourceData[7]; } set { setFloatN(7, value); } }
+                public float Unknown_F09 { get { return lightSourceData[8]; } set { setFloatN(8, value); } }
+                public float Unknown_F10 { get { return lightSourceData[9]; } set { setFloatN(9, value); } }
+                public float Unknown_F11 { get { return lightSourceData[10]; } set { setFloatN(10, value); } }
+                public float Unknown_F12 { get { return lightSourceData[11]; } set { setFloatN(11, value); } }
+                public float Unknown_F13 { get { return lightSourceData[12]; } set { setFloatN(12, value); } }
+                public float Unknown_F14 { get { return lightSourceData[13]; } set { setFloatN(13, value); } }
+                public float Unknown_F15 { get { return lightSourceData[14]; } set { setFloatN(14, value); } }
+                public float Unknown_F16 { get { return lightSourceData[15]; } set { setFloatN(15, value); } }
+                public float Unknown_F17 { get { return lightSourceData[16]; } set { setFloatN(16, value); } }
+                public float Unknown_F18 { get { return lightSourceData[17]; } set { setFloatN(17, value); } }
+                public float Unknown_F19 { get { return lightSourceData[18]; } set { setFloatN(18, value); } }
+                public float Unknown_F20 { get { return lightSourceData[19]; } set { setFloatN(19, value); } }
+                public float Unknown_F21 { get { return lightSourceData[20]; } set { setFloatN(20, value); } }
+                public float Unknown_F22 { get { return lightSourceData[21]; } set { setFloatN(21, value); } }
+                public float Unknown_F23 { get { return lightSourceData[22]; } set { setFloatN(22, value); } }
+                public float Unknown_F24 { get { return lightSourceData[23]; } set { setFloatN(23, value); } }
+            }
+
+            public class SpotLightSourceType : GeneralLightSourceType
+            {
+                public SpotLightSourceType(int APIversion, ElementChanged handler, float[] lightSourceData) : base(APIversion, handler, lightSourceData) { }
+
+                #region AHandlerElement
+                public override int RecommendedApiVersion { get { return 0; } }
+                public override List<string> ContentFields
+                {
+                    get
+                    {
+                        List<string> res = GetContentFields(requestedApiVersion, this.GetType());
+                        res.Remove("Unknown_F01");
+                        res.Remove("Unknown_F02");
+                        res.Remove("Unknown_F03");
+                        res.Remove("Unknown_F04");
+                        res.Remove("Unknown_F05");
+                        return res;
+                    }
+                }
+                #endregion
+
+                [ElementPriority(1)]
+                public Vertex At
+                {
+                    get { return new Vertex(0, null, lightSourceData[0], lightSourceData[1], lightSourceData[2]); }
+                    set { setFloatN(0, value); }
+                }
+                [ElementPriority(2)]
+                public float FalloffAngle { get { return lightSourceData[3]; } set { setFloatN(3, value); } }
+                [ElementPriority(3)]
+                public float BlurScale { get { return lightSourceData[4]; } set { setFloatN(4, value); } }
+            }
+
+            public class LampShadeLightSourceType : GeneralLightSourceType
+            {
+                public LampShadeLightSourceType(int APIversion, ElementChanged handler, float[] lightSourceData) : base(APIversion, handler, lightSourceData) { }
+
+                #region AHandlerElement
+                public override int RecommendedApiVersion { get { return 0; } }
+                public override List<string> ContentFields
+                {
+                    get
+                    {
+                        List<string> res = GetContentFields(requestedApiVersion, this.GetType());
+                        res.Remove("Unknown_F01");
+                        res.Remove("Unknown_F02");
+                        res.Remove("Unknown_F03");
+                        res.Remove("Unknown_F04");
+                        res.Remove("Unknown_F05");
+                        res.Remove("Unknown_F06");
+                        res.Remove("Unknown_F07");
+                        res.Remove("Unknown_F08");
+                        res.Remove("Unknown_F09");
+                        return res;
+                    }
+                }
+                #endregion
+
+                [ElementPriority(1)]
+                public Vertex At
+                {
+                    get { return new Vertex(0, null, lightSourceData[0], lightSourceData[1], lightSourceData[2]); }
+                    set { setFloatN(0, value); }
+                }
+                [ElementPriority(2)]
+                public float FalloffAngle { get { return lightSourceData[3]; } set { setFloatN(3, value); } }
+                [ElementPriority(3)]
+                public float ShadeLightRigMultiplier { get { return lightSourceData[4]; } set { setFloatN(4, value); } }
+                [ElementPriority(4)]
+                public float BottomAngle { get { return lightSourceData[5]; } set { setFloatN(5, value); } }
+                [ElementPriority(5)]
+                public RGB ShadeColor
+                {
+                    get { return new RGB(0, null, lightSourceData[6], lightSourceData[7], lightSourceData[8]); }
+                    set { setFloatN(6, value); }
                 }
             }
+
+            public class TubeLightSourceType : GeneralLightSourceType
+            {
+                public TubeLightSourceType(int APIversion, ElementChanged handler, float[] lightSourceData) : base(APIversion, handler, lightSourceData) { }
+
+                #region AHandlerElement
+                public override int RecommendedApiVersion { get { return 0; } }
+                public override List<string> ContentFields
+                {
+                    get
+                    {
+                        List<string> res = GetContentFields(requestedApiVersion, this.GetType());
+                        res.Remove("Unknown_F01");
+                        res.Remove("Unknown_F02");
+                        res.Remove("Unknown_F03");
+                        res.Remove("Unknown_F04");
+                        res.Remove("Unknown_F05");
+                        return res;
+                    }
+                }
+                #endregion
+
+                [ElementPriority(1)]
+                public Vertex At
+                {
+                    get { return new Vertex(0, null, lightSourceData[0], lightSourceData[1], lightSourceData[2]); }
+                    set { setFloatN(0, value); }
+                }
+                [ElementPriority(2)]
+                public float TubeLength { get { return lightSourceData[3]; } set { setFloatN(3, value); } }
+                [ElementPriority(3)]
+                public float BlurScale { get { return lightSourceData[4]; } set { setFloatN(4, value); } }
+            }
+
+            public class SquareWindowLightSourceType : GeneralLightSourceType
+            {
+                public SquareWindowLightSourceType(int APIversion, ElementChanged handler, float[] lightSourceData) : base(APIversion, handler, lightSourceData) { }
+
+                #region AHandlerElement
+                public override int RecommendedApiVersion { get { return 0; } }
+                public override List<string> ContentFields
+                {
+                    get
+                    {
+                        List<string> res = GetContentFields(requestedApiVersion, this.GetType());
+                        res.Remove("Unknown_F01");
+                        res.Remove("Unknown_F02");
+                        res.Remove("Unknown_F03");
+
+                        res.Remove("Unknown_F04");
+                        res.Remove("Unknown_F05");
+                        res.Remove("Unknown_F06");
+
+                        res.Remove("Unknown_F07");
+                        res.Remove("Unknown_F08");
+                        res.Remove("Unknown_F09");
+                        res.Remove("Unknown_F10");
+                        return res;
+                    }
+                }
+                #endregion
+
+                [ElementPriority(1)]
+                public Vertex At
+                {
+                    get { return new Vertex(0, null, lightSourceData[0], lightSourceData[1], lightSourceData[2]); }
+                    set { setFloatN(0, value); }
+                }
+                [ElementPriority(2)]
+                public Vertex Right
+                {
+                    get { return new Vertex(0, null, lightSourceData[3], lightSourceData[4], lightSourceData[5]); }
+                    set { setFloatN(3, value); }
+                }
+                [ElementPriority(3)]
+                public float Width { get { return lightSourceData[6]; } set { setFloatN(6, value); } }
+                [ElementPriority(4)]
+                public float Height { get { return lightSourceData[7]; } set { setFloatN(7, value); } }
+                [ElementPriority(5)]
+                public float FalloffAngle { get { return lightSourceData[8]; } set { setFloatN(8, value); } }
+                [ElementPriority(6)]
+                public float WindowTopBottomAngle { get { return lightSourceData[9]; } set { setFloatN(9, value); } }
+            }
+
+            public class CircularWindowLightSourceType : GeneralLightSourceType
+            {
+                public CircularWindowLightSourceType(int APIversion, ElementChanged handler, float[] lightSourceData) : base(APIversion, handler, lightSourceData) { }
+
+                #region AHandlerElement
+                public override int RecommendedApiVersion { get { return 0; } }
+                public override List<string> ContentFields
+                {
+                    get
+                    {
+                        List<string> res = GetContentFields(requestedApiVersion, this.GetType());
+                        res.Remove("Unknown_F01");
+                        res.Remove("Unknown_F02");
+                        res.Remove("Unknown_F03");
+
+                        res.Remove("Unknown_F04");
+                        res.Remove("Unknown_F05");
+                        res.Remove("Unknown_F06");
+
+                        res.Remove("Unknown_F07");
+                        return res;
+                    }
+                }
+                #endregion
+
+                [ElementPriority(1)]
+                public Vertex At
+                {
+                    get { return new Vertex(0, null, lightSourceData[0], lightSourceData[1], lightSourceData[2]); }
+                    set { setFloatN(0, value); }
+                }
+                [ElementPriority(2)]
+                public Vertex Right
+                {
+                    get { return new Vertex(0, null, lightSourceData[3], lightSourceData[4], lightSourceData[5]); }
+                    set { setFloatN(3, value); }
+                }
+                [ElementPriority(3)]
+                public float Radius { get { return lightSourceData[6]; } set { setFloatN(6, value); } }
+            }
+            #endregion
+
+
+            #region Content Fields
+            [ElementPriority(1)]
+            public LightSourceType LightType { get { return lightSource; } set { if (lightSource != value) { lightSource = value; OnElementChanged(); } } }
+            [ElementPriority(2)]
+            public Vertex Transform { get { return transform; } set { if (!transform.Equals(value)) { transform = new Vertex(requestedApiVersion, handler, value); OnElementChanged(); } } }
+            [ElementPriority(3)]
+            public RGB Color { get { return color; } set { if (!color.Equals(value)) { color = new RGB(requestedApiVersion, handler, value); OnElementChanged(); } } }
+            [ElementPriority(4)]
+            public float Intensity { get { return intensity; } set { if (intensity != value) { intensity = value; OnElementChanged(); } } }
+            [ElementPriority(5)]
+            public GeneralLightSourceType LightSourceData { get { return lightSourceData; } set { } }
+            [ElementPriority(5)]
+            public SpotLightSourceType SpotLightLightSourceData { get { return spotLightSourceData; } set { } }
+            [ElementPriority(5)]
+            public LampShadeLightSourceType LampShadeLightSourceData { get { return lampShadeLightSourceData; } set { } }
+            [ElementPriority(5)]
+            public TubeLightSourceType TubeLightLightSourceData { get { return tubeShadeLightSourceData; } set { } }
+            [ElementPriority(5)]
+            public SquareWindowLightSourceType SquareWindowLightSourceData { get { return squareWindowLightSourceData; } set { } }
+            [ElementPriority(5)]
+            public CircularWindowLightSourceType CircularWindowLightSourceData { get { return circularWindowLightSourceData; } set { } }
+            [ElementPriority(5)]
+            public SquareWindowLightSourceType SquareAreaLightSourceData { get { return squareAreaLightSourceData; } set { } }
+            [ElementPriority(5)]
+            public CircularWindowLightSourceType DiscAreaLightSourceData { get { return discAreaLightSourceData; } set { } }
+
+            public string Value { get { return ValueBuilder; } }
             #endregion
         }
 
-        public class LongSectionList : DependentList<LongSection>
+        public class LightSourceList : DependentList<LightSource>
         {
             int count;
 
             #region Constructors
-            public LongSectionList(EventHandler handler) : base(handler, Byte.MaxValue) { }
-            public LongSectionList(EventHandler handler, int count, Stream s) : base(null, Byte.MaxValue) { this.count = count; elementHandler = handler; Parse(s); this.handler = handler; }
-            public LongSectionList(EventHandler handler, IEnumerable<LongSection> llp) : base(handler, llp, Byte.MaxValue) { }
+            public LightSourceList(EventHandler handler) : base(handler, Byte.MaxValue) { }
+            public LightSourceList(EventHandler handler, int count, Stream s) : base(null, Byte.MaxValue) { this.count = count; elementHandler = handler; Parse(s); this.handler = handler; }
+            public LightSourceList(EventHandler handler, IEnumerable<LightSource> llp) : base(handler, llp, Byte.MaxValue) { }
             #endregion
 
             #region Data I/O
             protected override int ReadCount(Stream s) { return count; }
             protected override void WriteCount(Stream s, int count) { }
 
-            protected override LongSection CreateElement(Stream s) { return new LongSection(0, elementHandler, s); }
+            protected override LightSource CreateElement(Stream s) { return new LightSource(0, elementHandler, s); }
 
-            protected override void WriteElement(Stream s, LongSection element) { element.UnParse(s); }
+            protected override void WriteElement(Stream s, LightSource element) { element.UnParse(s); }
             #endregion
 
-            public override void Add() { this.Add(new LongSection(0, null)); }
+            public override void Add() { this.Add(new LightSource(0, null)); }
         }
 
-        public class ShortSection : AHandlerElement, IEquatable<ShortSection>
+        public class Occluder : AHandlerElement, IEquatable<Occluder>
         {
             const int recommendedApiVersion = 1;
 
             #region Attributes
-            uint unknown1 = 0;
-            float[] floats1_13_unknown = new float[13];
+            OccluderType occluderType = 0;
+            Vertex origin;
+            Vertex normal;
+            Vertex xAxis;
+            Vertex yAxis;
+            float pairOffset;
             #endregion
 
             #region Constructors
-            public ShortSection(int APIversion, EventHandler handler) : base(APIversion, handler) { }
-            public ShortSection(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
-            public ShortSection(int APIversion, EventHandler handler, ShortSection basis)
-                : this(APIversion, handler, basis.unknown1, basis.floats1_13_unknown) { }
-            public ShortSection(int APIversion, EventHandler handler, uint unknown1, float[] floats1_13_unknown)
+            public Occluder(int APIversion, EventHandler handler) : base(APIversion, handler) { }
+            public Occluder(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
+            public Occluder(int APIversion, EventHandler handler, Occluder basis)
+                : this(APIversion, handler, basis.occluderType, basis.origin, basis.normal, basis.xAxis, basis.yAxis, basis.pairOffset) { }
+            public Occluder(int APIversion, EventHandler handler, OccluderType occluderType, Vertex origin, Vertex normal, Vertex xAxis, Vertex yAxis, float pairOffset)
                 : base(APIversion, handler)
             {
-                this.unknown1 = unknown1;
-                if (checking) if (floats1_13_unknown.Length != 13)
-                        throw new ArgumentException("Array length must be 13");
-                this.floats1_13_unknown = (float[])floats1_13_unknown.Clone();
+                this.occluderType = occluderType;
+                this.origin = new Vertex(requestedApiVersion, handler, origin);
+                this.normal = new Vertex(requestedApiVersion, handler, normal);
+                this.xAxis = new Vertex(requestedApiVersion, handler, xAxis);
+                this.yAxis = new Vertex(requestedApiVersion, handler, yAxis);
+                this.pairOffset = pairOffset;
             }
             #endregion
 
@@ -461,17 +629,23 @@ namespace s3pi.GenericRCOLResource
             void Parse(Stream s)
             {
                 BinaryReader r = new BinaryReader(s);
-                unknown1 = r.ReadUInt32();
-                for (int i = 0; i < floats1_13_unknown.Length; i++)
-                    floats1_13_unknown[i] = r.ReadSingle();
+                occluderType = (OccluderType)r.ReadUInt32();
+                origin = new Vertex(recommendedApiVersion, handler, s);
+                normal = new Vertex(recommendedApiVersion, handler, s);
+                xAxis = new Vertex(recommendedApiVersion, handler, s);
+                yAxis = new Vertex(recommendedApiVersion, handler, s);
+                pairOffset = r.ReadSingle();
             }
 
             internal void UnParse(Stream s)
             {
                 BinaryWriter w = new BinaryWriter(s);
-                w.Write(unknown1);
-                for (int i = 0; i < floats1_13_unknown.Length; i++)
-                    w.Write(floats1_13_unknown[i]);
+                w.Write((uint)occluderType);
+                origin.UnParse(s);
+                normal.UnParse(s);
+                xAxis.UnParse(s);
+                yAxis.UnParse(s);
+                w.Write(pairOffset);
             }
             #endregion
 
@@ -483,83 +657,70 @@ namespace s3pi.GenericRCOLResource
             /// </summary>
             public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
 
-            public override AHandlerElement Clone(EventHandler handler) { return new ShortSection(requestedApiVersion, handler, this); }
+            public override AHandlerElement Clone(EventHandler handler) { return new Occluder(requestedApiVersion, handler, this); }
             #endregion
 
-            #region IEquatable<ShortSection> Members
+            #region IEquatable<Occluder> Members
 
-            public bool Equals(ShortSection other) { return unknown1.Equals(other.unknown1) && ArrayCompare(floats1_13_unknown, other.floats1_13_unknown) ; }
+            public bool Equals(Occluder other)
+            {
+                return occluderType.Equals(other.occluderType)
+                    && origin.Equals(other.origin)
+                    && normal.Equals(other.normal)
+                    && xAxis.Equals(other.xAxis)
+                    && yAxis.Equals(other.yAxis)
+                    && pairOffset.Equals(other.pairOffset)
+                    ;
+            }
 
+            #endregion
+
+            #region Sub-types
+            public enum OccluderType : uint
+            {
+                Disc = 0x00,
+                Rectangle = 0x01,
+            }
             #endregion
 
             #region Content Fields
             [ElementPriority(0)]
-            public uint Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnElementChanged(); } } }
+            public OccluderType Occluder_Type { get { return occluderType; } set { if (occluderType != value) { occluderType = value; OnElementChanged(); } } }
             [ElementPriority(1)]
-            public float F01_unknown { get { return floats1_13_unknown[0]; } set { setFloatN(0, value); } }
+            public Vertex Origin { get { return origin; } set { if (!origin.Equals(value)) { origin = new Vertex(requestedApiVersion, handler, value); OnElementChanged(); } } }
             [ElementPriority(2)]
-            public float F02_unknown { get { return floats1_13_unknown[1]; } set { setFloatN(1, value); } }
+            public Vertex Normal { get { return normal; } set { if (!normal.Equals(value)) { normal = new Vertex(requestedApiVersion, handler, value); OnElementChanged(); } } }
             [ElementPriority(3)]
-            public float F03_unknown { get { return floats1_13_unknown[2]; } set { setFloatN(2, value); } }
+            public Vertex XAxis { get { return xAxis; } set { if (!xAxis.Equals(value)) { xAxis = new Vertex(requestedApiVersion, handler, value); OnElementChanged(); } } }
             [ElementPriority(4)]
-            public float F04_unknown { get { return floats1_13_unknown[3]; } set { setFloatN(3, value); } }
+            public Vertex YAxis { get { return yAxis; } set { if (!yAxis.Equals(value)) { yAxis = new Vertex(requestedApiVersion, handler, value); OnElementChanged(); } } }
             [ElementPriority(5)]
-            public float F05_unknown { get { return floats1_13_unknown[4]; } set { setFloatN(4, value); } }
-            [ElementPriority(6)]
-            public float F06_unknown { get { return floats1_13_unknown[5]; } set { setFloatN(5, value); } }
-            [ElementPriority(7)]
-            public float F07_unknown { get { return floats1_13_unknown[6]; } set { setFloatN(6, value); } }
-            [ElementPriority(8)]
-            public float F08_unknown { get { return floats1_13_unknown[7]; } set { setFloatN(7, value); } }
-            [ElementPriority(9)]
-            public float F09_unknown { get { return floats1_13_unknown[8]; } set { setFloatN(8, value); } }
-            [ElementPriority(10)]
-            public float F10_unknown { get { return floats1_13_unknown[9]; } set { setFloatN(9, value); } }
-            [ElementPriority(11)]
-            public float F11_unknown { get { return floats1_13_unknown[10]; } set { setFloatN(10, value); } }
-            [ElementPriority(12)]
-            public float F12_unknown { get { return floats1_13_unknown[11]; } set { setFloatN(11, value); } }
-            [ElementPriority(13)]
-            public float F13_unknown { get { return floats1_13_unknown[12]; } set { setFloatN(12, value); } }
-            void setFloatN(int n, float value) { if (floats1_13_unknown[n] != value) { floats1_13_unknown[n] = value; OnElementChanged(); } }
+            public float PairOffset { get { return pairOffset; } set { pairOffset = value; OnElementChanged(); } }
 
-            public string Value
-            {
-                get
-                {
-                    return ValueBuilder;
-                    /*
-                    string s = "";
-                    foreach (string field in ContentFields)
-                        if (!field.Equals("Value"))
-                            s += "\n" + field + ": " + this[field];
-                    return s.TrimStart('\n');
-                    /**/
-                }
-            }
+            public string Value { get { return ValueBuilder; } }
             #endregion
         }
 
-        public class ShortSectionList : DependentList<ShortSection>
+        public class OccluderList : DependentList<Occluder>
         {
             int count;
 
             #region Constructors
-            public ShortSectionList(EventHandler handler) : base(handler, Byte.MaxValue) { }
-            public ShortSectionList(EventHandler handler, int count, Stream s) : base(null, Byte.MaxValue) { this.count = count; elementHandler = handler; Parse(s); this.handler = handler; }
-            public ShortSectionList(EventHandler handler, IEnumerable<ShortSection> lss) : base(handler, lss, Byte.MaxValue) { }
+            public OccluderList(EventHandler handler) : base(handler, Byte.MaxValue) { }
+            public OccluderList(EventHandler handler, int count, Stream s) : base(null, Byte.MaxValue) { this.count = count; elementHandler = handler; Parse(s); this.handler = handler; }
+            public OccluderList(EventHandler handler, IEnumerable<Occluder> lss) : base(handler, lss, Byte.MaxValue) { }
             #endregion
 
             #region Data I/O
             protected override int ReadCount(Stream s) { return count; }
             protected override void WriteCount(Stream s, int count) { }
 
-            protected override ShortSection CreateElement(Stream s) { return new ShortSection(0, elementHandler, s); }
+            protected override Occluder CreateElement(Stream s) { return new Occluder(0, elementHandler, s); }
 
-            protected override void WriteElement(Stream s, ShortSection element) { element.UnParse(s); }
+            protected override void WriteElement(Stream s, Occluder element) { element.UnParse(s); }
             #endregion
 
-            public override void Add() { this.Add(new ShortSection(0, null)); }
+            public override void Add() { this.Add(new Occluder(0, null)); }
         }
         #endregion
 
@@ -571,36 +732,11 @@ namespace s3pi.GenericRCOLResource
         [ElementPriority(13)]
         public ushort Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(14)]
-        public LongSectionList LongSections { get { return longSections; } set { if (longSections != value) { longSections = new LongSectionList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
+        public LightSourceList LongSections { get { return lightSources; } set { if (lightSources != value) { lightSources = new LightSourceList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(15)]
-        public ShortSectionList ShortSections { get { return shortSections; } set { if (shortSections != value) { shortSections = new ShortSectionList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
+        public OccluderList Occluders { get { return occluders; } set { if (occluders != value) { occluders = new OccluderList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
 
-        public string Value
-        {
-            get
-            {
-                return ValueBuilder;
-                /*
-                string s = "";
-                s += "Tag: 0x" + tag.ToString("X8");
-                s += "\nVersion: 0x" + version.ToString("X8");
-                s += "\nUnknown1: 0x" + unknown1.ToString("X8");
-                s += "\nUnknown2: 0x" + unknown1.ToString("X4");
-
-                string fmt;
-                s += String.Format("\nLong Sections ({0:X}):", longSections.Count);
-                fmt = "\n--[{0:X" + longSections.Count.ToString("X").Length + "}]--\n{1}\n--";
-                for (int i = 0; i < longSections.Count; i++) s += String.Format(fmt, i, longSections[i].Value);
-                s += "\n----";
-
-                s += String.Format("\nShort Sections ({0:X}):", shortSections.Count);
-                fmt = "\n--[{0:X" + shortSections.Count.ToString("X").Length + "}]--\n{1}\n--";
-                for (int i = 0; i < shortSections.Count; i++) s += String.Format(fmt, i, shortSections[i].Value);
-
-                return s;
-                /**/
-            }
-        }
+        public string Value { get { return ValueBuilder; } }
         #endregion
     }
 }
