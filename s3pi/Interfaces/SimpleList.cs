@@ -72,6 +72,7 @@ namespace s3pi.Interfaces
         WriteCountMethod writeCount;
         #endregion
 
+        #region Enumerator<U>
         /// <summary>
         /// Supports a simple iteration over a generic collection.
         /// </summary>
@@ -82,7 +83,7 @@ namespace s3pi.Interfaces
             DependentList<HandlerElement<U>> list;
             DependentList<HandlerElement<U>>.Enumerator enumerator;
 
-            public Enumerator(DependentList<HandlerElement<U>> list) { this.list = list; Reset(); }
+            internal Enumerator(DependentList<HandlerElement<U>> list) { this.list = list; Reset(); }
 
             /// <summary>
             /// Gets the element at the current position of the enumerator.
@@ -100,6 +101,7 @@ namespace s3pi.Interfaces
 
             object System.Collections.IEnumerator.Current { get { return enumerator.Current; } }
 
+            /// <summary>
             /// Advances the enumerator to the next element of the collection.
             /// </summary>
             /// <returns>
@@ -115,6 +117,7 @@ namespace s3pi.Interfaces
             /// <exception cref="System.InvalidOperationException">The collection was modified after the enumerator was created.</exception>
             public void Reset() { enumerator = list.GetEnumerator(); }
         }
+        #endregion
 
         #region Constructors
         /// <summary>
@@ -984,13 +987,6 @@ namespace s3pi.Interfaces
         /// <param name="basis">Basis on which to populate the list.</param>
         /// <param name="size">Optional list size.</param>
         public UIntList(EventHandler handler, IEnumerable<uint> basis, long size = -1) : base(handler, basis, ReadUInt32, WriteUInt32, size) { }
-        /// <summary>
-        /// Create a UIntList populated from an existing set of values.
-        /// </summary>
-        /// <param name="handler">Event handler.</param>
-        /// <param name="basis">Basis on which to populate the list.</param>
-        /// <param name="size">Optional list size.</param>
-        //public UIntList(EventHandler handler, IEnumerable<HandlerElement<uint>> basis, long size = -1) : base(handler, basis, ReadUInt32, WriteUInt32, size) { }
         /// <summary>
         /// Create a UIntList populated from a <see cref="Stream"/>.
         /// </summary>
