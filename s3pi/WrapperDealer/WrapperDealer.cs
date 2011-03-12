@@ -47,7 +47,7 @@ namespace s3pi.WrapperDealer
         /// Retrieve a resource from a package, readying the appropriate wrapper
         /// </summary>
         /// <param name="APIversion">API version of request</param>
-        /// <param name="pkg">Package containing <typeparamref name="IResourceCode"/> <paramref name="rie"/></param>
+        /// <param name="pkg">Package containing <paramref name="rie"/></param>
         /// <param name="rie">Identifies resource to be returned</param>
         /// <returns>A resource from the package</returns>
         public static IResource GetResource(int APIversion, IPackage pkg, IResourceIndexEntry rie) { return GetResource(APIversion, pkg, rie, false); }
@@ -57,8 +57,9 @@ namespace s3pi.WrapperDealer
         /// Retrieve a resource from a package, readying the appropriate wrapper or the default wrapper
         /// </summary>
         /// <param name="APIversion">API version of request</param>
-        /// <param name="pkg">Package containing <typeparamref name="IResourceCode"/> <paramref name="rie"/></param>
+        /// <param name="pkg">Package containing <paramref name="rie"/></param>
         /// <param name="rie">Identifies resource to be returned</param>
+        /// <param name="AlwaysDefault">When true, indicates WrapperDealer should always use the DefaultResource wrapper</param>
         /// <returns>A resource from the package</returns>
         public static IResource GetResource(int APIversion, IPackage pkg, IResourceIndexEntry rie, bool AlwaysDefault)
         {
