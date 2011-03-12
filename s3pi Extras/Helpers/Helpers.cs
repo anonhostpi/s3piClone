@@ -155,7 +155,8 @@ namespace s3pi.Helpers
         /// </summary>
         /// <param name="key">The resource index entry</param>
         /// <param name="res">The resource</param>
-        public HelperManager(IResourceIndexEntry key, IResource res)
+        /// <param name="resname">(Optional) The resource name</param>
+        public HelperManager(IResourceIndexEntry key, IResource res, string resname = null)
         {
             if (helpers == null) ReadConfig();
 
@@ -187,7 +188,7 @@ namespace s3pi.Helpers
                 }
             matched:
                 if (match != null)
-                    this.Add(new Helper(match, (s3pi.Extensions.TGIN)(key as AResourceIndexEntry), res));
+                    this.Add(new Helper(match, new s3pi.Extensions.TGIN(key, resname), res));
             }
         }
 
