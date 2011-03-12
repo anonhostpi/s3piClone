@@ -119,7 +119,7 @@ namespace s3pi.GenericRCOLResource
             #endregion
 
             #region Constructors
-            public LightSource(int APIversion, EventHandler handler) : base(APIversion, handler) { PointToLightSourceData(); }
+            protected LightSource(int APIversion, EventHandler handler) : base(APIversion, handler) { PointToLightSourceData(); }
             public LightSource(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); PointToLightSourceData(); }
             public LightSource(int APIversion, EventHandler handler, LightSource basis)
                 : this(APIversion, handler, basis.lightSource
@@ -235,8 +235,7 @@ namespace s3pi.GenericRCOLResource
             }
 
             #endregion
-
-
+            
             #region Sub-types
             public enum LightSourceType : uint
             {
@@ -541,11 +540,10 @@ namespace s3pi.GenericRCOLResource
                 public float Radius { get { return lightSourceData[6]; } set { setFloatN(6, value); } }
             }
             #endregion
-
-
+            
             #region Content Fields
             [ElementPriority(1)]
-            public LightSourceType LightType { get { return lightSource; } set { if (lightSource != value) { lightSource = value; OnElementChanged(); } } }
+            public LightSourceType LightType { get { return lightSource; } set { if (lightSource != value) { lightSource = value; PointToLightSourceData(); OnElementChanged(); } } }
             [ElementPriority(2)]
             public Vertex Transform { get { return transform; } set { if (!transform.Equals(value)) { transform = new Vertex(requestedApiVersion, handler, value); OnElementChanged(); } } }
             [ElementPriority(3)]
@@ -592,7 +590,7 @@ namespace s3pi.GenericRCOLResource
             protected override void WriteElement(Stream s, LightSource element) { element.UnParse(s); }
             #endregion
 
-            public override void Add() { this.Add(new LightSource(0, null)); }
+            public override void Add() { this.Add(new LightSource(0, null, LightSource.LightSourceType.Unknown, 0f, 0f, 0f, 0f, 0f, 0f, 0f, new float[24])); }
         }
 
         public class Occluder : AHandlerElement, IEquatable<Occluder>
@@ -609,7 +607,7 @@ namespace s3pi.GenericRCOLResource
             #endregion
 
             #region Constructors
-            public Occluder(int APIversion, EventHandler handler) : base(APIversion, handler) { }
+            protected Occluder(int APIversion, EventHandler handler) : base(APIversion, handler) { }
             public Occluder(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
             public Occluder(int APIversion, EventHandler handler, Occluder basis)
                 : this(APIversion, handler, basis.occluderType, basis.origin, basis.normal, basis.xAxis, basis.yAxis, basis.pairOffset) { }
@@ -720,7 +718,11 @@ namespace s3pi.GenericRCOLResource
             protected override void WriteElement(Stream s, Occluder element) { element.UnParse(s); }
             #endregion
 
-            public override void Add() { this.Add(new Occluder(0, null)); }
+            public override void Add()
+            {
+                this.Add(new Occluder(0, null, Occluder.OccluderType.Disc,
+                    new Vertex(0, null, 0f, 0f, 0f), new Vertex(0, null, 0f, 0f, 0f), new Vertex(0, null, 0f, 0f, 0f), new Vertex(0, null, 0f, 0f, 0f), 0f));
+            }
         }
         #endregion
 
@@ -732,7 +734,7 @@ namespace s3pi.GenericRCOLResource
         [ElementPriority(13)]
         public ushort Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(14)]
-        public LightSourceList LongSections { get { return lightSources; } set { if (lightSources != value) { lightSources = new LightSourceList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
+        public LightSourceList LightSources { get { return lightSources; } set { if (lightSources != value) { lightSources = new LightSourceList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(15)]
         public OccluderList Occluders { get { return occluders; } set { if (occluders != value) { occluders = new OccluderList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
 
