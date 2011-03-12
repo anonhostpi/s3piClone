@@ -31,6 +31,8 @@ namespace s3pi.Extensions
         public ulong ResInstance;
         public string ResName;
 
+        public TGIN(IResourceKey rk, string name) { ResType = rk.ResourceType; ResGroup = rk.ResourceGroup; ResInstance = rk.Instance; ResName = name; }
+
         public static implicit operator TGIN(AResourceKey value)
         {
             TGIN res = new TGIN();
