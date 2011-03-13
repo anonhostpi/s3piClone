@@ -42,16 +42,16 @@ namespace s3pi.Interfaces
         protected abstract void Parse(Stream s);
 
         #region AApiVersionedFields
-        protected override string ValueBuilder
+        static List<string> ARCOLBlockBanlist = new List<string>(new string[] {
+            "Tag", "ResourceType", "Data",
+        });
+        protected override List<string> ValueBuilderFields
         {
             get
             {
-                extraBanlist.AddRange(new string[] {
-                    "Tag",
-                    "ResourceType",
-                    "Data",
-                });
-                return base.ValueBuilder;
+                List<string> fields = base.ValueBuilderFields;
+                fields.RemoveAll(ARCOLBlockBanlist.Contains);
+                return fields;
             }
         }
         #endregion
