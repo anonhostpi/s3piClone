@@ -188,29 +188,43 @@ namespace s3pi.Interfaces
             }
         }
 
+        static List<string> valueBuilderBanlist = new List<string>(new string[] {
+            "Value", "Stream", "AsBytes",
+        });
+        static List<string> iDictionaryBanlist = new List<string>(new string[] {
+            "Keys", "Values", "Count", "IsReadOnly", "IsFixedSize", "IsSynchronized", "SyncRoot",
+        });
+
         /// <summary>
-        /// List of ContentFields ValueBuilder ignores
+        /// The fields ValueBuilder will return; used to eliminate those that should not be used.
         /// </summary>
-        protected List<string> extraBanlist = new List<string>(new string[] {
-                    "Value", "Stream", "AsBytes",
-                });
+        protected virtual List<string> ValueBuilderFields
+        {
+            get
+            {
+                List<string> fields = this.ContentFields;
+                fields.RemoveAll(banlist.Contains);
+                fields.RemoveAll(valueBuilderBanlist.Contains);
+                if (typeof(System.Collections.IDictionary).IsAssignableFrom(this.GetType())) fields.RemoveAll(iDictionaryBanlist.Contains);
+                return fields;
+            }
+        }
 
         /// <summary>
         /// Returns a string representing the value of the field (and any contained sub-fields)
         /// </summary>
-        protected virtual string ValueBuilder
+        protected string ValueBuilder
         {
             get
             {
-                if (typeof(System.Collections.IDictionary).IsAssignableFrom(this.GetType()))
-                    extraBanlist.AddRange(new string[] { "Keys", "Values", "Count", "IsReadOnly", "IsFixedSize", "IsSynchronized", "SyncRoot", });
-
                 System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
-                foreach (string f in this.ContentFields)
-                {
-                    if (banlist.Contains(f) || extraBanlist.Contains(f)) continue;
+                List<string> fields = this.ValueBuilderFields;
 
+                string headerFmt = "\n--- {0}: {1} (0x{2:X}) ---";
+
+                foreach (string f in fields)
+                {
                     TypedValue tv = this[f];
 
                     if (typeof(AApiVersionedFields).IsAssignableFrom(tv.Type))
@@ -232,7 +246,7 @@ namespace s3pi.Interfaces
                         string fmt = "\n   [{0:X" + l.Count.ToString("X").Length + "}]: {1}";
                         int i = 0;
 
-                        sb.Append("\n--- " + tv.Type.Name + ": " + f + " (0x" + l.Count.ToString("X") + ") ---");
+                        sb.Append(String.Format(headerFmt, tv.Type.Name, f, l.Count));
                         foreach (AHandlerElement v in l)
                         {
                             sb.Append(String.Format(fmt, i++, v["Val"].ToString()));
@@ -245,7 +259,7 @@ namespace s3pi.Interfaces
                         string fmt = "\n   [{0:X" + l.Count.ToString("X").Length + "}]: {1}";
                         int i = 0;
 
-                        sb.Append("\n--- " + tv.Type.Name + ": " + f + " (0x" + l.Count.ToString("X") + ") ---");
+                        sb.Append(String.Format(headerFmt, tv.Type.Name, f, l.Count));
                         foreach (TGIBlock v in l)
                             sb.Append(String.Format(fmt, i++, v.ToString()));
                         sb.Append("\n---");
@@ -257,7 +271,7 @@ namespace s3pi.Interfaces
                         string fmtShort = "\n   [{0:X" + l.Count.ToString("X").Length + "}]: {1}";
                         int i = 0;
 
-                        sb.Append("\n--- " + tv.Type.Name + ": " + f + " (0x" + l.Count.ToString("X") + ") ---");
+                        sb.Append(String.Format(headerFmt, tv.Type.Name, f, l.Count));
                         foreach (AHandlerElement v in l)
                         {
                             if (v.ContentFields.Contains("Value") &&
@@ -274,7 +288,8 @@ namespace s3pi.Interfaces
                     }
                     else if (tv.Type.HasElementType && typeof(AApiVersionedFields).IsAssignableFrom(tv.Type.GetElementType())) // it's an AApiVersionedFields array, slightly glossy...
                     {
-                        sb.Append("\n--- " + tv.Type.Name + ": " + f + " (0x" + ((Array)tv.Value).Length.ToString("X") + ") ---\n   " + tv.ToString().Replace("\n", "\n   ").TrimEnd() + "\n---");
+                        sb.Append(String.Format(headerFmt, tv.Type.Name, f, ((Array)tv.Value).Length));
+                        sb.Append("\n   " + tv.ToString().Replace("\n", "\n   ").TrimEnd() + "\n---");
                     }
                     else
                     {
