@@ -73,6 +73,7 @@
   <ItemGroup>
     <Compile Include="ArgumentLengthException.cs" />
     <Compile Include="AHandlerList.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="SevenBitString.cs" />
     <Compile Include="Sims3PackCRC.cs" />
     <Compile Include="FNVHash.cs" />
