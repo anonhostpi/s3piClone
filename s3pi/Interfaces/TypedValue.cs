@@ -137,8 +137,9 @@ namespace s3pi.Interfaces
                 object v = ary.GetValue(i);
                 TypedValue tv = new TypedValue(v.GetType(), v, "X");
                 sb.Append(String.Format(" [{0:X}:'{1}']", i, "" + tv));
+                if (i % 16 == 15) sb.Append("\n");
             }
-            return sb.ToString().TrimStart();
+            return sb.ToString().TrimStart().TrimEnd('\n');
         }
 
         static string FromAApiVersionedFieldsArray(Type type, Array ary)
