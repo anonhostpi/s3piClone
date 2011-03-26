@@ -315,7 +315,13 @@ namespace s3pi.Interfaces
         }
 
         /// <summary>
-        /// Sorts Content Field names by their ElementPriority (if set)
+        /// Returns a <see cref="System.String"/> that represents the current <see cref="AApiVersionedFields"/> object.
+        /// </summary>
+        /// <returns>A <see cref="System.String"/> that represents the current <see cref="AApiVersionedFields"/> object.</returns>
+        public override string ToString() { return ValueBuilder; }
+
+        /// <summary>
+        /// Sorts Content Field names by their <see cref="ElementPriorityAttribute"/> (if set)
         /// </summary>
         /// <param name="x">First content field name</param>
         /// <param name="y">Second content field name</param>
