@@ -300,7 +300,7 @@ namespace TxtcResource
                 {
                     // bytes
                     case 0x00: return new EntryBoolean(APIversion, handler, (EntryBoolean.BooleanProperties)property, unknown, dataType, r.ReadByte());
-                    case 0x01: return new EntrySignedByte(APIversion, handler, property, unknown, dataType, r.ReadSByte());
+                    case 0x01: return new EntrySByte(APIversion, handler, property, unknown, dataType, r.ReadSByte());
                     case 0x05: return new EntryByte(APIversion, handler, property, unknown, dataType, r.ReadByte());
                     case 0x0C: return new EntryTGIIndex(APIversion, handler, (EntryTGIIndex.TGIIndexProperties)property, unknown, dataType, r.ReadByte());
                     // words
@@ -367,13 +367,22 @@ namespace TxtcResource
             //[ElementPriority(3)]
             //public byte DataType { get { return dataType; } set { if (dataType != value) { dataType = value; OnElementChanged(); } } }
 
+            protected abstract string EntryValue { get; }
             public virtual string Value
             {
                 get
                 {
+                    string entryValue = EntryValue;
+                    string fmt = "{0} ({1})" + (entryValue == null ? "" : ": {2}");
+                    return String.Format(fmt,
+                        enumType == null ? "Unset" : (Enum.IsDefined(enumType, property) ? Enum.GetName(enumType, property)
+                            : String.Format("Unknown (0x{0:X8})", (uint)property)),
+                        this.GetType().Name.Substring(5), entryValue);
+                    /*
                     return this.GetType().Name +
                       ": Property: 0x" + ((uint)property).ToString("X8") + (enumType != null ? (Enum.IsDefined(enumType, property) ? " (" + Enum.GetName(enumType, property) + ")" : "(undefined)") : "") +
                       "; Unknown: 0x" + unknown.ToString("X2");
+                    /**/
                     //s += "; DataType: 0x" + dataType.ToString("X2");
                 }
             }
@@ -388,6 +397,7 @@ namespace TxtcResource
                 : base(APIversion, handler, 0, null, 0, 0) { }
             internal override void UnParse(Stream s) { throw new NotImplementedException(); }
             public override AHandlerElement Clone(EventHandler handler) { throw new NotImplementedException(); }
+            protected override string EntryValue { get { return null; } }
             public override string Value { get { throw new NotImplementedException(); } }
         }
         [ConstructorParameters(new object[] { BooleanProperties.UIVisible, (byte)0, (byte)0x00, (byte)0, })]
@@ -425,25 +435,27 @@ namespace TxtcResource
             }
             [ElementPriority(4)]
             public byte Data { get { return data; } set { if (data != value) { data = value; OnElementChanged(); } } }
-            public override string Value { get { return base.Value + "; Data: 0x" + data.ToString("X2"); } }
+            protected override string EntryValue { get { return "" + (data != 0); } }
+            //public override string Value { get { return base.Value + "; Data: 0x" + data.ToString("X2"); } }
         }
         [ConstructorParameters(new object[] { (uint)1, (byte)0, (byte)0x01, (sbyte)0, })]
-        public class EntrySignedByte : Entry
+        public class EntrySByte : Entry
         {
             sbyte data;
-            public EntrySignedByte(int APIversion, EventHandler handler, EntrySignedByte basis)
+            public EntrySByte(int APIversion, EventHandler handler, EntrySByte basis)
                 : this(APIversion, handler, basis.property, basis.unknown, basis.dataType, basis.data) { }
-            public EntrySignedByte(int APIversion, EventHandler handler, uint property, byte unknown, byte dataType, sbyte data)
+            public EntrySByte(int APIversion, EventHandler handler, uint property, byte unknown, byte dataType, sbyte data)
                 : base(APIversion, handler, property, null, unknown, dataType) { this.data = data; }
             internal override void UnParse(Stream s) { base.UnParse(s); new BinaryWriter(s).Write(data); }
-            public override AHandlerElement Clone(EventHandler handler) { return new EntrySignedByte(requestedApiVersion, handler, this); }
+            public override AHandlerElement Clone(EventHandler handler) { return new EntrySByte(requestedApiVersion, handler, this); }
             [ElementPriority(1)]
             public uint Property { get { return property; } set { if (property != value) { property = value; OnElementChanged(); } } }
             [ElementPriority(4)]
             public sbyte Data { get { return data; } set { if (data != value) { data = value; OnElementChanged(); } } }
-            public override string Value { get { return base.Value + "; Data: 0x" + data.ToString("X2"); } }
+            protected override string EntryValue { get { return "0x" + data.ToString("X2"); } }
+            //public override string Value { get { return base.Value + "; Data: 0x" + data.ToString("X2"); } }
         }
-        [ConstructorParameters(new object[] { (uint)5, (byte)0, (byte)0x05, (sbyte)0, })]
+        [ConstructorParameters(new object[] { (uint)5, (byte)0, (byte)0x05, (byte)0, })]
         public class EntryByte : Entry
         {
             byte data;
@@ -457,7 +469,8 @@ namespace TxtcResource
             public uint Property { get { return property; } set { if (property != value) { property = value; OnElementChanged(); } } }
             [ElementPriority(4)]
             public byte Data { get { return data; } set { if (data != value) { data = value; OnElementChanged(); } } }
-            public override string Value { get { return base.Value + "; Data: 0x" + data.ToString("X2"); } }
+            protected override string EntryValue { get { return "0x" + data.ToString("X2"); } }
+            //public override string Value { get { return base.Value + "; Data: 0x" + data.ToString("X2"); } }
         }
         [ConstructorParameters(new object[] { TGIIndexProperties.MaskKey, (byte)0, (byte)0x0C, (byte)0, })]
         public class EntryTGIIndex : Entry
@@ -494,7 +507,8 @@ namespace TxtcResource
             }
             [ElementPriority(4)]
             public byte Data { get { return data; } set { if (data != value) { data = value; OnElementChanged(); } } }
-            public override string Value { get { return base.Value + "; Data: 0x" + data.ToString("X2"); } }
+            protected override string EntryValue { get { return "0x" + data.ToString("X2"); } }
+            //public override string Value { get { return base.Value + "; Data: 0x" + data.ToString("X2"); } }
         }
         [ConstructorParameters(new object[] { (uint)2, (byte)0, (byte)0x02, (Int16)0, })]
         public class EntryInt16 : Entry
@@ -510,7 +524,8 @@ namespace TxtcResource
             public uint Property { get { return property; } set { if (property != value) { property = value; OnElementChanged(); } } }
             [ElementPriority(4)]
             public Int16 Data { get { return data; } set { if (data != value) { data = value; OnElementChanged(); } } }
-            public override string Value { get { return base.Value + "; Data: 0x" + data.ToString("X4"); } }
+            protected override string EntryValue { get { return "0x" + data.ToString("X4"); } }
+            //public override string Value { get { return base.Value + "; Data: 0x" + data.ToString("X4"); } }
         }
         [ConstructorParameters(new object[] { (uint)6, (byte)0, (byte)0x06, (UInt16)0, })]
         public class EntryUInt16 : Entry
@@ -526,7 +541,8 @@ namespace TxtcResource
             public uint Property { get { return property; } set { if (property != value) { property = value; OnElementChanged(); } } }
             [ElementPriority(4)]
             public UInt16 Data { get { return data; } set { if (data != value) { data = value; OnElementChanged(); } } }
-            public override string Value { get { return base.Value + "; Data: 0x" + data.ToString("X4"); } }
+            protected override string EntryValue { get { return "0x" + data.ToString("X4"); } }
+            //public override string Value { get { return base.Value + "; Data: 0x" + data.ToString("X4"); } }
         }
         [ConstructorParameters(new object[] { Int32Properties.DestinationBlend, (byte)0, (byte)0x03, (Int32)0, })]
         public class EntryInt32 : Entry
@@ -564,7 +580,8 @@ namespace TxtcResource
             }
             [ElementPriority(4)]
             public Int32 Data { get { return data; } set { if (data != value) { data = value; OnElementChanged(); } } }
-            public override string Value { get { return base.Value + "; Data: 0x" + data.ToString("X8"); } }
+            protected override string EntryValue { get { return "0x" + data.ToString("X8"); } }
+            //public override string Value { get { return base.Value + "; Data: 0x" + data.ToString("X8"); } }
         }
         [ConstructorParameters(new object[] { UInt32Properties.Width, (byte)0, (byte)0x07, (UInt32)0, })]
         public class EntryUInt32 : Entry
@@ -620,6 +637,8 @@ namespace TxtcResource
             }
             [ElementPriority(4)]
             public UInt32 Data { get { return data; } set { if (data != value) { data = value; OnElementChanged(); } } }
+            protected override string EntryValue { get { return "" + new TypedValue(data.GetType(), data, "X"); } }
+            /*
             public override string Value
             {
                 get
@@ -631,6 +650,7 @@ namespace TxtcResource
                       );
                 }
             }
+            /**/
         }
         [ConstructorParameters(new object[] { (uint)4, (byte)0, (byte)0x04, (UInt64)0, })]
         public class EntryInt64 : Entry
@@ -646,7 +666,8 @@ namespace TxtcResource
             public uint Property { get { return property; } set { if (property != value) { property = value; OnElementChanged(); } } }
             [ElementPriority(4)]
             public Int64 Data { get { return data; } set { if (data != value) { data = value; OnElementChanged(); } } }
-            public override string Value { get { return base.Value + "; Data: 0x" + data.ToString("X16"); } }
+            protected override string EntryValue { get { return "0x" + data.ToString("X16"); } }
+            //public override string Value { get { return base.Value + "; Data: 0x" + data.ToString("X16"); } }
         }
         [ConstructorParameters(new object[] { (uint)8, (byte)0, (byte)0x08, (UInt64)0, })]
         public class EntryUInt64 : Entry
@@ -662,7 +683,8 @@ namespace TxtcResource
             public uint Property { get { return property; } set { if (property != value) { property = value; OnElementChanged(); } } }
             [ElementPriority(4)]
             public UInt64 Data { get { return data; } set { if (data != value) { data = value; OnElementChanged(); } } }
-            public override string Value { get { return base.Value + "; Data: 0x" + data.ToString("X16"); } }
+            protected override string EntryValue { get { return "0x" + data.ToString("X16"); } }
+            //public override string Value { get { return base.Value + "; Data: 0x" + data.ToString("X16"); } }
         }
         [ConstructorParameters(new object[] { SingleProperties.MaskBias, (byte)0, (byte)0x09, (Single)0, })]
         public class EntrySingle : Entry
@@ -697,7 +719,8 @@ namespace TxtcResource
             }
             [ElementPriority(4)]
             public Single Data { get { return data; } set { if (data != value) { data = value; OnElementChanged(); } } }
-            public override string Value { get { return base.Value + "; Data: " + data.ToString(); } }
+            protected override string EntryValue { get { return data.ToString("F4"); } }
+            //public override string Value { get { return base.Value + "; Data: " + data.ToString(); } }
         }
         [ConstructorParameters(new object[] { RectangleProperties.SourceRectangle, (byte)0, (byte)0x0A, new Single[] { 0, 0, 0, 0 }, })]
         public class EntryRectangle : Entry
@@ -734,7 +757,8 @@ namespace TxtcResource
             }
             [ElementPriority(4)]
             public Single[] Data { get { return (Single[])data.Clone(); } set { if (value.Length != this.data.Length) throw new ArgumentLengthException(); if (!ArrayCompare(data, value)) { data = (Single[])value.Clone(); OnElementChanged(); } } }
-            public override string Value { get { return base.Value + "; Data: " + (new TypedValue(data.GetType(), data, "X")); } }
+            protected override string EntryValue { get { return String.Format("{0:F4}, {1:F4}; {2:F4}, {3:F4}", data[0], data[1], data[2], data[3]); } }
+            //public override string Value { get { return base.Value + "; Data: " + (new TypedValue(data.GetType(), data, "X")); } }
         }
         [ConstructorParameters(new object[] { VectorProperties.MaskSelect, (byte)0, (byte)0x0B, new Single[] { 0, 0, 0, 0 }, })]
         public class EntryVector : Entry
@@ -772,7 +796,8 @@ namespace TxtcResource
             }
             [ElementPriority(4)]
             public Single[] Data { get { return (Single[])data.Clone(); } set { if (value.Length != this.data.Length) throw new ArgumentLengthException(); if (!ArrayCompare(data, value)) { data = (Single[])value.Clone(); OnElementChanged(); } } }
-            public override string Value { get { return base.Value + "; Data: " + (new TypedValue(data.GetType(), data, "X")); } }
+            protected override string EntryValue { get { return String.Format("{0:F4}, {1:F4}, {2:F4}, {3:F4}", data[0], data[1], data[2], data[3]); } }
+            //public override string Value { get { return base.Value + "; Data: " + (new TypedValue(data.GetType(), data, "X")); } }
         }
         [ConstructorParameters(new object[] { StringProperties.Description, (byte)0, (byte)0x0D, "", })]
         public class EntryString : Entry
@@ -805,7 +830,8 @@ namespace TxtcResource
             }
             [ElementPriority(4)]
             public String Data { get { return data; } set { if (data != value) { data = value; OnElementChanged(); } } }
-            public override string Value { get { return base.Value + "; Data: \"" + data + "\""; } }
+            protected override string EntryValue { get { return data; } }
+            //public override string Value { get { return base.Value + "; Data: \"" + data + "\""; } }
         }
 
         public class EntryList : DependentList<Entry>
@@ -839,7 +865,7 @@ namespace TxtcResource
                 {
                     // bytes
                     case 0x00: return typeof(EntryBoolean);
-                    case 0x01: return typeof(EntrySignedByte);
+                    case 0x01: return typeof(EntrySByte);
                     case 0x05: return typeof(EntryByte);
                     case 0x0C: return typeof(EntryTGIIndex);
                     // words
