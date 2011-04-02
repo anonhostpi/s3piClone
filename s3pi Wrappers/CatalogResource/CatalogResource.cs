@@ -950,23 +950,20 @@ namespace CatalogResource
             {
                 get
                 {
-                    string s = "";
-                    string xmlType;
-                    if (mbList.Count > 0) { xmlType = "complate"; }
-                    else
-                        xmlType = "pattern";
-                    s += String.Format("<{0} Name=\"{1}\" ComplateXMLIndex=\"0x{2}\"", xmlType, name, complateXMLIndex.ToString("X2"));
-                    if (mbList.Count == 0) s += " variable=\"" + pattern + "\"";
-                    s += ">";
+                    System.Text.StringBuilder sb = new StringBuilder();
+                    string xmlType = mbList.Count > 0 ? "complate" : "pattern";
+                    sb.AppendFormat("<{0} Name=\"{1}\" ComplateXMLIndex=\"0x{2}\"", xmlType, name, complateXMLIndex.ToString("X2"));
+                    if (mbList.Count == 0) sb.Append(" variable=\"" + pattern + "\"");
+                    sb.AppendLine(">");
 
                     for (int i = 0; i < complateList.Count; i++)
-                        s += "\n  " + complateList[i].Value;
+                        sb.AppendLine("  " + complateList[i].Value);
 
                     for (int i = 0; i < mbList.Count; i++)
-                        s += mbList[i].Value.Replace("\n", "\n  ");
+                        sb.AppendLine("  " + mbList[i].Value.Replace("\n", "\n  "));
 
-                    s += String.Format("\n</{0}>", xmlType);
-                    return s;
+                    sb.AppendFormat("</{0}>", xmlType);
+                    return sb.ToString();
                 }
             }
             #endregion
