@@ -134,7 +134,7 @@ namespace s3pi.Interfaces
         /// Package index: the index
         /// </summary>
         [ElementPriority(14)]
-        public abstract IList<IResourceIndexEntry> GetResourceList { get; }
+        public abstract List<IResourceIndexEntry> GetResourceList { get; }
 
         /// <summary>
         /// Searches the entire <see cref="IPackage"/>
@@ -174,7 +174,7 @@ namespace s3pi.Interfaces
         /// <param name="flags">True bits enable matching against numerically equivalent <paramref name="values"/> entry.</param>
         /// <param name="values">Field values to compare against.</param>
         /// <returns>An <c>IList&lt;IResourceIndexEntry&gt;</c> of zero or more matches.</returns>
-        public abstract IList<IResourceIndexEntry> FindAll(uint flags, IResourceIndexEntry values);
+        public abstract List<IResourceIndexEntry> FindAll(uint flags, IResourceIndexEntry values);
 
         /// <summary>
         /// Searches the entire <see cref="IPackage"/>
@@ -184,7 +184,7 @@ namespace s3pi.Interfaces
         /// <param name="names">Names of <see cref="IResourceIndexEntry"/> fields to compare.</param>
         /// <param name="values">Field values to compare against.</param>
         /// <returns>An <c>IList&lt;IResourceIndexEntry&gt;</c> of zero or more matches.</returns>
-        public abstract IList<IResourceIndexEntry> FindAll(string[] names, TypedValue[] values);
+        public abstract List<IResourceIndexEntry> FindAll(string[] names, TypedValue[] values);
 
         /// <summary>
         /// Searches the entire <see cref="IPackage"/>
@@ -194,7 +194,7 @@ namespace s3pi.Interfaces
         /// <param name="Match"><c>Predicate&lt;IResourceIndexEntry&gt;</c> defining matching conditions.</param>
         /// <returns>Zero or more matches.</returns>
         /// <remarks>Note that entries marked as deleted will not be returned.</remarks>
-        public abstract IList<IResourceIndexEntry> FindAll(Predicate<IResourceIndexEntry> Match);
+        public abstract List<IResourceIndexEntry> FindAll(Predicate<IResourceIndexEntry> Match);
         #endregion
 
         #region Package content

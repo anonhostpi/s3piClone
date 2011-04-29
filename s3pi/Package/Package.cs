@@ -280,7 +280,7 @@ namespace s3pi.Package
         /// Package index: the index
         /// </summary>
         [ElementPriority(14)]
-        public override IList<IResourceIndexEntry> GetResourceList { get { return Index; } }
+        public override List<IResourceIndexEntry> GetResourceList { get { return Index; } }
 
         static bool FlagMatch(uint flags, IResourceIndexEntry values, IResourceIndexEntry target)
         {
@@ -347,7 +347,7 @@ namespace s3pi.Package
         /// <returns>An <c>IList&lt;IResourceIndexEntry&gt;</c> of zero or more matches.</returns>
         [MinimumVersion(1)]
         [MaximumVersion(recommendedApiVersion)]
-        public override IList<IResourceIndexEntry> FindAll(uint flags, IResourceIndexEntry values) { return Index.FindAll(x => !x.IsDeleted && FlagMatch(flags, values, x)); }
+        public override List<IResourceIndexEntry> FindAll(uint flags, IResourceIndexEntry values) { return Index.FindAll(x => !x.IsDeleted && FlagMatch(flags, values, x)); }
 
         /// <summary>
         /// Searches the entire <see cref="IPackage"/>
@@ -359,7 +359,7 @@ namespace s3pi.Package
         /// <returns>An <c>IList&lt;IResourceIndexEntry&gt;</c> of zero or more matches.</returns>
         [MinimumVersion(1)]
         [MaximumVersion(recommendedApiVersion)]
-        public override IList<IResourceIndexEntry> FindAll(string[] names, TypedValue[] values) { return Index.FindAll(x => !x.IsDeleted && NameMatch(names, values, x)); }
+        public override List<IResourceIndexEntry> FindAll(string[] names, TypedValue[] values) { return Index.FindAll(x => !x.IsDeleted && NameMatch(names, values, x)); }
 
         /// <summary>
         /// Searches the entire <see cref="IPackage"/>
@@ -371,7 +371,7 @@ namespace s3pi.Package
         /// <remarks>Note that entries marked as deleted will not be returned.</remarks>
         [MinimumVersion(1)]
         [MaximumVersion(recommendedApiVersion)]
-        public override IList<IResourceIndexEntry> FindAll(Predicate<IResourceIndexEntry> Match) { return Index.FindAll(x => !x.IsDeleted && Match(x)); }
+        public override List<IResourceIndexEntry> FindAll(Predicate<IResourceIndexEntry> Match) { return Index.FindAll(x => !x.IsDeleted && Match(x)); }
         #endregion
 
         #region Package content

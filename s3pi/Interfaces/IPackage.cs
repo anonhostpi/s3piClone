@@ -125,7 +125,7 @@ namespace s3pi.Interfaces
         /// Package index: the index as a <see cref="IResourceIndexEntry"/> list
         /// </summary>
         [ElementPriority(14)]
-        IList<IResourceIndexEntry> GetResourceList { get; }
+        List<IResourceIndexEntry> GetResourceList { get; }
 
         /// <summary>
         /// Searches the entire <see cref="IPackage"/>
@@ -165,7 +165,7 @@ namespace s3pi.Interfaces
         /// <param name="flags">True bits enable matching against numerically equivalent <paramref name="values"/> entry.</param>
         /// <param name="values">Field values to compare against.</param>
         /// <returns>An <c>IList&lt;IResourceIndexEntry&gt;</c> of zero or more matches.</returns>
-        IList<IResourceIndexEntry> FindAll(uint flags, IResourceIndexEntry values);
+        List<IResourceIndexEntry> FindAll(uint flags, IResourceIndexEntry values);
 
         /// <summary>
         /// Searches the entire <see cref="IPackage"/>
@@ -175,7 +175,7 @@ namespace s3pi.Interfaces
         /// <param name="names">Names of <see cref="IResourceIndexEntry"/> fields to compare.</param>
         /// <param name="values">Field values to compare against.</param>
         /// <returns>An <c>IList&lt;IResourceIndexEntry&gt;</c> of zero or more matches.</returns>
-        IList<IResourceIndexEntry> FindAll(string[] names, TypedValue[] values);
+        List<IResourceIndexEntry> FindAll(string[] names, TypedValue[] values);
 
         /// <summary>
         /// Searches the entire <see cref="IPackage"/>
@@ -185,7 +185,7 @@ namespace s3pi.Interfaces
         /// <param name="Match"><c>Predicate&lt;IResourceIndexEntry&gt;</c> defining matching conditions.</param>
         /// <returns>Zero or more matches.</returns>
         /// <remarks>Note that entries marked as deleted will not be returned.</remarks>
-        IList<IResourceIndexEntry> FindAll(Predicate<IResourceIndexEntry> Match);
+        List<IResourceIndexEntry> FindAll(Predicate<IResourceIndexEntry> Match);
         #endregion
 
         #region Package content
