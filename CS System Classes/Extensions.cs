@@ -34,7 +34,7 @@ namespace System
         /// <param name="array">The input array</param>
         /// <returns>An <c>TOut[]</c> array containing converted input elements.</returns>
         /// <exception cref="InvalidCastException">The element type of <paramref name="array"/> does not provide the <c>IConvertible</c> interface.</exception>
-        public static TOut[] Cast<TOut>(this Array array) { return array.Cast<TOut>(0, array.Length); }
+        public static TOut[] Cast<TOut>(this Array array) where TOut : IConvertible { return array.Cast<TOut>(0, array.Length); }
         /// <summary>
         /// Convert elements of an <c>Array</c> to <typeparamref name="TOut"/>,
         /// starting at <paramref name="start"/>.
@@ -45,7 +45,7 @@ namespace System
         /// <returns>An <c>TOut[]</c> array containing converted input elements.</returns>
         /// <exception cref="InvalidCastException">The element type of <paramref name="array"/> does not provide the <c>IConvertible</c> interface.</exception>
         /// <exception cref="IndexOutOfRangeException"><paramref name="start"/> is outside the bounds of <paramref name="array"/>.</exception>
-        public static TOut[] Cast<TOut>(this Array array, int start) { return array.Cast<TOut>(start, array.Length - start); }
+        public static TOut[] Cast<TOut>(this Array array, int start) where TOut : IConvertible { return array.Cast<TOut>(start, array.Length - start); }
         /// <summary>
         /// Convert elements of an <c>Array</c> to <typeparamref name="TOut"/>,
         /// starting at <paramref name="start"/> for <paramref name="length"/> elements.
@@ -58,7 +58,7 @@ namespace System
         /// <exception cref="InvalidCastException">The element type of <paramref name="array"/> does not provide the <c>IConvertible</c> interface.</exception>
         /// <exception cref="IndexOutOfRangeException"><paramref name="start"/> is outside the bounds of <paramref name="array"/>.</exception>
         /// <exception cref="ArgumentException"><paramref name="length"/> has an invalid value.</exception>
-        public static TOut[] Cast<TOut>(this Array array, int start, int length)
+        public static TOut[] Cast<TOut>(this Array array, int start, int length) where TOut : IConvertible
         {
             if (!typeof(IConvertible).IsAssignableFrom(array.GetType().GetElementType()))
                 throw new InvalidCastException(array.GetType().GetElementType().Name + " is not IConvertible");
