@@ -279,6 +279,220 @@ namespace s3pi.GenericRCOLResource
             VertexColor = 0xb39101ac,
             Walls = 0x974fba48,
         }
+
+        // At some point AHandlerElement will gain IResource...
+        public class MTRL : AHandlerElement, IEquatable<MTRL>, IResource
+        {
+            const int recommendedApiVersion = 1;
+
+            uint mtrlUnknown1;
+            ushort mtrlUnknown2;
+            ushort mtrlUnknown3;
+            ShaderDataList sdList = null;
+
+            public MTRL(int APIversion, EventHandler handler, MTRL basis)
+                : base(APIversion, handler)
+            {
+                this.mtrlUnknown1 = basis.mtrlUnknown1;
+                this.mtrlUnknown2 = basis.mtrlUnknown2;
+                this.mtrlUnknown3 = basis.mtrlUnknown3;
+                this.sdList = new ShaderDataList(handler, basis.sdList);
+            }
+            public MTRL(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
+            public MTRL(int APIversion, EventHandler handler) : base(APIversion, handler) { }
+
+            #region Data I/O
+            private void Parse(Stream s)
+            {
+                long start = s.Position;
+                BinaryReader r = new BinaryReader(s);
+                uint mtrlTag = r.ReadUInt32();
+                if (checking) if (mtrlTag != (uint)FOURCC("MTRL"))
+                        throw new InvalidDataException(String.Format("Invalid mtrlTag read: '{0}'; expected: 'MTRL'; at 0x{1:X8}", FOURCC(mtrlTag), s.Position));
+                mtrlUnknown1 = r.ReadUInt32();
+                mtrlUnknown2 = r.ReadUInt16();
+                mtrlUnknown3 = r.ReadUInt16();
+                this.sdList = new ShaderDataList(handler, s, start, -1);
+            }
+
+            internal void UnParse(Stream s)
+            {
+                long start = s.Position;
+                BinaryWriter w = new BinaryWriter(s);
+                w.Write((uint)FOURCC("MTRL"));
+                w.Write(mtrlUnknown1);
+                w.Write(mtrlUnknown2);
+                w.Write(mtrlUnknown3);
+                if (sdList == null) sdList = new ShaderDataList(handler);
+                sdList.UnParse(s, start);
+            }
+            #endregion
+
+            #region AHandlerElement Members
+            public override AHandlerElement Clone(EventHandler handler) { return new MTRL(requestedApiVersion, handler, this); }
+            public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
+            public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
+            #endregion
+
+            #region IEquatable<MTRL> Members
+
+            public bool Equals(MTRL other) { return mtrlUnknown1 == other.mtrlUnknown1 && mtrlUnknown2 == other.mtrlUnknown2 && mtrlUnknown3 == other.mtrlUnknown3 && sdList == other.sdList; }
+
+            #endregion
+
+            #region IResource
+            public Stream Stream
+            {
+                get
+                {
+                    MemoryStream ms = new MemoryStream();
+                    UnParse(ms);
+                    ms.Position = 0;
+                    return ms;
+                }
+            }
+
+            public byte[] AsBytes
+            {
+                get { return ((MemoryStream)Stream).ToArray(); }
+                set { MemoryStream ms = new MemoryStream(value); Parse(ms); OnElementChanged(); }
+            }
+
+            public event EventHandler ResourceChanged;
+            protected override void OnElementChanged()
+            {
+                dirty = true;
+                if (handler != null) handler(this, EventArgs.Empty);
+                if (ResourceChanged != null) ResourceChanged(this, EventArgs.Empty);
+            }
+            #endregion
+
+            #region Content Fields
+            [ElementPriority(1)]
+            public uint MTRLUnknown1 { get { return mtrlUnknown1; } set { if (mtrlUnknown1 != value) { mtrlUnknown1 = value; OnElementChanged(); } } }
+            [ElementPriority(2)]
+            public ushort MTRLUnknown2 { get { return mtrlUnknown2; } set { if (mtrlUnknown2 != value) { mtrlUnknown2 = value; OnElementChanged(); } } }
+            [ElementPriority(3)]
+            public ushort MTRLUnknown3 { get { return mtrlUnknown3; } set { if (mtrlUnknown3 != value) { mtrlUnknown3 = value; OnElementChanged(); } } }
+            [ElementPriority(4)]
+            public ShaderDataList SData { get { return sdList; } set { if (sdList != value) { sdList = new ShaderDataList(handler, value); OnElementChanged(); } } }
+
+            public string Value
+            {
+                get
+                {
+                    return ValueBuilder;
+                    /*
+                    string s = "";
+                    s += "MTRLUnknown1: 0x" + mtrlUnknown1.ToString("X8");
+                    s += "\nMTRLUnknown2: 0x" + mtrlUnknown2.ToString("X4");
+                    s += "\nMTRLUnknown3: 0x" + mtrlUnknown3.ToString("X4");
+
+                    s += String.Format("\nSData ({0:X}):", sdList.Count);
+                    string fmt = "\n  [{0:X" + sdList.Count.ToString("X").Length + "}]: {{{1}}}";
+                    for (int i = 0; i < sdList.Count; i++)
+                        s += String.Format(fmt, i, sdList[i].Value);
+                    return s;
+                    /**/
+                }
+            }
+            #endregion
+        }
+        public class MTNF : AHandlerElement, IEquatable<MTNF>, IResource
+        {
+            const int recommendedApiVersion = 1;
+
+            uint mtnfUnknown1;
+            ShaderDataList sdList = null;
+
+            public MTNF(int APIversion, EventHandler handler, MTNF basis)
+                : base(APIversion, handler)
+            {
+                this.mtnfUnknown1 = basis.mtnfUnknown1;
+                this.sdList = new ShaderDataList(handler, basis.sdList);
+            }
+            public MTNF(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
+            public MTNF(int APIversion, EventHandler handler) : base(APIversion, handler) { }
+
+            #region Data I/O
+            private void Parse(Stream s)
+            {
+                long start = s.Position;
+                BinaryReader r = new BinaryReader(s);
+                uint mtnfTag = r.ReadUInt32();
+                if (checking) if (mtnfTag != (uint)FOURCC("MTNF"))
+                        throw new InvalidDataException(String.Format("Invalid mtnfTag read: '{0}'; expected: 'MTNF'; at 0x{1:X8}", FOURCC(mtnfTag), s.Position));
+                mtnfUnknown1 = r.ReadUInt32();
+                this.sdList = new ShaderDataList(handler, s, start, r.ReadInt32());
+            }
+
+            internal void UnParse(Stream s)
+            {
+                long start = s.Position;
+                BinaryWriter w = new BinaryWriter(s);
+                w.Write((uint)FOURCC("MTNF"));
+                w.Write(mtnfUnknown1);
+                long dlPos = s.Position;
+                w.Write((uint)0);//data length
+                if (sdList == null) sdList = new ShaderDataList(handler);
+                sdList.UnParse(s, start);
+
+                long dlEnd = s.Position;
+                s.Position = dlPos;
+                w.Write((uint)(dlEnd - sdList.dataPos));
+                s.Position = dlEnd;
+            }
+            #endregion
+
+            #region AHandlerElement Members
+            public override AHandlerElement Clone(EventHandler handler) { return new MTNF(requestedApiVersion, handler, this); }
+            public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
+            public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
+            #endregion
+
+            #region IEquatable<MTNF> Members
+
+            public bool Equals(MTNF other) { return mtnfUnknown1 == other.mtnfUnknown1 && sdList == other.sdList; }
+
+            #endregion
+
+            #region IResource
+            public Stream Stream
+            {
+                get
+                {
+                    MemoryStream ms = new MemoryStream();
+                    UnParse(ms);
+                    ms.Position = 0;
+                    return ms;
+                }
+            }
+
+            public byte[] AsBytes
+            {
+                get { return ((MemoryStream)Stream).ToArray(); }
+                set { MemoryStream ms = new MemoryStream(value); Parse(ms); OnElementChanged(); }
+            }
+
+            public event EventHandler ResourceChanged;
+            protected override void OnElementChanged()
+            {
+                dirty = true;
+                if (handler != null) handler(this, EventArgs.Empty);
+                if (ResourceChanged != null) ResourceChanged(this, EventArgs.Empty);
+            }
+            #endregion
+
+            #region Content Fields
+            [ElementPriority(1)]
+            public uint MTNFUnknown1 { get { return mtnfUnknown1; } set { if (mtnfUnknown1 != value) { mtnfUnknown1 = value; OnElementChanged(); } } }
+            [ElementPriority(2)]
+            public ShaderDataList SData { get { return sdList; } set { if (sdList != value) { sdList = new ShaderDataList(handler, value); OnElementChanged(); } } }
+
+            public string Value { get { return ValueBuilder; } }
+            #endregion
+        }
+
         public enum FieldType : uint
         {
             None = 0,
@@ -386,165 +600,6 @@ namespace s3pi.GenericRCOLResource
             dtInt = 2,
             dtTexture = 4,
         }
-
-        public class MTRL : AHandlerElement, IEquatable<MTRL>
-        {
-            const int recommendedApiVersion = 1;
-
-            uint mtrlUnknown1;
-            ushort mtrlUnknown2;
-            ushort mtrlUnknown3;
-            ShaderDataList sdList = null;
-
-            public MTRL(int APIversion, EventHandler handler, MTRL basis)
-                : base(APIversion, handler)
-            {
-                this.mtrlUnknown1 = basis.mtrlUnknown1;
-                this.mtrlUnknown2 = basis.mtrlUnknown2;
-                this.mtrlUnknown3 = basis.mtrlUnknown3;
-                this.sdList = new ShaderDataList(handler, basis.sdList);
-            }
-            public MTRL(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
-            public MTRL(int APIversion, EventHandler handler) : base(APIversion, handler) { }
-
-            #region Data I/O
-            private void Parse(Stream s)
-            {
-                long start = s.Position;
-                BinaryReader r = new BinaryReader(s);
-                uint mtrlTag = r.ReadUInt32();
-                if (checking) if (mtrlTag != (uint)FOURCC("MTRL"))
-                        throw new InvalidDataException(String.Format("Invalid mtrlTag read: '{0}'; expected: 'MTRL'; at 0x{1:X8}", FOURCC(mtrlTag), s.Position));
-                mtrlUnknown1 = r.ReadUInt32();
-                mtrlUnknown2 = r.ReadUInt16();
-                mtrlUnknown3 = r.ReadUInt16();
-                this.sdList = new ShaderDataList(handler, s, start, -1);
-            }
-
-            internal void UnParse(Stream s)
-            {
-                long start = s.Position;
-                BinaryWriter w = new BinaryWriter(s);
-                w.Write((uint)FOURCC("MTRL"));
-                w.Write(mtrlUnknown1);
-                w.Write(mtrlUnknown2);
-                w.Write(mtrlUnknown3);
-                if (sdList == null) sdList = new ShaderDataList(handler);
-                sdList.UnParse(s, start);
-            }
-            #endregion
-
-            #region AHandlerElement Members
-            public override AHandlerElement Clone(EventHandler handler) { return new MTRL(requestedApiVersion, handler, this); }
-            public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
-            public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
-            #endregion
-
-            #region IEquatable<MTRL> Members
-
-            public bool Equals(MTRL other) { return mtrlUnknown1 == other.mtrlUnknown1 && mtrlUnknown2 == other.mtrlUnknown2 && mtrlUnknown3 == other.mtrlUnknown3 && sdList == other.sdList; }
-
-            #endregion
-
-            #region Content Fields
-            [ElementPriority(1)]
-            public uint MTRLUnknown1 { get { return mtrlUnknown1; } set { if (mtrlUnknown1 != value) { mtrlUnknown1 = value; OnElementChanged(); } } }
-            [ElementPriority(2)]
-            public ushort MTRLUnknown2 { get { return mtrlUnknown2; } set { if (mtrlUnknown2 != value) { mtrlUnknown2 = value; OnElementChanged(); } } }
-            [ElementPriority(3)]
-            public ushort MTRLUnknown3 { get { return mtrlUnknown3; } set { if (mtrlUnknown3 != value) { mtrlUnknown3 = value; OnElementChanged(); } } }
-            [ElementPriority(4)]
-            public ShaderDataList SData { get { return sdList; } set { if (sdList != value) { sdList = new ShaderDataList(handler, value); OnElementChanged(); } } }
-
-            public string Value
-            {
-                get
-                {
-                    return ValueBuilder;
-                    /*
-                    string s = "";
-                    s += "MTRLUnknown1: 0x" + mtrlUnknown1.ToString("X8");
-                    s += "\nMTRLUnknown2: 0x" + mtrlUnknown2.ToString("X4");
-                    s += "\nMTRLUnknown3: 0x" + mtrlUnknown3.ToString("X4");
-
-                    s += String.Format("\nSData ({0:X}):", sdList.Count);
-                    string fmt = "\n  [{0:X" + sdList.Count.ToString("X").Length + "}]: {{{1}}}";
-                    for (int i = 0; i < sdList.Count; i++)
-                        s += String.Format(fmt, i, sdList[i].Value);
-                    return s;
-                    /**/
-                }
-            }
-            #endregion
-        }
-        public class MTNF : AHandlerElement, IEquatable<MTNF>
-        {
-            const int recommendedApiVersion = 1;
-
-            uint mtnfUnknown1;
-            ShaderDataList sdList = null;
-
-            public MTNF(int APIversion, EventHandler handler, MTNF basis)
-                : base(APIversion, handler)
-            {
-                this.mtnfUnknown1 = basis.mtnfUnknown1;
-                this.sdList = new ShaderDataList(handler, basis.sdList);
-            }
-            public MTNF(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
-            public MTNF(int APIversion, EventHandler handler) : base(APIversion, handler) { }
-
-            #region Data I/O
-            private void Parse(Stream s)
-            {
-                long start = s.Position;
-                BinaryReader r = new BinaryReader(s);
-                uint mtnfTag = r.ReadUInt32();
-                if (checking) if (mtnfTag != (uint)FOURCC("MTNF"))
-                        throw new InvalidDataException(String.Format("Invalid mtnfTag read: '{0}'; expected: 'MTNF'; at 0x{1:X8}", FOURCC(mtnfTag), s.Position));
-                mtnfUnknown1 = r.ReadUInt32();
-                this.sdList = new ShaderDataList(handler, s, start, r.ReadInt32());
-            }
-
-            internal void UnParse(Stream s)
-            {
-                long start = s.Position;
-                BinaryWriter w = new BinaryWriter(s);
-                w.Write((uint)FOURCC("MTNF"));
-                w.Write(mtnfUnknown1);
-                long dlPos = s.Position;
-                w.Write((uint)0);//data length
-                if (sdList == null) sdList = new ShaderDataList(handler);
-                sdList.UnParse(s, start);
-
-                long dlEnd = s.Position;
-                s.Position = dlPos;
-                w.Write((uint)(dlEnd - sdList.dataPos));
-                s.Position = dlEnd;
-            }
-            #endregion
-
-            #region AHandlerElement Members
-            public override AHandlerElement Clone(EventHandler handler) { return new MTNF(requestedApiVersion, handler, this); }
-            public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
-            public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
-            #endregion
-
-            #region IEquatable<MTNF> Members
-
-            public bool Equals(MTNF other) { return mtnfUnknown1 == other.mtnfUnknown1 && sdList == other.sdList; }
-
-            #endregion
-
-            #region Content Fields
-            [ElementPriority(1)]
-            public uint MTNFUnknown1 { get { return mtnfUnknown1; } set { if (mtnfUnknown1 != value) { mtnfUnknown1 = value; OnElementChanged(); } } }
-            [ElementPriority(2)]
-            public ShaderDataList SData { get { return sdList; } set { if (sdList != value) { sdList = new ShaderDataList(handler, value); OnElementChanged(); } } }
-
-            public string Value { get { return ValueBuilder; } }
-            #endregion
-        }
-
         public abstract class ShaderData : AHandlerElement, IEquatable<ShaderData>
         {
             const int recommendedApiVersion = 1;
