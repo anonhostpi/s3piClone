@@ -27,6 +27,7 @@ namespace StblResource
     /// <summary>
     /// A resource wrapper that understands String Table resources
     /// </summary>
+    [ConstructorParameters(new object[] { (ulong)0, "" })]
     public class StblResource : AResource, IDictionary<ulong, string>, System.Collections.IDictionary
     {
         const int recommendedApiVersion = 1;

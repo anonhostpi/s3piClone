@@ -27,6 +27,7 @@ namespace NameMapResource
     /// <summary>
     /// A resource wrapper that understands 0x0166038C resources
     /// </summary>
+    [ConstructorParameters(new object[] { (ulong)0, "" })]
     public class NameMapResource : AResource, IDictionary<ulong, string>, System.Collections.IDictionary
     {
         static bool checking = s3pi.Settings.Settings.Checking;
