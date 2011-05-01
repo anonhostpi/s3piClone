@@ -125,6 +125,10 @@
       <Project>{5B43F245-AB0D-49FA-BC1E-1168103C7522}</Project>
       <Name>NameMapResource</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\s3pi Wrappers\NGMPHashMapResource\NGMPHashMapResource.csproj">
+      <Project>{F9D57571-FB42-455D-96DA-E1E11347A664}</Project>
+      <Name>NGMPHashMapResource</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\s3pi Wrappers\ObjKeyResource\ObjKeyResource.csproj">
       <Project>{C0297A33-3628-46E9-9324-408A72E2E922}</Project>
       <Name>ObjKeyResource</Name>
