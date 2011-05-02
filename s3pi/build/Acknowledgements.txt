@@ -13,8 +13,8 @@ http://www.simswiki.info/wiki.php?title=Tutorials:TS3_Advanced_Coding_Tutorials
 One name I have to mention specifically is Tiger, without whom the compression
 code would still run incredibly slowly (and have errors).  Thanks for the code!
 
-Atavera has written some addition wrappers, not currently included in the s3pi
-binary distribution:
+Atavera has written some additional wrappers, not currently included in the
+s3pi binary distribution:
 http://code.google.com/p/s3pi-wrappers/
 
 Finally, thanks to ParsimoniousKate, Wes Howe, Karybdis and EA Games.
