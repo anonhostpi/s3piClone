@@ -32,7 +32,7 @@ namespace NGMPHashMapResource
     {
         static bool checking = s3pi.Settings.Settings.Checking;
         const Int32 recommendedApiVersion = 1;
-        ushort version = 1;
+        uint version = 1;
         Dictionary<ulong, ulong> data = new Dictionary<ulong, ulong>();
 
         #region AApiVersionedFields
@@ -60,11 +60,11 @@ namespace NGMPHashMapResource
         {
             BinaryReader br = new BinaryReader(s);
 
-            version = br.ReadUInt16();
+            version = br.ReadUInt32();
             if (checking) if (version != 1)
                     throw new InvalidDataException(String.Format("{0}: unsupported 'version'.  Read '0x{1:X8}', supported: '0x00000001'", this.GetType().Name, version));
 
-            for (int i = br.ReadInt16(); i > 0; i--)
+            for (int i = br.ReadInt32(); i > 0; i--)
                 data.Add(br.ReadUInt64(), br.ReadUInt64());
 
             if (checking) if (s.Position != s.Length)
@@ -76,7 +76,7 @@ namespace NGMPHashMapResource
             MemoryStream ms = new MemoryStream();
             BinaryWriter w = new BinaryWriter(ms);
             w.Write(version);
-            w.Write((short)Count);
+            w.Write(Count);
             foreach (KeyValuePair<ulong, ulong> kvp in this)
             {
                 w.Write(kvp.Key);
@@ -90,7 +90,7 @@ namespace NGMPHashMapResource
 
         [MinimumVersion(1)]
         [MaximumVersion(recommendedApiVersion)]
-        public ushort Version { get { return version; } set { if (Version == value) return; version = value; OnResourceChanged(this, new EventArgs()); } }
+        public uint Version { get { return version; } set { if (Version == value) return; version = value; OnResourceChanged(this, new EventArgs()); } }
 
         public String Value { get { return ValueBuilder; } }
 
