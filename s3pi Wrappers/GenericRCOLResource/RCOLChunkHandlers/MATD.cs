@@ -312,7 +312,7 @@ namespace s3pi.GenericRCOLResource
                 mtrlUnknown1 = r.ReadUInt32();
                 mtrlUnknown2 = r.ReadUInt16();
                 mtrlUnknown3 = r.ReadUInt16();
-                this.sdList = new ShaderDataList(handler, s, start, -1);
+                this.sdList = new ShaderDataList(handler, s, start, null);
             }
 
             internal void UnParse(Stream s)
@@ -682,7 +682,7 @@ namespace s3pi.GenericRCOLResource
             }
 
             protected abstract DataType DataTypeFromType { get; }
-            protected abstract int CountFromType { get; }
+            public abstract int CountFromType { get; }
             protected abstract void UnParse(Stream s);
 
             protected void ReadZeros(Stream s, int length) { while (length-- > 0) if (s.ReadByte() != 0) throw new InvalidDataException("Non-zero padding at 0x" + s.Position.ToString("X8")); }
@@ -729,7 +729,7 @@ namespace s3pi.GenericRCOLResource
 
             protected override void UnParse(Stream s) { new BinaryWriter(s).Write(data); }
             protected override DataType DataTypeFromType { get { return DataType.dtFloat; } }
-            protected override int CountFromType { get { return 1; } }
+            public override int CountFromType { get { return 1; } }
             #endregion
 
             public override AHandlerElement Clone(EventHandler handler) { return new ElementFloat(requestedApiVersion, handler, this); }
@@ -766,7 +766,7 @@ namespace s3pi.GenericRCOLResource
 
             protected override void UnParse(Stream s) { BinaryWriter w = new BinaryWriter(s); w.Write(data0); w.Write(data1); }
             protected override DataType DataTypeFromType { get { return DataType.dtFloat; } }
-            protected override int CountFromType { get { return 2; } }
+            public override int CountFromType { get { return 2; } }
             #endregion
 
             public override AHandlerElement Clone(EventHandler handler) { return new ElementFloat2(requestedApiVersion, handler, this); }
@@ -809,7 +809,7 @@ namespace s3pi.GenericRCOLResource
 
             protected override void UnParse(Stream s) { BinaryWriter w = new BinaryWriter(s); w.Write(data0); w.Write(data1); w.Write(data2); }
             protected override DataType DataTypeFromType { get { return DataType.dtFloat; } }
-            protected override int CountFromType { get { return 3; } }
+            public override int CountFromType { get { return 3; } }
             #endregion
 
             public override AHandlerElement Clone(EventHandler handler) { return new ElementFloat3(requestedApiVersion, handler, this); }
@@ -856,7 +856,7 @@ namespace s3pi.GenericRCOLResource
 
             protected override void UnParse(Stream s) { BinaryWriter w = new BinaryWriter(s); w.Write(data0); w.Write(data1); w.Write(data2); w.Write(data3); }
             protected override DataType DataTypeFromType { get { return DataType.dtFloat; } }
-            protected override int CountFromType { get { return 4; } }
+            public override int CountFromType { get { return 4; } }
             #endregion
 
             public override AHandlerElement Clone(EventHandler handler) { return new ElementFloat4(requestedApiVersion, handler, this); }
@@ -903,7 +903,7 @@ namespace s3pi.GenericRCOLResource
 
             protected override void UnParse(Stream s) { new BinaryWriter(s).Write(data); }
             protected override DataType DataTypeFromType { get { return DataType.dtInt; } }
-            protected override int CountFromType { get { return 1; } }
+            public override int CountFromType { get { return 1; } }
             #endregion
 
             public override AHandlerElement Clone(EventHandler handler) { return new ElementInt(requestedApiVersion, handler, this); }
@@ -940,7 +940,7 @@ namespace s3pi.GenericRCOLResource
 
             protected override void UnParse(Stream s) { if (data == null) data = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, 0); data.UnParse(s); WriteZeros(s, 12); }
             protected override DataType DataTypeFromType { get { return DataType.dtTexture; } }
-            protected override int CountFromType { get { return 4; } }
+            public override int CountFromType { get { return 4; } }
             #endregion
 
             public override AHandlerElement Clone(EventHandler handler) { return new ElementTextureRef(requestedApiVersion, handler, this); }
@@ -977,7 +977,7 @@ namespace s3pi.GenericRCOLResource
 
             protected override void UnParse(Stream s) { if (data == null) data = new TGIBlock(requestedApiVersion, handler, 0); data.UnParse(s); WriteZeros(s, 4); }
             protected override DataType DataTypeFromType { get { return DataType.dtTexture; } }
-            protected override int CountFromType { get { return 5; } }
+            public override int CountFromType { get { return 5; } }
             #endregion
 
             public override AHandlerElement Clone(EventHandler handler) { return new ElementTextureKey(requestedApiVersion, handler, this); }
@@ -1003,15 +1003,22 @@ namespace s3pi.GenericRCOLResource
 
             #region Constructors
             public ShaderDataList(EventHandler handler) : base(handler) { }
-            public ShaderDataList(EventHandler handler, Stream s, long start, int dataLen) : base(null) { elementHandler = handler; Parse(s, start, dataLen); this.handler = handler; }
+            public ShaderDataList(EventHandler handler, Stream s, long start, Nullable<int> expectedDataLen) : base(null) { elementHandler = handler; Parse(s, start, expectedDataLen); this.handler = handler; }
             public ShaderDataList(EventHandler handler, IEnumerable<ShaderData> lsd) : base(handler, lsd) { }
             #endregion
 
             #region Data I/O
             protected override void Parse(Stream s) { throw new NotSupportedException(); }
-            internal void Parse(Stream s, long start, int dataLen)
+            internal void Parse(Stream s, long start, Nullable<int> expectedDataLen)
             {
-                for (int i = ReadCount(s); i > 0; i--) this.Add(ShaderData.CreateEntry(0, elementHandler, s, start));
+                int dataLen = 0;
+                for (int i = ReadCount(s); i > 0; i--)
+                {
+                    this.Add(ShaderData.CreateEntry(0, elementHandler, s, start));
+                    dataLen += this[Count - 1].CountFromType * 4;
+                }
+                if (checking) if (expectedDataLen != null && expectedDataLen != dataLen)
+                        throw new InvalidDataException(string.Format("Expected 0x{0:X8} bytes of data, read 0x{1:X8} at 0x{2:X8}", expectedDataLen, dataLen, s.Position));
                 s.Position += dataLen;
             }
             public override void UnParse(Stream s) { throw new NotSupportedException(); }
