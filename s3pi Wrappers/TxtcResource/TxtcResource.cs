@@ -308,7 +308,9 @@ namespace TxtcResource
                     case 0x06: return new EntryUInt16(APIversion, handler, property, unknown, dataType, r.ReadUInt16());
                     // dwords
                     case 0x03: return new EntryInt32(APIversion, handler, (EntryInt32.Int32Properties)property, unknown, dataType, r.ReadInt32());
-                    case 0x07: return new EntryUInt32(APIversion, handler, (EntryUInt32.UInt32Properties)property, unknown, dataType, r.ReadUInt32());
+                    case 0x07: return (property == 0x687720A6)
+                        ? (Entry)new EntryID(APIversion, handler, (EntryID.IDProperties)property, unknown, dataType, (EntryID.ID)r.ReadUInt32())
+                        : (Entry)new EntryUInt32(APIversion, handler, (EntryUInt32.UInt32Properties)property, unknown, dataType, r.ReadUInt32());
                     // qwords
                     case 0x04: return new EntryInt64(APIversion, handler, property, unknown, dataType, r.ReadInt64());
                     case 0x08: return new EntryUInt64(APIversion, handler, property, unknown, dataType, r.ReadUInt64());
@@ -593,24 +595,10 @@ namespace TxtcResource
                 SkipDetailLevel = 0x331178DF,
                 Height = 0x4C47D5C0,
                 DefaultColor = 0x64399EC5,
-                ID = 0x687720A6,
                 ImageSource = 0x8A7006DB,
                 RenderTarget = 0xA2C91332,
                 MinDetailLevel = 0xAE5FE82A,
                 Color = 0xB01748DA,
-            }
-
-            enum ID : uint
-            {
-                DrawFabric = 0x034210A5,
-                ChannelSelect = 0x1E363B9B,
-                SkinTone = 0x43B554E3,
-                HairTone = 0x5D7C85D4,
-                ColorFill = 0x9CD1269D,
-                DrawImage = 0xA15200B1,
-                CASPickData = 0xC6B6AC1F,
-                SetTarget = 0xD6BD8695,
-                HSVtoRGB = 0xDC0984B9,
             }
 
             UInt32 data;
@@ -638,19 +626,52 @@ namespace TxtcResource
             [ElementPriority(4)]
             public UInt32 Data { get { return data; } set { if (data != value) { data = value; OnElementChanged(); } } }
             protected override string EntryValue { get { return "" + new TypedValue(data.GetType(), data, "X"); } }
-            /*
-            public override string Value
+        }
+        [ConstructorParameters(new object[] { IDProperties.ID, (byte)0, (byte)0x07, (ID)0, })]
+        public class EntryID : Entry
+        {
+            public enum IDProperties : uint
             {
-                get
+                ID = 0x687720A6,
+            }
+            public enum ID : uint
+            {
+                DrawFabric = 0x034210A5,
+                ChannelSelect = 0x1E363B9B,
+                SkinTone = 0x43B554E3,
+                HairTone = 0x5D7C85D4,
+                ColorFill = 0x9CD1269D,
+                DrawImage = 0xA15200B1,
+                CASPickData = 0xC6B6AC1F,
+                SetTarget = 0xD6BD8695,
+                HSVtoRGB = 0xDC0984B9,
+            }
+
+            ID data;
+            public EntryID(int APIversion, EventHandler handler, EntryID basis)
+                : this(APIversion, handler, IDProperties.ID, basis.unknown, basis.dataType, basis.data) { }
+            public EntryID(int APIversion, EventHandler handler, IDProperties property, byte unknown, byte dataType, ID data)
+                : base(APIversion, handler, (uint)property, typeof(IDProperties), unknown, dataType) { this.data = data; }
+            internal override void UnParse(Stream s) { base.UnParse(s); new BinaryWriter(s).Write((uint)data); }
+            public override AHandlerElement Clone(EventHandler handler) { return new EntryID(requestedApiVersion, handler, this); }
+            [ElementPriority(1)]
+            public IDProperties Property
+            {
+                get { return (IDProperties)property; }
+                set
                 {
-                    return base.Value + "; Data: 0x" + data.ToString("X8") +
-                      ((property == (uint)UInt32Properties.ID)
-                        ? " (" + ((Enum.IsDefined(typeof(ID), data)) ? Enum.GetName(typeof(ID), data) : "undefined") + ")"
-                        : ""
-                      );
+                    if (property != (uint)value)
+                    {
+                        if (checking) if (!Enum.IsDefined(typeof(IDProperties), property))
+                                throw new ArgumentException(String.Format("Unexpected property ID 0x{0:X8}", property));
+                        property = (uint)value;
+                        OnElementChanged();
+                    }
                 }
             }
-            /**/
+            [ElementPriority(4)]
+            public ID Data { get { return data; } set { if (data != value) { data = value; OnElementChanged(); } } }
+            protected override string EntryValue { get { return "" + new TypedValue(data.GetType(), data, "X"); } }
         }
         [ConstructorParameters(new object[] { (uint)4, (byte)0, (byte)0x04, (UInt64)0, })]
         public class EntryInt64 : Entry
@@ -873,7 +894,7 @@ namespace TxtcResource
                     case 0x06: return typeof(EntryUInt16);
                     // dwords
                     case 0x03: return typeof(EntryInt32);
-                    case 0x07: return typeof(EntryUInt32);
+                    case 0x07: return (property == 0x687720A6) ? typeof(EntryID) : typeof(EntryUInt32);
                     // qwords
                     case 0x04: return typeof(EntryInt64);
                     case 0x08: return typeof(EntryUInt64);
