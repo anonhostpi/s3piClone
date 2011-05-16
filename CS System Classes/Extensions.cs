@@ -18,6 +18,7 @@
  *  along with s3pi.  If not, see <http://www.gnu.org/licenses/>.          *
  ***************************************************************************/
 using System;
+using System.Globalization;
 using System.Collections;
 
 namespace System
@@ -34,7 +35,16 @@ namespace System
         /// <param name="array">The input array</param>
         /// <returns>An <c>TOut[]</c> array containing converted input elements.</returns>
         /// <exception cref="InvalidCastException">The element type of <paramref name="array"/> does not provide the <c>IConvertible</c> interface.</exception>
-        public static TOut[] Cast<TOut>(this Array array) where TOut : IConvertible { return array.Cast<TOut>(0, array.Length); }
+        public static TOut[] ConvertAll<TOut>(this Array array) where TOut : IConvertible { return array.ConvertAll<TOut>(0, array.Length, CultureInfo.CurrentCulture); }
+        /// <summary>
+        /// Convert all elements of an <c>Array</c> to <typeparamref name="TOut"/>.
+        /// </summary>
+        /// <typeparam name="TOut">The output element type.</typeparam>
+        /// <param name="array">The input array</param>
+        /// <param name="provider">An <c>System.IFormatProvider</c> interface implementation that supplies culture-specific formatting information.</param>
+        /// <returns>An <c>TOut[]</c> array containing converted input elements.</returns>
+        /// <exception cref="InvalidCastException">The element type of <paramref name="array"/> does not provide the <c>IConvertible</c> interface.</exception>
+        public static TOut[] ConvertAll<TOut>(this Array array, IFormatProvider provider) where TOut : IConvertible { return array.ConvertAll<TOut>(0, array.Length, provider); }
         /// <summary>
         /// Convert elements of an <c>Array</c> to <typeparamref name="TOut"/>,
         /// starting at <paramref name="start"/>.
@@ -45,7 +55,19 @@ namespace System
         /// <returns>An <c>TOut[]</c> array containing converted input elements.</returns>
         /// <exception cref="InvalidCastException">The element type of <paramref name="array"/> does not provide the <c>IConvertible</c> interface.</exception>
         /// <exception cref="IndexOutOfRangeException"><paramref name="start"/> is outside the bounds of <paramref name="array"/>.</exception>
-        public static TOut[] Cast<TOut>(this Array array, int start) where TOut : IConvertible { return array.Cast<TOut>(start, array.Length - start); }
+        public static TOut[] ConvertAll<TOut>(this Array array, int start) where TOut : IConvertible { return array.ConvertAll<TOut>(start, array.Length - start, CultureInfo.CurrentCulture); }
+        /// <summary>
+        /// Convert elements of an <c>Array</c> to <typeparamref name="TOut"/>,
+        /// starting at <paramref name="start"/>.
+        /// </summary>
+        /// <typeparam name="TOut">The output element type.</typeparam>
+        /// <param name="array">The input array</param>
+        /// <param name="start">The offset into <paramref name="array"/> from which to start creating the output.</param>
+        /// <param name="provider">An <c>System.IFormatProvider</c> interface implementation that supplies culture-specific formatting information.</param>
+        /// <returns>An <c>TOut[]</c> array containing converted input elements.</returns>
+        /// <exception cref="InvalidCastException">The element type of <paramref name="array"/> does not provide the <c>IConvertible</c> interface.</exception>
+        /// <exception cref="IndexOutOfRangeException"><paramref name="start"/> is outside the bounds of <paramref name="array"/>.</exception>
+        public static TOut[] ConvertAll<TOut>(this Array array, int start, IFormatProvider provider) where TOut : IConvertible { return array.ConvertAll<TOut>(start, array.Length - start, provider); }
         /// <summary>
         /// Convert elements of an <c>Array</c> to <typeparamref name="TOut"/>,
         /// starting at <paramref name="start"/> for <paramref name="length"/> elements.
@@ -55,10 +77,34 @@ namespace System
         /// <param name="start">The offset into <paramref name="array"/> from which to start creating the output.</param>
         /// <param name="length">The number of elements in the output.</param>
         /// <returns>An <c>TOut[]</c> array containing converted input elements.</returns>
-        /// <exception cref="InvalidCastException">The element type of <paramref name="array"/> does not provide the <c>IConvertible</c> interface.</exception>
+        /// <exception cref="InvalidCastException">The element type of <paramref name="array"/> does not provide the <c>IConvertible</c> interface.
+        /// <br/>-or-<br/>
+        /// this conversion is not supported.
+        /// <br/>-or-<br/>
+        /// an <paramref name="array"/> element is null and <typeparamref name="TOut"/> is a value type.
+        /// </exception>
         /// <exception cref="IndexOutOfRangeException"><paramref name="start"/> is outside the bounds of <paramref name="array"/>.</exception>
         /// <exception cref="ArgumentException"><paramref name="length"/> has an invalid value.</exception>
-        public static TOut[] Cast<TOut>(this Array array, int start, int length) where TOut : IConvertible
+        public static TOut[] ConvertAll<TOut>(this Array array, int start, int length) where TOut : IConvertible { return array.ConvertAll<TOut>(start, length, CultureInfo.CurrentCulture); }
+        /// <summary>
+        /// Convert elements of an <c>Array</c> to <typeparamref name="TOut"/>,
+        /// starting at <paramref name="start"/> for <paramref name="length"/> elements.
+        /// </summary>
+        /// <typeparam name="TOut">The output element type.</typeparam>
+        /// <param name="array">The input array</param>
+        /// <param name="start">The offset into <paramref name="array"/> from which to start creating the output.</param>
+        /// <param name="length">The number of elements in the output.</param>
+        /// <param name="provider">An <c>System.IFormatProvider</c> interface implementation that supplies culture-specific formatting information.</param>
+        /// <returns>An <c>TOut[]</c> array containing converted input elements.</returns>
+        /// <exception cref="InvalidCastException">The element type of <paramref name="array"/> does not provide the <c>IConvertible</c> interface.
+        /// <br/>-or-<br/>
+        /// this conversion is not supported.
+        /// <br/>-or-<br/>
+        /// an <paramref name="array"/> element is null and <typeparamref name="TOut"/> is a value type.
+        /// </exception>
+        /// <exception cref="IndexOutOfRangeException"><paramref name="start"/> is outside the bounds of <paramref name="array"/>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="length"/> has an invalid value.</exception>
+        public static TOut[] ConvertAll<TOut>(this Array array, int start, int length, IFormatProvider provider) where TOut : IConvertible
         {
             if (!typeof(IConvertible).IsAssignableFrom(array.GetType().GetElementType()))
                 throw new InvalidCastException(array.GetType().GetElementType().Name + " is not IConvertible");
@@ -72,7 +118,7 @@ namespace System
             TOut[] res = new TOut[length];
 
             for (int i = 0; i < res.Length; i++)
-                res[i] = (TOut)System.Convert.ChangeType(((IList)array)[i + start], typeof(TOut));
+                res[i] = (TOut)System.Convert.ChangeType(((IList)array)[i + start], typeof(TOut), provider);
 
             return res;
         }
