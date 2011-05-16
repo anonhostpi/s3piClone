@@ -190,94 +190,52 @@ namespace s3pi.GenericRCOLResource
         #region Sub-types
         public enum ShaderType : uint
         {
-            None = 0,
-            additive = 0x5af16731,
-            BasinWater = 0x6aad2ad5,
-            BrushedMetal = 0x3fd7990d,
-            BurntTile = 0x690fdf06,
-            CasSilk = 0x0072aa53,
-            CasSimEyes = 0xb51ec997,
-            CasSimHair = 0xfcf80ce1,
-            CasSimHairSimple = 0xa7b368fb,
-            CasSkin = 0x01772897,
-            Counters = 0xa4172f62,
-            DropShadow = 0xc09c7582,
-            ExteriorCeiling = 0xd2ac4914,
-            ExteriorWalls = 0xcd677552,
-            Fence = 0x67107fe8,
-            FlatMirror = 0xa68d9e29,
-            Floors = 0xbc84d000,
-            FloorsVisualizer = 0x2b1f3aec,
-            Foliage = 0x4549e22e,
-            FullBright = 0x14fa335e,
-            Gemstones = 0xa063c1d0,
-            Ghost = 0x2b1f3aec,
-            GhostEyes = 0x8c88b4a8,
-            GhostHair = 0x00c394a6,
-            GlassForFences = 0x52986c62,
-            GlassForObjects = 0x492eca7c,
-            GlassForObjectsTranslucent = 0x849cf021,
-            GlassForPortals = 0x81dd204d,
-            GlassForRabbitHoles = 0x265ffaa1,
-            ImpostorColorDefault = 0xed4fb30e,
-            ImpostorColorGlow = 0x9661e300,
-            ImposterLightingDefault = 0x5f03f969,
-            ImpostorLightingGlow = 0x05954911,
-            Instanced = 0x0cb82eb8,
-            InstancedImpostorColor = 0xe7abde9c,
-            LotImposter = 0x68601de3,
-            LotPondWater = 0xe1386384,
-            LotTerrain = 0x11d0b721,
-            LotTerrainImposterMaker = 0xaee088f0,
-            Occluder = 0x071fd3d4,
-            OutdoorProp = 0x4d26bec0,
-            Painting = 0xaa495821,
-            Particle = 0x6da87a9b,
-            ParticleAnim = 0x460e93f4,
-            ParticleLight = 0xd9a8e549,
-            phong_alpha = 0xfc5fc212,
-            Phong = 0xb9105a6d,
-            PickCASSim = 0x26d1704a,
-            PickCounters = 0xce0c0dc1,
-            PickDefault = 0x9017b045,
-            PickInstanced = 0xb7178269,
-            PickRug = 0x18120028,
-            PickSim = 0x301464c3,
-            PickTerrain = 0x0f49bea1,
-            PickWater = 0xc107590f,
-            PickWalls = 0xb81ad379,
-            Plumbob = 0xdef16564,
-            Ponds = 0x79c38597,
-            PreviewWallsAndFloors = 0x213d6300,
-            RabbitHoleHighDetail = 0x8d346bbc,
-            RabbitHoleMediumDetail = 0xaede7105,
-            Roads = 0x5e0ac22e,
-            RoadsCompositor = 0x7c8b3791,
-            Roofs = 0x4c0628aa,
-            RoofImpostorLighting = 0xcb14114c,
-            Rug = 0x2a72b9a1,
-            ShadowMapMerged = 0xe2918799,
-            SimEyes = 0xcf8a70b4,
-            SimEyelashes = 0x9d9da161,
-            SimHair = 0x84fd7152,
-            SimHairVisualizer = 0x109defb6,
-            SimSilk = 0x53881019,
-            Simple = 0x723aa6e7,
-            SimSkin = 0x548394b9,
-            SimSkinThumbnail = 0x9eff872b,
-            SimSkinVisualizer = 0x969921ad,
-            Stairs = 0x4ce2f497,
-            StandingWater = 0x70fde012,
-            StaticTerrain = 0xe05b91aa,
-            StaticTerrainLowLOD = 0x413d7051,
-            Subtractive = 0x0b272cc5,
-            TerrainLightFog = 0x69eb86e4,
-            TerrainVisualization = 0xc589e244,
-            TreeBillboard = 0xedd106f2,
-            TreeShadowCompositor = 0x974fba48,
-            ThumbnailShadowPlane = 0xd32eec7b,
-            VertexColor = 0xb39101ac,
-            Walls = 0x974fba48,
+            None = 0x00000000,
+            Subtractive = 0x0B272CC5,
+            Instanced = 0x0CB82EB8,
+            FullBright = 0x14FA335E,
+            PreviewWallsAndFloors = 0x213D6300,
+            ShadowMap = 0x21FE207D,
+            GlassForRabbitHoles = 0x265FFAA1,
+            ImpostorWater = 0x277CF8EB,
+            Rug = 0x2A72B9A1,
+            Trampoline = 0x3939E094,
+            Foliage = 0x4549E22E,
+            ParticleAnim = 0x460E93F4,
+            SolidPhong = 0x47C6638C,
+            GlassForObjects = 0x492ECA7C,
+            Stairs = 0x4CE2F497,
+            OutdoorProp = 0x4D26BEC0,
+            GlassForFences = 0x52986C62,
+            SimSkin = 0x548394B9,
+            Additive = 0x5AF16731,
+            SimGlass = 0x5EDA9CDE,
+            Fence = 0x67107FE8,
+            LotImposter = 0x68601DE3,
+            BasinWater = 0x6AAD2AD5,
+            StandingWater = 0x70FDE012,
+            BuildingWindow = 0x7B036C01,
+            Roof = 0x7BD05F63,
+            GlassForPortals = 0x81DD204D,
+            GlassForObjectsTranslucent = 0x849CF021,
+            SimHair = 0x84FD7152,
+            Landmark = 0x8A60B969,
+            RabbitHoleHighDetail = 0x8D346BBC,
+            CASRoom = 0x94B9A835,
+            SimEyelashes = 0x9D9DA161,
+            Gemstones = 0xA063C1D0,
+            Counters = 0xA4172F62,
+            FlatMirror = 0xA68D9E29,
+            Painting = 0xAA495821,
+            RabbitHoleMediumDetail = 0xAEDE7105,
+            Phong = 0xB9105A6D,
+            Floors = 0xBC84D000,
+            DropShadow = 0xC09C7582,
+            SimEyes = 0xCF8A70B4,
+            Plumbob = 0xDEF16564,
+            SculptureIce = 0xE5D98507,
+            PhongAlpha = 0xFC5FC212,
+            ParticleJet = 0xFF5E6908,
         }
 
         // At some point AHandlerElement will gain IResource...
@@ -495,104 +453,149 @@ namespace s3pi.GenericRCOLResource
 
         public enum FieldType : uint
         {
-            None = 0,
-            AlphaMap = 0xc3faac4f,
-            AlphaMaskThreshold = 0xe77a2b60,
-            Ambient = 0x04a5daa3,
-            AmbientOcclusionMap = 0xb01cba60,
-            AmbientUVSelector = 0x797f8e81,
-            AnimDir = 0x3f89c2ef,
-            AnimSpeed = 0xd600cb63,
-            AutoRainbow = 0x5f7800ea,
-            BackFaceDiffuseContribution = 0xd641a1b1,
-            bHasDetailmap = 0xe9008abe,
-            bHasNormalMap = 0x5e99ee74,
-            bIsTerrainRoad = 0xa4a17516,
-            BloomFactor = 0x4168508b,
-            BounceAmountMeters = 0xd8542d8b,
-            ContourSmoothing = 0x1e27dccd,
-            CounterMatrixRow1 = 0x1ef8655d,
-            CounterMatrixRow2 = 0x1ef8655e,
-            CutoutValidHeights = 0x6d43d7b7,
-            DetailMap = 0x9205daa8,
-            DetailUVScale = 0xcd985a0b,
-            Diffuse = 0x637daa05,
-            DiffuseMap = 0x6cc0fd85,
-            DiffuseUVScale = 0x2d4e507e,
-            DiffuseUVSelector = 0x91eebaff,
-            DimmingCenterHeight = 0x01adace0,
-            DimmingRadius = 0x32dfa298,
-            DirtOverlay = 0x48372e62,
-            DropShadowAtlas = 0x22ad8507,
-            DropShadowStrength = 0x1b1ab4d5,
-            EdgeDarkening = 0x8c27d8c9,
-            Emission = 0x3bd441a0,
-            EmissionMap = 0xf303d152,
-            EmissiveBloomMultiplier = 0x490e6eb4,
-            EmissiveLightMultiplier = 0x8ef71c85,
-            FadeDistance = 0x957210ea,
-            FresnelOffset = 0xfb66a8cb,
-            ImposterTexture = 0xbdcf71c5,
-            ImposterTextureAOandSI = 0x15c9d298,
-            ImposterTextureWater = 0xbf3fb9fa,
-            ImpostorDetailTexture = 0x56e1c6b2,
-            ImpostorWater = 0x277cf8eb,
-            Layer2Shift = 0x92692cb2,
-            LayerOffset = 0x80d9bfe1,
-            LightMapScale = 0x4f7dcb9b,
-            MaskHeight = 0x849cdadc,
-            MaskWidth = 0x707f712f,
-            NoiseMap = 0xe19fd579,
-            NoiseMapScale = 0x5e86dea1,
-            NormalMap = 0x6e56548a,
-            NormalMapScale = 0x3c45e334,
-            NormalMapUVSelector = 0x415368b4,
-            NormalUVScale = 0xba2d1ab9,
-            PosOffset = 0x790ebf2c,
-            PosScale = 0x487648e5,
-            Reflective = 0x73c9923e,
-            RefractionDistortionScale = 0xc3c472a1,
-            RevealMap = 0xf3f22ac4,
-            RippleDistanceScale = 0xccb35b98,
-            RippleHeights = 0x6a07d7e1,
-            RippleSpeed = 0x52dec070,
-            RoadDetailMap = 0x28392dc6,
-            RoadNormalMap = 0xbca022bc,
-            RoadTexture = 0x53521204,
-            RoomLightMap = 0xe7ca9166,
-            RotationSpeed = 0x32003ad4,
-            RugSort = 0x906997a9,
-            ShadowAlphaTest = 0xfeb1f9cb,
-            Shininess = 0xf755f7ff,
-            SparkleCube = 0x1d90c086,
-            SparkleSpeed = 0xba13921e,
-            SpecStyle = 0x9554d40f,
-            Specular = 0x2ce11842,
-            SpecularMap = 0xad528a60,
-            SpecularUVScale = 0xf12e27c3,
-            SpecularUVSelector = 0xb63546ac,
-            TerrainLightMap = 0x5fd5b006,
-            TextureSpeedScale = 0x583df357,
-            Transparency = 0x05d22fd3,
-            Transparent = 0x988403f9,
-            UVOffset = 0x57582869,
-            UVScale = 0x159ba53e,
-            UVScales = 0x420520e9,
-            UVScrollSpeed = 0xf2eea6ec,
-            UVTiling = 0x773cab85,
-            VertexColorScale = 0xa2fd73ca,
-            WaterScrollSpeedLayer1 = 0xafa11436,
-            WaterScrollSpeedLayer2 = 0xafa11435,
-            WindSpeed = 0x66e9b6bc,
-            WindStrength = 0xbc4a2544,
-            Unknown1 = 0x209b1c8e,
-            Unknown2 = 0xdaa9532d,
-            Unknown3 = 0x29bcdd1f,
-            Unknown4 = 0x2eb8e9d4,
-            HaloRamp = 0x84f6e0fb,
-            HaloBlur = 0xc3ad4f50,
-            HaloHighColor = 0xd4043258,
+            None = 0x00000000,
+            AlignAcrossDirection = 0x01885886, // Float
+            DimmingCenterHeight = 0x01ADACE0, // Float
+            Transparency = 0x05D22FD3, // Float
+            BlendSourceMode = 0x0995E96C, // Float
+            SharpSpecControl = 0x11483F01, // Float
+            RotateSpeedRadsSec = 0x16BF7A44, // Float
+            AlignToDirection = 0x17B78AF6, // Float
+            DropShadowStrength = 0x1B1AB4D5, // Float
+            ContourSmoothing = 0x1E27DCCD, // Float
+            reflectivity = 0x29BCDD1F, // Float
+            BlendOperation = 0x2D13B939, // Float
+            RotationSpeed = 0x32003AD4, // Float
+            DimmingRadius = 0x32DFA298, // Float
+            IsSolidObject = 0x3BBF99CF, // Float
+            NormalMapScale = 0x3C45E334, // Float
+            NoAutomaticDaylightDimming = 0x3CB5FA70, // Float
+            FramesPerSecond = 0x406ADE00, // Float
+            BloomFactor = 0x4168508B, // Float
+            EmissiveBloomMultiplier = 0x490E6EB4, // Float
+            RippleSpeed = 0x52DEC070, // Float
+            UseLampColor = 0x56B220CD, // Float
+            TextureSpeedScale = 0x583DF357, // Float
+            NoiseMapScale = 0x5E86DEA1, // Float
+            AutoRainbow = 0x5F7800EA, // Float
+            DebouncePower = 0x656025DF, // Float
+            SpeedStretchFactor = 0x66479028, // Float
+            WindSpeed = 0x66E9B6BC, // Float
+            DaytimeOnly = 0x6BB389BC, // Float
+            FramesRandomStartFactor = 0x7211F24F, // Float
+            DeflectionThreshold = 0x7D621D61, // Float
+            LifetimeSeconds = 0x84212733, // Float
+            NormalBumpScale = 0x88C64AE2, // Float
+            DeformerOffset = 0x8BDF4746, // Float
+            EdgeDarkening = 0x8C27D8C9, // Float
+            OverrideFactor = 0x8E35CCC0, // Float
+            EmissiveLightMultiplier = 0x8EF71C85, // Float
+            SharpSpecThreshold = 0x903BE4D3, // Float
+            RugSort = 0x906997A9, // Float
+            Layer2Shift = 0x92692CB2, // Float
+            SpecStyle = 0x9554D40F, // Float
+            FadeDistance = 0x957210EA, // Float
+            BlendDestMode = 0x9BDECB37, // Float
+            LightingEnabled = 0xA15E4594, // Float
+            OverrideSpeed = 0xA3D6342E, // Float
+            VisibleOnlyAtNight = 0xAC5D0A82, // Float
+            UseDiffuseForAlphaTest = 0xB597FA7F, // Float
+            SparkleSpeed = 0xBA13921E, // Float
+            WindStrength = 0xBC4A2544, // Float
+            HaloBlur = 0xC3AD4F50, // Float
+            RefractionDistortionScale = 0xC3C472A1, // Float
+            DiffuseMapUVChannel = 0xC45A5F41, // Float
+            SpecularMapUVChannel = 0xCB053686, // Float
+            ParticleCount = 0xCC31B828, // Float
+            RippleDistanceScale = 0xCCB35B98, // Float
+            DivetScale = 0xCE8C8311, // Float
+            ForceAmount = 0xD4D51D02, // Float
+            AnimSpeed = 0xD600CB63, // Float
+            BackFaceDiffuseContribution = 0xD641A1B1, // Float
+            BounceAmountMeters = 0xD8542D8B, // Float
+            index_of_refraction = 0xDAA9532D, // Float
+            BloomScale = 0xE29BA4AC, // Float
+            AlphaMaskThreshold = 0xE77A2B60, // Float
+            LightingDirectScale = 0xEF270EE4, // Float
+            AlwaysOn = 0xF019641D, // Float
+            Shininess = 0xF755F7FF, // Float
+            FresnelOffset = 0xFB66A8CB, // Float
+            BouncePower = 0xFBA6B898, // Float
+            ShadowAlphaTest = 0xFEB1F9CB, // Float
+            DiffuseUVScale = 0x2D4E507E, // Float2
+            RippleHeights = 0x6A07D7E1, // Float2
+            CutoutValidHeights = 0x6D43D7B7, // Float2
+            UVTiling = 0x773CAB85, // Float2
+            SizeScaleEnd = 0x891A3133, // Float2
+            SizeScaleStart = 0x9A6C2EC8, // Float2
+            WaterScrollSpeedLayer2 = 0xAFA11435, // Float2
+            WaterScrollSpeedLayer1 = 0xAFA11436, // Float2
+            NormalUVScale = 0xBA2D1AB9, // Float2
+            DetailUVScale = 0xCD985A0B, // Float2
+            SpecularUVScale = 0xF12E27C3, // Float2
+            UVScrollSpeed = 0xF2EEA6EC, // Float2
+            Ambient = 0x04A5DAA3, // Float3
+            OverrideDirection = 0x0C12DED8, // Float3
+            OverrideVelocity = 0x14677578, // Float3
+            CounterMatrixRow1 = 0x1EF8655D, // Float3
+            CounterMatrixRow2 = 0x1EF8655E, // Float3
+            ForceDirection = 0x29881F55, // Float3
+            Specular = 0x2CE11842, // Float3
+            HaloLowColor = 0x2EB8E8D4, // Float3
+            Emission = 0x3BD441A0, // Float3
+            NormalMapUVSelector = 0x415368B4, // Float3
+            UVScales = 0x420520E9, // Float3
+            LightMapScale = 0x4F7DCB9B, // Float3
+            Diffuse = 0x637DAA05, // Float3
+            Reflective = 0x73C9923E, // Float3
+            AmbientUVSelector = 0x797F8E81, // Float3
+            HighlightColor = 0x90F8DCF0, // Float3
+            DiffuseUVSelector = 0x91EEBAFF, // Float3
+            Transparent = 0x988403F9, // Float3
+            VertexColorScale = 0xA2FD73CA, // Float3
+            SpecularUVSelector = 0xB63546AC, // Float3
+            EmissionMapUVSelector = 0xBC823DDC, // Float3
+            HaloHighColor = 0xD4043258, // Float3
+            RootColor = 0xE90599F6, // Float3
+            ForceVector = 0xEBA4727B, // Float3
+            PositionTweak = 0xEF36D180, // Float3
+            TimelineLength = 0x0081AE98, // Float4
+            UVScale = 0x159BA53E, // Float4
+            FrameData = 0x1E5B2324, // Float4
+            AnimDir = 0x3F89C2EF, // Float4
+            PosScale = 0x487648E5, // Float4
+            Births = 0x568E0367, // Float4
+            UVOffset = 0x57582869, // Float4
+            PosOffset = 0x790EBF2C, // Float4
+            AverageColor = 0x449A3A67, // Int
+            MaskWidth = 0x707F712F, // Int
+            MaskHeight = 0x849CDADC, // Int
+            SparkleCube = 0x1D90C086, // Texture
+            DropShadowAtlas = 0x22AD8507, // Texture
+            DirtOverlay = 0x48372E62, // Texture
+            OverlayTexture = 0x4DC0C8BC, // Texture
+            JetTexture = 0x52CE211B, // Texture
+            ColorRamp = 0x581835D6, // Texture
+            DiffuseMap = 0x6CC0FD85, // Texture
+            SelfIlluminationMap = 0x6E067554, // Texture
+            NormalMap = 0x6E56548A, // Texture
+            HaloRamp = 0x84F6E0FB, // Texture
+            DetailMap = 0x9205DAA8, // Texture
+            SpecularMap = 0xAD528A60, // Texture
+            AmbientOcclusionMap = 0xB01CBA60, // Texture
+            AlphaMap = 0xC3FAAC4F, // Texture
+            MultiplyMap = 0xCD869A45, // Texture
+            SpecCompositeTexture = 0xD652FADE, // Texture
+            NoiseMap = 0xE19FD579, // Texture
+            RoomLightMap = 0xE7CA9166, // Texture
+            EmissionMap = 0xF303D152, // Texture
+            RevealMap = 0xF3F22AC4, // Texture
+            ImposterTextureAOandSI = 0x15C9D298, // TextureKey
+            ImpostorDetailTexture = 0x56E1C6B2, // TextureKey
+            ImposterTexture = 0xBDCF71C5, // TextureKey
+            ImposterTextureWater = 0xBF3FB9FA, // TextureKey
         }
+
         public enum DataType : uint
         {
             dtUnknown = 0,
@@ -659,6 +662,8 @@ namespace s3pi.GenericRCOLResource
                     .Invoke(new object[] { APIversion, handler, basis, });
             }
 
+            internal int ByteCount() { return CountFromType; }
+
             #region Data I/O
             internal void UnParseHeader(Stream s)
             {
@@ -682,7 +687,7 @@ namespace s3pi.GenericRCOLResource
             }
 
             protected abstract DataType DataTypeFromType { get; }
-            public abstract int CountFromType { get; }
+            protected abstract int CountFromType { get; }
             protected abstract void UnParse(Stream s);
 
             protected void ReadZeros(Stream s, int length) { while (length-- > 0) if (s.ReadByte() != 0) throw new InvalidDataException("Non-zero padding at 0x" + s.Position.ToString("X8")); }
@@ -729,7 +734,7 @@ namespace s3pi.GenericRCOLResource
 
             protected override void UnParse(Stream s) { new BinaryWriter(s).Write(data); }
             protected override DataType DataTypeFromType { get { return DataType.dtFloat; } }
-            public override int CountFromType { get { return 1; } }
+            protected override int CountFromType { get { return 1; } }
             #endregion
 
             public override AHandlerElement Clone(EventHandler handler) { return new ElementFloat(requestedApiVersion, handler, this); }
@@ -766,7 +771,7 @@ namespace s3pi.GenericRCOLResource
 
             protected override void UnParse(Stream s) { BinaryWriter w = new BinaryWriter(s); w.Write(data0); w.Write(data1); }
             protected override DataType DataTypeFromType { get { return DataType.dtFloat; } }
-            public override int CountFromType { get { return 2; } }
+            protected override int CountFromType { get { return 2; } }
             #endregion
 
             public override AHandlerElement Clone(EventHandler handler) { return new ElementFloat2(requestedApiVersion, handler, this); }
@@ -809,7 +814,7 @@ namespace s3pi.GenericRCOLResource
 
             protected override void UnParse(Stream s) { BinaryWriter w = new BinaryWriter(s); w.Write(data0); w.Write(data1); w.Write(data2); }
             protected override DataType DataTypeFromType { get { return DataType.dtFloat; } }
-            public override int CountFromType { get { return 3; } }
+            protected override int CountFromType { get { return 3; } }
             #endregion
 
             public override AHandlerElement Clone(EventHandler handler) { return new ElementFloat3(requestedApiVersion, handler, this); }
@@ -856,7 +861,7 @@ namespace s3pi.GenericRCOLResource
 
             protected override void UnParse(Stream s) { BinaryWriter w = new BinaryWriter(s); w.Write(data0); w.Write(data1); w.Write(data2); w.Write(data3); }
             protected override DataType DataTypeFromType { get { return DataType.dtFloat; } }
-            public override int CountFromType { get { return 4; } }
+            protected override int CountFromType { get { return 4; } }
             #endregion
 
             public override AHandlerElement Clone(EventHandler handler) { return new ElementFloat4(requestedApiVersion, handler, this); }
@@ -903,7 +908,7 @@ namespace s3pi.GenericRCOLResource
 
             protected override void UnParse(Stream s) { new BinaryWriter(s).Write(data); }
             protected override DataType DataTypeFromType { get { return DataType.dtInt; } }
-            public override int CountFromType { get { return 1; } }
+            protected override int CountFromType { get { return 1; } }
             #endregion
 
             public override AHandlerElement Clone(EventHandler handler) { return new ElementInt(requestedApiVersion, handler, this); }
@@ -940,7 +945,7 @@ namespace s3pi.GenericRCOLResource
 
             protected override void UnParse(Stream s) { if (data == null) data = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, 0); data.UnParse(s); WriteZeros(s, 12); }
             protected override DataType DataTypeFromType { get { return DataType.dtTexture; } }
-            public override int CountFromType { get { return 4; } }
+            protected override int CountFromType { get { return 4; } }
             #endregion
 
             public override AHandlerElement Clone(EventHandler handler) { return new ElementTextureRef(requestedApiVersion, handler, this); }
@@ -977,7 +982,7 @@ namespace s3pi.GenericRCOLResource
 
             protected override void UnParse(Stream s) { if (data == null) data = new TGIBlock(requestedApiVersion, handler, 0); data.UnParse(s); WriteZeros(s, 4); }
             protected override DataType DataTypeFromType { get { return DataType.dtTexture; } }
-            public override int CountFromType { get { return 5; } }
+            protected override int CountFromType { get { return 5; } }
             #endregion
 
             public override AHandlerElement Clone(EventHandler handler) { return new ElementTextureKey(requestedApiVersion, handler, this); }
@@ -1015,7 +1020,7 @@ namespace s3pi.GenericRCOLResource
                 for (int i = ReadCount(s); i > 0; i--)
                 {
                     this.Add(ShaderData.CreateEntry(0, elementHandler, s, start));
-                    dataLen += this[Count - 1].CountFromType * 4;
+                    dataLen += this[Count - 1].ByteCount() * 4;
                 }
                 if (checking) if (expectedDataLen != null && expectedDataLen != dataLen)
                         throw new InvalidDataException(string.Format("Expected 0x{0:X8} bytes of data, read 0x{1:X8} at 0x{2:X8}", expectedDataLen, dataLen, s.Position));
