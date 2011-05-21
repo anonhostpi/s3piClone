@@ -451,30 +451,6 @@ namespace s3pi.Interfaces
         /// <param name="t">Enum type</param>
         /// <returns>Valid enum names</returns>
         public static string FlagNames(Type t) { string p = ""; foreach (string q in Enum.GetNames(t)) p += " " + q; return p.Trim(); }
-
-        /// <summary>
-        /// Check that the two arrays are equal (same type, same value content)
-        /// </summary>
-        /// <param name="x">First array.</param>
-        /// <param name="y">Second array.</param>
-        /// <returns>True if type and content of <paramref name="x"/>  equals type and content of <paramref name="y"/>.</returns>
-        /// <remarks>Where the arrays are of AApiVersionedFields elements, the array elements must be references to the same instances.</remarks>
-        public static bool ArrayCompare(System.Collections.IList x, System.Collections.IList y)
-        {
-            if (x.GetType() != y.GetType()) throw new ArgumentException();
-            Type type = x.GetType().GetElementType();
-            if (type == null) throw new ArgumentException();//needs to be an array
-
-            if (x.Count != y.Count) return false;
-
-            if (!typeof(AApiVersionedFields).IsAssignableFrom(type))//i.e. it's a "simple type"
-                return new TypedValue(x.GetType(), x, "X").ToString() == new TypedValue(y.GetType(), y, "X").ToString();
-
-            //If it's an array of AApiVersionedFields, then we require the elements to be references to the same instances
-            for (int i = 0; i < x.Count; i++)
-                if (x[i] != y[i]) return false;
-            return true;
-        }
     }
 
     /// <summary>
