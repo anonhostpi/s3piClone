@@ -123,7 +123,7 @@ namespace s3pi.Interfaces
 
         #region IEquatable<ARCOLBlock> Members
 
-        public virtual bool Equals(ARCOLBlock other) { return ArrayCompare(this.AsBytes, other.AsBytes); }
+        public virtual bool Equals(ARCOLBlock other) { return this.AsBytes.Equals<byte>(other.AsBytes); }
 
         #endregion
 

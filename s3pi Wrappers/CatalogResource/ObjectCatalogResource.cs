@@ -878,7 +878,7 @@ namespace CatalogResource
             PlayDrums,
         }
 
-        public class TopicRating : AHandlerElement, IEquatable<TopicRating>
+        public class TopicRating : AHandlerElement, IEquatable<TopicRating>, IComparable<TopicRating>
         {
             #region Attributes
             TopicCategory topic;
@@ -913,12 +913,17 @@ namespace CatalogResource
             }
             #endregion
 
-            #region IEquatable<MTDoorEntry> Members
-
-            public bool Equals(TopicRating other)
+            #region IComparable<TopicRating>
+            public int CompareTo(TopicRating other)
             {
-                return (topic == other.topic && rating == other.rating);
+                int res = topic.CompareTo(other.topic); if (res != 0) return res;
+                return rating.CompareTo(other.rating);
             }
+            #endregion
+
+            #region IEquatable<TopicRating> Members
+
+            public bool Equals(TopicRating other) { return this.CompareTo(other) == 0; }
 
             #endregion
 
@@ -1022,7 +1027,7 @@ namespace CatalogResource
                 set
                 {
                     if (value.Length != unknown1.Length) throw new ArgumentLengthException("unknown1", this.unknown1.Length);
-                    if (!ArrayCompare(unknown1, value)) { unknown1 = (float[])value.Clone(); OnElementChanged(); }
+                    if (!unknown1.Equals<float>(value)) { unknown1 = (float[])value.Clone(); OnElementChanged(); }
                 }
             }
             [ElementPriority(2)]
@@ -1145,7 +1150,7 @@ namespace CatalogResource
             set
             {
                 if (value.Length != this.topicRatings.Length) throw new ArgumentLengthException("TopicRatings", this.topicRatings.Length);
-                if (!ArrayCompare(topicRatings, value)) { topicRatings = value == null ? null : (TopicRating[])value.Clone(); OnResourceChanged(this, new EventArgs()); }
+                if (!topicRatings.Equals<TopicRating>(value)) { topicRatings = value == null ? null : (TopicRating[])value.Clone(); OnResourceChanged(this, new EventArgs()); }
             }
         }
         [ElementPriority(49), TGIBlockListContentField("TGIBlocks")]

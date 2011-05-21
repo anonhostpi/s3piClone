@@ -319,7 +319,7 @@ namespace s3pi.GenericRCOLResource
             set
             {
                 if (value.Length != this.unused.Length) throw new ArgumentLengthException("Unused", this.unused.Length);
-                if (!ArrayCompare(unused, value)) { unused = value == null ? null : (byte[])value.Clone(); OnRCOLChanged(this, EventArgs.Empty); }
+                if (!unused.Equals<byte>(value)) { unused = value == null ? null : (byte[])value.Clone(); OnRCOLChanged(this, EventArgs.Empty); }
             }
         }
         [ElementPriority(16)]

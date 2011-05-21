@@ -215,7 +215,7 @@ namespace TxtcResource
             {
                 return id == other.id
                     && unknown1 == other.unknown1
-                    && ArrayCompare(unknown2, other.unknown2)
+                    && unknown2.Equals<byte>(other.unknown2)
                     && unknown3 == other.unknown3
                     && entries == other.entries
                     && unknown4 == other.unknown4;
@@ -226,7 +226,7 @@ namespace TxtcResource
             #region Content Fields
             public byte ID { get { return id; } set { if (id != value) { id = value; OnElementChanged(); } } }
             public uint Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnElementChanged(); } } }
-            public byte[] Unknown2 { get { return (byte[])unknown2.Clone(); } set { if (!ArrayCompare(unknown2, value)) { unknown2 = (byte[])value.Clone(); OnElementChanged(); } } }
+            public byte[] Unknown2 { get { return (byte[])unknown2.Clone(); } set { if (!unknown2.Equals<byte>(value)) { unknown2 = (byte[])value.Clone(); OnElementChanged(); } } }
             public byte Unknown3 { get { return unknown3; } set { if (unknown3 != value) { unknown3 = value; OnElementChanged(); } } }
             public EntryBlockList Entries { get { return entries; } set { if (entries != value) { entries = new EntryBlockList(handler, value); OnElementChanged(); } } }
             public uint Unknown4 { get { return unknown4; } set { if (unknown4 != value) { unknown4 = value; OnElementChanged(); } } }
@@ -357,7 +357,7 @@ namespace TxtcResource
                 UnParse(thisMS);
                 MemoryStream otherMS = new MemoryStream();
                 other.UnParse(otherMS);
-                return ArrayCompare(thisMS.ToArray(), otherMS.ToArray());
+                return thisMS.ToArray().Equals<byte>(otherMS.ToArray());
             }
 
             #endregion
@@ -777,7 +777,7 @@ namespace TxtcResource
                 }
             }
             [ElementPriority(4)]
-            public Single[] Data { get { return (Single[])data.Clone(); } set { if (value.Length != this.data.Length) throw new ArgumentLengthException(); if (!ArrayCompare(data, value)) { data = (Single[])value.Clone(); OnElementChanged(); } } }
+            public Single[] Data { get { return (Single[])data.Clone(); } set { if (value.Length != this.data.Length) throw new ArgumentLengthException(); if (!data.Equals<float>(value)) { data = (Single[])value.Clone(); OnElementChanged(); } } }
             protected override string EntryValue { get { return String.Format("{0:F4}, {1:F4}; {2:F4}, {3:F4}", data[0], data[1], data[2], data[3]); } }
             //public override string Value { get { return base.Value + "; Data: " + (new TypedValue(data.GetType(), data, "X")); } }
         }
@@ -816,7 +816,7 @@ namespace TxtcResource
                 }
             }
             [ElementPriority(4)]
-            public Single[] Data { get { return (Single[])data.Clone(); } set { if (value.Length != this.data.Length) throw new ArgumentLengthException(); if (!ArrayCompare(data, value)) { data = (Single[])value.Clone(); OnElementChanged(); } } }
+            public Single[] Data { get { return (Single[])data.Clone(); } set { if (value.Length != this.data.Length) throw new ArgumentLengthException(); if (!data.Equals<float>(value)) { data = (Single[])value.Clone(); OnElementChanged(); } } }
             protected override string EntryValue { get { return String.Format("{0:F4}, {1:F4}, {2:F4}, {3:F4}", data[0], data[1], data[2], data[3]); } }
             //public override string Value { get { return base.Value + "; Data: " + (new TypedValue(data.GetType(), data, "X")); } }
         }

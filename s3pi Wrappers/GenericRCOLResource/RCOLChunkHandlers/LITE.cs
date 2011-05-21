@@ -230,7 +230,7 @@ namespace s3pi.GenericRCOLResource
                     && transform.Equals(other.transform)
                     && color.Equals(other.color)
                     && intensity.Equals(other.intensity)
-                    && ArrayCompare(lightSourceDataArray, other.lightSourceDataArray)
+                    && lightSourceDataArray.Equals<float>(other.lightSourceDataArray)
                     ;
             }
 
