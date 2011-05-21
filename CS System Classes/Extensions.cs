@@ -122,5 +122,33 @@ namespace System
 
             return res;
         }
+
+
+        /// <summary>
+        /// Compares this instance to a specified array of type <typeparamref name="T"/>
+        /// and returns an indication of their relative values.
+        /// </summary>
+        /// <typeparam name="T">A type supporting <c>IComparable{T}.</c></typeparam>
+        /// <param name="first">This instance.</param>
+        /// <param name="second">An array to compare.</param>
+        /// <returns>An indication of the relative value of this instance and the specified array.</returns>
+        public static int CompareTo<T>(this T[] first, T[] second) where T : IComparable<T>
+        {
+            if (first == null) if (second != null) return -1; else return 0;//should never happen!
+            if (second == null) return 1;
+
+            int lim = Math.Min(first.Length, second.Length);
+            int cmp;
+            for (int i = 0; i < lim; i++) { cmp = first[i].CompareTo(second[i]); if (cmp != 0) return cmp; }
+            return first.Length.CompareTo(second.Length);
+        }
+        /// <summary>
+        /// Returns a value indicating whether this instance is equal to a specified <typeparamref name="T"/> value.
+        /// </summary>
+        /// <typeparam name="T">A type supporting <c>IComparable{T}.</c></typeparam>
+        /// <param name="first">This instance.</param>
+        /// <param name="second">An array to compare.</param>
+        /// <returns>And indication of the equality of the values of this instance and the specified array.</returns>
+        public static bool Equals<T>(this T[] first, T[] second) where T : IComparable<T> { return first.CompareTo<T>(second) == 0; }
     }
 }
