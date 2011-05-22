@@ -20,6 +20,7 @@
 using System;
 using System.Globalization;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace System
 {
@@ -125,30 +126,30 @@ namespace System
 
 
         /// <summary>
-        /// Compares this instance to a specified array of type <typeparamref name="T"/>
+        /// Compares this instance to a specified list of type <typeparamref name="T"/>
         /// and returns an indication of their relative values.
         /// </summary>
         /// <typeparam name="T">A type supporting <c>IComparable{T}.</c></typeparam>
-        /// <param name="first">This instance.</param>
-        /// <param name="second">An array to compare.</param>
-        /// <returns>An indication of the relative value of this instance and the specified array.</returns>
-        public static int CompareTo<T>(this T[] first, T[] second) where T : IComparable<T>
+        /// <param name="value">This instance.</param>
+        /// <param name="target">A list to compare.</param>
+        /// <returns>An indication of the relative value of this instance and the specified list.</returns>
+        public static int CompareTo<T>(this IList<T> value, IList<T> target) where T : IComparable<T>
         {
-            if (first == null) if (second != null) return -1; else return 0;//should never happen!
-            if (second == null) return 1;
+            if (value == null) if (target != null) return -1; else return 0;//should never happen!
+            if (target == null) return 1;
 
-            int lim = Math.Min(first.Length, second.Length);
+            int lim = Math.Min(value.Count, target.Count);
             int cmp;
-            for (int i = 0; i < lim; i++) { cmp = first[i].CompareTo(second[i]); if (cmp != 0) return cmp; }
-            return first.Length.CompareTo(second.Length);
+            for (int i = 0; i < lim; i++) { cmp = value[i].CompareTo(target[i]); if (cmp != 0) return cmp; }
+            return value.Count.CompareTo(target.Count);
         }
         /// <summary>
-        /// Returns a value indicating whether this instance is equal to a specified <typeparamref name="T"/> value.
+        /// Returns a value indicating whether this instance is equal to a specified list of <typeparamref name="T"/> values.
         /// </summary>
         /// <typeparam name="T">A type supporting <c>IComparable{T}.</c></typeparam>
-        /// <param name="first">This instance.</param>
-        /// <param name="second">An array to compare.</param>
-        /// <returns>And indication of the equality of the values of this instance and the specified array.</returns>
-        public static bool Equals<T>(this T[] first, T[] second) where T : IComparable<T> { return first.CompareTo<T>(second) == 0; }
+        /// <param name="value">This instance.</param>
+        /// <param name="target">A list to compare.</param>
+        /// <returns>And indication of the equality of the values of this instance and the specified list.</returns>
+        public static bool Equals<T>(this IList<T> value, IList<T> target) where T : IComparable<T> { return value.CompareTo<T>(target) == 0; }
     }
 }
