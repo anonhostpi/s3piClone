@@ -14,7 +14,7 @@
     <RootNamespace>Documentation</RootNamespace>
     <Name>Documentation</Name>
     <!-- SHFB properties -->
-    <OutputPath>X:\Temp\Help\</OutputPath>
+    <OutputPath>C:\Temp\Help\</OutputPath>
     <HtmlHelpName>s3piHelp</HtmlHelpName>
     <DocumentationSources>
       <DocumentationSource sourceFile="..\s3pi\s3pi.sln" xmlns="" />
@@ -32,7 +32,7 @@
     <SyntaxFilters>Standard</SyntaxFilters>
     <IndentHtml>False</IndentHtml>
     <FeedbackEMailLinkText>the author</FeedbackEMailLinkText>
-    <WorkingPath>X:\Temp\HelpWork\</WorkingPath>
+    <WorkingPath>C:\Temp\HelpWork\</WorkingPath>
     <NamespaceSummaries>
       <NamespaceSummaryItem name="CatalogResource" isDocumented="False" />
       <NamespaceSummaryItem name="ComplateResource" isDocumented="False" />
@@ -47,10 +47,31 @@
       <NamespaceSummaryItem name="TextResource" isDocumented="False" />
       <NamespaceSummaryItem name="TxtcResource" isDocumented="False" />
       <NamespaceSummaryItem name="CASPartResource" isDocumented="False" />
+      <NamespaceSummaryItem name="NGMPHashMapResource" isDocumented="False" />
     </NamespaceSummaries>
     <MissingTags>Summary, Parameter, Returns, AutoDocumentCtors, TypeParameter, AutoDocumentDispose</MissingTags>
     <VisibleItems>Attributes, ExplicitInterfaceImplementations, InheritedMembers, InheritedFrameworkMembers, Protected, SealedProtected</VisibleItems>
     <RootNamespaceContainer>True</RootNamespaceContainer>
+    <ComponentConfigurations>
+      <ComponentConfig id="Cached MSDN URL References" enabled="True" xmlns="">
+        <component id="Cached MSDN URL References" type="SandcastleBuilder.Components.CachedResolveReferenceLinksComponent" assembly="{@SHFBFolder}SandcastleBuilder.Components.dll" locale="{@Locale}" linkTarget="{@SdkLinkTarget}">
+<cache filename="{@LocalDataFolder}Cache\MsdnUrl.cache" />
+<targets base="{@SandcastlePath}Data\Reflection" recurse="true" files="*.xml" type="{@SDKLinks}" />
+<targets files="reflection.xml" type="{@ProjectLinks}" />
+</component>
+      </ComponentConfig>
+<ComponentConfig id="Code Block Component" enabled="True" xmlns=""><component id="Code Block Component" type="SandcastleBuilder.Components.CodeBlockComponent" assembly="{@SHFBFolder}SandcastleBuilder.Components.dll">
+  <basePath value="{@HtmlEncProjectFolder}" />
+  <languageFilter value="true" />
+  <allowMissingSource value="false" />
+  <removeRegionMarkers value="false" />
+  <colorizer syntaxFile="{@SHFBFolder}Colorizer\highlight.xml" styleFile="{@SHFBFolder}Colorizer\highlight.xsl" copyImageUrl="../icons/CopyCode.gif" language="cs" tabSize="0" numberLines="false" outlining="true" keepSeeTags="false" defaultTitle="true" />
+</component></ComponentConfig>
+<ComponentConfig id="IntelliSense Component" enabled="True" xmlns=""><component id="IntelliSense Component" type="SandcastleBuilder.Components.IntelliSenseComponent" assembly="{@SHFBFolder}SandcastleBuilder.Components.dll"><!-- Output options (optional)
+                 Attributes:
+                    Include Namespaces (false by default)
+                    Namespaces filename ("Namespaces" if not specified or empty)
+                    Directory (current folder if not specified or empty) --><output includeNamespaces="false" namespacesFile="Namespaces" folder="{@OutputFolder}" /></component></ComponentConfig></ComponentConfigurations>
   </PropertyGroup>
   <!-- There are no properties for these groups.  AnyCPU needs to appear in
        order for Visual Studio to perform the build.  The others are optional
