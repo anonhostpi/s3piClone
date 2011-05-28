@@ -174,19 +174,55 @@ namespace s3pi.Package
         /// <param name="APIversion">(unused)</param>
         /// <param name="packagePath">Fully qualified filename of the package</param>
         /// <returns>IPackage reference to an existing package on disk</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="packagePath"/> is null.</exception>
+        /// <exception cref="FileNotFoundException">The file cannot be found.</exception>
+        /// <exception cref="DirectoryNotFoundException"><paramref name="packagePath"/> is invalid, such as being on an unmapped drive.</exception>
+        /// <exception cref="PathTooLongException">
+        /// <paramref name="packagePath"/>, or a component of the file name, exceeds the system-defined maximum length.
+        /// For example, on Windows-based platforms, paths must be less than 248 characters, and file names must be less than 260 characters.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="packagePath"/> is an empty string (""), contains only white space, or contains one or more invalid characters.
+        /// <br/>-or-<br/>
+        /// <paramref name="packagePath"/> refers to a non-file device, such as "con:", "com1:", "lpt1:", etc. in an NTFS environment.
+        /// </exception>
+        /// <exception cref="NotSupportedException">
+        /// <paramref name="packagePath"/> refers to a non-file device, such as "con:", "com1:", "lpt1:", etc. in a non-NTFS environment.
+        /// </exception>
+        /// <exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
         /// <exception cref="InvalidDataException">Thrown if the package header is malformed.</exception>
         public static new IPackage OpenPackage(int APIversion, string packagePath) { return OpenPackage(APIversion, packagePath, false); }
         /// <summary>
         /// Open an existing package by filename, optionally readwrite
         /// </summary>
         /// <param name="APIversion">(unused)</param>
-        /// <param name="PackagePath">Fully qualified filename of the package</param>
+        /// <param name="packagePath">Fully qualified filename of the package</param>
         /// <param name="readwrite">True to indicate read/write access required</param>
         /// <returns>IPackage reference to an existing package on disk</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="packagePath"/> is null.</exception>
+        /// <exception cref="FileNotFoundException">The file cannot be found.</exception>
+        /// <exception cref="DirectoryNotFoundException"><paramref name="packagePath"/> is invalid, such as being on an unmapped drive.</exception>
+        /// <exception cref="PathTooLongException">
+        /// <paramref name="packagePath"/>, or a component of the file name, exceeds the system-defined maximum length.
+        /// For example, on Windows-based platforms, paths must be less than 248 characters, and file names must be less than 260 characters.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="packagePath"/> is an empty string (""), contains only white space, or contains one or more invalid characters.
+        /// <br/>-or-<br/>
+        /// <paramref name="packagePath"/> refers to a non-file device, such as "con:", "com1:", "lpt1:", etc. in an NTFS environment.
+        /// </exception>
+        /// <exception cref="NotSupportedException">
+        /// <paramref name="packagePath"/> refers to a non-file device, such as "con:", "com1:", "lpt1:", etc. in a non-NTFS environment.
+        /// </exception>
+        /// <exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
+        /// <exception cref="UnauthorizedAccessException">
+        /// The access requested is not permitted by the operating system for <paramref name="packagePath"/>,
+        /// such as when access is ReadWrite and the file or directory is set for read-only access.
+        /// </exception>
         /// <exception cref="InvalidDataException">Thrown if the package header is malformed.</exception>
-        public static new IPackage OpenPackage(int APIversion, string PackagePath, bool readwrite)
+        public static new IPackage OpenPackage(int APIversion, string packagePath, bool readwrite)
         {
-            return new Package(APIversion, new FileStream(PackagePath, FileMode.Open, readwrite ? FileAccess.ReadWrite : FileAccess.Read, FileShare.ReadWrite));
+            return new Package(APIversion, new FileStream(packagePath, FileMode.Open, readwrite ? FileAccess.ReadWrite : FileAccess.Read, FileShare.ReadWrite));
         }
 
         /// <summary>
