@@ -34,6 +34,7 @@ namespace CatalogResource
         ObjectType objectTypeFlags;
         WallPlacement wallPlacementFlags;
         Movement movementFlags;
+        uint unknown22;//Version>=0x1a
         uint cutoutTilesPerLevel;
         uint levels;
         MTDoorList mtDoorList = null;
@@ -380,19 +381,23 @@ namespace CatalogResource
             get
             {
                 List<string> res = base.ContentFields;
-                if (this.version < 0x00000019)
+                if (this.version < 0x0000001a)
                 {
-                    res.Remove("LevelBelowOBJDIndex");
-                    if (this.version < 0x00000018)
+                    res.Remove("Unknown22");
+                    if (this.version < 0x00000019)
                     {
-                        res.Remove("BuildableShellDisplayStateHashes");
-                        if (this.version < 0x00000017)
+                        res.Remove("LevelBelowOBJDIndex");
+                        if (this.version < 0x00000018)
                         {
-                            res.Remove("FloorCutoutDDSIndex");
-                            res.Remove("FloorCutoutLevelOffset");
-                            res.Remove("FloorCutoutBoundsLength");
-                            if (this.version < 0x00000016)
-                                res.Remove("InstanceName");
+                            res.Remove("BuildableShellDisplayStateHashes");
+                            if (this.version < 0x00000017)
+                            {
+                                res.Remove("FloorCutoutDDSIndex");
+                                res.Remove("FloorCutoutLevelOffset");
+                                res.Remove("FloorCutoutBoundsLength");
+                                if (this.version < 0x00000016)
+                                    res.Remove("InstanceName");
+                            }
                         }
                     }
                 }
@@ -965,7 +970,7 @@ namespace CatalogResource
         {
             #region Attributes
             float[] unknown1 = new float[4];
-            uint unknown2;
+            uint levelOffset;
             uint wallMaskIndex;
             #endregion
 
@@ -973,13 +978,13 @@ namespace CatalogResource
             public MTDoor(int APIversion, EventHandler handler) : base(APIversion, handler) { }
             public MTDoor(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
             public MTDoor(int APIversion, EventHandler handler, MTDoor basis)
-                : this(APIversion, handler, basis.unknown1, basis.unknown2, basis.wallMaskIndex) { }
+                : this(APIversion, handler, basis.unknown1, basis.levelOffset, basis.wallMaskIndex) { }
             public MTDoor(int APIversion, EventHandler handler, float[] unknown1, uint unknownX, uint wallMaskIndex)
                 : base(APIversion, handler)
             {
                 if (unknown1.Length != this.unknown1.Length) throw new ArgumentLengthException("unknown1", this.unknown1.Length);
                 this.unknown1 = (float[])unknown1.Clone();
-                this.unknown2 = unknownX;
+                this.levelOffset = unknownX;
                 this.wallMaskIndex = wallMaskIndex;
             }
             #endregion
@@ -989,14 +994,14 @@ namespace CatalogResource
             {
                 BinaryReader r = new BinaryReader(s);
                 this.unknown1 = new float[4]; for (int i = 0; i < unknown1.Length; i++) unknown1[i] = r.ReadSingle();
-                this.unknown2 = r.ReadUInt32();
+                this.levelOffset = r.ReadUInt32();
                 this.wallMaskIndex = r.ReadUInt32();
             }
             public void UnParse(Stream s)
             {
                 BinaryWriter w = new BinaryWriter(s);
                 foreach (float f in unknown1) w.Write(f);
-                w.Write(unknown2);
+                w.Write(levelOffset);
                 w.Write(wallMaskIndex);
             }
             #endregion
@@ -1006,7 +1011,7 @@ namespace CatalogResource
             public bool Equals(MTDoor other)
             {
                 for (int i = 0; i < unknown1.Length; i++) if (unknown1[i] != other.unknown1[i]) return false;
-                return (unknown2 == other.unknown2 && wallMaskIndex == other.wallMaskIndex);
+                return (levelOffset == other.levelOffset && wallMaskIndex == other.wallMaskIndex);
             }
 
             #endregion
@@ -1031,7 +1036,7 @@ namespace CatalogResource
                 }
             }
             [ElementPriority(2)]
-            public uint Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnElementChanged(); } } }
+            public uint LevelOffset { get { return levelOffset; } set { if (levelOffset != value) { levelOffset = value; OnElementChanged(); } } }
             [ElementPriority(3)]
             public uint WallMaskIndex { get { return wallMaskIndex; } set { if (wallMaskIndex != value) { wallMaskIndex = value; OnElementChanged(); } } }
 
@@ -1078,72 +1083,77 @@ namespace CatalogResource
         [ElementPriority(24)]
         public Movement MovementFlags { get { return movementFlags; } set { if (movementFlags != value) { movementFlags = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(25)]
-        public uint CutoutTilesPerLevel { get { return cutoutTilesPerLevel; } set { if (cutoutTilesPerLevel != value) { cutoutTilesPerLevel = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint Unknown22 {
+            get { if (version < 0x0000001a) throw new InvalidOperationException(); return unknown22; }
+            set { if (version < 0x0000001a) throw new InvalidOperationException(); if (unknown22 != value) { unknown22 = value; OnResourceChanged(this, new EventArgs()); } }
+        }
         [ElementPriority(26)]
-        public uint Levels { get { return levels; } set { if (levels != value) { levels = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint CutoutTilesPerLevel { get { return cutoutTilesPerLevel; } set { if (cutoutTilesPerLevel != value) { cutoutTilesPerLevel = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(27)]
-        public MTDoorList MTDoors { get { return mtDoorList; } set { if (mtDoorList != value) { mtDoorList = value == null ? null : new MTDoorList(OnResourceChanged, value); } OnResourceChanged(this, new EventArgs()); } }
+        public uint Levels { get { return levels; } set { if (levels != value) { levels = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(28)]
+        public MTDoorList MTDoors { get { return mtDoorList; } set { if (mtDoorList != value) { mtDoorList = value == null ? null : new MTDoorList(OnResourceChanged, value); } OnResourceChanged(this, new EventArgs()); } }
+        [ElementPriority(29)]
         public bool IsScriptEnabled { get { return isScriptEnabled != 0; } set { if (IsScriptEnabled != value) { isScriptEnabled = (byte)(value ? 1 : 0); OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(29), TGIBlockListContentField("TGIBlocks")]
+        [ElementPriority(30), TGIBlockListContentField("TGIBlocks")]
         public uint DiagonalIndex { get { return diagonalIndex; } set { if (diagonalIndex != value) { diagonalIndex = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(30)]
-        public uint AmbienceTypeHash { get { return ambienceTypeHash; } set { if (ambienceTypeHash != value) { ambienceTypeHash = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(31)]
-        public RoomCategory RoomCategoryFlags { get { return roomCategoryFlags; } set { if (roomCategoryFlags != value) { roomCategoryFlags = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint AmbienceTypeHash { get { return ambienceTypeHash; } set { if (ambienceTypeHash != value) { ambienceTypeHash = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(32)]
-        public FunctionCategory FunctionCategoryFlags { get { return functionCategoryFlags; } set { if (functionCategoryFlags != value) { functionCategoryFlags = value; OnResourceChanged(this, new EventArgs()); } } }
+        public RoomCategory RoomCategoryFlags { get { return roomCategoryFlags; } set { if (roomCategoryFlags != value) { roomCategoryFlags = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(33)]
-        public FunctionSubCategory FunctionSubCategoryFlags { get { return functionSubCategoryFlags; } set { if (functionSubCategoryFlags != value) { functionSubCategoryFlags = value; OnResourceChanged(this, new EventArgs()); } } }
+        public FunctionCategory FunctionCategoryFlags { get { return functionCategoryFlags; } set { if (functionCategoryFlags != value) { functionCategoryFlags = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(34)]
-        public RoomSubCategory RoomSubCategoryFlags { get { return roomSubCategoryFlags; } set { if (roomSubCategoryFlags != value) { roomSubCategoryFlags = value; OnResourceChanged(this, new EventArgs()); } } }
+        public FunctionSubCategory FunctionSubCategoryFlags { get { return functionSubCategoryFlags; } set { if (functionSubCategoryFlags != value) { functionSubCategoryFlags = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(35)]
+        public RoomSubCategory RoomSubCategoryFlags { get { return roomSubCategoryFlags; } set { if (roomSubCategoryFlags != value) { roomSubCategoryFlags = value; OnResourceChanged(this, new EventArgs()); } } }
+        [ElementPriority(36)]
         public BuildCategory BuildCategoryFlags { get { return buildCategoryFlags; } set { if (buildCategoryFlags != value) { buildCategoryFlags = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(36), TGIBlockListContentField("TGIBlocks")]
-        public uint SurfaceCutoutDDSIndex { get { return surfaceCutoutDDSIndex; } set { if (surfaceCutoutDDSIndex != value) { surfaceCutoutDDSIndex = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(37), TGIBlockListContentField("TGIBlocks")]
+        public uint SurfaceCutoutDDSIndex { get { return surfaceCutoutDDSIndex; } set { if (surfaceCutoutDDSIndex != value) { surfaceCutoutDDSIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        [ElementPriority(38), TGIBlockListContentField("TGIBlocks")]
         public uint FloorCutoutDDSIndex
         {
             get { if (version < 0x00000017) throw new InvalidOperationException(); return floorCutoutDDSIndex; }
             set { if (version < 0x00000017) throw new InvalidOperationException(); if (floorCutoutDDSIndex != value) { floorCutoutDDSIndex = value; OnResourceChanged(this, new EventArgs()); } }
         }
-        [ElementPriority(38)]
+        [ElementPriority(39)]
         public uint FloorCutoutLevelOffset
         {
             get { if (version < 0x00000017) throw new InvalidOperationException(); return floorCutoutLevelOffset; }
             set { if (version < 0x00000017) throw new InvalidOperationException(); if (floorCutoutLevelOffset != value) { floorCutoutLevelOffset = value; OnResourceChanged(this, new EventArgs()); } }
         }
-        [ElementPriority(39)]
+        [ElementPriority(40)]
         public float FloorCutoutBoundsLength
         {
             get { if (version < 0x00000017) throw new InvalidOperationException(); return floorCutoutBoundsLength; }
             set { if (version < 0x00000017) throw new InvalidOperationException(); if (floorCutoutBoundsLength != value) { floorCutoutBoundsLength = value; OnResourceChanged(this, new EventArgs()); } }
         }
-        [ElementPriority(40)]
+        [ElementPriority(41)]
         public UIntList BuildableShellDisplayStateHashes
         {
             get { if (version < 0x00000018) throw new InvalidOperationException(); return buildableShellDisplayStateHashes; }
             set { if (version < 0x00000018) throw new InvalidOperationException(); if (buildableShellDisplayStateHashes != value) { buildableShellDisplayStateHashes = value == null ? null : new UIntList(OnResourceChanged, value); } OnResourceChanged(this, new EventArgs()); }
         }
-        [ElementPriority(41), TGIBlockListContentField("TGIBlocks")]
+        [ElementPriority(42), TGIBlockListContentField("TGIBlocks")]
         public uint LevelBelowOBJDIndex
         {
             get { if (version < 0x00000019) throw new InvalidOperationException(); return levelBelowOBJDIndex; }
             set { if (version < 0x00000019) throw new InvalidOperationException(); if (levelBelowOBJDIndex != value) { levelBelowOBJDIndex = value; OnResourceChanged(this, new EventArgs()); } }
         }
-        [ElementPriority(42)]
-        public SlotPlacement SlotPlacementFlags { get { return slotPlacementFlags; } set { if (slotPlacementFlags != value) { slotPlacementFlags = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(43)]
-        public string SurfaceType { get { return surfaceType; } set { if (surfaceType != value) { surfaceType = value; OnResourceChanged(this, new EventArgs()); } } }
+        public SlotPlacement SlotPlacementFlags { get { return slotPlacementFlags; } set { if (slotPlacementFlags != value) { slotPlacementFlags = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(44)]
-        public string SourceMaterial { get { return sourceMaterial; } set { if (sourceMaterial != value) { sourceMaterial = value; OnResourceChanged(this, new EventArgs()); } } }
+        public string SurfaceType { get { return surfaceType; } set { if (surfaceType != value) { surfaceType = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(45)]
-        public Moodlet MoodletGiven { get { return moodletGiven; } set { if (moodletGiven != value) { moodletGiven = value; OnResourceChanged(this, new EventArgs()); } } }
+        public string SourceMaterial { get { return sourceMaterial; } set { if (sourceMaterial != value) { sourceMaterial = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(46)]
-        public int MoodletScore { get { return moodletScore; } set { if (moodletScore != value) { moodletScore = value; OnResourceChanged(this, new EventArgs()); } } }
+        public Moodlet MoodletGiven { get { return moodletGiven; } set { if (moodletGiven != value) { moodletGiven = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(47)]
-        public uint Unknown21 { get { return unknown21; } set { if (unknown21 != value) { unknown21 = value; OnResourceChanged(this, new EventArgs()); } } }
+        public int MoodletScore { get { return moodletScore; } set { if (moodletScore != value) { moodletScore = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(48)]
+        public uint Unknown21 { get { return unknown21; } set { if (unknown21 != value) { unknown21 = value; OnResourceChanged(this, new EventArgs()); } } }
+        [ElementPriority(49)]
         public TopicRating[] TopicRatings
         {
             get { return topicRatings; }
@@ -1153,7 +1163,7 @@ namespace CatalogResource
                 if (!topicRatings.Equals<TopicRating>(value)) { topicRatings = value == null ? null : (TopicRating[])value.Clone(); OnResourceChanged(this, new EventArgs()); }
             }
         }
-        [ElementPriority(49), TGIBlockListContentField("TGIBlocks")]
+        [ElementPriority(50), TGIBlockListContentField("TGIBlocks")]
         public uint FallbackIndex { get { return fallbackIndex; } set { if (fallbackIndex != value) { fallbackIndex = value; OnResourceChanged(this, new EventArgs()); } } }
         //--insert TGIBlockList: no ElementPriority
         #endregion
