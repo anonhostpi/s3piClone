@@ -266,6 +266,10 @@ namespace CatalogResource
             this.objectTypeFlags = (ObjectType)r.ReadUInt32();
             this.wallPlacementFlags = (WallPlacement)r.ReadUInt32();
             this.movementFlags = (Movement)r.ReadUInt32();
+            if (this.version >= 0x0000001a)
+            {
+                this.Unknown22 = r.ReadUInt32();
+            }
             this.cutoutTilesPerLevel = r.ReadUInt32();
             this.levels = r.ReadUInt32();
             this.mtDoorList = new MTDoorList(OnResourceChanged, s);
@@ -323,6 +327,10 @@ namespace CatalogResource
             w.Write((uint)objectTypeFlags);
             w.Write((uint)wallPlacementFlags);
             w.Write((uint)movementFlags);
+            if (this.version >= 0x0000001a)
+            {
+                w.Write(unknown22);
+            }
             w.Write(cutoutTilesPerLevel);
             w.Write(levels);
             if (mtDoorList == null) mtDoorList = new MTDoorList(OnResourceChanged);
