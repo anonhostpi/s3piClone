@@ -278,5 +278,12 @@ namespace System.Collections.Generic
         /// Invokes the list change event handler.
         /// </summary>
         protected void OnListChanged() { if (handler != null) handler(this, EventArgs.Empty); }
+
+        /// <summary>
+        /// Determine whether this list is equal to <paramref name="target"/>.
+        /// </summary>
+        /// <param name="target">A <see cref="AHandlerList{T}"/> against which to test this list for equality.</param>
+        /// <returns>True if this list is equal to <paramref name="target"/>; otherwise false.</returns>
+        public bool Equals(AHandlerList<T> target) { return this.Equals<T>(target); }
     }
 }
