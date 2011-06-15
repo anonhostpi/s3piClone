@@ -38,7 +38,7 @@ namespace CASPartResource
 
         #region Attributes
         uint version = 18;
-        XMLEntryList xmlEntries;
+        PresetList presets;
         string unknown1 = "";
         float sortPriority;
         byte unknown2;
@@ -54,7 +54,7 @@ namespace CASPartResource
         byte blendInfoSpecialIndex;
         uint unknown3;
         ByteEntryList vpxyIndexes;
-        OuterEntryList outerEntries;
+        LODInfoEntryList lodInfo;
         ByteEntryList diffuse1Indexes;
         ByteEntryList specular1Indexes;
         ByteEntryList diffuse2Indexes;
@@ -76,7 +76,7 @@ namespace CASPartResource
 
             version = r.ReadUInt32();
             tgiPosn = r.ReadInt32() + 8;
-            xmlEntries = new XMLEntryList(OnResourceChanged, s);
+            presets = new PresetList(OnResourceChanged, s);
             unknown1 = BigEndianUnicodeString.Read(s);
             sortPriority = r.ReadSingle();
             unknown2 = r.ReadByte();
@@ -92,7 +92,7 @@ namespace CASPartResource
             blendInfoSpecialIndex = r.ReadByte();
             unknown3 = r.ReadUInt32();
             vpxyIndexes = new ByteEntryList(OnResourceChanged, s);
-            outerEntries = new OuterEntryList(OnResourceChanged, s);
+            lodInfo = new LODInfoEntryList(OnResourceChanged, s);
             diffuse1Indexes = new ByteEntryList(OnResourceChanged, s);
             specular1Indexes = new ByteEntryList(OnResourceChanged, s);
             diffuse2Indexes = new ByteEntryList(OnResourceChanged, s);
@@ -118,8 +118,8 @@ namespace CASPartResource
             posn = s.Position;
             w.Write((int)0); //offset
 
-            if (xmlEntries == null) xmlEntries = new XMLEntryList(OnResourceChanged);
-            xmlEntries.UnParse(s);
+            if (presets == null) presets = new PresetList(OnResourceChanged);
+            presets.UnParse(s);
 
             BigEndianUnicodeString.Write(s, unknown1);
             w.Write(sortPriority);
@@ -137,7 +137,7 @@ namespace CASPartResource
             w.Write(unknown3);
 
             if (vpxyIndexes == null) vpxyIndexes = new ByteEntryList(OnResourceChanged); vpxyIndexes.UnParse(s);
-            if (outerEntries == null) outerEntries = new OuterEntryList(OnResourceChanged); outerEntries.UnParse(s);
+            if (lodInfo == null) lodInfo = new LODInfoEntryList(OnResourceChanged); lodInfo.UnParse(s);
             if (diffuse1Indexes == null) diffuse1Indexes = new ByteEntryList(OnResourceChanged); diffuse1Indexes.UnParse(s);
             if (specular1Indexes == null) specular1Indexes = new ByteEntryList(OnResourceChanged); specular1Indexes.UnParse(s);
             if (diffuse2Indexes == null) diffuse2Indexes = new ByteEntryList(OnResourceChanged); diffuse2Indexes.UnParse(s);
@@ -162,7 +162,7 @@ namespace CASPartResource
         #endregion
 
         #region Sub-types
-        public class XMLEntry : AHandlerElement, IEquatable<XMLEntry>
+        public class Preset : AHandlerElement, IEquatable<Preset>
         {
             const int recommendedApiVersion = 1;
 
@@ -172,10 +172,10 @@ namespace CASPartResource
             #endregion
 
             #region Constructors
-            public XMLEntry(int APIversion, EventHandler handler) : base(APIversion, handler) { }
-            public XMLEntry(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
-            public XMLEntry(int APIversion, EventHandler handler, XMLEntry basis) : this(APIversion, handler, basis.xml, basis.unknown1) { }
-            public XMLEntry(int APIversion, EventHandler handler, string xml, uint unknown1) : base(APIversion, handler) { this.xml = xml; this.unknown1 = unknown1; }
+            public Preset(int APIversion, EventHandler handler) : base(APIversion, handler) { }
+            public Preset(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
+            public Preset(int APIversion, EventHandler handler, Preset basis) : this(APIversion, handler, basis.xml, basis.unknown1) { }
+            public Preset(int APIversion, EventHandler handler, string xml, uint unknown1) : base(APIversion, handler) { this.xml = xml; this.unknown1 = unknown1; }
             #endregion
 
             #region Data I/O
@@ -198,12 +198,12 @@ namespace CASPartResource
             #region AHandlerElement Members
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
             public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
-            public override AHandlerElement Clone(EventHandler handler) { return new XMLEntry(requestedApiVersion, handler, this); }
+            public override AHandlerElement Clone(EventHandler handler) { return new Preset(requestedApiVersion, handler, this); }
             #endregion
 
-            #region IEquatable<XMLEntry> Members
+            #region IEquatable<Preset> Members
 
-            public bool Equals(XMLEntry other)
+            public bool Equals(Preset other)
             {
                 return
                     this.xml == other.xml
@@ -240,20 +240,20 @@ namespace CASPartResource
             }
             #endregion
         }
-        public class XMLEntryList : DependentList<XMLEntry>
+        public class PresetList : DependentList<Preset>
         {
             #region Constructors
-            public XMLEntryList(EventHandler handler) : base(handler) { }
-            public XMLEntryList(EventHandler handler, Stream s) : base(handler, s) { }
-            public XMLEntryList(EventHandler handler, IEnumerable<XMLEntry> le) : base(handler, le) { }
+            public PresetList(EventHandler handler) : base(handler) { }
+            public PresetList(EventHandler handler, Stream s) : base(handler, s) { }
+            public PresetList(EventHandler handler, IEnumerable<Preset> le) : base(handler, le) { }
             #endregion
 
             #region Data I/O
-            protected override XMLEntry CreateElement(Stream s) { return new XMLEntry(0, elementHandler, s); }
-            protected override void WriteElement(Stream s, XMLEntry element) { element.UnParse(s); }
+            protected override Preset CreateElement(Stream s) { return new Preset(0, elementHandler, s); }
+            protected override void WriteElement(Stream s, Preset element) { element.UnParse(s); }
             #endregion
 
-            public override void Add() { this.Add(new XMLEntry(0, null)); }
+            public override void Add() { this.Add(new Preset(0, null)); }
         }
 
         public class ByteEntryList : SimpleList<byte>
@@ -272,56 +272,63 @@ namespace CASPartResource
             #endregion
         }
 
-        public class InnerEntry : AHandlerElement, IEquatable<InnerEntry>
+        public class LODInfoEntry : AHandlerElement, IEquatable<LODInfoEntry>
         {
             const int recommendedApiVersion = 1;
 
             #region Attributes
-            uint unknown1;
-            uint unknown2;
-            uint unknown3;
+            byte level;
+            DataTypeFlags destTexture;
+            LODAssetList lodAssets;
             #endregion
 
             #region Constructors
-            public InnerEntry(int APIversion, EventHandler handler) : base(APIversion, handler) { }
-            public InnerEntry(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
-            public InnerEntry(int APIversion, EventHandler handler, InnerEntry basis) : this(APIversion, handler, basis.unknown1, basis.unknown2, basis.unknown3) { }
-            public InnerEntry(int APIversion, EventHandler handler, uint unknown1, uint unknown2, uint unknown3)
-                : base(APIversion, handler) { this.unknown1 = unknown1; this.unknown2 = unknown2; this.unknown3 = unknown3; }
+            public LODInfoEntry(int APIversion, EventHandler handler) : base(APIversion, handler) { }
+            public LODInfoEntry(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
+            public LODInfoEntry(int APIversion, EventHandler handler, LODInfoEntry basis)
+                : this(APIversion, handler, basis.level, basis.destTexture, basis.lodAssets) { }
+            public LODInfoEntry(int APIversion, EventHandler handler, byte level, DataTypeFlags destTexture, IEnumerable<LODAsset> lodAssets)
+                : base(APIversion, handler)
+            {
+                this.level = level;
+                this.destTexture = destTexture;
+                this.lodAssets = new LODAssetList(handler, lodAssets);
+            }
             #endregion
 
             #region Data I/O
             void Parse(Stream s)
             {
                 BinaryReader r = new BinaryReader(s);
-                unknown1 = r.ReadUInt32();
-                unknown2 = r.ReadUInt32();
-                unknown3 = r.ReadUInt32();
+                level = r.ReadByte();
+                destTexture = (DataTypeFlags)r.ReadUInt32();
+                lodAssets = new LODAssetList(handler, s);
             }
 
             internal void UnParse(Stream s)
             {
                 BinaryWriter w = new BinaryWriter(s);
-                w.Write(unknown1);
-                w.Write(unknown2);
-                w.Write(unknown3);
+                w.Write(level);
+                w.Write((uint)destTexture);
+                if (lodAssets == null) lodAssets = new LODAssetList(handler);
+                lodAssets.UnParse(s);
             }
             #endregion
 
             #region AHandlerElement Members
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
+            public override AHandlerElement Clone(EventHandler handler) { return new LODInfoEntry(requestedApiVersion, handler, this); }
             public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
-            public override AHandlerElement Clone(EventHandler handler) { return new InnerEntry(requestedApiVersion, handler, this); }
             #endregion
 
-            #region IEquatable<InnerEntry> Members
+            #region IEquatable<LODInfoEntry> Members
 
-            public bool Equals(InnerEntry other)
+            public bool Equals(LODInfoEntry other)
             {
                 return
-                    this.unknown1 == other.unknown1
-                    && this.unknown2 == other.unknown2
-                    && this.unknown3 == other.unknown3
+                    this.level == other.level
+                    && this.destTexture == other.destTexture
+                    && this.lodAssets.Equals(other.lodAssets)
                     ;
             }
 
@@ -329,13 +336,104 @@ namespace CASPartResource
 
             #region Content Fields
             [ElementPriority(1)]
-            public uint Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnElementChanged(); } } }
+            public byte Level { get { return level; } set { if (level != value) { level = value; OnElementChanged(); } } }
             [ElementPriority(2)]
-            public uint Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnElementChanged(); } } }
+            public DataTypeFlags DestTexture { get { return destTexture; } set { if (destTexture != value) { destTexture = value; OnElementChanged(); } } }
             [ElementPriority(3)]
-            public uint Unknown3 { get { return unknown3; } set { if (unknown3 != value) { unknown3 = value; OnElementChanged(); } } }
+            public LODAssetList LODAssets { get { return lodAssets; } set { if (!lodAssets.Equals(value)) { lodAssets = new LODAssetList(handler, value); OnElementChanged(); } } }
 
             public string Value
+            {
+                get
+                {
+                    return ValueBuilder;
+                }
+            }
+            #endregion
+        }
+        public class LODInfoEntryList : DependentList<LODInfoEntry>
+        {
+            #region Constructors
+            public LODInfoEntryList(EventHandler handler) : base(handler, Byte.MaxValue) { }
+            public LODInfoEntryList(EventHandler handler, Stream s) : base(handler, s, Byte.MaxValue) { }
+            public LODInfoEntryList(EventHandler handler, IEnumerable<LODInfoEntry> le) : base(handler, le, Byte.MaxValue) { }
+            #endregion
+
+            #region Data I/O
+            protected override int ReadCount(Stream s) { return new BinaryReader(s).ReadByte(); }
+            protected override void WriteCount(Stream s, int count) { new BinaryWriter(s).Write((byte)count); }
+            protected override LODInfoEntry CreateElement(Stream s) { return new LODInfoEntry(0, elementHandler, s); }
+            protected override void WriteElement(Stream s, LODInfoEntry element) { element.UnParse(s); }
+            #endregion
+
+            public override void Add() { this.Add(new LODInfoEntry(0, null)); }
+        }
+
+        public class LODAsset : AHandlerElement, IEquatable<LODAsset>
+        {
+            const int recommendedApiVersion = 1;
+
+            #region Attributes
+            CASGeomFlags sorting;
+            CASGeomFlags specLevel;
+            CASGeomFlags castShadow;
+            #endregion
+
+            #region Constructors
+            public LODAsset(int APIversion, EventHandler handler) : base(APIversion, handler) { }
+            public LODAsset(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
+            public LODAsset(int APIversion, EventHandler handler, LODAsset basis) : this(APIversion, handler, basis.sorting, basis.specLevel, basis.castShadow) { }
+            public LODAsset(int APIversion, EventHandler handler, CASGeomFlags sorting, CASGeomFlags specLevel, CASGeomFlags castShadow)
+                : base(APIversion, handler) { this.sorting = sorting; this.specLevel = specLevel; this.castShadow = castShadow; }
+            #endregion
+
+            #region Data I/O
+            void Parse(Stream s)
+            {
+                BinaryReader r = new BinaryReader(s);
+                sorting = (CASGeomFlags)r.ReadUInt32();
+                specLevel = (CASGeomFlags)r.ReadUInt32();
+                castShadow = (CASGeomFlags)r.ReadUInt32();
+            }
+
+            internal void UnParse(Stream s)
+            {
+                BinaryWriter w = new BinaryWriter(s);
+                w.Write((uint)sorting);
+                w.Write((uint)specLevel);
+                w.Write((uint)castShadow);
+            }
+            #endregion
+
+            #region AHandlerElement Members
+            public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
+            public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
+            public override AHandlerElement Clone(EventHandler handler) { return new LODAsset(requestedApiVersion, handler, this); }
+            #endregion
+
+            #region IEquatable<LODAsset> Members
+
+            public bool Equals(LODAsset other)
+            {
+                return
+                    this.sorting == other.sorting
+                    && this.specLevel == other.specLevel
+                    && this.castShadow == other.castShadow
+                    ;
+            }
+
+            #endregion
+
+            #region Content Fields
+            [ElementPriority(1)]
+            public CASGeomFlags Sorting { get { return sorting; } set { if (sorting != value) { sorting = value; OnElementChanged(); } } }
+            [ElementPriority(2)]
+            public CASGeomFlags SpecLevel { get { return specLevel; } set { if (specLevel != value) { specLevel = value; OnElementChanged(); } } }
+            [ElementPriority(3)]
+            public CASGeomFlags CastShadow { get { return castShadow; } set { if (castShadow != value) { castShadow = value; OnElementChanged(); } } }
+
+            public string Value { get { return ValueBuilder; } }
+            /*public string Value
             {
                 get
                 {
@@ -345,129 +443,25 @@ namespace CASPartResource
                             sb.Append(string.Format("{0}: {1}; ", field, this[field]));
                     return sb.ToString().TrimEnd(';', ' ');
                 }
-            }
+            }/**/
             #endregion
         }
-        public class InnerEntryList : DependentList<InnerEntry>
+        public class LODAssetList : DependentList<LODAsset>
         {
             #region Constructors
-            public InnerEntryList(EventHandler handler) : base(handler, Byte.MaxValue) { }
-            public InnerEntryList(EventHandler handler, Stream s) : base(handler, s, Byte.MaxValue) { }
-            public InnerEntryList(EventHandler handler, IEnumerable<InnerEntry> le) : base(handler, le, Byte.MaxValue) { }
+            public LODAssetList(EventHandler handler) : base(handler, Byte.MaxValue) { }
+            public LODAssetList(EventHandler handler, Stream s) : base(handler, s, Byte.MaxValue) { }
+            public LODAssetList(EventHandler handler, IEnumerable<LODAsset> le) : base(handler, le, Byte.MaxValue) { }
             #endregion
 
             #region Data I/O
             protected override int ReadCount(Stream s) { return new BinaryReader(s).ReadByte(); }
             protected override void WriteCount(Stream s, int count) { new BinaryWriter(s).Write((byte)count); }
-            protected override InnerEntry CreateElement(Stream s) { return new InnerEntry(0, elementHandler, s); }
-            protected override void WriteElement(Stream s, InnerEntry element) { element.UnParse(s); }
+            protected override LODAsset CreateElement(Stream s) { return new LODAsset(0, elementHandler, s); }
+            protected override void WriteElement(Stream s, LODAsset element) { element.UnParse(s); }
             #endregion
 
-            public override void Add() { this.Add(new InnerEntry(0, null)); }
-        }
-
-        public class OuterEntry : AHandlerElement, IEquatable<OuterEntry>
-        {
-            const int recommendedApiVersion = 1;
-
-            #region Attributes
-            byte outerEntryNum;
-            uint unknown1;
-            InnerEntryList innerEntries;
-            #endregion
-
-            #region Constructors
-            public OuterEntry(int APIversion, EventHandler handler) : base(APIversion, handler) { }
-            public OuterEntry(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
-            public OuterEntry(int APIversion, EventHandler handler, OuterEntry basis)
-                : this(APIversion, handler, basis.outerEntryNum, basis.unknown1, basis.innerEntries) { }
-            public OuterEntry(int APIversion, EventHandler handler, byte outerEntryNum, uint unknown1, IEnumerable<InnerEntry> le)
-                : base(APIversion, handler)
-            {
-                this.outerEntryNum = outerEntryNum;
-                this.unknown1 = unknown1;
-                this.innerEntries = new InnerEntryList(handler, le);
-            }
-            #endregion
-
-            #region Data I/O
-            void Parse(Stream s)
-            {
-                BinaryReader r = new BinaryReader(s);
-                outerEntryNum = r.ReadByte();
-                unknown1 = r.ReadUInt32();
-                innerEntries = new InnerEntryList(handler, s);
-            }
-
-            internal void UnParse(Stream s)
-            {
-                BinaryWriter w = new BinaryWriter(s);
-                w.Write(outerEntryNum);
-                w.Write(unknown1);
-                if (innerEntries == null) innerEntries = new InnerEntryList(handler);
-                innerEntries.UnParse(s);
-            }
-            #endregion
-
-            #region AHandlerElement Members
-            public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
-            public override AHandlerElement Clone(EventHandler handler) { return new OuterEntry(requestedApiVersion, handler, this); }
-            public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
-            #endregion
-
-            #region IEquatable<Entry> Members
-
-            public bool Equals(OuterEntry other)
-            {
-                return
-                    this.outerEntryNum == other.outerEntryNum
-                    && this.unknown1 == other.unknown1
-                    && this.innerEntries.Equals(other.innerEntries)
-                    ;
-            }
-
-            #endregion
-
-            #region Content Fields
-            [ElementPriority(1)]
-            public byte OuterEntryNum { get { return outerEntryNum; } set { if (outerEntryNum != value) { outerEntryNum = value; OnElementChanged(); } } }
-            [ElementPriority(2)]
-            public uint Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnElementChanged(); } } }
-            [ElementPriority(3)]
-            public InnerEntryList InnerEntries { get { return innerEntries; } set { if (!innerEntries.Equals(value)) { innerEntries = new InnerEntryList(handler, value); OnElementChanged(); } } }
-
-            public string Value
-            {
-                get
-                {
-                    return ValueBuilder;
-                    /*
-                    string s = "";
-                    s += string.Format("OuterEntryNum: {0}; Unknown1: {1}; InnerEntries:", outerEntryNum, unknown1);
-                    for (int i = 0; i < innerEntries.Count; i++)
-                        s += string.Format("\n  [{0}]: {1}", i, innerEntries[i].Value);
-                    return s;
-                    /**/
-                }
-            }
-            #endregion
-        }
-        public class OuterEntryList : DependentList<OuterEntry>
-        {
-            #region Constructors
-            public OuterEntryList(EventHandler handler) : base(handler, Byte.MaxValue) { }
-            public OuterEntryList(EventHandler handler, Stream s) : base(handler, s, Byte.MaxValue) { }
-            public OuterEntryList(EventHandler handler, IEnumerable<OuterEntry> le) : base(handler, le, Byte.MaxValue) { }
-            #endregion
-
-            #region Data I/O
-            protected override int ReadCount(Stream s) { return new BinaryReader(s).ReadByte(); }
-            protected override void WriteCount(Stream s, int count) { new BinaryWriter(s).Write((byte)count); }
-            protected override OuterEntry CreateElement(Stream s) { return new OuterEntry(0, elementHandler, s); }
-            protected override void WriteElement(Stream s, OuterEntry element) { element.UnParse(s); }
-            #endregion
-
-            public override void Add() { this.Add(new OuterEntry(0, null)); }
+            public override void Add() { this.Add(new LODAsset(0, null)); }
         }
         #endregion
 
@@ -475,7 +469,7 @@ namespace CASPartResource
         [ElementPriority(1)]
         public uint Version { get { return version; } set { if (version != value) { version = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(2)]
-        public XMLEntryList XmlEntries { get { return xmlEntries; } set { if (xmlEntries.Equals(value)) { xmlEntries = new XMLEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public PresetList Presets { get { return presets; } set { if (presets.Equals(value)) { presets = new PresetList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(3)]
         public string Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(4)]
@@ -507,7 +501,7 @@ namespace CASPartResource
         [ElementPriority(17), DataGridExpandable]
         public ByteEntryList VPXYIndexes { get { return vpxyIndexes; } set { if (vpxyIndexes.Equals(value)) { vpxyIndexes = new ByteEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(18)]
-        public OuterEntryList OuterEntries { get { return outerEntries; } set { if (outerEntries.Equals(value)) { outerEntries = new OuterEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public LODInfoEntryList LODInfo { get { return lodInfo; } set { if (lodInfo.Equals(value)) { lodInfo = new LODInfoEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(19), DataGridExpandable]
         public ByteEntryList Diffuse1Indexes { get { return diffuse1Indexes; } set { if (diffuse1Indexes.Equals(value)) { diffuse1Indexes = new ByteEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(20), DataGridExpandable]
@@ -522,62 +516,7 @@ namespace CASPartResource
         [ElementPriority(24)]
         public CountedTGIBlockList TGIBlocks { get { return tgiBlocks; } set { if (!tgiBlocks.Equals(value)) { tgiBlocks = new CountedTGIBlockList(OnResourceChanged, "IGT", value); OnResourceChanged(this, new EventArgs()); } } }
 
-        public string Value
-        {
-            get
-            {
-                return ValueBuilder;
-                /*
-                string s = "";
-
-                foreach (string field in ContentFields)
-                    if (field.Equals("Value") || field.Equals("AsBytes") || field.Equals("Stream")) continue;
-                    else if (field.EndsWith("Index"))
-                    {
-                        s += String.Format("\n{0}: {1} ({2})", field, this[field], tgiBlocks[Convert.ToInt32(this[field].Value)]);
-                    }
-                    else if (field.EndsWith("Indexes"))
-                    {
-                        s += String.Format("\n--\n{0}:", field);
-                        ByteEntryList list = this[field].Value as ByteEntryList;
-                        string fmt = "\n  [{0:X" + list.Count.ToString("X").Length + "}]: 0x{1:X2} ({2})";
-                        for (int i = 0; i < list.Count; i++)
-                            s += String.Format(fmt, i, list[i], tgiBlocks[list[i]]);
-                        s += "\n----";
-                    }
-                    else if (field.Equals("XmlEntries"))
-                    {
-                        s += "\n--\nXmlEntries:";
-                        string fmt = "\n  [{0:X" + xmlEntries.Count.ToString("X").Length + "}]: {1}";
-                        for (int i = 0; i < xmlEntries.Count; i++)
-                            s += String.Format(fmt, i, xmlEntries[i].Value);
-                        s += "\n----";
-                    }
-                    else if (field.Equals("OuterEntries"))
-                    {
-                        s += "\n--\nOuterEntries:";
-                        string fmt = "\n--[{0:X" + outerEntries.Count.ToString("X").Length + "}]--{1}";
-                        for (int i = 0; i < outerEntries.Count; i++)
-                            s += String.Format(fmt, i, outerEntries[i].Value);
-                        s += "\n----";
-                    }
-                    else if (field.Equals("TGIBlocks"))
-                    {
-                        s += "\n--\nTGIBlocks:";
-                        string fmt = "\n  [{0:X" + tgiBlocks.Count.ToString("X").Length + "}]: {1}";
-                        for (int i = 0; i < tgiBlocks.Count; i++)
-                            s += String.Format(fmt, i, tgiBlocks[i].Value);
-                        s += "\n----";
-                    }
-                    else
-                    {
-                        s += String.Format("\n{0}: {1}", field, this[field]);
-                    }
-
-                return s;
-                /**/
-            }
-        }
+        public string Value { get { return ValueBuilder; } }
         #endregion
     }
 
