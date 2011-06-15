@@ -135,7 +135,8 @@ namespace System
         /// <returns>An indication of the relative value of this instance and the specified list.</returns>
         public static int CompareTo<T>(this IList<T> value, IList<T> target) where T : IComparable<T>
         {
-            if (value == null) if (target != null) return -1; else return 0;//should never happen!
+            if (value == null)//should never happen!
+                return (target != null) ? -1 : 0;
             if (target == null) return 1;
 
             int lim = Math.Min(value.Count, target.Count);
@@ -146,10 +147,19 @@ namespace System
         /// <summary>
         /// Returns a value indicating whether this instance is equal to a specified list of <typeparamref name="T"/> values.
         /// </summary>
-        /// <typeparam name="T">A type supporting <c>IComparable{T}.</c></typeparam>
+        /// <typeparam name="T">A type supporting <see cref="IEquatable{T}"/>.</typeparam>
         /// <param name="value">This instance.</param>
         /// <param name="target">A list to compare.</param>
         /// <returns>And indication of the equality of the values of this instance and the specified list.</returns>
-        public static bool Equals<T>(this IList<T> value, IList<T> target) where T : IComparable<T> { return value.CompareTo<T>(target) == 0; }
+        public static bool Equals<T>(this IList<T> value, IList<T> target) where T : IEquatable<T>
+        {
+            if (value == null)//should never happen!
+                return (target == null);
+            if (target == null) return false;
+
+            if (value.Count != target.Count) return false;
+            for (int i = 0; i < value.Count; i++) if (!value[i].Equals(target[i])) return false;
+            return true;
+        }
     }
 }
