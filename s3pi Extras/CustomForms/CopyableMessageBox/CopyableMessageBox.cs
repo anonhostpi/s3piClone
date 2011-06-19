@@ -33,7 +33,7 @@ namespace System.Windows.Forms
             InitializeComponent();
         }
 
-        Label lb = new Label();
+        Label lb = new Label() { AutoSize = true, Margin = new Padding(12), };
         internal CopyableMessageBoxInternal(string message, string caption, CopyableMessageBoxIcon icon, IList<string> buttons, int defBtn, int cncBtn)
             : this()
         {
@@ -57,7 +57,6 @@ namespace System.Windows.Forms
             if (winSize.Height < Screen.PrimaryScreen.WorkingArea.Size.Height / 4) winSize.Height = Screen.PrimaryScreen.WorkingArea.Size.Height;
             lb.MaximumSize = new Size((int)(winSize.Width * .8) - (formWidth + tbPadding + iconWidth),
                 (int)(winSize.Height * .8) - (formHeight + buttonHeight + tbPadding));
-            lb.AutoSize = true;
             lb.Text = message;
 
             tbMessage_SizeChanged(tbMessage, null);
@@ -143,29 +142,97 @@ namespace System.Windows.Forms
         }
     }
 
+    /// <summary>
+    /// Specifies constants defining which symbol to display on a <see cref="CopyableMessageBox"/>.
+    /// </summary>
     public enum CopyableMessageBoxIcon
     {
+        /// <summary>
+        /// The message box contain no symbols.
+        /// </summary>
+        /// <remarks>This is the default for unknown values.</remarks>
         None = 0,
+        /// <summary>
+        /// The message box contains a symbol consisting of a lowercase letter i.
+        /// This is styled italic and displayed in blue on very pale blue.
+        /// </summary>
         Information = 1,
+        /// <summary>
+        /// The message box contains a symbol consisting of a lowercase letter i.
+        /// This is styled italic and displayed in blue on very pale blue.
+        /// </summary>
+        /// <remarks>This is the same as <see cref="CopyableMessageBoxIcon.Information"/>.</remarks>
         Asterisk = 1,
+        /// <summary>
+        /// The message box contains a symbol consisting of a question mark.
+        /// This is styled regular and displayed in green on very pale green.
+        /// </summary>
         Question = 2,
+        /// <summary>
+        /// The message box contains a symbol consisting of an exclamation mark.
+        /// This is styled bold and displayed in black on yellow.
+        /// </summary>
         Warning = 3,
+        /// <summary>
+        /// The message box contains a symbol consisting of an exclamation mark.
+        /// This is styled bold and displayed in black on yellow.
+        /// </summary>
+        /// <remarks>This is the same as <see cref="CopyableMessageBoxIcon.Warning"/>.</remarks>
         Exclamation = 3,
+        /// <summary>
+        /// The message box contains a symbol consisting of an uppercase letter X.
+        /// This is styled bold and displayed in white on red.
+        /// </summary>
         Error = 4,
+        /// <summary>
+        /// The message box contains a symbol consisting of an uppercase letter X.
+        /// This is styled bold and displayed in white on red.
+        /// </summary>
+        /// <remarks>This is the same as <see cref="CopyableMessageBoxIcon.Error"/>.</remarks>
         Hand = 4,
+        /// <summary>
+        /// The message box contains a symbol consisting of an uppercase letter X.
+        /// This is styled bold and displayed in white on red.
+        /// </summary>
+        /// <remarks>This is the same as <see cref="CopyableMessageBoxIcon.Error"/>.</remarks>
         Stop = 4,
     }
 
+    /// <summary>
+    /// Specifies constants defining which buttons to display on a <see cref="CopyableMessageBox"/>.
+    /// </summary>
     public enum CopyableMessageBoxButtons
     {
+        /// <summary>
+        /// The message box contains an OK button.
+        /// </summary>
+        /// <remarks>This is the default for unknown values.</remarks>
         OK,
+        /// <summary>
+        /// The message box contains OK and Cancel buttons.
+        /// </summary>
         OKCancel,
+        /// <summary>
+        /// The message box contains Abort, Retry, and Ignore buttons.
+        /// </summary>
         AbortRetryIgnore,
+        /// <summary>
+        /// The message box contains Yes, No, and Cancel buttons.
+        /// </summary>
         YesNoCancel,
+        /// <summary>
+        /// The message box contains Yes and No buttons.
+        /// </summary>
         YesNo,
+        /// <summary>
+        /// The message box contains Retry and Cancel buttons.
+        /// </summary>
         RetryCancel,
     }
 
+    /// <summary>
+    /// Displays a message box from which the text can be copied.
+    /// </summary>
     public static class CopyableMessageBox
     {
         internal static Form OwningForm
@@ -178,40 +245,82 @@ namespace System.Windows.Forms
             }
         }
 
+        /// <summary>
+        /// Displays a message box with the specified text.
+        /// The text can be copied.
+        /// </summary>
+        /// <param name="message">The text to display in the message box.  This text can be copied.</param>
+        /// <returns>Always returns <c>0</c>.</returns>
         public static int Show(string message)
         {
             return Show(message, OwningForm != null ? OwningForm.Text : Application.ProductName,
                 CopyableMessageBoxIcon.None, new List<string>(new string[] { "OK" }), 0, 0);
         }
-        public static int Show(string message, string caption)
-        {
-            return Show(message, caption, CopyableMessageBoxIcon.None, new List<string>(new string[] { "OK" }), 0, 0);
-        }
-        public static int Show(string message, string caption, CopyableMessageBoxButtons buttons)
-        {
-            int cncBtn = enumToCncBtn(buttons);
-            return Show(message, caption, CopyableMessageBoxIcon.None, enumToList(buttons), 0, cncBtn);
-        }
-        public static int Show(string message, string caption, CopyableMessageBoxButtons buttons, CopyableMessageBoxIcon icon)
-        {
-            int cncBtn = enumToCncBtn(buttons);
-            return Show(message, caption, icon, enumToList(buttons), 0, cncBtn);
-        }
-        public static int Show(string message, string caption, CopyableMessageBoxButtons buttons, CopyableMessageBoxIcon icon, int defBtn)
+        /// <summary>
+        /// Displays a message box with the specified text, caption, buttons, icon and default button.
+        /// The text can be copied.
+        /// </summary>
+        /// <param name="message">The text to display in the message box.  This text can be copied.</param>
+        /// <param name="caption">The text to display in the title bar of the message box.</param>
+        /// <param name="buttons">One of the <see cref="CopyableMessageBoxButtons"/> values that specifies which buttons to display in the message box.
+        /// If not specified, <see cref="CopyableMessageBoxButtons.OK"/> is used.</param>
+        /// <param name="icon">One of the <see cref="CopyableMessageBoxIcon"/> values that specifies which icon to display in the message box.
+        /// If not specified, <see cref="CopyableMessageBoxIcon.None"/> is used.</param>
+        /// <param name="defBtn">The zero-based index of the default button.
+        /// If not specified, <c>0</c> is used.</param>
+        /// <returns>The zero-based index of the button pressed.</returns>
+        public static int Show(string message, string caption,
+            CopyableMessageBoxButtons buttons = CopyableMessageBoxButtons.OK,
+            CopyableMessageBoxIcon icon = CopyableMessageBoxIcon.None,
+            int defBtn = 0)
         {
             int cncBtn = enumToCncBtn(buttons);
             return Show(message, caption, icon, enumToList(buttons), defBtn, cncBtn);
         }
+        /// <summary>
+        /// Displays a message box with the specified text, caption, icon, buttons, default button and cancel button.
+        /// The text can be copied.
+        /// </summary>
+        /// <param name="message">The text to display in the message box.  This text can be copied.</param>
+        /// <param name="caption">The text to display in the title bar of the message box.</param>
+        /// <param name="buttons">One of the <see cref="CopyableMessageBoxButtons"/> values that specifies which buttons to display in the message box.</param>
+        /// <param name="icon">One of the <see cref="CopyableMessageBoxIcon"/> values that specifies which icon to display in the message box.</param>
+        /// <param name="defBtn">The zero-based index of the default button.</param>
+        /// <param name="cncBtn">The zero-based index of the cancel button.</param>
+        /// <returns>The zero-based index of the button pressed.</returns>
         public static int Show(string message, string caption, CopyableMessageBoxButtons buttons, CopyableMessageBoxIcon icon, int defBtn, int cncBtn)
         {
             return Show(message, caption, icon, enumToList(buttons), defBtn, cncBtn);
         }
 
+        /// <summary>
+        /// Displays a message box with the specified text, caption, icon, buttons, default button and cancel button.
+        /// The text can be copied.
+        /// </summary>
+        /// <param name="message">The text to display in the message box.  This text can be copied.</param>
+        /// <param name="caption">The text to display in the title bar of the message box.</param>
+        /// <param name="icon">One of the <see cref="CopyableMessageBoxIcon"/> values that specifies which icon to display in the message box.</param>
+        /// <param name="buttons">A <see cref="IList{T}"/> (where <c>T</c> is <see cref="string"/>) to display as buttons in the message box.</param>
+        /// <param name="defBtn">The zero-based index of the default button.</param>
+        /// <param name="cncBtn">The zero-based index of the cancel button.</param>
+        /// <returns>The zero-based index of the button pressed.</returns>
         public static int Show(string message, string caption, CopyableMessageBoxIcon icon, IList<string> buttons, int defBtn, int cncBtn)
         {
             return Show(OwningForm, message, caption, icon, buttons, defBtn, cncBtn);
         }
 
+        /// <summary>
+        /// Displays a message box with the specified text, caption, icon, buttons, default button and cancel button.
+        /// The text can be copied.
+        /// </summary>
+        /// <param name="owner">An implementation of <see cref="System.Windows.Forms.IWin32Window"/> that will own the modal dialog box.</param>
+        /// <param name="message">The text to display in the message box.  This text can be copied.</param>
+        /// <param name="caption">The text to display in the title bar of the message box.</param>
+        /// <param name="icon">One of the <see cref="CopyableMessageBoxIcon"/> values that specifies which icon to display in the message box.</param>
+        /// <param name="buttons">A <see cref="IList{T}"/> (where <c>T</c> is <see cref="string"/>) to display as buttons in the message box.</param>
+        /// <param name="defBtn">The zero-based index of the default button.</param>
+        /// <param name="cncBtn">The zero-based index of the cancel button.</param>
+        /// <returns>The zero-based index of the button pressed.</returns>
         public static int Show(IWin32Window owner, string message, string caption, CopyableMessageBoxIcon icon, IList<string> buttons, int defBtn, int cncBtn)
         {
             CopyableMessageBoxInternal cmb = new CopyableMessageBoxInternal(message, caption, icon, buttons, defBtn, cncBtn);
@@ -251,8 +360,30 @@ namespace System.Windows.Forms
             }
         }
 
+        /// <summary>
+        /// Displays a message box containing the specified <see cref="Exception"/>
+        /// including a full traceback of inner exceptions.
+        /// The text can be copied.
+        /// </summary>
+        /// <param name="ex">A <see cref="Exception"/> to display.</param>
         public static void IssueException(Exception ex) { IssueException(ex, "", "Program Exception"); }
+        /// <summary>
+        /// Displays a message box containing the specified <see cref="Exception"/>
+        /// including a full traceback of inner exceptions, with the specified caption.
+        /// The text can be copied.
+        /// </summary>
+        /// <param name="ex">A <see cref="Exception"/> to display.</param>
+        /// <param name="caption">The text to display in the title bar of the message box.</param>
         public static void IssueException(Exception ex, string caption) { IssueException(ex, "", caption); }
+        /// <summary>
+        /// Displays a message box containing the specified <see cref="Exception"/>
+        /// including a full traceback of inner exceptions, with the specified caption.
+        /// The <paramref name="prefix"/> text is display before the exception trace.
+        /// The text can be copied.
+        /// </summary>
+        /// <param name="ex">A <see cref="Exception"/> to display.</param>
+        /// <param name="prefix">Text to display before the exception.</param>
+        /// <param name="caption">The text to display in the title bar of the message box.</param>
         public static void IssueException(Exception ex, string prefix, string caption)
         {
             System.Text.StringBuilder sb = new Text.StringBuilder();
