@@ -211,7 +211,9 @@ namespace s3pi.GenericRCOLResource
             Delayed = 0x3, //Other resource
         }
 
-        public class ChunkReference : AHandlerElement, IEquatable<ChunkReference>
+        public class ChunkReference : AHandlerElement,
+            IEquatable<ChunkReference>, IEqualityComparer<ChunkReference>,
+            IComparer<ChunkReference>, IComparable<ChunkReference>
         {
             const Int32 recommendedApiVersion = 1;
 
@@ -253,6 +255,27 @@ namespace s3pi.GenericRCOLResource
             #region IEquatable<ChunkReference> Members
 
             public bool Equals(ChunkReference other) { return chunkReference == other.chunkReference; }
+            public override bool Equals(object obj) { return (obj as ChunkReference != null) ? this.Equals(obj as ChunkReference) : false; }
+            public override int GetHashCode() { return chunkReference.GetHashCode(); }
+
+            #endregion
+
+            #region IEqualityComparer<ChunkReference>
+
+            public bool Equals(ChunkReference x, ChunkReference y) { return x.Equals(y); }
+            public int GetHashCode(ChunkReference obj) { return obj.GetHashCode(); }
+
+            #endregion
+
+            #region IComparer<ChunkReference>
+
+            public int CompareTo(ChunkReference other) { return chunkReference.CompareTo(other.chunkReference); }
+
+            #endregion
+
+            #region IComparable<ChunkReference>
+
+            public int Compare(ChunkReference x, ChunkReference y) { return x.CompareTo(y); }
 
             #endregion
 
