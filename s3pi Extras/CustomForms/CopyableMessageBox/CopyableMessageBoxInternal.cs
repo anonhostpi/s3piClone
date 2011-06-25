@@ -33,54 +33,82 @@ namespace System.Windows.Forms
             InitializeComponent();
         }
 
-        Label lb = new Label() { AutoSize = true, Margin = new Padding(12), };
         internal CopyableMessageBoxInternal(string message, string caption, CopyableMessageBoxIcon icon, IList<string> buttons, int defBtn, int cncBtn)
             : this()
         {
             if (buttons.Count < 1)
                 throw new ArgumentLengthException("At least one button text must be supplied");
 
-            this.SuspendLayout();
-
-
-            int formWidth = Bounds.Width - ClientSize.Width; // screen estate used by the form border
-            int formHeight = Bounds.Height - ClientSize.Height; // screen estate used by the form border
-            int tbPadding = tbMessage.Margin.Left + tbMessage.Margin.Right; // screen estate used by the text box regardless of content
-            int buttonHeight = flpButtons.Height; // screen estate reserved for the buttons
-
-            int iconWidth = icon == CopyableMessageBoxIcon.None ? 0 : 80; // icon area, if icon present
-            int iconHeight = icon == CopyableMessageBoxIcon.None ? 0 : 77; // icon area, if icon present
-
-            // To calculate the text box size, we get an autosize label to tell us how big it should be
-            Size winSize = CopyableMessageBox.OwningForm != null ? CopyableMessageBox.OwningForm.Size : Screen.PrimaryScreen.WorkingArea.Size;
-            if (winSize.Width < Screen.PrimaryScreen.WorkingArea.Size.Width / 4) winSize.Width = Screen.PrimaryScreen.WorkingArea.Size.Width;
-            if (winSize.Height < Screen.PrimaryScreen.WorkingArea.Size.Height / 4) winSize.Height = Screen.PrimaryScreen.WorkingArea.Size.Height;
-            lb.MaximumSize = new Size((int)(winSize.Width * .8) - (formWidth + tbPadding + iconWidth),
-                (int)(winSize.Height * .8) - (formHeight + buttonHeight + tbPadding));
-            lb.Text = message;
-
-            tbMessage_SizeChanged(tbMessage, null);
-
-            int buttonWidth = 15 + (81 * (buttons.Count - 1)) + 75 + 15;
-            int textWidth = tbPadding + lb.PreferredWidth;
-            int textHeight = tbPadding + lb.PreferredHeight;
-
-            this.ClientSize = new Size(Math.Max(buttonWidth, iconWidth + textWidth),
-                buttonHeight + Math.Max(iconHeight, textHeight));
-
-
-            this.Text = caption;
-
             this.tbMessage.Lines = message.Split('\n');
-
+            this.Text = caption;
             enumToGlyph(icon, lbIcon);
-
             CreateButtons(buttons, defBtn, cncBtn);
 
-
-            this.ResumeLayout();
-
             this.DialogResult = DialogResult.OK;
+        }
+
+        Size ctlSize = new Size();
+        void CopyableMessageBoxInternal_Layout(object sender, LayoutEventArgs e)
+        {
+            if (!ctlSize.IsEmpty) return;
+
+            this.SuspendLayout();
+
+            // Calculate our maximum work area
+            // Start off with the owning form size or, failing that being available, the primary screen size
+            Size winSize = CopyableMessageBox.OwningForm != null ? CopyableMessageBox.OwningForm.Size : Screen.PrimaryScreen.WorkingArea.Size;
+
+            // Next, if we got less than 1/4 of the screen width or height above, use the primary screen width or height
+            if (winSize.Width < Screen.PrimaryScreen.WorkingArea.Size.Width / 4) winSize.Width = Screen.PrimaryScreen.WorkingArea.Size.Width;
+            if (winSize.Height < Screen.PrimaryScreen.WorkingArea.Size.Height / 4) winSize.Height = Screen.PrimaryScreen.WorkingArea.Size.Height;
+
+            // Finally, reduce to 80% of width and height
+            winSize.Width = winSize.Width * 4 / 5;
+            winSize.Height = winSize.Height * 4 / 5;
+
+            // Now determine how much estate is lost to the form border
+            int formWidth = Bounds.Width - ClientSize.Width;
+            int formHeight = Bounds.Height - ClientSize.Height;
+
+            // Space for the icon, if present
+            lbIcon.PerformLayout();
+            Size iconSize = lbIcon.Visible ? lbIcon.PreferredSize : new Size(0, 0);
+
+            flpButtons.PerformLayout();
+            Size btnSize = flpButtons.PreferredSize;
+
+            // So, remaining size...
+            int maxWidth = winSize.Width - formWidth - iconSize.Width;
+            int maxHeight = winSize.Height - formHeight - btnSize.Height;
+
+            // To calculate our text box size, we get an autosize TextBox to tell us how big it should be
+            TextBox tb = new TextBox
+            {
+                AutoSize = true,
+                Font = new Label().Font,
+                Margin = new Padding(12),
+                MaximumSize = new Size(maxWidth, maxHeight),
+                Multiline = true,
+                Text = this.tbMessage.Text,
+            };
+            tb.PerformLayout();
+
+            tbMessage.Font = tb.Font;
+            tbMessage.ClientSize = tb.PreferredSize;
+            tbMessage.PerformLayout();
+
+            int minWidth = Math.Max(btnSize.Width, iconSize.Width) + formWidth;
+            int minHeight = btnSize.Height + iconSize.Height + formHeight;
+            this.MinimumSize = new Size(minWidth, minHeight);
+
+            int clientWidth = Math.Min(winSize.Width - formWidth, Math.Max(btnSize.Width, tableLayoutPanel1.PreferredSize.Width));
+            int clientHeight = Math.Min(winSize.Height - formHeight, btnSize.Height + tableLayoutPanel1.PreferredSize.Height);
+            ctlSize = new Size(clientWidth, clientHeight);
+            this.ClientSize = ctlSize;
+
+            this.Location = new Point((Screen.PrimaryScreen.WorkingArea.Size.Width - Size.Width) / 2, (Screen.PrimaryScreen.WorkingArea.Size.Height - Size.Height) / 2);
+
+            this.ResumeLayout(true);
         }
 
         private void enumToGlyph(CopyableMessageBoxIcon icon, Label lb)
@@ -117,13 +145,16 @@ namespace System.Windows.Forms
 
         private Button CreateButton(string Name, int TabIndex, string Text)
         {
-            Button newButton = new Button();
-            newButton.Anchor = System.Windows.Forms.AnchorStyles.None;
-            newButton.Name = Name;
-            newButton.Size = new System.Drawing.Size(75, 23);
-            newButton.TabIndex = TabIndex;
-            newButton.Text = Text;
-            newButton.UseVisualStyleBackColor = true;
+            Button newButton = new Button()
+            {
+                Anchor = System.Windows.Forms.AnchorStyles.None,
+                Margin = new Forms.Padding(9),
+                Size = new System.Drawing.Size(75, 23),
+                UseVisualStyleBackColor = true,
+                Name = Name,
+                TabIndex = TabIndex,
+                Text = Text,
+            };
             newButton.Click += new System.EventHandler(this.button_Click);
             return newButton;
         }
@@ -135,11 +166,11 @@ namespace System.Windows.Forms
             this.Close();
         }
 
-        private void tbMessage_SizeChanged(object sender, EventArgs e)
+        private void ctl_SizeChanged(object sender, EventArgs e)
         {
-            TextBox tb = sender as TextBox;
-            tbMessage.ScrollBars = ((tb.Height < lb.PreferredHeight || tb.Width < lb.PreferredWidth) ? ScrollBars.Vertical : ScrollBars.None);
+            if (ctlSize.IsEmpty) return;
+
+            tbMessage.ScrollBars = ClientSize.Height < ctlSize.Height || ClientSize.Width < ctlSize.Width ? ScrollBars.Vertical : ScrollBars.None;
         }
     }
-
 }
