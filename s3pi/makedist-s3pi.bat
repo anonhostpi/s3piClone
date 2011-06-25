@@ -43,7 +43,7 @@ if exist "%help%" copy "%help%" %base%
 pushd %base%
 echo %suffix% >%TargetName%-Version.txt
 attrib +r %TargetName%-Version.txt
-7za a -r -t7z -mx9 -ms -xr!.?* -xr!build.dll %pdb% "%out%%base%_%suffix%.7z" *
+7za a -r -t7z -mx9 -ms -xr!.?* -xr!build.* %pdb% "%out%%base%_%suffix%.7z" *
 del /f %TargetName%-Version.txt
 popd
 
