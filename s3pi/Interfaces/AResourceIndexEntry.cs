@@ -84,5 +84,30 @@ namespace s3pi.Interfaces
         /// </summary>
         public EventHandler ResourceIndexEntryChanged;
         #endregion
+
+        #region IEquatable<IResourceIndexEntry>
+        /// <summary>
+        /// Indicates whether the current <see cref="IResourceIndexEntry"/> instance is equal to another <see cref="IResourceIndexEntry"/> instance.
+        /// </summary>
+        /// <param name="other">An <see cref="IResourceIndexEntry"/> instance to compare with this instance.</param>
+        /// <returns>true if the current instance is equal to the <paramref name="other"/> parameter; otherwise, false.</returns>
+        public abstract bool Equals(IResourceIndexEntry other);
+
+        /// <summary>
+        /// Determines whether the specified <see cref="System.Object"/> is equal to the current <see cref="AResourceIndexEntry"/>.
+        /// </summary>
+        /// <param name="obj">The <see cref="System.Object"/> to compare with the current <see cref="AResourceIndexEntry"/>.</param>
+        /// <returns>true if the specified <see cref="System.Object"/> is equal to the current <see cref="AResourceIndexEntry"/>; otherwise, false.</returns>
+        public override bool Equals(object obj)
+        {
+            return obj as AResourceIndexEntry != null ? this.Equals(obj as AResourceIndexEntry) : false;
+        }
+
+        /// <summary>
+        /// Returns the hash code for this instance.
+        /// </summary>
+        /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
+        public override abstract int GetHashCode();
+        #endregion
     }
 }

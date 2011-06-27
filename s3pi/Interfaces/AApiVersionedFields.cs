@@ -556,6 +556,26 @@ namespace s3pi.Interfaces
         /// <param name="other">An object to compare with this object.</param>
         /// <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
         public bool Equals(HandlerElement<T> other) { return val.Equals(other.val); }
+
+        /// <summary>
+        /// Determines whether the specified <see cref="System.Object"/> is equal to the current <see cref="HandlerElement{T}"/>.
+        /// </summary>
+        /// <param name="obj">The <see cref="System.Object"/> to compare with the current <see cref="HandlerElement{T}"/>.</param>
+        /// <returns>true if the specified <see cref="System.Object"/> is equal to the current <see cref="HandlerElement{T}"/>; otherwise, false.</returns>
+        /// <exception cref="System.NullReferenceException">The obj parameter is null.</exception>
+        public override bool Equals(object obj)
+        {
+            if (obj is T) return val.Equals((T)obj);
+            else if (obj is HandlerElement<T>) return this.Equals(obj as HandlerElement<T>);
+            return false;
+        }
+
+        /// <summary>
+        /// Returns the hash code for this instance.
+        /// </summary>
+        /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
+        public override int GetHashCode() { return val.GetHashCode(); }
+
         #endregion
 
         /// <summary>

@@ -348,6 +348,7 @@ namespace s3pi.Package
         /// <returns>The first match, if any; otherwise null.</returns>
         [MinimumVersion(1)]
         [MaximumVersion(recommendedApiVersion)]
+        [Obsolete("Please use Find(Predicate<IResourceIndexEntry> Match)")]
         public override IResourceIndexEntry Find(uint flags, IResourceIndexEntry values) { return Index.Find(x => !x.IsDeleted && FlagMatch(flags, values, x)); }
 
         /// <summary>
@@ -359,6 +360,7 @@ namespace s3pi.Package
         /// <returns>The first match, if any; otherwise null.</returns>
         [MinimumVersion(1)]
         [MaximumVersion(recommendedApiVersion)]
+        [Obsolete("Please use Find(Predicate<IResourceIndexEntry> Match)")]
         public override IResourceIndexEntry Find(string[] names, TypedValue[] values) { return Index.Find(x => !x.IsDeleted && NameMatch(names, values, x)); }
 
         /// <summary>
@@ -383,6 +385,7 @@ namespace s3pi.Package
         /// <returns>An <c>IList&lt;IResourceIndexEntry&gt;</c> of zero or more matches.</returns>
         [MinimumVersion(1)]
         [MaximumVersion(recommendedApiVersion)]
+        [Obsolete("Please use FindAll(Predicate<IResourceIndexEntry> Match)")]
         public override List<IResourceIndexEntry> FindAll(uint flags, IResourceIndexEntry values) { return Index.FindAll(x => !x.IsDeleted && FlagMatch(flags, values, x)); }
 
         /// <summary>
@@ -395,6 +398,7 @@ namespace s3pi.Package
         /// <returns>An <c>IList&lt;IResourceIndexEntry&gt;</c> of zero or more matches.</returns>
         [MinimumVersion(1)]
         [MaximumVersion(recommendedApiVersion)]
+        [Obsolete("Please use FindAll(Predicate<IResourceIndexEntry> Match)")]
         public override List<IResourceIndexEntry> FindAll(string[] names, TypedValue[] values) { return Index.FindAll(x => !x.IsDeleted && NameMatch(names, values, x)); }
 
         /// <summary>

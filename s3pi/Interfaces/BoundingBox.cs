@@ -128,6 +128,25 @@ namespace s3pi.Interfaces
             return this.x == other.x && this.y == other.y && this.z == other.z;
         }
 
+        /// <summary>
+        /// Determines whether the specified <see cref="System.Object"/> is equal to the current <see cref="Vertex"/>.
+        /// </summary>
+        /// <param name="obj">The <see cref="System.Object"/> to compare with the current <see cref="Vertex"/>.</param>
+        /// <returns>true if the specified <see cref="System.Object"/> is equal to the current <see cref="Vertex"/>; otherwise, false.</returns>
+        public override bool Equals(object obj)
+        {
+            return obj as Vertex != null ? this.Equals(obj as Vertex) : false;
+        }
+
+        /// <summary>
+        /// Returns the hash code for this instance.
+        /// </summary>
+        /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
+        public override int GetHashCode()
+        {
+            return x.GetHashCode() ^ y.GetHashCode() ^ z.GetHashCode();
+        }
+
         #endregion
 
         #region Content Fields
@@ -258,6 +277,25 @@ namespace s3pi.Interfaces
         public bool Equals(BoundingBox other)
         {
             return min.Equals(other.min) && max.Equals(other.max);
+        }
+
+        /// <summary>
+        /// Determines whether the specified <see cref="System.Object"/> is equal to the current <see cref="BoundingBox"/>.
+        /// </summary>
+        /// <param name="obj">The <see cref="System.Object"/> to compare with the current <see cref="BoundingBox"/>.</param>
+        /// <returns>true if the specified <see cref="System.Object"/> is equal to the current <see cref="BoundingBox"/>; otherwise, false.</returns>
+        public override bool Equals(object obj)
+        {
+            return obj as BoundingBox != null ? this.Equals(obj as BoundingBox) : false;
+        }
+
+        /// <summary>
+        /// Returns the hash code for this instance.
+        /// </summary>
+        /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
+        public override int GetHashCode()
+        {
+            return min.GetHashCode() ^ max.GetHashCode();
         }
 
         #endregion

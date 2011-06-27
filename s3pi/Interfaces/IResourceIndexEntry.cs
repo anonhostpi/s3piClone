@@ -25,7 +25,7 @@ namespace s3pi.Interfaces
     /// <summary>
     /// An index entry within a package
     /// </summary>
-    public interface IResourceIndexEntry : IApiVersion, IContentFields, IResourceKey
+    public interface IResourceIndexEntry : IApiVersion, IContentFields, IResourceKey, IEquatable<IResourceIndexEntry>
     {
         /// <summary>
         /// If the resource was read from a package, the location in the package the resource was read from

@@ -148,6 +148,26 @@ namespace s3pi.Package
         public override AHandlerElement Clone(EventHandler handler) { return new ResourceIndexEntry(indexEntry); }
         #endregion
 
+        #region IEquatable<IResourceIndexEntry>
+        /// <summary>
+        /// Indicates whether the current <see cref="ResourceIndexEntry"/> instance is equal to another <see cref="IResourceIndexEntry"/> instance.
+        /// </summary>
+        /// <param name="other">An <see cref="IResourceIndexEntry"/> instance to compare with this instance.</param>
+        /// <returns>true if the current instance is equal to the <paramref name="other"/> parameter; otherwise, false.</returns>
+        public override bool Equals(IResourceIndexEntry other)
+        {
+            return other as ResourceIndexEntry != null ? indexEntry.Equals<byte>((other as ResourceIndexEntry).indexEntry) : false;
+        }
+        /// <summary>
+        /// Returns the hash code for this instance.
+        /// </summary>
+        /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
+        public override int GetHashCode()
+        {
+            return indexEntry.GetHashCode();
+        }
+        #endregion
+
 
         #region Implementation
         /// <summary>

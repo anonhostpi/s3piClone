@@ -127,6 +127,16 @@ namespace s3pi.Interfaces
         /// <returns>true if the current instance is equal to the <paramref name="other"/> parameter; otherwise, false.</returns>
         public bool Equals(IResourceKey other) { return this.CompareTo(other) == 0; }
 
+        /// <summary>
+        /// Determines whether the specified <see cref="System.Object"/> is equal to the current <see cref="AResourceKey"/>.
+        /// </summary>
+        /// <param name="obj">The <see cref="System.Object"/> to compare with the current <see cref="AResourceKey"/>.</param>
+        /// <returns>true if the specified <see cref="System.Object"/> is equal to the current <see cref="AResourceKey"/>; otherwise, false.</returns>
+        public override bool Equals(object obj)
+        {
+            return obj as AResourceKey != null ? this.Equals(obj as AResourceKey) : false;
+        }
+
         #endregion
 
         #region IComparable<IResourceKey> Members

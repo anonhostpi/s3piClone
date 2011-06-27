@@ -26,6 +26,8 @@ namespace s3pi.Interfaces
     /// <summary>
     /// An implementation of AResourceKey that supports storing the Type, Group and Instance in any order.
     /// </summary>
+    /// <remarks>An explicit implementation of <see cref="IEquatable{TGIBlock}"/> is required by
+    /// <see cref="CountedTGIBlockList"/> and <see cref="TGIBlockList"/>.</remarks>
     public class TGIBlock : AResourceKey, IEquatable<TGIBlock>
     {
         #region Attributes
@@ -250,7 +252,7 @@ namespace s3pi.Interfaces
         /// </summary>
         /// <param name="other">An <see cref="TGIBlock"/> instance to compare with this instance.</param>
         /// <returns>true if the current instance is equal to the <paramref name="other"/> parameter; otherwise, false.</returns>
-        public bool Equals(TGIBlock other) { return this.Equals((IResourceKey)other); }
+        public bool Equals(TGIBlock other) { return base.Equals(other); }
 
         #endregion
 

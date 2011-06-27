@@ -135,6 +135,7 @@ namespace s3pi.Interfaces
         /// <param name="flags">True bits enable matching against numerically equivalent <paramref name="values"/> entry.</param>
         /// <param name="values">Field values to compare against.</param>
         /// <returns>The first matching <see cref="IResourceIndexEntry"/>, if any; otherwise null.</returns>
+        [Obsolete("Please use Find(Predicate<IResourceIndexEntry> Match)")]
         IResourceIndexEntry Find(uint flags, IResourceIndexEntry values);
 
         /// <summary>
@@ -145,6 +146,7 @@ namespace s3pi.Interfaces
         /// <param name="names">Names of <see cref="IResourceIndexEntry"/> fields to compare.</param>
         /// <param name="values">Field values to compare against.</param>
         /// <returns>The first matching <see cref="IResourceIndexEntry"/>, if any; otherwise null.</returns>
+        [Obsolete("Please use Find(Predicate<IResourceIndexEntry> Match)")]
         IResourceIndexEntry Find(string[] names, TypedValue[] values);
 
         /// <summary>
@@ -165,6 +167,7 @@ namespace s3pi.Interfaces
         /// <param name="flags">True bits enable matching against numerically equivalent <paramref name="values"/> entry.</param>
         /// <param name="values">Field values to compare against.</param>
         /// <returns>An <c>IList&lt;IResourceIndexEntry&gt;</c> of zero or more matches.</returns>
+        [Obsolete("Please use FindAll(Predicate<IResourceIndexEntry> Match)")]
         List<IResourceIndexEntry> FindAll(uint flags, IResourceIndexEntry values);
 
         /// <summary>
@@ -175,6 +178,7 @@ namespace s3pi.Interfaces
         /// <param name="names">Names of <see cref="IResourceIndexEntry"/> fields to compare.</param>
         /// <param name="values">Field values to compare against.</param>
         /// <returns>An <c>IList&lt;IResourceIndexEntry&gt;</c> of zero or more matches.</returns>
+        [Obsolete("Please use FindAll(Predicate<IResourceIndexEntry> Match)")]
         List<IResourceIndexEntry> FindAll(string[] names, TypedValue[] values);
 
         /// <summary>

@@ -238,6 +238,25 @@ namespace s3pi.Interfaces
         /// <returns>true if the current instance is equal to the <paramref name="other"/> parameter; otherwise, false.</returns>
         public bool Equals(TypedValue other) { return this.Value.Equals(other.Value); }
 
+        /// <summary>
+        /// Determines whether the specified <see cref="System.Object"/> is equal to the current <see cref="TypedValue"/>.
+        /// </summary>
+        /// <param name="obj">The <see cref="System.Object"/> to compare with the current <see cref="TypedValue"/>.</param>
+        /// <returns>true if the specified <see cref="System.Object"/> is equal to the current <see cref="TypedValue"/>; otherwise, false.</returns>
+        public override bool Equals(object obj)
+        {
+            return obj as TypedValue != null ? this.Equals((TypedValue)obj) : false;
+        }
+
+        /// <summary>
+        /// Returns the hash code for this instance.
+        /// </summary>
+        /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
+        public override int GetHashCode()
+        {
+            return Value.GetHashCode();
+        }
+
         #endregion
 
         #region IConvertible Members
