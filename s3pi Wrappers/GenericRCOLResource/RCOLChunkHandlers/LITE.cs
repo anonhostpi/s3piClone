@@ -234,6 +234,21 @@ namespace s3pi.GenericRCOLResource
                     ;
             }
 
+            public override bool Equals(object obj)
+            {
+                return obj as LightSource != null ? this.Equals(obj as LightSource) : false;
+            }
+
+            public override int GetHashCode()
+            {
+                return lightSource.GetHashCode()
+                    ^ transform.GetHashCode()
+                    ^ color.GetHashCode()
+                    ^ intensity.GetHashCode()
+                    ^ lightSourceDataArray.GetHashCode()
+                    ;
+            }
+
             #endregion
             
             #region Sub-types
@@ -668,6 +683,22 @@ namespace s3pi.GenericRCOLResource
                     && xAxis.Equals(other.xAxis)
                     && yAxis.Equals(other.yAxis)
                     && pairOffset.Equals(other.pairOffset)
+                    ;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj as Occluder != null ? this.Equals(obj as Occluder) : false;
+            }
+
+            public override int GetHashCode()
+            {
+                return occluderType.GetHashCode()
+                    ^ origin.GetHashCode()
+                    ^ normal.GetHashCode()
+                    ^ xAxis.GetHashCode()
+                    ^ yAxis.GetHashCode()
+                    ^ pairOffset.GetHashCode()
                     ;
             }
 

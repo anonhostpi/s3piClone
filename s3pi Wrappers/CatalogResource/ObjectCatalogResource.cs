@@ -938,6 +938,16 @@ namespace CatalogResource
 
             public bool Equals(TopicRating other) { return this.CompareTo(other) == 0; }
 
+            public override bool Equals(object obj)
+            {
+                return obj as TopicRating != null ? this.Equals((TopicRating)obj) : false;
+            }
+
+            public override int GetHashCode()
+            {
+                return topic.GetHashCode() ^ rating.GetHashCode();
+            }
+
             #endregion
 
             #region AHandlerElement
@@ -1020,6 +1030,16 @@ namespace CatalogResource
             {
                 for (int i = 0; i < unknown1.Length; i++) if (unknown1[i] != other.unknown1[i]) return false;
                 return (levelOffset == other.levelOffset && wallMaskIndex == other.wallMaskIndex);
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj as MTDoor != null ? this.Equals((MTDoor)obj) : false;
+            }
+
+            public override int GetHashCode()
+            {
+                return unknown1.GetHashCode() ^ levelOffset.GetHashCode() ^ wallMaskIndex.GetHashCode();
             }
 
             #endregion

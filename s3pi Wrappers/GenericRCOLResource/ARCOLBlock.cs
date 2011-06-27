@@ -125,6 +125,16 @@ namespace s3pi.Interfaces
 
         public virtual bool Equals(ARCOLBlock other) { return this.AsBytes.Equals<byte>(other.AsBytes); }
 
+        public override bool Equals(object obj)
+        {
+            return obj as ARCOLBlock != null ? this.Equals(obj as ARCOLBlock) : false;
+        }
+
+        public override int GetHashCode()
+        {
+            return AsBytes.GetHashCode();
+        }
+
         #endregion
 
         /// <summary>

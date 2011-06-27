@@ -191,6 +191,11 @@ namespace s3pi.GenericRCOLResource
             #region IEquatable<Entry> Members
 
             public abstract bool Equals(Entry other);
+            public override bool Equals(object obj)
+            {
+                return obj as Entry != null ? this.Equals(obj as Entry) : false;
+            }
+            public abstract override int GetHashCode();
 
             #endregion
 
@@ -219,6 +224,10 @@ namespace s3pi.GenericRCOLResource
             {
                 return other.GetType() == this.GetType() &&
                     (other as Entry00).entryID == entryID && (other as Entry00).tgiIndexes == tgiIndexes;
+            }
+            public override int GetHashCode()
+            {
+                return entryID.GetHashCode() ^ tgiIndexes.GetHashCode();
             }
 
             public override AHandlerElement Clone(EventHandler handler) { return new Entry00(requestedApiVersion, handler, this); }
@@ -253,6 +262,10 @@ namespace s3pi.GenericRCOLResource
             }
 
             public override bool Equals(Entry other) { return other.GetType() == this.GetType() && (other as Entry01).tgiIndex == tgiIndex; }
+            public override int GetHashCode()
+            {
+                return tgiIndex.GetHashCode();
+            }
 
             public override AHandlerElement Clone(EventHandler handler) { return new Entry01(requestedApiVersion, handler, this); }
 

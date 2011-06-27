@@ -221,6 +221,21 @@ namespace TxtcResource
                     && unknown4 == other.unknown4;
             }
 
+            public override bool Equals(object obj)
+            {
+                return obj as SuperBlock != null ? this.Equals(obj as SuperBlock) : false;
+            }
+
+            public override int GetHashCode()
+            {
+                return id.GetHashCode()
+                    ^ unknown1.GetHashCode()
+                    ^ unknown2.GetHashCode()
+                    ^ unknown3.GetHashCode()
+                    ^ entries.GetHashCode()
+                    ^ unknown4.GetHashCode();
+            }
+
             #endregion
 
             #region Content Fields
@@ -358,6 +373,18 @@ namespace TxtcResource
                 MemoryStream otherMS = new MemoryStream();
                 other.UnParse(otherMS);
                 return thisMS.ToArray().Equals<byte>(otherMS.ToArray());
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj as Entry != null ? this.Equals(obj as Entry) : false;
+            }
+
+            public override int GetHashCode()
+            {
+                MemoryStream thisMS = new MemoryStream();
+                UnParse(thisMS);
+                return thisMS.ToArray().GetHashCode();
             }
 
             #endregion
@@ -936,6 +963,14 @@ namespace TxtcResource
             #region IEquatable<EntryBlock> Members
 
             public bool Equals(EntryBlock other) { return theList.Equals(other.theList); }
+            public override bool Equals(object obj)
+            {
+                return obj as EntryBlock != null ? this.Equals(obj as EntryBlock) : false;
+            }
+            public override int GetHashCode()
+            {
+                return theList.GetHashCode();
+            }
 
             #endregion
 

@@ -301,7 +301,7 @@ namespace s3pi.GenericRCOLResource
             public override AHandlerElement Clone(EventHandler handler) { return new LODGroup(requestedApiVersion, handler, this); }
             #endregion
 
-            #region IEquatable<MLODReference> Members
+            #region IEquatable<LODGroup> Members
 
             public bool Equals(LODGroup other)
             {
@@ -326,6 +326,38 @@ namespace s3pi.GenericRCOLResource
                     && unknown3.Equals(other.unknown3)
                     && unknown4.Equals(other.unknown4)
                     && unknown5.Equals(other.unknown5)
+                    ;
+                return res;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj as LODGroup != null ? this.Equals(obj as LODGroup) : false;
+            }
+
+            public override int GetHashCode()
+            {
+                int res =
+                    groupNameHash.GetHashCode()
+                    ^ matdMtstIndex.GetHashCode()
+                    ^ vbufIndex.GetHashCode()
+                    ^ ibufIndex.GetHashCode()
+                    ^ vbufType.GetHashCode()
+                    ^ vbufOffset.GetHashCode()
+                    ^ ibufOffset.GetHashCode()
+                    ^ vbufCount.GetHashCode()
+                    ^ ibufCount.GetHashCode()
+                    ^ boundingBox.GetHashCode()
+                    ^ skinIndex.GetHashCode()
+                    ^ boneNameHashes.GetHashCode()
+                    ^ geoStates.GetHashCode()
+                    ;
+                if (mlodVersion >= 0x0202) res = res
+                    ^ unknown1.GetHashCode()
+                    ^ unknown2.GetHashCode()
+                    ^ unknown3.GetHashCode()
+                    ^ unknown4.GetHashCode()
+                    ^ unknown5.GetHashCode()
                     ;
                 return res;
             }
@@ -503,7 +535,7 @@ namespace s3pi.GenericRCOLResource
             public override AHandlerElement Clone(EventHandler handler) { return new GeoState(requestedApiVersion, handler, this); }
             #endregion
 
-            #region IEquatable<BoxPoint> Members
+            #region IEquatable<GeoState> Members
 
             public bool Equals(GeoState other)
             {
@@ -512,6 +544,21 @@ namespace s3pi.GenericRCOLResource
                     && firstVbufNum.Equals(other.firstVbufNum)
                     && ibufCount.Equals(other.ibufCount)
                     && vbufCount.Equals(other.vbufCount)
+                    ;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj as GeoState != null ? this.Equals(obj as GeoState) : false;
+            }
+
+            public override int GetHashCode()
+            {
+                return stateNameHash.GetHashCode()
+                    ^ firstIbufNum.GetHashCode()
+                    ^ firstVbufNum.GetHashCode()
+                    ^ ibufCount.GetHashCode()
+                    ^ vbufCount.GetHashCode()
                     ;
             }
 

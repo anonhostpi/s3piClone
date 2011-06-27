@@ -143,6 +143,16 @@ namespace ObjKeyResource
 
             public bool Equals(ComponentElement other) { return ((uint)element).Equals((uint)other.element); }
 
+            public override bool Equals(object obj)
+            {
+                return obj as ComponentElement != null ? this.Equals(obj as ComponentElement) : false;
+            }
+
+            public override int GetHashCode()
+            {
+                return element.GetHashCode();
+            }
+
             #endregion
 
             public TypedValue Data(ComponentDataList list, TGIBlockList tgiBlocks)
@@ -256,6 +266,16 @@ namespace ObjKeyResource
             #region IEquatable<Key> Members
 
             public bool Equals(ComponentDataType other) { return this.CompareTo(other) == 0; }
+
+            public override bool Equals(object obj)
+            {
+                return obj as ComponentDataType != null ? this.Equals(obj as ComponentDataType) : false;
+            }
+
+            public override int GetHashCode()
+            {
+                return key.GetHashCode() ^ controlCode.GetHashCode();
+            }
 
             #endregion
 
@@ -441,14 +461,14 @@ namespace ObjKeyResource
                 throw new ArgumentException(String.Format("Unknown control code 0x{0:X2}", (byte)fields[1]));
             }
 
-            public bool ContainsKey(string key) { foreach (ComponentDataType cd in this) if (cd.Key.Equals(key)) return true; return false; }
+            public bool ContainsKey(string key) { return Find(x => x.Key.Equals(key)) != null; }
 
             public ComponentDataType this[string key]
             {
                 get
                 {
-                    foreach (ComponentDataType cd in this)
-                        if (cd.Key.Equals(key)) return cd;
+                    ComponentDataType cd = this.Find(x => x.Key.Equals(key));
+                    if (cd != null) return cd;
                     throw new KeyNotFoundException();
                 }
                 set { this[IndexOf(this[key])] = value; }

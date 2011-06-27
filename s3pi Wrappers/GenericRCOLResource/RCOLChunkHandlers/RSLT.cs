@@ -209,7 +209,7 @@ namespace s3pi.GenericRCOLResource
             public override AHandlerElement Clone(EventHandler handler) { return new SevenFloats(requestedApiVersion, handler, this); }
             #endregion
 
-            #region IEquatable<Route>
+            #region IEquatable<SevenFloats>
             public bool Equals(SevenFloats other)
             {
                 return unknown1 == other.unknown1
@@ -219,6 +219,22 @@ namespace s3pi.GenericRCOLResource
                     && unknown5 == other.unknown5
                     && unknown6 == other.unknown6
                     && unknown7 == other.unknown7;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj as SevenFloats != null ? this.Equals(obj as SevenFloats) : false;
+            }
+
+            public override int GetHashCode()
+            {
+                return unknown1.GetHashCode()
+                    ^ unknown2.GetHashCode()
+                    ^ unknown3.GetHashCode()
+                    ^ unknown4.GetHashCode()
+                    ^ unknown5.GetHashCode()
+                    ^ unknown6.GetHashCode()
+                    ^ unknown7.GetHashCode();
             }
             #endregion
 
@@ -319,8 +335,16 @@ namespace s3pi.GenericRCOLResource
             public override AHandlerElement Clone(EventHandler handler) { return new TransformElement(requestedApiVersion, handler, this); }
             #endregion
 
-            #region IEquatable<Route>
+            #region IEquatable<TransformElement>
             public bool Equals(TransformElement other) { return rot1 == other.rot1 && rot2 == other.rot2 && rot3 == other.rot3 && pos == other.pos; }
+            public override bool Equals(object obj)
+            {
+                return obj as TransformElement != null ? this.Equals(obj as TransformElement) : false;
+            }
+            public override int GetHashCode()
+            {
+                return rot1.GetHashCode() ^ rot2.GetHashCode() ^ rot3.GetHashCode() ^ pos.GetHashCode(); 
+            }
             #endregion
 
             #region Content Fields
@@ -379,7 +403,7 @@ namespace s3pi.GenericRCOLResource
             public override AHandlerElement Clone(EventHandler handler) { return new Part(requestedApiVersion, handler, this); }
             #endregion
 
-            #region IEquatable<Route>
+            #region IEquatable<Part>
             public bool Equals(Part other)
             {
                 return slotName.Equals(other.slotName)
@@ -387,6 +411,21 @@ namespace s3pi.GenericRCOLResource
                     && tX.Equals(other.tX)
                     && tY.Equals(other.tY)
                     && tZ.Equals(other.tZ)
+                    ;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj as Part != null ? this.Equals(obj as Part) : false;
+            }
+
+            public override int GetHashCode()
+            {
+                return slotName.GetHashCode()
+                    ^ boneName.GetHashCode()
+                    ^ tX.GetHashCode()
+                    ^ tY.GetHashCode()
+                    ^ tZ.GetHashCode()
                     ;
             }
             #endregion
@@ -517,23 +556,17 @@ namespace s3pi.GenericRCOLResource
                 : base(APIversion, handler, slotName, boneName, tX, tY, tZ) { this.slotPlacementFlags = slotPlacementFlags; }
 
             public bool Equals(SlottedPart other) { return ((Part)this).Equals((Part)other) && slotPlacementFlags.Equals(other.slotPlacementFlags); }
+            public override bool Equals(object obj)
+            {
+                return obj as SlottedPart != null ? this.Equals(obj as SlottedPart) : false;
+            }
+            public override int GetHashCode()
+            {
+                return base.GetHashCode() ^ slotPlacementFlags.GetHashCode();
+            }
 
             [ElementPriority(3)]
             public SlotPlacement SlotPlacementFlags { get { return slotPlacementFlags; } set { if (slotPlacementFlags != value) { slotPlacementFlags = value; OnElementChanged(); } } }
-
-            /*
-            public override string Value
-            {
-                get
-                {
-                    return ValueBuilder;
-                    string s = base.Value;
-                    s += "\nSlotPlacementFlags: " + this["SlotPlacementFlags"];
-                    return s;
-                    /**
-                }
-            }
-            /**/
         }
         public class SlottedPartList : DependentList<SlottedPart>
         {

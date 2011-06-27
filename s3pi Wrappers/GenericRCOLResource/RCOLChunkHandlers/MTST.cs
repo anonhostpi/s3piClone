@@ -134,6 +134,14 @@ namespace s3pi.GenericRCOLResource
             #region IEquatable<Entry> Members
 
             public bool Equals(Entry other) { return this.index == other.index && this.fnv32 == other.fnv32; }
+            public override bool Equals(object obj)
+            {
+                return obj as Entry != null ? this.Equals(obj as Entry) : false;
+            }
+            public override int GetHashCode()
+            {
+                return index.GetHashCode() ^ fnv32.GetHashCode();
+            }
 
             #endregion
 

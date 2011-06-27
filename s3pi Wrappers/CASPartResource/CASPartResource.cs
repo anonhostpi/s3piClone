@@ -210,6 +210,17 @@ namespace CASPartResource
                     && this.unknown1 == other.unknown1
                     ;
             }
+            public override bool Equals(object obj)
+            {
+                return obj as Preset != null ? this.Equals(obj as Preset) : false;
+            }
+            public override int GetHashCode()
+            {
+                return
+                    this.xml.GetHashCode()
+                    ^ this.unknown1.GetHashCode()
+                    ;
+            }
 
             #endregion
 
@@ -332,6 +343,20 @@ namespace CASPartResource
                     ;
             }
 
+            public override bool Equals(object obj)
+            {
+                return obj as LODInfoEntry != null ? this.Equals(obj as LODInfoEntry) : false;
+            }
+
+            public override int GetHashCode()
+            {
+                return
+                    this.level.GetHashCode()
+                    ^ this.destTexture.GetHashCode()
+                    ^ this.lodAssets.GetHashCode()
+                    ;
+            }
+
             #endregion
 
             #region Content Fields
@@ -422,6 +447,20 @@ namespace CASPartResource
                     ;
             }
 
+            public override bool Equals(object obj)
+            {
+                return obj as LODAsset != null ? this.Equals(obj as LODAsset) : false;
+            }
+
+            public override int GetHashCode()
+            {
+                return
+                    this.sorting.GetHashCode()
+                    ^ this.specLevel.GetHashCode()
+                    ^ this.castShadow.GetHashCode()
+                    ;
+            }
+
             #endregion
 
             #region Content Fields
@@ -469,7 +508,7 @@ namespace CASPartResource
         [ElementPriority(1)]
         public uint Version { get { return version; } set { if (version != value) { version = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(2)]
-        public PresetList Presets { get { return presets; } set { if (presets.Equals(value)) { presets = new PresetList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public PresetList Presets { get { return presets; } set { if (!presets.Equals(value)) { presets = new PresetList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(3)]
         public string Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(4)]
@@ -499,19 +538,19 @@ namespace CASPartResource
         [ElementPriority(16)]
         public uint Unknown3 { get { return unknown3; } set { if (unknown3 != value) { unknown3 = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(17), DataGridExpandable]
-        public ByteEntryList VPXYIndexes { get { return vpxyIndexes; } set { if (vpxyIndexes.Equals(value)) { vpxyIndexes = new ByteEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public ByteEntryList VPXYIndexes { get { return vpxyIndexes; } set { if (!vpxyIndexes.Equals(value)) { vpxyIndexes = new ByteEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(18)]
-        public LODInfoEntryList LODInfo { get { return lodInfo; } set { if (lodInfo.Equals(value)) { lodInfo = new LODInfoEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public LODInfoEntryList LODInfo { get { return lodInfo; } set { if (!lodInfo.Equals(value)) { lodInfo = new LODInfoEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(19), DataGridExpandable]
-        public ByteEntryList Diffuse1Indexes { get { return diffuse1Indexes; } set { if (diffuse1Indexes.Equals(value)) { diffuse1Indexes = new ByteEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public ByteEntryList Diffuse1Indexes { get { return diffuse1Indexes; } set { if (!diffuse1Indexes.Equals(value)) { diffuse1Indexes = new ByteEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(20), DataGridExpandable]
-        public ByteEntryList Specular1Indexes { get { return specular1Indexes; } set { if (specular1Indexes.Equals(value)) { specular1Indexes = new ByteEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public ByteEntryList Specular1Indexes { get { return specular1Indexes; } set { if (!specular1Indexes.Equals(value)) { specular1Indexes = new ByteEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(21), DataGridExpandable]
-        public ByteEntryList Diffuse2Indexes { get { return diffuse2Indexes; } set { if (diffuse2Indexes.Equals(value)) { diffuse2Indexes = new ByteEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public ByteEntryList Diffuse2Indexes { get { return diffuse2Indexes; } set { if (!diffuse2Indexes.Equals(value)) { diffuse2Indexes = new ByteEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(22), DataGridExpandable]
-        public ByteEntryList Specular2Indexes { get { return specular2Indexes; } set { if (specular2Indexes.Equals(value)) { specular2Indexes = new ByteEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public ByteEntryList Specular2Indexes { get { return specular2Indexes; } set { if (!specular2Indexes.Equals(value)) { specular2Indexes = new ByteEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(23), DataGridExpandable]
-        public ByteEntryList BONDIndexes { get { return bondIndexes; } set { if (bondIndexes.Equals(value)) { bondIndexes = new ByteEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public ByteEntryList BONDIndexes { get { return bondIndexes; } set { if (!bondIndexes.Equals(value)) { bondIndexes = new ByteEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
 
         [ElementPriority(24)]
         public CountedTGIBlockList TGIBlocks { get { return tgiBlocks; } set { if (!tgiBlocks.Equals(value)) { tgiBlocks = new CountedTGIBlockList(OnResourceChanged, "IGT", value); OnResourceChanged(this, new EventArgs()); } } }

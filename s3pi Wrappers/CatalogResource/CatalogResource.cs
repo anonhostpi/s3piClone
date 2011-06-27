@@ -414,9 +414,14 @@ namespace CatalogResource
 
             #endregion
 
-            #region IEquatable<TypeCode> Members
+            #region IEquatable<ComplateElement> Members
 
             public bool Equals(ComplateElement other) { return Equals(this, other); }
+
+            public override bool Equals(object obj)
+            {
+                return obj as ComplateElement != null ? this.Equals((ComplateElement)obj) : false;
+            }
 
             #endregion
 
@@ -918,6 +923,11 @@ namespace CatalogResource
 
             public bool Equals(MaterialBlock other) { return this.CompareTo(other) == 0; }
 
+            public override bool Equals(object obj)
+            {
+                return obj as MaterialBlock != null ? this.Equals((MaterialBlock)obj) : false;
+            }
+
             #endregion
 
             #region ICloneable Members
@@ -1106,6 +1116,11 @@ namespace CatalogResource
             #region IEquatable<Material> Members
 
             public bool Equals(Material other) { return this.CompareTo(other) == 0; }
+
+            public override bool Equals(object obj)
+            {
+                return obj as Material != null ? this.Equals((Material)obj) : false;
+            }
 
             #endregion
 

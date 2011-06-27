@@ -222,6 +222,19 @@ namespace CASPartResource
                     ;
             }
 
+            public override bool Equals(object obj)
+            {
+                return obj as XMLEntry != null ? this.Equals(obj as XMLEntry) : false;
+            }
+
+            public override int GetHashCode()
+            {
+                return
+                    this.unknown1.GetHashCode()
+                    ^ this.xml.GetHashCode()
+                    ;
+            }
+
             #endregion
 
             #region Content Fields
@@ -304,9 +317,17 @@ namespace CASPartResource
             public override AHandlerElement Clone(EventHandler handler) { return new IndexPair(requestedApiVersion, handler, this); }
             #endregion
 
-            #region IEquatable<XMLEntry> Members
+            #region IEquatable<IndexPair> Members
 
-            public bool Equals(IndexPair other) { return this.txtc1index == other.txtc1index; }
+            public bool Equals(IndexPair other) { return this.txtc1index == other.txtc1index && this.txtc2index == other.txtc2index; }
+            public override bool Equals(object obj)
+            {
+                return obj as IndexPair != null ? this.Equals(obj as IndexPair) : false;
+            }
+            public override int GetHashCode()
+            {
+                return txtc1index.GetHashCode() ^ txtc2index.GetHashCode();
+            }
 
             #endregion
 
@@ -378,7 +399,7 @@ namespace CASPartResource
             public override AHandlerElement Clone(EventHandler handler) { return new CASEntry(requestedApiVersion, handler, this); }
             #endregion
 
-            #region IEquatable<InnerEntry> Members
+            #region IEquatable<CASEntry> Members
 
             public bool Equals(CASEntry other)
             {
@@ -387,6 +408,16 @@ namespace CASPartResource
                     && this.clothing == other.clothing
                     && this.txtcIndexes.Equals(other.txtcIndexes)
                     ;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj as CASEntry != null ? this.Equals(obj as CASEntry) : false;
+            }
+
+            public override int GetHashCode()
+            {
+                return casPartIndex.GetHashCode() ^ clothing.GetHashCode() ^ txtcIndexes.GetHashCode();
             }
 
             #endregion
@@ -484,7 +515,7 @@ namespace CASPartResource
             public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
             #endregion
 
-            #region IEquatable<Entry> Members
+            #region IEquatable<FaceEntry> Members
 
             public bool Equals(FaceEntry other)
             {
@@ -492,6 +523,16 @@ namespace CASPartResource
                     this.faceIndex == other.faceIndex
                     && this.unknown1 == other.unknown1
                     ;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj as FaceEntry != null ? this.Equals(obj as FaceEntry) : false;
+            }
+
+            public override int GetHashCode()
+            {
+                return faceIndex.GetHashCode() ^ unknown1.GetHashCode();
             }
 
             #endregion
@@ -548,7 +589,7 @@ namespace CASPartResource
         [ElementPriority(1)]
         public uint Version { get { return version; } set { if (version != value) { version = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(2)]
-        public XMLEntryList XmlEntries { get { return xmlEntries; } set { if (xmlEntries.Equals(value)) { xmlEntries = new XMLEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public XMLEntryList XmlEntries { get { return xmlEntries; } set { if (!xmlEntries.Equals(value)) { xmlEntries = new XMLEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(3)]
         public int Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(4)]
@@ -584,9 +625,9 @@ namespace CASPartResource
         [ElementPriority(19)]
         public UInt32 HairHaloLowColour { get { return hairHaloLowColour; } set { if (!hairHaloLowColour.Equals(value)) { hairHaloLowColour = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(20)]
-        public CASEntryList CASPEntries { get { return caspEntries; } set { if (caspEntries.Equals(value)) { caspEntries = new CASEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public CASEntryList CASPEntries { get { return caspEntries; } set { if (!caspEntries.Equals(value)) { caspEntries = new CASEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(21)]
-        public FaceEntryList FACEEntries { get { return faceEntries; } set { if (faceEntries.Equals(value)) { faceEntries = new FaceEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public FaceEntryList FACEEntries { get { return faceEntries; } set { if (!faceEntries.Equals(value)) { faceEntries = new FaceEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(22)]
         public CountedTGIBlockList TGIBlocks { get { return tgiBlocks; } set { if (!tgiBlocks.Equals(value)) { tgiBlocks = new CountedTGIBlockList(OnResourceChanged, "IGT", value); OnResourceChanged(this, new EventArgs()); } } }
 

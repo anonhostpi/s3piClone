@@ -183,6 +183,25 @@ namespace s3pi.GenericRCOLResource
                     this.quatZ == other.quatZ &&
                     this.quatW == other.quatW;
             }
+
+            public override bool Equals(object obj)
+            {
+                return obj as Adjustment != null ? this.Equals(obj as Adjustment) : false;
+            }
+            public override int GetHashCode()
+            {
+                return this.slotName.GetHashCode() ^
+                    this.offsetX.GetHashCode() ^
+                    this.offsetY.GetHashCode() ^
+                    this.offsetZ.GetHashCode() ^
+                    this.scaleX.GetHashCode() ^
+                    this.scaleY.GetHashCode() ^
+                    this.scaleZ.GetHashCode() ^
+                    this.quatX.GetHashCode() ^
+                    this.quatY.GetHashCode() ^
+                    this.quatZ.GetHashCode() ^
+                    this.quatW.GetHashCode();
+            }
             #endregion
 
             #region Content Fields

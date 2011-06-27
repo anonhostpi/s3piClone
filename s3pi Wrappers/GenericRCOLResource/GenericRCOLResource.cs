@@ -149,6 +149,16 @@ namespace s3pi.GenericRCOLResource
 
             public bool Equals(ChunkEntry other) { return tgiBlock == other.tgiBlock && rcolBlock == other.rcolBlock; }
 
+            public override bool Equals(object obj)
+            {
+                return obj as ChunkEntry != null ? this.Equals(obj as ChunkEntry) : false;
+            }
+
+            public override int GetHashCode()
+            {
+                return tgiBlock.GetHashCode() ^ rcolBlock.GetHashCode();
+            }
+
             #endregion
 
             [ElementPriority(1)]

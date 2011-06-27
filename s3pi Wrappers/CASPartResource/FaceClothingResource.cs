@@ -147,6 +147,20 @@ namespace CASPartResource
                     ;
             }
 
+            public override bool Equals(object obj)
+            {
+                return obj as Entry != null ? this.Equals(obj as Entry) : false;
+            }
+
+            public override int GetHashCode()
+            {
+                return
+                    this.ageGender.GetHashCode()
+                    ^ this.amount.GetHashCode()
+                    ^ this.index.GetHashCode()
+                    ;
+            }
+
             #endregion
 
             #region Content Fields
@@ -287,6 +301,22 @@ namespace CASPartResource
                         && this.bone.Equals(other.bone)
                     )
                     ;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj as CASEntry != null ? this.Equals(obj as CASEntry) : false;
+            }
+
+            public override int GetHashCode()
+            {
+                return
+                    this.facialRegion.GetHashCode()
+                    ^ this.andBone.GetHashCode()
+                    ^ (this.andBone == 0 ? this.useGeom.GetHashCode() : 0)
+                    ^ this.geom.GetHashCode()
+                    ^ (this.andBone > 0 ? this.useBone.GetHashCode() ^ this.bone.GetHashCode() : 0)
+                ;
             }
 
             #endregion

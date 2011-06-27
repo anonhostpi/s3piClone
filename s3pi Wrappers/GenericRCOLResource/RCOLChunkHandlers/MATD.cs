@@ -296,6 +296,16 @@ namespace s3pi.GenericRCOLResource
 
             public bool Equals(MTRL other) { return mtrlUnknown1 == other.mtrlUnknown1 && mtrlUnknown2 == other.mtrlUnknown2 && mtrlUnknown3 == other.mtrlUnknown3 && sdList == other.sdList; }
 
+            public override bool Equals(object obj)
+            {
+                return obj as MTRL != null ? this.Equals(obj as MTRL) : false;
+            }
+
+            public override int GetHashCode()
+            {
+                return mtrlUnknown1.GetHashCode() ^ mtrlUnknown2.GetHashCode() ^ mtrlUnknown3.GetHashCode() ^ sdList.GetHashCode();
+            }
+
             #endregion
 
             #region IResource
@@ -411,6 +421,14 @@ namespace s3pi.GenericRCOLResource
             #region IEquatable<MTNF> Members
 
             public bool Equals(MTNF other) { return mtnfUnknown1 == other.mtnfUnknown1 && sdList == other.sdList; }
+            public override bool Equals(object obj)
+            {
+                return obj as MTNF != null ? this.Equals(obj as MTNF) : false;
+            }
+            public override int GetHashCode()
+            {
+                return mtnfUnknown1.GetHashCode() ^ sdList.GetHashCode();
+            }
 
             #endregion
 
@@ -706,6 +724,11 @@ namespace s3pi.GenericRCOLResource
             #region IEquatable<Entry> Members
 
             public abstract bool Equals(ShaderData other);
+            public override bool Equals(object obj)
+            {
+                return obj as ShaderData != null ? this.Equals(obj as ShaderData) : false;
+            }
+            public override abstract int GetHashCode();
 
             #endregion
 
@@ -742,6 +765,10 @@ namespace s3pi.GenericRCOLResource
             #region IEquatable<Entry> Members
 
             public override bool Equals(ShaderData other) { return this.GetType().Equals(other.GetType()) && this.data == ((ElementFloat)other).data; }
+            public override int GetHashCode()
+            {
+                return field.GetHashCode() ^ data.GetHashCode();
+            }
 
             #endregion
 
@@ -782,6 +809,10 @@ namespace s3pi.GenericRCOLResource
                 && this.data0 == ((ElementFloat2)other).data0
                 && this.data1 == ((ElementFloat2)other).data1
                 ; }
+            public override int GetHashCode()
+            {
+                return field.GetHashCode() ^ data0.GetHashCode() ^ data1.GetHashCode();
+            }
 
             #endregion
 
@@ -826,6 +857,10 @@ namespace s3pi.GenericRCOLResource
                 && this.data1 == ((ElementFloat3)other).data1
                 && this.data2 == ((ElementFloat3)other).data2
                 ; }
+            public override int GetHashCode()
+            {
+                return field.GetHashCode() ^ data0.GetHashCode() ^ data1.GetHashCode() ^ data2.GetHashCode();
+            }
 
             #endregion
 
@@ -874,6 +909,10 @@ namespace s3pi.GenericRCOLResource
                 && this.data2 == ((ElementFloat4)other).data2
                 && this.data3 == ((ElementFloat4)other).data3
                 ; }
+            public override int GetHashCode()
+            {
+                return field.GetHashCode() ^ data0.GetHashCode() ^ data1.GetHashCode() ^ data2.GetHashCode() ^ data3.GetHashCode();
+            }
 
             #endregion
 
@@ -916,6 +955,10 @@ namespace s3pi.GenericRCOLResource
             #region IEquatable<Entry> Members
 
             public override bool Equals(ShaderData other) { return this.GetType().Equals(other.GetType()) && this.data == ((ElementInt)other).data; }
+            public override int GetHashCode()
+            {
+                return field.GetHashCode() ^ data.GetHashCode();
+            }
 
             #endregion
 
@@ -953,6 +996,10 @@ namespace s3pi.GenericRCOLResource
             #region IEquatable<Entry> Members
 
             public override bool Equals(ShaderData other) { return this.GetType().Equals(other.GetType()) && this.data == ((ElementTextureRef)other).data; }
+            public override int GetHashCode()
+            {
+                return field.GetHashCode() ^ data.GetHashCode();
+            }
 
             #endregion
 
@@ -990,6 +1037,10 @@ namespace s3pi.GenericRCOLResource
             #region IEquatable<Entry> Members
 
             public override bool Equals(ShaderData other) { return this.GetType().Equals(other.GetType()) && this.data == ((ElementTextureKey)other).data; }
+            public override int GetHashCode()
+            {
+                return field.GetHashCode() ^ data.GetHashCode();
+            }
 
             #endregion
 

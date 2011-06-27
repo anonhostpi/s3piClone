@@ -183,6 +183,11 @@ namespace CatalogResource
 
             public bool Equals(WallFloorPatternMaterial other) { return this.CompareTo(other) == 0; }
 
+            public override bool Equals(object obj)
+            {
+                return obj as WallFloorPatternMaterial != null ? this.Equals(obj as WallFloorPatternMaterial) : false;
+            }
+
             #endregion
 
             #region AApiVersionedFields

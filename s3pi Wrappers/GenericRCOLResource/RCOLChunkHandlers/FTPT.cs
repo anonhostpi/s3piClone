@@ -141,6 +141,16 @@ namespace s3pi.GenericRCOLResource
                 return this.x == other.x && this.y == other.y;
             }
 
+            public override bool Equals(object obj)
+            {
+                return obj as PolygonPoint != null ? this.Equals(obj as PolygonPoint) : false;
+            }
+
+            public override int GetHashCode()
+            {
+                return x.GetHashCode() ^ y.GetHashCode();
+            }
+
             #endregion
 
             #region Content Fields
@@ -374,6 +384,27 @@ namespace s3pi.GenericRCOLResource
                     lowerY == other.lowerY &&
                     upperX == other.upperX &&
                     upperY == other.upperY;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj as Area != null ? this.Equals(obj as Area) : false;
+            }
+
+            public override int GetHashCode()
+            {
+                return name.GetHashCode() ^
+                    priority.GetHashCode() ^
+                    areaTypeFlags.GetHashCode() ^
+                    closedPolygon.GetHashCode() ^
+                    allowIntersectionFlags.GetHashCode() ^
+                    surfaceTypeFlags.GetHashCode() ^
+                    surfaceAttributeFlags.GetHashCode() ^
+                    levelOffset.GetHashCode() ^
+                    lowerX.GetHashCode() ^
+                    lowerY.GetHashCode() ^
+                    upperX.GetHashCode() ^
+                    upperY.GetHashCode();
             }
 
             #endregion
