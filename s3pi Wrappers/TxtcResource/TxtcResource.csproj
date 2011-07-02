@@ -71,22 +71,6 @@
     <Compile Include="Properties\AssemblyVersion.cs" />
     <Compile Include="TxtcResource.cs" />
   </ItemGroup>
-  <PropertyGroup>
-    <PreBuildEvent>set mydate=%25date: =0%25
-set dd=%25mydate:~0,2%25
-set mm=%25mydate:~3,2%25
-set yy=%25mydate:~8,2%25
-set mytime=%25time: =0%25
-set h=%25mytime:~0,2%25
-set version="%25yy%25%25mm%25.%25dd%25.%25h%25%25m%25.*"
-
-(echo using System.Reflection;
-echo using System.Runtime.CompilerServices;
-echo using System.Runtime.InteropServices;
-echo /*"*/ [assembly: AssemblyVersion(%25version%25)] /*"*/
-)&gt;"$(ProjectDir)Properties\AssemblyVersion.cs"
-</PreBuildEvent>
-  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\CS System Classes\CS System Classes.csproj">
       <Project>{00200E76-C245-42A7-B567-5C30EDBCE977}</Project>
@@ -121,4 +105,7 @@ echo /*"*/ [assembly: AssemblyVersion(%25version%25)] /*"*/
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <PropertyGroup>
+    <PreBuildEvent>$(SolutionDir)CreateAssemblyVersion\$(OutDir)CreateAssemblyVersion "$(ProjectDir)\"</PreBuildEvent>
+  </PropertyGroup>
 </Project>
