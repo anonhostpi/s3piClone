@@ -65,7 +65,6 @@
   -->
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -85,38 +84,13 @@
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
-  <PropertyGroup>
-    <PreBuildEvent>set mydate=%25date: =0%25
-set dd=%25mydate:~0,2%25
-set mm=%25mydate:~3,2%25
-set yy=%25mydate:~8,2%25
-set mytime=%25time: =0%25
-set h=%25mytime:~0,2%25
-set version="%25yy%25%25mm%25.%25dd%25.%25h%25%25m%25.*"
-
-(echo using System.Reflection;
-echo using System.Runtime.CompilerServices;
-echo using System.Runtime.InteropServices;
-echo /*"*/ [assembly: AssemblyVersion(%25version%25)] /*"*/
-)&gt;"$(ProjectDir)Properties\AssemblyVersion.cs"
-</PreBuildEvent>
-  </PropertyGroup>
   <ItemGroup>
     <Compile Include="ARCOLBlock.cs" />
-    <Compile Include="RCOLChunkHandlers\SlotAdjust.cs" />
-    <Compile Include="RCOLChunkHandlers\RSLT.cs" />
-    <Compile Include="RCOLChunkHandlers\LITE.cs" />
-    <Compile Include="RCOLChunkHandlers\DefaultRCOL.cs" />
-    <Compile Include="RCOLChunkHandlers\FTPT.cs" />
+    <Compile Include="DefaultRCOL.cs" />
     <Compile Include="GenericRCOLResource.cs" />
     <Compile Include="IRCOLBlock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\AssemblyVersion.cs" />
-    <Compile Include="RCOLChunkHandlers\MATD.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="RCOLChunkHandlers\MTST.cs" />
-    <Compile Include="RCOLChunkHandlers\VPXY.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="RCOLResources.txt">
@@ -140,4 +114,10 @@ echo /*"*/ [assembly: AssemblyVersion(%25version%25)] /*"*/
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="RCOLChunkHandlers\" />
+  </ItemGroup>
+  <PropertyGroup>
+    <PreBuildEvent>$(SolutionDir)CreateAssemblyVersion\$(OutDir)CreateAssemblyVersion "$(ProjectDir)\"</PreBuildEvent>
+  </PropertyGroup>
 </Project>
