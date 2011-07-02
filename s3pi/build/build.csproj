@@ -157,6 +157,10 @@
       <Project>{9D8BB6F7-373E-4FBC-B5E8-9709B4CE9A37}</Project>
       <Name>Package</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\s3pi Wrappers\s3piRCOLChunks\s3piRCOLChunks.csproj">
+      <Project>{F2E30D04-82C7-487F-B9E8-E8BABB1C94E1}</Project>
+      <Name>s3piRCOLChunks</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Settings\Settings.csproj">
       <Project>{374F37CF-1F27-4613-96FD-9B956A3D82B1}</Project>
       <Name>Settings</Name>
