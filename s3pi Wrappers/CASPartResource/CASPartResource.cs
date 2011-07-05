@@ -551,8 +551,10 @@ namespace CASPartResource
         public ByteEntryList Specular2Indexes { get { return specular2Indexes; } set { if (!specular2Indexes.Equals(value)) { specular2Indexes = new ByteEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(23), DataGridExpandable]
         public ByteEntryList BONDIndexes { get { return bondIndexes; } set { if (!bondIndexes.Equals(value)) { bondIndexes = new ByteEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
-
         [ElementPriority(24)]
+        public string Unknown4 { get { return unknown4; } set { if (unknown4 != value) { unknown4 = value; OnResourceChanged(this, new EventArgs()); } } }
+
+        [ElementPriority(25)]
         public CountedTGIBlockList TGIBlocks { get { return tgiBlocks; } set { if (!tgiBlocks.Equals(value)) { tgiBlocks = new CountedTGIBlockList(OnResourceChanged, "IGT", value); OnResourceChanged(this, new EventArgs()); } } }
 
         public string Value { get { return ValueBuilder; } }
