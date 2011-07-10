@@ -89,6 +89,10 @@
       <Project>{D9B63641-D3BE-4120-9115-7D67B1238FBF}</Project>
       <Name>Helpers</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\s3pi Extras\s3piControls\s3piControls.csproj">
+      <Project>{DF6E6825-5488-43EC-81A5-0EE87945228B}</Project>
+      <Name>s3piControls</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\s3pi Wrappers\CASPartResource\CASPartResource.csproj">
       <Project>{38D21F02-C139-43C8-8B74-D84E22B89F50}</Project>
       <Name>CASPartResource</Name>
