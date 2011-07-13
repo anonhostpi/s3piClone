@@ -8,5 +8,7 @@
 0x0604ABDA XML with encoding bytes -- <DreamTree/>
 0x1F886EAD Various configuration bits
 0x73E93EEB XML without encoding bytes -- <manifest/>
+0xA8D58BE5 XML without encoding bytes -- <skills_store/>
 0xD4D9FBE5 XML without encoding bytes -- <patternlist/>
+0xDD3223A7 XML without encoding bytes -- <buff_store/>
 0xF0FF5598 Shortcut definitions
