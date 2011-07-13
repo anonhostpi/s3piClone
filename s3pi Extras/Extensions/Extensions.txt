@@ -132,6 +132,7 @@
 0x9151E6BC  CWST   .wallstyle
 0x91EDBD3E  CRST   .roofstyle
 0x94C5D14A  SIGR   .signature
+0xA8D58BE5  SKIL   .xml
 0xB1CC1AF6  _VID   .video
 0xB4DD716B  _INV   .inventory
 0xB52F5055  FBLN   .facialblend
@@ -148,6 +149,7 @@
 0xF609FD60  WPID   .wpackid
 0xCF9A4ACE  MDLR   .modular
 0xD382BF57  FTPT   .footprint
+0xDD3223A7  BUFF   .xml
 0xF1EDBD86  CRMT   .roofmatrl
 0xF3A38370  NGMP   .guidmap
 *           UNKN   .bnry
