@@ -268,6 +268,7 @@ namespace System.Windows.Forms
         {
             System.Text.StringBuilder sb = new Text.StringBuilder();
             sb.Append(prefix);
+            sb.Append("\n== START ==");
             for (Exception inex = ex; inex != null; inex = inex.InnerException)
             {
                 sb.Append("\nSource: " + inex.Source);
@@ -276,6 +277,7 @@ namespace System.Windows.Forms
                 sb.Append("\n" + inex.StackTrace);
                 sb.Append("\n-----");
             }
+            sb.Append("\n== END ==");
             CopyableMessageBox.Show(sb.ToString(), caption, CopyableMessageBoxButtons.OK, CopyableMessageBoxIcon.Stop);
         }
     }
