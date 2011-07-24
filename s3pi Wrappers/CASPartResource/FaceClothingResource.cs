@@ -32,7 +32,18 @@ namespace CASPartResource
     {
         const int recommendedApiVersion = 1;
         public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
-        public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
+        public override List<string> ContentFields
+        {
+            get
+            {
+                List<string> res = GetContentFields(requestedApiVersion, this.GetType());
+                if (version < 8)
+                {
+                    res.Remove("BlendGeometry");
+                }
+                return res;
+            }
+        }
 
         static bool checking = s3pi.Settings.Settings.Checking;
 
@@ -59,10 +70,15 @@ namespace CASPartResource
 
             partName = BigEndianUnicodeString.Read(s);
             unknown1 = r.ReadUInt32();
-            blendGeometry = new TGIBlock(requestedApiVersion, OnResourceChanged, s);
+
+            if (version >= 8)
+            {
+                blendGeometry = new TGIBlock(requestedApiVersion, OnResourceChanged, s);
+            }
+
             casEntries = new CASEntryList(OnResourceChanged, s);
 
-            tgiBlocks = new TGIBlockList(OnResourceChanged, s, tgiPosn, tgiSize, true);
+            tgiBlocks = new TGIBlockList(OnResourceChanged, s, tgiPosn, tgiSize, addEight: version >= 8);
         }
 
         protected override Stream UnParse()
@@ -79,8 +95,13 @@ namespace CASPartResource
 
             BigEndianUnicodeString.Write(s, partName);
             w.Write(unknown1);
-            if (blendGeometry == null) blendGeometry = new TGIBlock(requestedApiVersion, OnResourceChanged);
-            blendGeometry.UnParse(s);
+            
+            if (version >= 8)
+            {
+                if (blendGeometry == null) blendGeometry = new TGIBlock(requestedApiVersion, OnResourceChanged);
+                blendGeometry.UnParse(s);
+            }
+
             if (casEntries == null) casEntries = new CASEntryList(OnResourceChanged);
             casEntries.UnParse(s);
 
@@ -376,7 +397,11 @@ namespace CASPartResource
         [ElementPriority(3)]
         public uint Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(4)]
-        public TGIBlock BlendGeometry { get { return blendGeometry; } set { if (!blendGeometry.Equals(value)) { blendGeometry = new TGIBlock(requestedApiVersion, OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public TGIBlock BlendGeometry
+        {
+            get { if (version < 8) throw new InvalidOperationException(); return blendGeometry; }
+            set { if (version < 8) throw new InvalidOperationException(); if (!blendGeometry.Equals(value)) { blendGeometry = new TGIBlock(requestedApiVersion, OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } }
+        }
         [ElementPriority(5)]
         public CASEntryList CASEntries { get { return casEntries; } set { if (!casEntries.Equals(value)) { casEntries = new CASEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(6)]
