@@ -57,7 +57,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "s3piRCOLChunks", "..\s3pi W
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "s3piControls", "..\s3pi Extras\s3piControls\s3piControls.csproj", "{DF6E6825-5488-43EC-81A5-0EE87945228B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDSPanel", "..\s3pe Helpers\ViewDDS\DDSPanel\DDSPanel.csproj", "{901D5F73-7DAC-49C3-9A5F-33EEA1E97F22}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDSPanel", "..\s3pi Extras\DDSPanel\DDSPanel.csproj", "{901D5F73-7DAC-49C3-9A5F-33EEA1E97F22}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
