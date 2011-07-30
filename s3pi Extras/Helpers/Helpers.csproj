@@ -13,7 +13,8 @@
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>false</SignAssembly>
-    <AssemblyOriginatorKeyFile>GACkey.snk.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <OldToolsVersion>3.5</OldToolsVersion>
@@ -66,10 +67,6 @@
     <Compile Include="RunHelper.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\s3pi\gpl-3.0.txt">
-      <Link>gpl-3.0.txt</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <None Include="Helpers\Notepad.helper">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -79,9 +76,6 @@
     <Content Include="Helpers\Helpers.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="GACkey.snk.pfx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\s3pi\Interfaces\Interfaces.csproj">
