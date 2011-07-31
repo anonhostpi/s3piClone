@@ -32,7 +32,7 @@ namespace s3pi.GenericRCOLResource
         uint tag = (uint)FOURCC("MTST");
         uint version = 0x00000200;
 
-        uint fnv32 = 0;
+        uint nameHash = 0;
         GenericRCOLResource.ChunkReference index;
         EntryList list = null;
         #endregion
@@ -41,11 +41,11 @@ namespace s3pi.GenericRCOLResource
         public MTST(int APIversion, EventHandler handler) : base(APIversion, handler, null) { }
         public MTST(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler, s) { }
         public MTST(int APIversion, EventHandler handler, MTST basis)
-            : this(APIversion, handler, basis.fnv32, basis.index, basis.list) { }
-        public MTST(int APIversion, EventHandler handler, uint fnv32, GenericRCOLResource.ChunkReference index, IEnumerable<Entry> list)
+            : this(APIversion, handler, basis.nameHash, basis.index, basis.list) { }
+        public MTST(int APIversion, EventHandler handler, uint nameHash, GenericRCOLResource.ChunkReference index, IEnumerable<Entry> list)
             : base(APIversion, handler, null)
         {
-            this.fnv32 = fnv32;
+            this.nameHash = nameHash;
             this.index = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, index);
             this.list = new EntryList(OnRCOLChanged, list);
         }
@@ -68,7 +68,7 @@ namespace s3pi.GenericRCOLResource
             if (checking) if (version != 0x00000200)
                     throw new InvalidDataException(String.Format("Invalid Version read: 0x{0:X8}; expected 0x00000200; at 0x{1:X8}", version, s.Position));
 
-            fnv32 = r.ReadUInt32();
+            nameHash = r.ReadUInt32();
             index = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, s);
             list = new EntryList(OnRCOLChanged, s);
         }
@@ -81,7 +81,7 @@ namespace s3pi.GenericRCOLResource
             w.Write(tag);
             w.Write(version);
 
-            w.Write(fnv32);
+            w.Write(nameHash);
             if (index == null) this.index = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, 0);
             index.UnParse(ms);
             if (list == null) this.list = new EntryList(OnRCOLChanged);
@@ -94,38 +94,45 @@ namespace s3pi.GenericRCOLResource
         #endregion
 
         #region Sub-types
+        public enum Set : uint
+        {
+            Default = 0x2EA8FB98,
+            Dirty = 0xEEAB4327,
+            VeryDirty = 0x2E5DF9BB,
+            Burnt = 0xC3867C32,
+            Clogged = 0x257FB026,
+        }
+
         public class Entry : AHandlerElement, IEquatable<Entry>
         {
             const int recommendedApiVersion = 1;
 
             #region Attributes
             GenericRCOLResource.ChunkReference index;
-            uint fnv32 = 0;
+            Set materialSet = 0;
             #endregion
 
             #region Constructors
             public Entry(int APIversion, EventHandler handler) : base(APIversion, handler) { }
             public Entry(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
-            public Entry(int APIversion, EventHandler handler, Entry basis) : this(APIversion, handler, basis.index, basis.fnv32) { }
-            public Entry(int APIversion, EventHandler handler, GenericRCOLResource.ChunkReference index, uint fnv32) : base(APIversion, handler)
+            public Entry(int APIversion, EventHandler handler, Entry basis) : this(APIversion, handler, basis.index, basis.materialSet) { }
+            public Entry(int APIversion, EventHandler handler, GenericRCOLResource.ChunkReference index, Set materialSet)
+                : base(APIversion, handler)
             {
                 this.index = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, index);
-                this.fnv32 = fnv32;
+                this.materialSet = materialSet;
             }
             #endregion
 
             #region Data I/O
-            void Parse(Stream s) { index = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, s); fnv32 = new BinaryReader(s).ReadUInt32(); }
+            void Parse(Stream s) { index = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, s); materialSet = (Set)new BinaryReader(s).ReadUInt32(); }
 
-            internal void UnParse(Stream s) { index.UnParse(s); new BinaryWriter(s).Write(fnv32); }
+            internal void UnParse(Stream s) { index.UnParse(s); new BinaryWriter(s).Write((uint)materialSet); }
             #endregion
 
             #region AHandlerElement Members
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
 
-            /// <summary>
-            /// The list of available field names on this API object
-            /// </summary>
             public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
 
             public override AHandlerElement Clone(EventHandler handler) { return new Entry(requestedApiVersion, handler, this); }
@@ -133,14 +140,14 @@ namespace s3pi.GenericRCOLResource
 
             #region IEquatable<Entry> Members
 
-            public bool Equals(Entry other) { return this.index == other.index && this.fnv32 == other.fnv32; }
+            public bool Equals(Entry other) { return this.index == other.index && this.materialSet == other.materialSet; }
             public override bool Equals(object obj)
             {
-                return obj as Entry != null ? this.Equals(obj as Entry) : false;
+                return obj as Entry != null && this.Equals(obj as Entry);
             }
             public override int GetHashCode()
             {
-                return index.GetHashCode() ^ fnv32.GetHashCode();
+                return index.GetHashCode() ^ materialSet.GetHashCode();
             }
 
             #endregion
@@ -149,9 +156,9 @@ namespace s3pi.GenericRCOLResource
             [ElementPriority(1)]
             public GenericRCOLResource.ChunkReference Index { get { return index; } set { if (index != value) { new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, value); OnElementChanged(); } } }
             [ElementPriority(2)]
-            public UInt32 FNV32 { get { return fnv32; } set { if (fnv32 != value) { fnv32 = value; OnElementChanged(); } } }
+            public Set MaterialSet { get { return materialSet; } set { if (materialSet != value) { materialSet = value; OnElementChanged(); } } }
 
-            public string Value { get { return String.Format("Index: {0}; FNV32: 0x{1:X8}", index.Value, fnv32); } }
+            public string Value { get { return ValueBuilder.Replace("\n", "; "); } }
             #endregion
         }
         public class EntryList : DependentList<Entry>
@@ -175,33 +182,13 @@ namespace s3pi.GenericRCOLResource
         [ElementPriority(11)]
         public uint Version { get { return version; } set { if (version != value) { version = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(12)]
-        public GenericRCOLResource.ChunkReference Index { get { return index; } set { if (index != value) { new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
+        public uint NameHash { get { return nameHash; } set { if (nameHash != value) { nameHash = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(13)]
-        public uint FNV32 { get { return fnv32; } set { if (fnv32 != value) { fnv32 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
+        public GenericRCOLResource.ChunkReference Index { get { return index; } set { if (index != value) { new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(14)]
         public EntryList Entries { get { return list; } set { if (list != value) { list = new EntryList(OnRCOLChanged, value); OnRCOLChanged(this, EventArgs.Empty); } } }
 
-        public string Value
-        {
-            get
-            {
-                return ValueBuilder;
-                /*
-                string s = "";
-                s += "Tag: 0x" + tag.ToString("X8");
-                s += "\nVersion: 0x" + version.ToString("X8");
-
-                s += String.Format("\nIndex: 0x{0:X8}\nFNV32: 0x{1:X8}", index, fnv32);
-
-                s += "\n--\nEntry List:";
-                for (int i = 0; i < list.Count; i++)
-                    s += String.Format("\n  [{0}]: {1}", i, list[i].Value);
-                s += "\n--";
-
-                return s;
-                /**/
-            }
-        }
+        public string Value { get { return ValueBuilder; } }
         #endregion
     }
 }
