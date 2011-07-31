@@ -1,4 +1,5 @@
-﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <!-- The configuration and platform will be used to determine which
          assemblies to include from solution and project documentation
@@ -7,7 +8,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{b6b0c9a5-005a-4f4b-9df3-c7474d10124a}</ProjectGuid>
-    <SHFBSchemaVersion>1.8.0.3</SHFBSchemaVersion>
+    <SHFBSchemaVersion>1.9.3.0</SHFBSchemaVersion>
     <!-- AssemblyName, Name, and RootNamespace are not used by SHFB but Visual
          Studio adds them anyway -->
     <AssemblyName>Documentation</AssemblyName>
@@ -28,50 +29,119 @@
     <FeedbackEMailAddress>pljones%40users.sf.net</FeedbackEMailAddress>
     <NamingMethod>MemberName</NamingMethod>
     <HtmlHelp1xCompilerPath>C:\Program Files (x86)\HTML Help Workshop\</HtmlHelp1xCompilerPath>
-    <SdkLinkType>Msdn</SdkLinkType>
     <SyntaxFilters>Standard</SyntaxFilters>
     <IndentHtml>False</IndentHtml>
     <FeedbackEMailLinkText>the author</FeedbackEMailLinkText>
     <WorkingPath>C:\Temp\HelpWork\</WorkingPath>
     <NamespaceSummaries>
       <NamespaceSummaryItem name="CatalogResource" isDocumented="False" />
-      <NamespaceSummaryItem name="ComplateResource" isDocumented="False" />
-      <NamespaceSummaryItem name="ImageResource" isDocumented="False" />
-      <NamespaceSummaryItem name="ModularResource" isDocumented="False" />
-      <NamespaceSummaryItem name="NameMapResource" isDocumented="False" />
-      <NamespaceSummaryItem name="ObjKeyResource" isDocumented="False" />
-      <NamespaceSummaryItem name="s3pi.DefaultResource" isDocumented="False" />
-      <NamespaceSummaryItem name="s3pi.GenericRCOLResource" isDocumented="False" />
-      <NamespaceSummaryItem name="ScriptResource" isDocumented="False" />
-      <NamespaceSummaryItem name="StblResource" isDocumented="False" />
-      <NamespaceSummaryItem name="TextResource" isDocumented="False" />
-      <NamespaceSummaryItem name="TxtcResource" isDocumented="False" />
-      <NamespaceSummaryItem name="CASPartResource" isDocumented="False" />
-      <NamespaceSummaryItem name="NGMPHashMapResource" isDocumented="False" />
-    </NamespaceSummaries>
-    <MissingTags>Summary, Parameter, Returns, AutoDocumentCtors, TypeParameter, AutoDocumentDispose</MissingTags>
-    <VisibleItems>Attributes, ExplicitInterfaceImplementations, InheritedMembers, InheritedFrameworkMembers, Protected, SealedProtected</VisibleItems>
+<NamespaceSummaryItem name="ComplateResource" isDocumented="False" />
+<NamespaceSummaryItem name="ImageResource" isDocumented="False" />
+<NamespaceSummaryItem name="ModularResource" isDocumented="False" />
+<NamespaceSummaryItem name="NameMapResource" isDocumented="False" />
+<NamespaceSummaryItem name="ObjKeyResource" isDocumented="False" />
+<NamespaceSummaryItem name="s3pi.DefaultResource" isDocumented="True" />
+<NamespaceSummaryItem name="s3pi.GenericRCOLResource" isDocumented="True">When using the s3pi.GenericRCOLResource assembley, ensure RCOLResources.txt is included in your project and resides in the same folder at run time.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="ScriptResource" isDocumented="False" />
+<NamespaceSummaryItem name="StblResource" isDocumented="False" />
+<NamespaceSummaryItem name="TextResource" isDocumented="False" />
+<NamespaceSummaryItem name="TxtcResource" isDocumented="False" />
+<NamespaceSummaryItem name="CASPartResource" isDocumented="False" />
+<NamespaceSummaryItem name="NGMPHashMapResource" isDocumented="False" />
+<NamespaceSummaryItem name="(global)" isDocumented="True" /></NamespaceSummaries>
+    <MissingTags>Summary, Parameter, Returns, AutoDocumentCtors, TypeParameter, IncludeTargets, AutoDocumentDispose</MissingTags>
+    <VisibleItems>Attributes, ExplicitInterfaceImplementations, Protected</VisibleItems>
     <RootNamespaceContainer>True</RootNamespaceContainer>
     <ComponentConfigurations>
-      <ComponentConfig id="Cached MSDN URL References" enabled="True" xmlns="">
-        <component id="Cached MSDN URL References" type="SandcastleBuilder.Components.CachedResolveReferenceLinksComponent" assembly="{@SHFBFolder}SandcastleBuilder.Components.dll" locale="{@Locale}" linkTarget="{@SdkLinkTarget}">
-<cache filename="{@LocalDataFolder}Cache\MsdnUrl.cache" />
-<targets base="{@SandcastlePath}Data\Reflection" recurse="true" files="*.xml" type="{@SDKLinks}" />
-<targets files="reflection.xml" type="{@ProjectLinks}" />
-</component>
+      <ComponentConfig id="Post-transform Component" enabled="True">
+        <component id="Post-transform Component" type="SandcastleBuilder.Components.PostTransformComponent" assembly="{@SHFBFolder}SandcastleBuilder.Components.dll">
+          <!-- Code colorizer files (required).
+                 Attributes:
+                    Stylesheet file (required)
+                    Script file (required)
+                    "Copy" image file (required) -->
+          <colorizer stylesheet="{@SHFBFolder}Colorizer\highlight.css" scriptFile="{@SHFBFolder}Colorizer\highlight.js" copyImage="{@SHFBFolder}Colorizer\CopyCode.gif" />
+          <!-- Base output paths for the files (required).  These should match
+                 the parent folder of the output path of the HTML files (see
+                 each of the SaveComponent instances below). -->
+          <outputPaths>
+{@HelpFormatOutputPaths}
+            </outputPaths>
+          <!-- Logo image file (optional).  Filename is required. The height,
+                 width, altText, placement, and alignment attributes are
+                 optional. -->
+          <logoFile filename="C:\Users\Peter L Jones\Pictures\s3pe.png" height="32" width="32" altText="" placement="left" alignment="left" />
+        </component>
       </ComponentConfig>
-<ComponentConfig id="Code Block Component" enabled="True" xmlns=""><component id="Code Block Component" type="SandcastleBuilder.Components.CodeBlockComponent" assembly="{@SHFBFolder}SandcastleBuilder.Components.dll">
-  <basePath value="{@HtmlEncProjectFolder}" />
-  <languageFilter value="true" />
-  <allowMissingSource value="false" />
-  <removeRegionMarkers value="false" />
-  <colorizer syntaxFile="{@SHFBFolder}Colorizer\highlight.xml" styleFile="{@SHFBFolder}Colorizer\highlight.xsl" copyImageUrl="../icons/CopyCode.gif" language="cs" tabSize="0" numberLines="false" outlining="true" keepSeeTags="false" defaultTitle="true" />
-</component></ComponentConfig>
-<ComponentConfig id="IntelliSense Component" enabled="True" xmlns=""><component id="IntelliSense Component" type="SandcastleBuilder.Components.IntelliSenseComponent" assembly="{@SHFBFolder}SandcastleBuilder.Components.dll"><!-- Output options (optional)
+      <ComponentConfig id="IntelliSense Component" enabled="True">
+        <component id="IntelliSense Component" type="SandcastleBuilder.Components.IntelliSenseComponent" assembly="{@SHFBFolder}SandcastleBuilder.Components.dll">
+          <!-- Output options (optional)
                  Attributes:
                     Include Namespaces (false by default)
                     Namespaces filename ("Namespaces" if not specified or empty)
-                    Directory (current folder if not specified or empty) --><output includeNamespaces="false" namespacesFile="Namespaces" folder="{@OutputFolder}" /></component></ComponentConfig></ComponentConfigurations>
+                    Directory (current folder if not specified or empty) -->
+          <output includeNamespaces="false" namespacesFile="Namespaces" folder="{@OutputFolder}" />
+        </component>
+      </ComponentConfig>
+      <ComponentConfig id="Code Block Component" enabled="True">
+        <component id="Code Block Component" type="SandcastleBuilder.Components.CodeBlockComponent" assembly="{@SHFBFolder}SandcastleBuilder.Components.dll">
+          <basePath value="{@HtmlEncProjectFolder}" />
+          <languageFilter value="true" />
+          <allowMissingSource value="false" />
+          <removeRegionMarkers value="false" />
+          <colorizer syntaxFile="{@SHFBFolder}Colorizer\highlight.xml" styleFile="{@SHFBFolder}Colorizer\highlight.xsl" copyImageUrl="../icons/CopyCode.gif" language="cs" tabSize="0" numberLines="false" outlining="true" keepSeeTags="false" defaultTitle="true" />
+        </component>
+      </ComponentConfig>
+      <ComponentConfig id="Cached MSDN URL References" enabled="True">
+        <component id="Cached MSDN URL References" type="SandcastleBuilder.Components.CachedResolveReferenceLinksComponent" assembly="{@SHFBFolder}SandcastleBuilder.Components.dll" locale="{@Locale}" linkTarget="{@SdkLinkTarget}">
+          <helpOutput format="HtmlHelp1">
+            <cache filename="{@LocalDataFolder}Cache\MsdnUrl.cache" />
+            <targets base="{@SandcastlePath}Data\Reflection" recurse="true" files="*.xml" type="{@HtmlSdkLinkType}" />
+            <targets files="reflection.xml" type="Local" />
+          </helpOutput>
+          <helpOutput format="MSHelp2">
+            <cache filename="{@LocalDataFolder}Cache\MsdnUrl.cache" />
+            <targets base="{@SandcastlePath}Data\Reflection" recurse="true" files="*.xml" type="{@MSHelp2SdkLinkType}" />
+            <targets files="reflection.xml" type="Index" />
+          </helpOutput>
+          <helpOutput format="MSHelpViewer">
+            <cache filename="{@LocalDataFolder}Cache\MsdnUrl.cache" />
+            <targets base="{@SandcastlePath}Data\Reflection" recurse="true" files="*.xml" type="{@MSHelpViewerSdkLinkType}" />
+            <targets files="reflection.xml" type="Id" />
+          </helpOutput>
+          <helpOutput format="Website">
+            <cache filename="{@LocalDataFolder}Cache\MsdnUrl.cache" />
+            <targets base="{@SandcastlePath}Data\Reflection" recurse="true" files="*.xml" type="{@WebsiteSdkLinkType}" />
+            <targets files="reflection.xml" type="Local" />
+          </helpOutput>
+        </component>
+      </ComponentConfig>
+    </ComponentConfigurations>
+    <FrameworkVersion>.NET 3.5</FrameworkVersion>
+    <PlugInConfigurations />
+    <ApiFilter>
+      <Filter entryType="Namespace" fullName="CASPartResource" isExposed="False" xmlns="" />
+      <Filter entryType="Namespace" fullName="CatalogResource" isExposed="False" xmlns="" />
+      <Filter entryType="Namespace" fullName="ComplateResource" isExposed="False" xmlns="" />
+      <Filter entryType="Namespace" fullName="ImageResource" isExposed="False" xmlns="" />
+      <Filter entryType="Namespace" fullName="ModularResource" isExposed="False" xmlns="" />
+      <Filter entryType="Namespace" fullName="NameMapResource" isExposed="False" xmlns="" />
+      <Filter entryType="Namespace" fullName="NGMPHashMapResource" isExposed="False" xmlns="" />
+      <Filter entryType="Namespace" fullName="ObjKeyResource" isExposed="False" xmlns="" />
+      <Filter entryType="Namespace" fullName="s3pi.GenericRCOLResource" isExposed="False" xmlns="">
+        <Filter entryType="Class" fullName="s3pi.GenericRCOLResource.DefaultRCOL" filterName="DefaultRCOL" isExposed="True" />
+        <Filter entryType="Class" fullName="s3pi.GenericRCOLResource.GenericRCOLResource" filterName="GenericRCOLResource" isExposed="True" />
+        <Filter entryType="Class" fullName="s3pi.GenericRCOLResource.GenericRCOLResource.ChunkEntry" filterName="GenericRCOLResource.ChunkEntry" isExposed="True" />
+        <Filter entryType="Class" fullName="s3pi.GenericRCOLResource.GenericRCOLResource.ChunkEntryList" filterName="GenericRCOLResource.ChunkEntryList" isExposed="True" />
+        <Filter entryType="Class" fullName="s3pi.GenericRCOLResource.GenericRCOLResource.ChunkReference" filterName="GenericRCOLResource.ChunkReference" isExposed="True" />
+        <Filter entryType="Enumeration" fullName="s3pi.GenericRCOLResource.GenericRCOLResource.ReferenceType" filterName="GenericRCOLResource.ReferenceType" isExposed="True" />
+        <Filter entryType="Class" fullName="s3pi.GenericRCOLResource.GenericRCOLResourceHandler" filterName="GenericRCOLResourceHandler" isExposed="True" />
+      </Filter>
+      <Filter entryType="Namespace" fullName="ScriptResource" isExposed="False" xmlns="" />
+      <Filter entryType="Namespace" fullName="StblResource" isExposed="False" xmlns="" />
+      <Filter entryType="Namespace" fullName="TextResource" isExposed="False" xmlns="" />
+      <Filter entryType="Namespace" fullName="TxtcResource" isExposed="False" xmlns="" />
+    </ApiFilter>
   </PropertyGroup>
   <!-- There are no properties for these groups.  AnyCPU needs to appear in
        order for Visual Studio to perform the build.  The others are optional
