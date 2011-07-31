@@ -25,16 +25,27 @@ using System.IO;
 
 namespace s3pi.Extensions
 {
+    /// <summary>
+    /// Provides a look-up from resource type to resource &quot;tag&quot; and file extension.
+    /// The collection is read-only.
+    /// </summary>
+    /// <seealso cref="TGIN"/>
     public class ExtList : Dictionary<string, List<string>>
     {
         static ExtList e = null;
         static ExtList() { e = new ExtList(); }
+        /// <summary>
+        /// A look-up from resource type to resource &quot;tag&quot; and file extension.
+        /// The collection is read-only.
+        /// </summary>
         public static ExtList Ext { get { return e; } }
 
         ExtList()
         {
-            string path = Path.GetDirectoryName(typeof(ExtList).Assembly.Location);
-            StreamReader sr = new StreamReader(Path.Combine(path, "Extensions.txt"));
+            string path = Path.Combine(Path.GetDirectoryName(typeof(ExtList).Assembly.Location), "Extensions.txt");
+            if (!File.Exists(path)) return;
+
+            StreamReader sr = new StreamReader(path);
             string s;
             while ((s = sr.ReadLine()) != null)
             {
@@ -45,6 +56,32 @@ namespace s3pi.Extensions
                 t.RemoveAt(0);
                 this.Add(t0, t);
             }
+        }
+
+        /// <summary>
+        /// Gets or sets the value associated with the specified key.
+        /// </summary>
+        /// <param name="key">The key of the value to get or set.</param>
+        /// <returns>The value associated with the specified key.
+        /// If the specified key is not found, returns a default value.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="key"/> is null.</exception>
+        public List<string> this[uint key]
+        {
+            get { return this["0x" + key.ToString("X8")]; }
+        }
+
+        /// <summary>
+        /// Gets or sets the value associated with the specified key.
+        /// </summary>
+        /// <param name="key">The key of the value to get or set.</param>
+        /// <returns>The value associated with the specified key.
+        /// If the specified key is not found, returns a default value.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="key"/> is null.</exception>
+        /// <exception cref="InvalidOperationException">An attempt was made to set a value.</exception>
+        public new List<string> this[string key]
+        {
+            get { return this.ContainsKey(key) ? base[key] : base["*"]; }
+            set { throw new InvalidOperationException(); }
         }
     }
 }
