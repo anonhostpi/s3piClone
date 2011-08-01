@@ -192,7 +192,7 @@ namespace s3pi.Interfaces
         /// Writes the value of a list element to <paramref name="s"/>.
         /// </summary>
         /// <param name="s"><see cref="Stream"/> containing data.</param>
-        /// <param name="element">List element for which to write the value to the <seealso cref="Stream"/>.</param>
+        /// <param name="element">List element for which to write the value to the <see cref="Stream"/>.</param>
         protected override void WriteElement(Stream s, HandlerElement<T> element) { if (writeElement != null) writeElement(s, element.Val); }
         #endregion
 

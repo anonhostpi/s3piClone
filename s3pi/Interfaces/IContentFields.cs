@@ -50,7 +50,7 @@ namespace s3pi.Interfaces
         /// <summary>
         /// A <see cref="TypedValue"/> on this object
         /// </summary>
-        /// <param name="index">The <seealso cref="string"/> representing the name of the field
+        /// <param name="index">The <see cref="string"/> representing the name of the field
         /// (i.e. one of the values from <see cref="ContentFields"/>)</param>
         /// <returns>The <see cref="TypedValue"/> of field <paramref name="index"/> on this API object.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Thrown when an unknown index name is requested</exception>
