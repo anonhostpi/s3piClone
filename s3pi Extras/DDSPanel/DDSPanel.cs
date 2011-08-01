@@ -260,10 +260,10 @@ namespace System.Windows.Forms
         }
 
         /// <summary>
-        /// Sets the DDS image for this <seealso cref="DDSPanel"/> from the given <paramref name="ddsfile"/>.
-        /// <seealso cref="SupportsHSV"/> is determined from the <seealso cref="DdsFile.SupportsHSV"/> value.
+        /// Sets the DDS image for this <see cref="DDSPanel"/> from the given <paramref name="ddsfile"/>.
+        /// <see cref="SupportsHSV"/> is determined from the <see cref="DdsFile.SupportsHSV"/> value.
         /// </summary>
-        /// <param name="ddsfile">A <seealso cref="DdsFile"/> to display in this <seealso cref="DDSPanel"/>.</param>
+        /// <param name="ddsfile">A <see cref="DdsFile"/> to display in this <see cref="DDSPanel"/>.</param>
         public void DDSLoad(DdsFile ddsfile)
         {
             this.ddsFile = ddsfile;
@@ -273,11 +273,11 @@ namespace System.Windows.Forms
         }
 
         /// <summary>
-        /// Sets the DDS image for this <seealso cref="DDSPanel"/> from the given <paramref name="image"/>;
+        /// Sets the DDS image for this <see cref="DDSPanel"/> from the given <paramref name="image"/>;
         /// if <paramref name="supportHSV"/> is passed and true (default is false), the image will
         /// support HSV shift operations.
         /// </summary>
-        /// <param name="image">A <seealso cref="Bitmap"/> to display in this <seealso cref="DDSPanel"/>.</param>
+        /// <param name="image">A <see cref="Bitmap"/> to display in this <see cref="DDSPanel"/>.</param>
         /// <param name="supportHSV">Optional; when true, HSV operations will be supported on the image.</param>
         public void DDSLoad(Bitmap image, bool supportHSV = false)
         {
@@ -288,12 +288,12 @@ namespace System.Windows.Forms
         }
 
         /// <summary>
-        /// Imports an <seealso cref="System.Drawing.Image"/> from the specified file using embedded color
+        /// Imports an <see cref="System.Drawing.Image"/> from the specified file using embedded color
         /// management information in that file and uses the file as the DDS image to work on;
         /// if <paramref name="supportHSV"/> is passed and true (default is false), the image will
         /// support HSV shift operations.
         /// </summary>
-        /// <param name="filename">A string that contains the name of the file from which to read the <seealso cref="System.Drawing.Image"/>.</param>
+        /// <param name="filename">A string that contains the name of the file from which to read the <see cref="System.Drawing.Image"/>.</param>
         /// <param name="supportHSV">Optional; when true, HSV operations will be supported on the image.</param>
         /// <exception cref="System.OutOfMemoryException">
         /// The file does not have a valid image format.<br/>
@@ -471,7 +471,7 @@ namespace System.Windows.Forms
         /// <summary>
         /// Set the alpha channel of the current image from the given DDS file stream.
         /// </summary>
-        /// <param name="image"><seealso cref="Stream"/> containing a DDS image.</param>
+        /// <param name="image"><see cref="Stream"/> containing a DDS image.</param>
         public void SetAlphaFromGreyscale(Stream image)
         {
             DdsFile greyscale = new DdsFile();
@@ -483,7 +483,7 @@ namespace System.Windows.Forms
         /// <summary>
         /// Set the alpha channel of the current image from the given <paramref name="greyscale"/>.
         /// </summary>
-        /// <param name="greyscale"><seealso cref="Image"/> to use to set alpha channel.</param>
+        /// <param name="greyscale"><see cref="Image"/> to use to set alpha channel.</param>
         public void SetAlphaFromGreyscale(Image greyscale)
         {
             try
@@ -505,7 +505,7 @@ namespace System.Windows.Forms
         /// <summary>
         /// Set the alpha channel of the current image from the given <paramref name="greyscale"/>.
         /// </summary>
-        /// <param name="greyscale"><seealso cref="Bitmap"/> to use to set alpha channel.</param>
+        /// <param name="greyscale"><see cref="Bitmap"/> to use to set alpha channel.</param>
         public void SetAlphaFromGreyscale(Bitmap greyscale)
         {
             SetAlphaFromGreyscale(greyscale as Image);

@@ -53,6 +53,10 @@ namespace System.Drawing
     /// A &quot;DirectX Draw Surface&quot; stores compressed pixel data that is used when
     /// rendering scenes.  The pixel data may be used for purposes other than purely display,
     /// such as being used for masked operations on another DDS image.
+    /// <para>Note that this assembly depends on two unmanaged libraries:
+    /// <br/>squishinterface_Win32.dll - code for 32bit Windows systems.
+    /// <br/>squishinterface_x64.dll - code for 64bit Windows systems.
+    /// </para>
     /// </remarks>
     public class DdsFile : IDisposable
     {
@@ -804,11 +808,11 @@ namespace System.Drawing
         }
 
         /// <summary>
-        /// Creates an image of a single colour, specified by the <seealso cref="Color"/> parameter,
+        /// Creates an image of a single colour, specified by the <see cref="Color"/> parameter,
         /// with the size given by the int parameters.
         /// If <paramref name="supportHSV"/> is true, also creates an HSVa-encoded version of the image.
         /// </summary>
-        /// <param name="color"><seealso cref="Color"/> of image.</param>
+        /// <param name="color"><see cref="Color"/> of image.</param>
         /// <param name="width">Width of image.</param>
         /// <param name="height">Height of image.</param>
         /// <param name="supportHSV">When true, create an HSVa-encoded version of the image.</param>
@@ -848,10 +852,10 @@ namespace System.Drawing
         }
 
         /// <summary>
-        /// Creates an image from a given <seealso cref="T:DdsFile"/>.
+        /// Creates an image from a given <see cref="T:DdsFile"/>.
         /// If <paramref name="supportHSV"/> is true, also creates an HSVa-encoded version of the image.
         /// </summary>
-        /// <param name="image"><seealso cref="T:DdsFile"/> to clone.</param>
+        /// <param name="image"><see cref="T:DdsFile"/> to clone.</param>
         /// <param name="supportHSV">When true, create an HSVa-encoded version of the image.</param>
         public void CreateImage(DdsFile image, bool supportHSV)
         {
@@ -867,10 +871,10 @@ namespace System.Drawing
         }
 
         /// <summary>
-        /// Creates an image from a given <seealso cref="T:Image"/>.
+        /// Creates an image from a given <see cref="T:Image"/>.
         /// If <paramref name="supportHSV"/> is true, also creates an HSVa-encoded version of the image.
         /// </summary>
-        /// <param name="image"><seealso cref="T:Image"/> from which to extract image pixel.</param>
+        /// <param name="image"><see cref="T:Image"/> from which to extract image pixel.</param>
         /// <param name="supportHSV">When true, create an HSVa-encoded version of the image.</param>
         public void CreateImage(Image image, bool supportHSV)
         {
@@ -878,10 +882,10 @@ namespace System.Drawing
         }
 
         /// <summary>
-        /// Creates an image from a given <seealso cref="Bitmap"/>.
+        /// Creates an image from a given <see cref="Bitmap"/>.
         /// If <paramref name="supportHSV"/> is true, also creates an HSVa-encoded version of the image.
         /// </summary>
-        /// <param name="image"><seealso cref="Bitmap"/> from which to extract image pixel.</param>
+        /// <param name="image"><see cref="Bitmap"/> from which to extract image pixel.</param>
         /// <param name="supportHSV">When true, create an HSVa-encoded version of the image.</param>
         public void CreateImage(Bitmap image, bool supportHSV)
         {
@@ -902,7 +906,7 @@ namespace System.Drawing
         /// Converts the R, G and B channels of the supplied <paramref name="image"/> to greyscale
         /// and loads this into the Alpha channel of the current image.
         /// </summary>
-        /// <param name="image"><seealso cref="DdsFile"/> to extract greyscale data from for alpha channel.</param>
+        /// <param name="image"><see cref="DdsFile"/> to extract greyscale data from for alpha channel.</param>
         public void SetAlphaFromGreyscale(DdsFile image)
         {
             for (int y = 0; y < ddsHeader.m_height; y++)
@@ -925,7 +929,7 @@ namespace System.Drawing
         /// Converts the R, G and B channels of the supplied <paramref name="image"/> to greyscale
         /// and loads this into the Alpha channel of the current image.
         /// </summary>
-        /// <param name="image"><seealso cref="T:Image"/> to extract greyscale data from for alpha channel.</param>
+        /// <param name="image"><see cref="T:Image"/> to extract greyscale data from for alpha channel.</param>
         public void SetAlphaFromGreyscale(Image image)
         {
             SetAlphaFromGreyscale(new Bitmap(image));
@@ -937,7 +941,7 @@ namespace System.Drawing
         /// Converts the R, G and B channels of the supplied <paramref name="image"/> to greyscale
         /// and loads this into the Alpha channel of the current image.
         /// </summary>
-        /// <param name="image"><seealso cref="Bitmap"/> to extract greyscale data from for alpha channel.</param>
+        /// <param name="image"><see cref="Bitmap"/> to extract greyscale data from for alpha channel.</param>
         public void SetAlphaFromGreyscale(Bitmap image)
         {
             for (int y = 0; y < ddsHeader.m_height; y++)
@@ -982,7 +986,7 @@ namespace System.Drawing
         }
 
         /// <summary>
-        /// Extract a <seealso cref="T:Image"/> representing the current image, subject to the filtering requested.
+        /// Extract a <see cref="T:Image"/> representing the current image, subject to the filtering requested.
         /// </summary>
         /// <param name="red">When true, the red channel of the DDS contributes to the red pixels of the returned image.</param>
         /// <param name="green">When true, the green channel of the DDS contributes to the green pixels of the returned image.</param>
@@ -1281,9 +1285,9 @@ namespace System.Drawing
     }
 
     /// <summary>
-    /// Convert a <seealso cref="T:Color"/> value into a UInt32 ARGB format pixel value.
+    /// Convert a <see cref="T:Color"/> value into a UInt32 ARGB format pixel value.
     /// </summary>
-    /// <param name="color">A <seealso cref="T:Color"/> value</param>
+    /// <param name="color">A <see cref="T:Color"/> value</param>
     /// <returns>A UInt32 ARGB format pixel value.</returns>
     public delegate uint ARGBToPixel(Color color);
 
@@ -1293,14 +1297,14 @@ namespace System.Drawing
     public static class Extensions
     {
         /// <summary>
-        /// Convert an array of UInt32 ARGB elements into a <seealso cref="T:Bitmap"/>.
+        /// Convert an array of UInt32 ARGB elements into a <see cref="T:Bitmap"/>.
         /// </summary>
         /// <param name="argbData">The array of UInt32 ARGB elements to decode.</param>
         /// <param name="size">The size of the encoded image.</param>
         /// <returns>The decoded image.</returns>
         public static Bitmap ToBitmap(this uint[] argbData, Size size) { return argbData.ToBitmap(size.Width, size.Height); }
         /// <summary>
-        /// Convert an array of UInt32 ARGB elements into a <seealso cref="T:Bitmap"/>.
+        /// Convert an array of UInt32 ARGB elements into a <see cref="T:Bitmap"/>.
         /// </summary>
         /// <param name="argbData">The array of UInt32 ARGB elements to decode.</param>
         /// <param name="width">The width of the encoded image.</param>
@@ -1319,24 +1323,24 @@ namespace System.Drawing
         }
 
         /// <summary>
-        /// Converts a <seealso cref="T:Image"/> into an array of UInt32 ARGB elements.
+        /// Converts a <see cref="T:Image"/> into an array of UInt32 ARGB elements.
         /// </summary>
         /// <param name="image">The image to encode.</param>
         /// <returns>An array of UInt32 ARGB elements.</returns>
         public static uint[] ToARGBData(this Image image) { return new Bitmap(image).ToARGBData(); }
         /// <summary>
-        /// Converts a <seealso cref="T:Bitmap"/> into an array of UInt32 ARGB elements.
+        /// Converts a <see cref="T:Bitmap"/> into an array of UInt32 ARGB elements.
         /// </summary>
         /// <param name="bitmap">The bitmap image to encode.</param>
         /// <returns>An array of UInt32 ARGB elements.</returns>
         public static uint[] ToARGBData(this Bitmap bitmap) { return bitmap.ToPixelData(x => (uint)x.ToArgb()); }
 
         /// <summary>
-        /// Converts a <seealso cref="T:Bitmap"/> into a pixel data array,
+        /// Converts a <see cref="T:Bitmap"/> into a pixel data array,
         /// using the provided encoder.
         /// </summary>
         /// <param name="bitmap">The bitmap image to encode.</param>
-        /// <param name="encoder">The method to invoke to encode bitmap <seealso cref="T:Color"/> pixels.</param>
+        /// <param name="encoder">The method to invoke to encode bitmap <see cref="T:Color"/> pixels.</param>
         /// <returns>An array of uint elements containing the encoded pixel data.</returns>
         public static uint[] ToPixelData(this Bitmap bitmap, ARGBToPixel encoder)
         {
