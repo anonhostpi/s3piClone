@@ -23,6 +23,9 @@ using System.IO;
 
 namespace s3pi.Interfaces
 {
+    /// <summary>
+    /// Defines the interface exposed by an RCOL block.
+    /// </summary>
     public interface IRCOLBlock : IResource
     {
         /// <summary>

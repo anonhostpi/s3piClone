@@ -23,13 +23,30 @@ using System.IO;
 
 namespace s3pi.Interfaces
 {
+    /// <summary>
+    /// Represents the abstract RCOL block within a <see cref="GenericRCOLResource"/>.
+    /// </summary>
     public abstract class ARCOLBlock : AHandlerElement, IRCOLBlock, IEquatable<ARCOLBlock>
     {
         const int recommendedApiVersion = 1;
 
+        /// <summary>
+        /// Holds the requested API version.
+        /// </summary>
         protected int requestedAPIversion;
+        /// <summary>
+        /// Holds the stream from which the block was read.
+        /// </summary>
+        /// <remarks>Note that the state of the stream may change once the <see cref="Parse"/> method completes.</remarks>
         protected Stream stream;
 
+        /// <summary>
+        /// Create a new instance based on the data in the supplied <see cref="Stream"/>.
+        /// </summary>
+        /// <param name="APIversion">The requested API version.</param>
+        /// <param name="handler">The change event handler for the resource.</param>
+        /// <param name="s">The <see cref="Stream"/> containing the data.</param>
+        /// <seealso cref="Parse"/>
         public ARCOLBlock(int APIversion, EventHandler handler, Stream s)
             : base(APIversion, handler)
         {
@@ -39,12 +56,20 @@ namespace s3pi.Interfaces
             Parse(stream);
         }
 
+        /// <summary>
+        /// Any implementation must provide a method of reading data from the resource.
+        /// </summary>
+        /// <param name="s">The <see cref="Stream"/> referencing the data in the resource, position to the start of this block.</param>
+        /// <remarks>Any implementation must ensure the stream position ends at the first byte of the next block.</remarks>
         protected abstract void Parse(Stream s);
 
         #region AApiVersionedFields
         static List<string> ARCOLBlockBanlist = new List<string>(new string[] {
             "Tag", "ResourceType", "Data",
         });
+        /// <summary>
+        /// Remove the additional &quot;banned&quot; fields for an RCOL block.
+        /// </summary>
         protected override List<string> ValueBuilderFields
         {
             get
@@ -62,16 +87,34 @@ namespace s3pi.Interfaces
         /// </summary>
         public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
 
+        /// <summary>
+        /// Unless overridden in an implementing class, returns <c>1</c>.
+        /// </summary>
         public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
 
+        /// <summary>
+        /// Implementing classes must provide a means of creating a copy of themselves.
+        /// </summary>
+        /// <param name="handler">The <see cref="EventHandler"/> for the new instance.</param>
+        /// <returns>A new instance of the class with identical values, with the given change <see cref="EventHandler"/>.</returns>
         public abstract override AHandlerElement Clone(EventHandler handler);
         #endregion
 
         #region IRCOLBlock Members
+        /// <summary>
+        /// The &quot;FOUR CC&quot; tag identifying this RCOL block; may be <c>null</c> if not present.
+        /// </summary>
         [ElementPriority(2)]
         public abstract string Tag { get; }
+        /// <summary>
+        /// The Resource Type identifying this block format.
+        /// </summary>
         [ElementPriority(3)]
         public abstract uint ResourceType { get; }
+        /// <summary>
+        /// Implementing classes must provide a means of storing themselves in a <see cref="Stream"/>.
+        /// </summary>
+        /// <returns>The <see cref="Stream"/> containing the data from the RCOL block.</returns>
         public abstract Stream UnParse();
         #endregion
 
@@ -122,28 +165,36 @@ namespace s3pi.Interfaces
         #endregion
 
         #region IEquatable<ARCOLBlock> Members
-
+        /// <summary>
+        /// Indicates whether the current <see cref="ARCOLBlock"/> is equal to another instance.
+        /// </summary>
+        /// <param name="other">Another instance to compare with this <see cref="ARCOLBlock"/>.</param>
+        /// <returns><c>true</c> if the current <see cref="ARCOLBlock"/> is equal to the <paramref name="other"/> parameter;
+        /// otherwise, <c>false</c>.</returns>
         public virtual bool Equals(ARCOLBlock other) { return this.AsBytes.Equals<byte>(other.AsBytes); }
 
-        public override bool Equals(object obj)
-        {
-            return obj as ARCOLBlock != null ? this.Equals(obj as ARCOLBlock) : false;
-        }
+        /// <summary>
+        /// Indicates whether the current <see cref="ARCOLBlock"/> is equal to another object of the same type.
+        /// </summary>
+        /// <param name="obj">An object to compare with this <see cref="ARCOLBlock"/>.</param>
+        /// <returns><c>true</c> if the current <see cref="ARCOLBlock"/> is equal to the <paramref name="obj"/> parameter;
+        /// otherwise, <c>false</c>.</returns>
+        public override bool Equals(object obj) { return obj as ARCOLBlock != null && this.Equals(obj as ARCOLBlock); }
 
-        public override int GetHashCode()
-        {
-            return AsBytes.GetHashCode();
-        }
-
+        /// <summary>
+        /// Serves as a hash function for an <see cref="ARCOLBlock"/>.
+        /// </summary>
+        /// <returns>A hash code for the current <see cref="ARCOLBlock"/>.</returns>
+        public override int GetHashCode() { return AsBytes.GetHashCode(); }
         #endregion
 
         /// <summary>
-        /// Used to indicate the RCOL has changed
+        /// Used to indicate the RCOL has changed.
         /// </summary>
         protected virtual void OnRCOLChanged(object sender, EventArgs e) { OnElementChanged(); }
 
         /// <summary>
-        /// To allow editor import/export
+        /// To allow editor import/export as a minimum.
         /// </summary>
         [ElementPriority(1)]
         public virtual BinaryReader Data
