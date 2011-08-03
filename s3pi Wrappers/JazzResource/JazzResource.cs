@@ -835,8 +835,8 @@ namespace s3pi.GenericRCOLResource
             : base(APIversion, handler, null)
         {
             this.version = version;
-            this.clipResource = new TGIBlock(requestedApiVersion, handler, clipResource);
-            this.tkmkResource = new TGIBlock(requestedApiVersion, handler, tkmkResource);
+            this.clipResource = new TGIBlock(requestedApiVersion, handler, "IGT", clipResource);
+            this.tkmkResource = new TGIBlock(requestedApiVersion, handler, "IGT", tkmkResource);
             this.unknown1 = unknown1;
             this.unknown2 = unknown2;
             this.unknown3 = unknown3;
@@ -882,8 +882,8 @@ namespace s3pi.GenericRCOLResource
             BinaryReader r = new BinaryReader(s);
 
             this.version = r.ReadUInt32();
-            this.clipResource = new TGIBlock(requestedApiVersion, handler, s);
-            this.tkmkResource = new TGIBlock(requestedApiVersion, handler, s);
+            this.clipResource = new TGIBlock(requestedApiVersion, handler, "IGT", s);
+            this.tkmkResource = new TGIBlock(requestedApiVersion, handler, "IGT", s);
             actorSlotCount = r.ReadInt32();
             this.unknown1 = r.ReadUInt32();
             this.unknown2 = r.ReadUInt32();
@@ -926,9 +926,9 @@ namespace s3pi.GenericRCOLResource
             BinaryWriter w = new BinaryWriter(ms);
 
             w.Write(version);
-            if (clipResource == null) clipResource = new TGIBlock(requestedAPIversion, handler);
+            if (clipResource == null) clipResource = new TGIBlock(requestedAPIversion, handler, "IGT");
             clipResource.UnParse(ms);
-            if (tkmkResource == null) tkmkResource = new TGIBlock(requestedAPIversion, handler);
+            if (tkmkResource == null) tkmkResource = new TGIBlock(requestedAPIversion, handler, "IGT");
             tkmkResource.UnParse(ms);
             if (actorSlots == null) actorSlots = new ActorSlotList(handler);
             w.Write(actorSlots.Count);
@@ -1168,9 +1168,9 @@ namespace s3pi.GenericRCOLResource
         [ElementPriority(11)]
         public uint Version { get { return version; } set { if (version != value) { version = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(12)]
-        public IResourceKey ClipResource { get { return clipResource; } set { if (clipResource != value) { clipResource = new TGIBlock(requestedApiVersion, handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
+        public IResourceKey ClipResource { get { return clipResource; } set { if (clipResource != value) { clipResource = new TGIBlock(requestedApiVersion, handler, "IGT", value); OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(13)]
-        public IResourceKey TkmkResource { get { return tkmkResource; } set { if (tkmkResource != value) { tkmkResource = new TGIBlock(requestedApiVersion, handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
+        public IResourceKey TkmkResource { get { return tkmkResource; } set { if (tkmkResource != value) { tkmkResource = new TGIBlock(requestedApiVersion, handler, "IGT", value); OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(14)]
         public uint Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(15)]
@@ -1710,7 +1710,7 @@ namespace s3pi.GenericRCOLResource
             this.version = version;
             this.actorDefinitionIndex = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, actorDefinitionIndex);
             this.unknown1 = unknown1;
-            this.propResource = new TGIBlock(requestedApiVersion, handler, propResource);
+            this.propResource = new TGIBlock(requestedApiVersion, handler, "IGT", propResource);
             this.unknown2 = unknown2;
             this.unknown3 = unknown3;
             this.unknown4 = unknown4;
@@ -1736,7 +1736,7 @@ namespace s3pi.GenericRCOLResource
             this.version = r.ReadUInt32();
             this.actorDefinitionIndex = new GenericRCOLResource.ChunkReference(requestedAPIversion, handler, s);
             this.unknown1 = r.ReadUInt32();
-            this.propResource = new TGIBlock(requestedApiVersion, handler, s);
+            this.propResource = new TGIBlock(requestedApiVersion, handler, "IGT", s);
             this.unknown2 = r.ReadUInt32();
             this.unknown3 = r.ReadUInt32();
             this.unknown4 = r.ReadUInt32();
@@ -1755,7 +1755,7 @@ namespace s3pi.GenericRCOLResource
             if (actorDefinitionIndex == null) actorDefinitionIndex = new GenericRCOLResource.ChunkReference(requestedAPIversion, handler, 0);
             actorDefinitionIndex.UnParse(ms);
             w.Write(unknown1);
-            if (propResource == null) propResource = new TGIBlock(requestedAPIversion, handler);
+            if (propResource == null) propResource = new TGIBlock(requestedAPIversion, handler, "IGT");
             propResource.UnParse(ms);
             w.Write(unknown2);
             w.Write(unknown3);
@@ -1780,7 +1780,7 @@ namespace s3pi.GenericRCOLResource
         [ElementPriority(13)]
         public uint Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(14)]
-        public IResourceKey PropResource { get { return propResource; } set { if (propResource != value) { propResource = new TGIBlock(requestedApiVersion, handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
+        public IResourceKey PropResource { get { return propResource; } set { if (propResource != value) { propResource = new TGIBlock(requestedApiVersion, handler, "IGT", value); OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(15)]
         public uint Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(16)]
