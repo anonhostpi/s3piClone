@@ -94,7 +94,7 @@ namespace s3pi.GenericRCOLResource
         #endregion
 
         #region Sub-types
-        public enum Set : uint
+        public enum State : uint
         {
             Default = 0x2EA8FB98,
             Dirty = 0xEEAB4327,
@@ -109,25 +109,25 @@ namespace s3pi.GenericRCOLResource
 
             #region Attributes
             GenericRCOLResource.ChunkReference index;
-            Set materialSet = 0;
+            State materialState = 0;
             #endregion
 
             #region Constructors
             public Entry(int APIversion, EventHandler handler) : base(APIversion, handler) { }
             public Entry(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
-            public Entry(int APIversion, EventHandler handler, Entry basis) : this(APIversion, handler, basis.index, basis.materialSet) { }
-            public Entry(int APIversion, EventHandler handler, GenericRCOLResource.ChunkReference index, Set materialSet)
+            public Entry(int APIversion, EventHandler handler, Entry basis) : this(APIversion, handler, basis.index, basis.materialState) { }
+            public Entry(int APIversion, EventHandler handler, GenericRCOLResource.ChunkReference index, State materialSet)
                 : base(APIversion, handler)
             {
                 this.index = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, index);
-                this.materialSet = materialSet;
+                this.materialState = materialSet;
             }
             #endregion
 
             #region Data I/O
-            void Parse(Stream s) { index = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, s); materialSet = (Set)new BinaryReader(s).ReadUInt32(); }
+            void Parse(Stream s) { index = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, s); materialState = (State)new BinaryReader(s).ReadUInt32(); }
 
-            internal void UnParse(Stream s) { index.UnParse(s); new BinaryWriter(s).Write((uint)materialSet); }
+            internal void UnParse(Stream s) { index.UnParse(s); new BinaryWriter(s).Write((uint)materialState); }
             #endregion
 
             #region AHandlerElement Members
@@ -140,14 +140,14 @@ namespace s3pi.GenericRCOLResource
 
             #region IEquatable<Entry> Members
 
-            public bool Equals(Entry other) { return this.index == other.index && this.materialSet == other.materialSet; }
+            public bool Equals(Entry other) { return this.index == other.index && this.materialState == other.materialState; }
             public override bool Equals(object obj)
             {
                 return obj as Entry != null && this.Equals(obj as Entry);
             }
             public override int GetHashCode()
             {
-                return index.GetHashCode() ^ materialSet.GetHashCode();
+                return index.GetHashCode() ^ materialState.GetHashCode();
             }
 
             #endregion
@@ -156,7 +156,7 @@ namespace s3pi.GenericRCOLResource
             [ElementPriority(1)]
             public GenericRCOLResource.ChunkReference Index { get { return index; } set { if (index != value) { new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, value); OnElementChanged(); } } }
             [ElementPriority(2)]
-            public Set MaterialSet { get { return materialSet; } set { if (materialSet != value) { materialSet = value; OnElementChanged(); } } }
+            public State MaterialState { get { return materialState; } set { if (materialState != value) { materialState = value; OnElementChanged(); } } }
 
             public string Value { get { return ValueBuilder.Replace("\n", "; "); } }
             #endregion
