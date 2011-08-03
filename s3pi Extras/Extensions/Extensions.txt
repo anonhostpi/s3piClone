@@ -102,6 +102,7 @@
 0x2E75C764  ICON   .png
 0x2E75C765  ICON   .png
 0x2E75C766  ICON   .png
+0x2E75C767  ICON   .png
 0x2F7D0008  UITX   .uitexture
 0x316C78F2  CFND   .foundation
 0x319E4F1D  OBJD   .object
