@@ -539,7 +539,7 @@ namespace s3pi.Package
                 throw new InvalidDataException("Expected major version '" + major + "'.  Found '" + Major.ToString() + "'.");
 
             if (Minor != minor)
-                throw new InvalidDataException("Expected major version '" + minor + "'.  Found '" + Minor.ToString() + "'.");
+                throw new InvalidDataException("Expected minor version '" + minor + "'.  Found '" + Minor.ToString() + "'.");
         }
         #endregion
 
