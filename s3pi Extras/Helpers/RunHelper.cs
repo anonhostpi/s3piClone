@@ -44,10 +44,12 @@ namespace s3pi.Helpers
                 return -1;
             }
 
+            List<char> switchChars = new List<char>(new char[] { '/', '-', });
+            switchChars.Remove(Path.DirectorySeparatorChar);
             foreach (string s in args)
             {
                 string p = s;
-                if (p.StartsWith("/") || p.StartsWith("-"))
+                if (p.Length > 1 && switchChars.Contains(p[0]))
                 {
                     if ("clipboard".StartsWith(p.Substring(1).ToLower()))
                         useClipboard = true;
