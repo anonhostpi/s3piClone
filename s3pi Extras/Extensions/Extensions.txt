@@ -59,6 +59,7 @@
 0x0589DC44  THUM   .png
 0x0589DC45  THUM   .png
 0x0589DC46  THUM   .png
+0x0589DC47  THUM   .png
 0x05FF6BA4  2ARY   .bnry
 0x05B17698  THUM   .png
 0x05B17699  THUM   .png
@@ -134,6 +135,8 @@
 0x91EDBD3E  CRST   .roofstyle
 0x94C5D14A  SIGR   .signature
 0xA8D58BE5  SKIL   .xml
+0xAD366F95  THUM   .png
+0xAD366F96  THUM   .png
 0xB1CC1AF6  _VID   .video
 0xB4DD716B  _INV   .inventory
 0xB52F5055  FBLN   .facialblend
