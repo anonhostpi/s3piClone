@@ -59,6 +59,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "s3piControls", "..\s3pi Ext
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDSPanel", "..\s3pi Extras\DDSPanel\DDSPanel.csproj", "{901D5F73-7DAC-49C3-9A5F-33EEA1E97F22}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Filetable", "..\s3pi Extras\Filetable\Filetable.csproj", "{FEAA8674-9363-4BC7-B016-7BE984A2D185}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -181,6 +183,10 @@ Global
 		{901D5F73-7DAC-49C3-9A5F-33EEA1E97F22}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{901D5F73-7DAC-49C3-9A5F-33EEA1E97F22}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{901D5F73-7DAC-49C3-9A5F-33EEA1E97F22}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FEAA8674-9363-4BC7-B016-7BE984A2D185}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FEAA8674-9363-4BC7-B016-7BE984A2D185}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FEAA8674-9363-4BC7-B016-7BE984A2D185}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FEAA8674-9363-4BC7-B016-7BE984A2D185}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

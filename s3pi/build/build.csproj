@@ -89,6 +89,10 @@
       <Project>{9B4C57BA-E09F-4439-98B4-B9B535A4ABF6}</Project>
       <Name>Extensions</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\s3pi Extras\Filetable\Filetable.csproj">
+      <Project>{FEAA8674-9363-4BC7-B016-7BE984A2D185}</Project>
+      <Name>Filetable</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\s3pi Extras\Helpers\Helpers.csproj">
       <Project>{D9B63641-D3BE-4120-9115-7D67B1238FBF}</Project>
       <Name>Helpers</Name>
