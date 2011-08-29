@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<gamefolders xmlns="http://sims3.drealm.info/terms/gamefolders/1.0">
+  <defaultrootfolder>C:/Program Files (x86)/</defaultrootfolder>
+  <rootfolder vendor="Microsoft" os="Win64">C:/Program Files (x86)/</rootfolder>
+  <rootfolder vendor="Microsoft" os="Win32">C:/Program Files/</rootfolder>
+  <game class="baseGame" rgversion="0">
+    <Name>base</Name>
+    <Longname>The Sims 3</Longname>
+    <DefaultInstallDir>Electronic Arts/The Sims 3</DefaultInstallDir>
+    <Suppressed>not-allowed</Suppressed>
+  </game>
+  <game class="EP" rgversion="1">
+    <Name>ep1</Name>
+    <Longname>The Sims 3 World Adventures</Longname>
+    <DefaultInstallDir>Electronic Arts/The Sims 3 World Adventures</DefaultInstallDir>
+    <Suppressed>false</Suppressed>
+  </game>
+  <game class="SP" rgversion="2">
+    <Name>sp1</Name>
+    <Longname>The Sims 3 High-End Loft Stuff</Longname>
+    <DefaultInstallDir>Electronic Arts/The Sims 3 High-End Loft Stuff</DefaultInstallDir>
+    <Suppressed>false</Suppressed>
+  </game>
+  <game class="EP" rgversion="3">
+    <Name>ep2</Name>
+    <Longname>The Sims 3 Ambitions</Longname>
+    <DefaultInstallDir>Electronic Arts/The Sims 3 Ambitions</DefaultInstallDir>
+    <Suppressed>false</Suppressed>
+  </game>
+  <game class="SP" rgversion="4">
+    <Name>sp2</Name>
+    <Longname>The Sims 3 Fast Lane Stuff</Longname>
+    <DefaultInstallDir>Electronic Arts/The Sims 3 Fast Lane Stuff</DefaultInstallDir>
+    <Suppressed>false</Suppressed>
+  </game>
+  <game class="EP" rgversion="5">
+    <Name>ep3</Name>
+    <Longname>The Sims 3 Late Night</Longname>
+    <DefaultInstallDir>Electronic Arts/The Sims 3 Late Night</DefaultInstallDir>
+    <Suppressed>false</Suppressed>
+  </game>
+  <game class="SP" rgversion="6">
+    <Name>sp3</Name>
+    <Longname>The Sims 3 Outdoor Living Stuff</Longname>
+    <DefaultInstallDir>Electronic Arts/The Sims 3 Outdoor Living Stuff</DefaultInstallDir>
+    <Suppressed>false</Suppressed>
+  </game>
+  <game class="EP" rgversion="7">
+    <Name>ep4</Name>
+    <Longname>The Sims 3 Generations</Longname>
+    <DefaultInstallDir>Electronic Arts/The Sims 3 Generations</DefaultInstallDir>
+    <Suppressed>false</Suppressed>
+  </game>
+  <game class="SP" rgversion="8">
+    <Name>sp4</Name>
+    <Longname>The Sims 3 Town Life Stuff</Longname>
+    <DefaultInstallDir>Electronic Arts/The Sims 3 Town Life Stuff</DefaultInstallDir>
+    <Suppressed>false</Suppressed>
+  </game>
+</gamefolders>
