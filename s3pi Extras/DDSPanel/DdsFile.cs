@@ -468,7 +468,7 @@ namespace System.Drawing
 
                 // Size of a source pixel, in bytes
                 int srcPixelSize = (int)ddsHeader.m_pixelFormat.m_rgbBitCount / 8;
-                if (srcPixelSize >= 4)
+                if (srcPixelSize > 4)
                     throw new FormatException("Pixel size must be four bytes or less.");
 
                 ToARGB toARGB = null;
