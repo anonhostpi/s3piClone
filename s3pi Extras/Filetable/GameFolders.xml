@@ -1,19 +1,29 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <gamefolders xmlns="http://sims3.drealm.info/terms/gamefolders/1.0">
   <defaultrootfolder>C:/Program Files (x86)/</defaultrootfolder>
-  <rootfolder vendor="Microsoft" os="Win64">C:/Program Files (x86)/</rootfolder>
-  <rootfolder vendor="Microsoft" os="Win32">C:/Program Files/</rootfolder>
+  <rootfolder vendor="Microsoft" os="64bit">C:/Program Files (x86)/</rootfolder>
+  <rootfolder vendor="Microsoft" os="32bit">C:/Program Files/</rootfolder>
   <game class="baseGame" rgversion="0">
     <Name>base</Name>
     <Longname>The Sims 3</Longname>
     <DefaultInstallDir>Electronic Arts/The Sims 3</DefaultInstallDir>
     <Suppressed>not-allowed</Suppressed>
+    <!--The purpose of "ExtraPackage" is to add extra EA packages GameFolders does not find
+        It is not expected to be needed except to "fill the gap" between tool releases.
+    <ExtraPackage><![CDATA[C:/Some location/EA Content/DeltaFoo.package]]></ExtraPackage>
+    <ExtraPackage><![CDATA[C:/Some location/EA Content/DeltaBar.package]]></ExtraPackage>
+    -->
   </game>
   <game class="EP" rgversion="1">
     <Name>ep1</Name>
     <Longname>The Sims 3 World Adventures</Longname>
     <DefaultInstallDir>Electronic Arts/The Sims 3 World Adventures</DefaultInstallDir>
     <Suppressed>false</Suppressed>
+    <!--The purpose of "ExtraPackage" is to add extra EA packages GameFolders does not find
+        It is not expected to be needed except to "fill the gap" between tool releases.
+    <ExtraPackage><![CDATA[C:/Some location/EA Content/DeltaFoo.package]]></ExtraPackage>
+    <ExtraPackage><![CDATA[C:/Some location/EA Content/DeltaBar.package]]></ExtraPackage>
+    -->
   </game>
   <game class="SP" rgversion="2">
     <Name>sp1</Name>

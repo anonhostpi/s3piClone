@@ -29,6 +29,76 @@ namespace s3pi.Filetable
     /// Provides access to the XML definition of game folder default locations and
     /// the resultant list of known games.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// When using this class - which is depended upon by <see cref="Filetable"/> - ensure
+    /// the file <c>GameFolders.xml</c> is present in the same folder as the assembly containing this class as it
+    /// is used to specify a number of configuration values.
+    /// These are as follows:
+    /// </para>
+    /// <list type="table">
+    /// <listheader><term><c>GameFolders.xml</c> tag</term><description>Description</description></listheader>
+    /// <item><term><c>&lt;gamefolders&gt;</c></term><description>Root element of the file, defines the XML namespace used.</description></item>
+    /// <item><term><c>&lt;defaultrootfolder&gt;</c></term><description>The folder to use when no <c>&lt;rootfolder&gt;</c> tag applies.
+    /// If this value is also not found, a value of <c>/</c> is used.
+    /// </description></item>
+    /// <item><term><c>&lt;rootfolder&gt;</c></term>
+    /// <description>A search is performed for a matching entry based on the <c>vendor</c> and <c>os</c> attributes:
+    /// <list type="table">
+    /// <listheader><term>attribute</term><description>values</description></listheader>
+    /// <item><term>vendor</term><description>
+    /// <see cref="Environment"/><c cref="OperatingSystem">.OSVersion</c> (see <see cref="OperatingSystem"/>) <c cref="PlatformID">.Platform</c> (see <see cref="PlatformID"/>)
+    /// is used to determine whether the vendor is <c>MacOSX</c>, <c>Unix</c> or (otherwise) <c>Microsoft</c>.
+    /// </description></item>
+    /// <item><term>os</term>
+    /// <description><c>64bit</c>, or <c>32bit</c> when the size of <see cref="T:System.IntPtr"/> is 4 bytes.</description>
+    /// </item>
+    /// </list>
+    /// </description>
+    /// </item>
+    /// <item><term><c>&lt;game&gt;</c></term><description>
+    /// <para>This is a container for details about a specific Sims3 game.  It has two attributes:</para>
+    /// <list type="table">
+    /// <listheader><term>attribute</term><description>values</description></listheader>
+    /// <item><term>class</term><description><c>baseGame</c> (the base game itself), <c>EP</c> (a full expansion pack) or <c>SP</c> (a stuff pack).
+    /// The value is not used.</description></item>
+    /// <item><term>rgversion</term><description>Exposed as <see cref="Game.RGVersion"/> and used internally (e.g. to determine where delta build packages are found)
+    /// as well as by the <see cref="Filetable"/>.  The value is expected to match the top five "version" bits of the
+    /// <see cref="s3pi.Interfaces.IResourceKey.ResourceGroup"/> (hence RGVersion) of certain resources.</description></item>
+    /// </list>
+    /// <para>The following tags appear for each game:</para>
+    /// <list type="table">
+    /// <listheader><term><c>&lt;game&gt;</c> section tag</term><term><see cref="Game"/> property</term><description>Description</description></listheader>
+    /// <item><term><c>&lt;Name&gt;</c></term><term><see cref="Game.Name"/></term><description>The identity of the game, used for the list of EPs Disabled (see <see cref="EPsDisabled"/>).</description></item>
+    /// <item><term><c>&lt;Longname&gt;</c></term><term><see cref="Game.Longname"/></term><description>A descriptive name for the section.</description></item>
+    /// <item><term><c>&lt;DefaultInstallDir&gt;</c></term><term><see cref="Game.DefaultInstallDir"/></term><description>(English-language) default install folder for the game.</description></item>
+    /// <item><term><c>&lt;Suppressed&gt;</c></term><term><see cref="Game.Suppressed"/></term>
+    /// <description>Whether the game is disabled by default; the value <c>not-allowed</c> means the game will always be enabled.</description></item>
+    /// <item><term><c>&lt;ExtraPackage&gt;</c></term><term><c> </c></term>
+    /// <description>Optional tag to allow extra an EA content package to be added for this <see cref="Game"/> that is otherwise not found.
+    /// Multiple occurrences are supported.
+    /// It is expected only to be required if EA change the naming scheme and a library update has not been issued to cater for the change.
+    /// This is not directly exposed but all values are prepended to <see cref="Game.GameContent"/>, <see cref="Game.DDSImages"/> and <see cref="Game.Thumbnails"/>
+    /// - see <see cref="Game"/> remarks for more details.
+    /// </description></item>
+    /// </list>
+    /// </description></item>
+    /// </list>
+    /// <para>
+    /// The "root folder" for the installation is determined by:
+    /// </para>
+    /// <list type="bullet">
+    /// <item>finding a matching &lt;rootfolder&gt; tag; or</item>
+    /// <item>finding the &lt;defaultrootfolder&gt; tag exists and is a valid folder; or</item>
+    /// <item>using "/".</item>
+    /// </list>
+    /// <para>
+    /// The EA packages for a <see cref="Game"/> are found relative to the folder either specified in <see cref="InstallDirs"/>,
+    /// or the &lt;DefaultInstallDir&gt; tag value for the &lt;game&gt; - i.e. the value returned by <see cref="Game.UserInstallDir"/>.
+    /// </para>
+    /// </remarks>
+    /// <seealso cref="Game"/>
+    /// <seealso cref="GameFoldersForm"/>
     public static class GameFolders
     {
         #region The first level element/attribute names...
@@ -49,7 +119,7 @@ namespace s3pi.Filetable
                 if (_gameFoldersXml == null)
                 {
                     XDocument gameFoldersXml;
-                    string iniFile = Path.Combine(Path.GetDirectoryName(typeof(GameFoldersForm).Assembly.Location), "GameFolders.xml");
+                    string iniFile = Path.Combine(Path.GetDirectoryName(typeof(GameFolders).Assembly.Location), "GameFolders.xml");
                     gameFoldersXml = XDocument.Load(iniFile);
 
                     _gameFoldersXml = gameFoldersXml;
@@ -67,23 +137,23 @@ namespace s3pi.Filetable
                 if (_rootFolder == null)
                 {
                     string rootFolder = "/";
-                    XElement root = null;
-                    if (Environment.OSVersion.Platform != PlatformID.MacOSX && Environment.OSVersion.Platform != PlatformID.Unix)
-                    {
-                        string vendor = "Microsoft";
-                        string os = "Win64";
-                        if (System.Runtime.InteropServices.Marshal.SizeOf(typeof(IntPtr)) == 4)
-                        {
-                            os = "Win32";
-                        }
+                    string vendor = "Microsoft";
+                    string os = "64bit";
 
-                        root = XElementGameFolders.Elements(rootfolderXName)
-                            .Where(x => x.Attributes(vendorAttributeName).Any(y => y.Value == vendor))
-                            .Where(x => x.Attributes(osAttributeName).Any(y => y.Value == os))
-                            .FirstOrDefault();
-                    }
+                    if (Environment.OSVersion.Platform == PlatformID.MacOSX || Environment.OSVersion.Platform == PlatformID.Unix)
+                        vendor = Environment.OSVersion.Platform.ToString();
+
+                    if (System.Runtime.InteropServices.Marshal.SizeOf(typeof(IntPtr)) == 4)
+                        os = "32bit";
+
+                    XElement root = XElementGameFolders.Elements(rootfolderXName)
+                        .Where(x => x.Attributes(vendorAttributeName).Any(y => y.Value == vendor))
+                        .Where(x => x.Attributes(osAttributeName).Any(y => y.Value == os))
+                        .FirstOrDefault();
+
                     if (root == null)
                         root = XElementGameFolders.Elements(defaultrootfolderXName).FirstOrDefault();
+
                     if (root != null && root.Value != null)
                         rootFolder = root.Value;
 
@@ -95,7 +165,7 @@ namespace s3pi.Filetable
 
         static List<Game> _games = null;
         /// <summary>
-        /// The list of <see cref="Game"/>s defined in <see cref="GameFoldersXML"/>.
+        /// The list of <see cref="Game"/>s defined in the <c>GameFolders.xml</c> file.
         /// </summary>
         public static List<Game> Games
         {
@@ -147,11 +217,13 @@ namespace s3pi.Filetable
 
         /// <summary>
         /// Return the folder where the given <see cref="Game"/> is installed.
-        /// This will either be a user-specified location or the <see cref="Game.DefaultInstallDir"/>
-        /// relative to the <see cref="RootFolder"/>.
         /// </summary>
         /// <param name="game"><see cref="Game"/> for which to determine install folder.</param>
         /// <returns>The install folder for <paramref name="game"/>.</returns>
+        /// <remarks>
+        /// This will either be a user-specified location or the <see cref="Game.DefaultInstallDir"/>
+        /// relative to the determined root folder (see <see cref="GameFolders"/> Remarks section).
+        /// </remarks>
         public static string InstallDir(Game game)
         {
             return installDirs.ContainsKey(game) && Directory.Exists(installDirs[game]) ? installDirs[game] : Path.Combine(RootFolder, game.DefaultInstallDir);
@@ -188,6 +260,39 @@ namespace s3pi.Filetable
     /// <summary>
     /// Represents a known game object.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <see cref="GameContent"/>, <see cref="DDSImages"/> and <see cref="Thumbnails"/> all return enumerations of paths based on
+    /// EA's known behaviour for distributing EPs and SPs.  If this changes to a method not supported (see below), the
+    /// &lt;ExtraPackage&gt; tag for the &lt;game&gt; can be used - see <see cref="GameFolders"/> remarks for details.
+    /// </para>
+    /// <para>
+    /// For <see cref="GameContent"/> and <see cref="DDSImages"/>, one of the following values is returned:
+    /// </para>
+    /// <list type="bullet">
+    /// <item>If no <see cref="UserInstallDir"/> is known, return only the &lt;ExtraPackage&gt; paths.</item>
+    /// <item>Otherwise, return the &lt;ExtraPackage&gt; paths, delta packages and the appropriate fullbuild (0 for <see cref="GameContent"/>; 2 for <see cref="DDSImages"/>).</item>
+    /// </list>
+    /// <para>
+    /// Delta packages are found under the <see cref="UserInstallDir"/> + "GameData\Shared\DeltaPackages".
+    /// This is searched for each sub-folder named "pXX" (where "XX" is the deltabuild number - assumed for the timebeing to have 32 as the highest value).
+    /// Within each sub-folder, the package named "Deltabuild_pXX.package" is added to the list, if found.
+    /// </para>
+    /// <para>
+    /// Finally, under the <see cref="UserInstallDir"/> + "GameData\Shared\Packages" folder:
+    /// </para>
+    /// <list type="bullet">
+    /// <item>For games other than the basegame, any packages matching "FullBuild*.package" are added to the list.</item>
+    /// <item>For the basegame, DeltaBuildX.package and FullBuildX.package (where X is 0 for <see cref="GameContent"/>; 2 for <see cref="DDSImages"/>) are added to the list.</item>
+    /// </list>
+    /// <para>
+    /// For <see cref="Thumbnails"/>, one of the following values is returned:
+    /// </para>
+    /// <list type="bullet">
+    /// <item>If no <see cref="UserInstallDir"/> is known, return only the &lt;ExtraPackage&gt; paths.</item>
+    /// <item>Otherwise, return the &lt;ExtraPackage&gt; paths and any packages matching "*Thumbnails.package" under <see cref="UserInstallDir"/> + "Thumbnails".</item>
+    /// </list>
+    /// </remarks>
     public class Game
     {
         XElement _game;
@@ -261,8 +366,9 @@ namespace s3pi.Filetable
 
         string _defaultInstallDir = null;
         /// <summary>
-        /// The default installation location, relative to <see cref="GameFolders.RootFolder"/>.
+        /// The default installation location, relative to the determined root folder.
         /// </summary>
+        /// <remarks>See <see cref="GameFolders"/> remarks for details of how "root folder" is determined.</remarks>
         public string DefaultInstallDir
         {
             get
@@ -311,15 +417,13 @@ namespace s3pi.Filetable
         /// </summary>
         /// <seealso cref="DDSImages"/>
         /// <seealso cref="Thumbnails"/>
-        public List<string> GameContent
+        public IEnumerable<string> GameContent
         {
             get
             {
-                if (!Directory.Exists(UserInstallDir)) return new List<string>();
+                if (!Directory.Exists(UserInstallDir)) return GetUserPackages();
 
-                List<string> paths = new List<string>(GetDeltaPackages());
-                paths.AddRange(GetFBPackages("0"));
-                return paths;
+                return GetUserPackages().Union(GetDeltaPackages(), PathComparer).Union(GetFBPackages("0"), PathComparer);
             }
         }
 
@@ -328,13 +432,13 @@ namespace s3pi.Filetable
         /// </summary>
         /// <seealso cref="DDSImages"/>
         /// <seealso cref="Thumbnails"/>
-        public List<string> DDSImages
+        public IEnumerable<string> DDSImages
         {
             get
             {
-                List<string> paths = new List<string>(GetDeltaPackages());
-                paths.AddRange(GetFBPackages("2"));
-                return paths;
+                if (!Directory.Exists(UserInstallDir)) return GetUserPackages();
+
+                return GetUserPackages().Union(GetDeltaPackages(), PathComparer).Union(GetFBPackages("2"), PathComparer);
             }
         }
 
@@ -343,20 +447,30 @@ namespace s3pi.Filetable
         /// </summary>
         /// <seealso cref="GameContent"/>
         /// <seealso cref="DDSImages"/>
-        public List<string> Thumbnails
+        public IEnumerable<string> Thumbnails
         {
             get
             {
                 string root = Path.Combine(UserInstallDir, "Thumbnails");
-                if (Directory.Exists(root)) return Directory.GetFiles(root, "*Thumbnails.package").ToList();
-                else return new List<string>();
+                if (!Directory.Exists(root)) return GetUserPackages();
+
+                return GetUserPackages().Union(Directory.GetFiles(root, "*Thumbnails.package"), PathComparer);
             }
         }
 
-        List<string> GetDeltaPackages()
+        internal class PathsEqual : IEqualityComparer<string>
+        {
+            public bool Equals(string x, string y) { return Path.GetFullPath(x) == Path.GetFullPath(y); }
+            public int GetHashCode(string obj) { return obj.GetHashCode(); }
+        }
+        internal static PathsEqual PathComparer = new PathsEqual();
+
+        IEnumerable<string> GetUserPackages() { return _game.Elements(ns + "UserPackage").Select(xe => xe.Value).Where(File.Exists).Select(Path.GetFullPath).Distinct(PathComparer); }
+
+        IEnumerable<string> GetDeltaPackages()
         {
             List<string> paths = new List<string>();
-            string root = Path.Combine(UserInstallDir, "GameData/Shared/DeltaPackages");
+            string root = Path.Combine(UserInstallDir, "GameData\\Shared\\DeltaPackages");
             if (Directory.Exists(root))
             {
                 for (int i = 0x20; i > 1; i--)
@@ -364,15 +478,15 @@ namespace s3pi.Filetable
                     string p = string.Format("p{0:d2}", i);
                     string db = Path.Combine(root, p);
                     if (!Directory.Exists(db)) continue;
-                    paths.InsertRange(0, Directory.GetFiles(db, "DeltaBuild_" + p + ".package"));
+                    foreach (string pkg in Directory.GetFiles(db, "DeltaBuild_" + p + ".package"))
+                        yield return pkg;
                 }
             }
-            return paths;
         }
 
         IEnumerable<string> GetFBPackages(string sfx)
         {
-            string root = Path.Combine(UserInstallDir, "GameData/Shared/Packages");
+            string root = Path.Combine(UserInstallDir, "GameData\\Shared\\Packages");
             if (Directory.Exists(root))
                 return RGVersion == 0
                     ? (new string[] { "Delta", "Full", })
