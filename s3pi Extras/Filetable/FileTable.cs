@@ -49,8 +49,8 @@ namespace s3pi.Filetable
         {
             get
             {
-                if (customContent == null && Directory.Exists(CustomContentPath))
-                    customContent = ccGetList(CustomContentPath);
+                if (customContent == null)
+                    customContent = ccGetList(CustomContentPath).ToList();
                 return customContent;
             }
         }
@@ -73,8 +73,9 @@ namespace s3pi.Filetable
 
         static FT gameContent = new GameContent();
         /// <summary>
-        /// List of vendor primary game content <see cref="PathPackageTuple"/>s,
-        /// excluding DDS images (see <see cref="DDSImages"/>)
+        /// List of primary game content <see cref="PathPackageTuple"/>s comprising
+        /// the current package (if set), custom content (if enabled) and vendor content;
+        /// excludes vendor DDS images (see <see cref="DDSImages"/>)
         /// and thumbnail images (see <see cref="Thumbnails"/>).
         /// </summary>
         /// <seealso cref="DDSImages"/>
@@ -83,7 +84,8 @@ namespace s3pi.Filetable
 
         static FT ddsImages = new DDSImages();
         /// <summary>
-        /// List of vendor DDS image <see cref="PathPackageTuple"/>s.
+        /// List of DDS image <see cref="PathPackageTuple"/>s comprising
+        /// the current package (if set), custom content (if enabled) and vendor content.
         /// </summary>
         /// <seealso cref="GameContent"/>
         /// <seealso cref="Thumbnails"/>
@@ -91,8 +93,8 @@ namespace s3pi.Filetable
 
         static FT thumbnails = new Thumbnails();
         /// <summary>
-        /// List of vendor thumnail image <see cref="PathPackageTuple"/>s,
-        /// including CAS thumbnails.
+        /// List of thumnail image <see cref="PathPackageTuple"/>s, comprising
+        /// the current package (if set), custom content (if enabled) and vendor content.
         /// </summary>
         /// <seealso cref="GameContent"/>
         /// <seealso cref="DDSImages"/>
@@ -152,29 +154,30 @@ namespace s3pi.Filetable
         //Inge (15-01-2011): "Only ever look in *.package for custom content"
         //static List<string> pkgPatterns = new List<string>(new string[] { "*.package", "*.dbc", "*.world", "*.nhd", });
         static List<string> CCpkgPatterns = new List<string>(new string[] { "*.package", });
-        static List<PathPackageTuple> ccGetList(string ccPath)
+        static IEnumerable<PathPackageTuple> ccGetList(string ccPath)
         {
             List<PathPackageTuple> ppts = new List<PathPackageTuple>();
 
-            if (ccPath == null || !Directory.Exists(ccPath)) return ppts;
-
-            //Depth-first search
-            foreach (var dir in Directory.GetDirectories(ccPath))
+            if (ccPath != null && Directory.Exists(ccPath))
             {
-                List<PathPackageTuple> dirPPTs = ccGetList(dir);
-                if (dirPPTs != null && dirPPTs.Count > 0)
+                //Depth-first search
+                foreach (var dir in Directory.GetDirectories(ccPath))
                 {
-                    ppts.AddRange(dirPPTs);
+                    foreach (var ppt in ccGetList(dir))
+                        yield return ppt;
                 }
-            }
-            foreach (string pattern in CCpkgPatterns)
-                foreach (var path in Directory.GetFiles(ccPath, pattern))
-                    try
+                foreach (string pattern in CCpkgPatterns)
+                    foreach (var path in Directory.GetFiles(ccPath, pattern))
                     {
-                        ppts.Add(new PathPackageTuple(path));
+                        PathPackageTuple ppt = null;
+                        try
+                        {
+                            ppt = new PathPackageTuple(path);
+                        }
+                        catch (InvalidDataException) { continue; }
+                        yield return ppt;
                     }
-                    catch (InvalidDataException) { }
-            return ppts;
+            }
         }
     }
 
@@ -189,8 +192,8 @@ namespace s3pi.Filetable
                 {
                     IEnumerable<Game> games = GameFolders.Games.OrderByDescending(x => x.RGVersion);
                     IEnumerable<Game> enabledGames = games.Where(game => game.Enabled);
-                    IEnumerable<List<string>> ftPaths = enabledGames.Select(game => this.FTPaths(game));
-                    IEnumerable<string> allPaths = ftPaths.SelectMany(x => x);
+                    IEnumerable<IEnumerable<string>> ftPaths = enabledGames.Select(game => this.FTPaths(game));
+                    IEnumerable<string> allPaths = ftPaths.SelectMany(x => x).Distinct(Game.PathComparer);
                     IEnumerable<PathPackageTuple> ppts = allPaths.Select(path => new PathPackageTuple(path, false));
 
                     vendorContent = ppts.ToList();
@@ -199,7 +202,7 @@ namespace s3pi.Filetable
             }
         }
 
-        protected abstract List<string> FTPaths(Game game);
+        protected abstract IEnumerable<string> FTPaths(Game game);
 
         public void Reset()
         {
@@ -211,9 +214,9 @@ namespace s3pi.Filetable
         }
     }
 
-    class GameContent : FT { protected override List<string> FTPaths(Game game) { return game.GameContent; } }
+    class GameContent : FT { protected override IEnumerable<string> FTPaths(Game game) { return game.GameContent; } }
 
-    class DDSImages : FT { protected override List<string> FTPaths(Game game) { return game.DDSImages; } }
+    class DDSImages : FT { protected override IEnumerable<string> FTPaths(Game game) { return game.DDSImages; } }
 
-    class Thumbnails : FT { protected override List<string> FTPaths(Game game) { return game.Thumbnails; } }
+    class Thumbnails : FT { protected override IEnumerable<string> FTPaths(Game game) { return game.Thumbnails; } }
 }
