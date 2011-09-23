@@ -41,14 +41,15 @@
 <NamespaceSummaryItem name="NameMapResource" isDocumented="False" />
 <NamespaceSummaryItem name="ObjKeyResource" isDocumented="False" />
 <NamespaceSummaryItem name="s3pi.DefaultResource" isDocumented="True" />
-<NamespaceSummaryItem name="s3pi.GenericRCOLResource" isDocumented="True">When using the s3pi.GenericRCOLResource assembley, ensure RCOLResources.txt is included in your project and resides in the same folder at run time.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="s3pi.GenericRCOLResource" isDocumented="True">When using the s3pi.GenericRCOLResource assembly, ensure RCOLResources.txt resides in the same folder as the assembly at run time.</NamespaceSummaryItem>
 <NamespaceSummaryItem name="ScriptResource" isDocumented="False" />
 <NamespaceSummaryItem name="StblResource" isDocumented="False" />
 <NamespaceSummaryItem name="TextResource" isDocumented="False" />
 <NamespaceSummaryItem name="TxtcResource" isDocumented="False" />
 <NamespaceSummaryItem name="CASPartResource" isDocumented="False" />
 <NamespaceSummaryItem name="NGMPHashMapResource" isDocumented="False" />
-<NamespaceSummaryItem name="(global)" isDocumented="True" /></NamespaceSummaries>
+<NamespaceSummaryItem name="(global)" isDocumented="True" />
+<NamespaceSummaryItem name="s3pi.Filetable" isDocumented="True">When using the s3pi.Filetable assembly, ensure GameFolders.xml resides in the same folder as the assembly at run time.</NamespaceSummaryItem></NamespaceSummaries>
     <MissingTags>Summary, Parameter, Returns, AutoDocumentCtors, TypeParameter, IncludeTargets, AutoDocumentDispose</MissingTags>
     <VisibleItems>Attributes, ExplicitInterfaceImplementations, Protected</VisibleItems>
     <RootNamespaceContainer>True</RootNamespaceContainer>
