@@ -30,6 +30,10 @@ namespace s3pi.Filetable
     /// <summary>
     /// Provides a common control for enabling editing of the install locations of game folders.
     /// </summary>
+    /// <remarks>
+    /// Note that it is left to the containing application to pass values between this form and the Filetable.
+    /// This is to allow any additional processing, such as storing user preferences, to be handled.
+    /// </remarks>
     public partial class GameFoldersForm : Form
     {
         /// <summary>
@@ -95,53 +99,89 @@ namespace s3pi.Filetable
 
         /* ------------------------- */
 
-        Dictionary<int, Game> RowToGame = new Dictionary<int, Game>();
+        Dictionary<int, Game> RowToGame = null;
         private void GameFoldersForm_Load(object sender, EventArgs e)
         {
-            Size size = this.Size;
-            Size sizeTLP = tlpGameFolders.Size;
-
-            foreach (Game game in GameFolders.Games.OrderByDescending(x => x.RGVersion))
+            if (RowToGame == null)
             {
-                RowToGame.Add(tlpGameFolders.RowCount - 2, game);
+                Size size = this.Size;
+                Size sizeTLP = tlpGameFolders.Size;
 
-                tlpGameFolders.RowCount++;
-                tlpGameFolders.RowStyles.Insert(tlpGameFolders.RowCount - 2, new RowStyle(SizeType.AutoSize));
+                RowToGame = new Dictionary<int, Game>();
+                foreach (Game game in GameFolders.Games.OrderByDescending(x => x.RGVersion))
+                {
+                    int row = tlpGameFolders.RowCount - 1;
+                    RowToGame.Add(row - 1, game);
 
-                Label lbGameID = new Label();
-                CheckBox ckbEnabled = new CheckBox();
-                TextBox tbInstFolder = new TextBox();
-                Button btnEdit = new Button();
+                    tlpGameFolders.RowCount++;
+                    tlpGameFolders.RowStyles.Insert(row, new RowStyle(SizeType.AutoSize));
 
-                lbGameID.Anchor = AnchorStyles.None;
-                lbGameID.AutoSize = true;
-                lbGameID.Text = game.Name;
+                    Label lbGameID = new Label();
+                    CheckBox ckbEnabled = new CheckBox();
+                    TextBox tbInstFolder = new TextBox();
+                    Button btnEdit = new Button();
 
-                ckbEnabled.Anchor = AnchorStyles.None;
-                ckbEnabled.AutoSize = true;
-                ckbEnabled.Visible = game.Suppressed.HasValue;
-                ckbEnabled.Checked = !ePsDisabled.Contains(game.Name);
-                ckbEnabled.CheckedChanged += new EventHandler(ckbEnabled_CheckedChanged);
+                    lbGameID.Anchor = AnchorStyles.None;
+                    lbGameID.AutoSize = true;
+                    lbGameID.Text = game.Name;
 
-                tbInstFolder.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-                tbInstFolder.Text = this[game] == null ? "(not set)" : this[game];
-                tbInstFolder.ReadOnly = true;
-                tbInstFolder.BackColor = tbInstFolder.Text == "(not set)" ? SystemColors.ControlDark : SystemColors.Control;
+                    ckbEnabled.Anchor = AnchorStyles.None;
+                    ckbEnabled.AutoSize = true;
+                    ckbEnabled.Visible = game.Suppressed.HasValue;
+                    ckbEnabled.Checked = !ePsDisabled.Contains(game.Name);
+                    ckbEnabled.CheckedChanged += new EventHandler(ckbEnabled_CheckedChanged);
 
-                btnEdit.Anchor = AnchorStyles.None;
-                btnEdit.AutoSize = true;
-                btnEdit.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-                btnEdit.Enabled = ckbEnabled.Checked;
-                btnEdit.Text = "Edit";
-                btnEdit.Click += new EventHandler(btnEdit_Click);
+                    tbInstFolder.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+                    tbInstFolder.Text = this[game] == null ? "(not set)" : this[game];
+                    tbInstFolder.ReadOnly = true;
+                    tbInstFolder.BackColor = tbInstFolder.Text == "(not set)" ? SystemColors.ControlDark : SystemColors.Control;
 
-                tlpGameFolders.Controls.Add(lbGameID, 0, tlpGameFolders.RowCount - 2);
-                tlpGameFolders.Controls.Add(ckbEnabled, 1, tlpGameFolders.RowCount - 2);
-                tlpGameFolders.Controls.Add(tbInstFolder, 2, tlpGameFolders.RowCount - 2);
-                tlpGameFolders.Controls.Add(btnEdit, 3, tlpGameFolders.RowCount - 2);
+                    btnEdit.Anchor = AnchorStyles.None;
+                    btnEdit.AutoSize = true;
+                    btnEdit.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+                    btnEdit.Enabled = ckbEnabled.Checked;
+                    btnEdit.Text = "Edit";
+                    btnEdit.Click += new EventHandler(btnEdit_Click);
+
+                    tlpGameFolders.Controls.Add(lbGameID, 0, row);
+                    tlpGameFolders.Controls.Add(ckbEnabled, 1, row);
+                    tlpGameFolders.Controls.Add(tbInstFolder, 2, row);
+                    tlpGameFolders.Controls.Add(btnEdit, 3, row);
+                }
+
+                this.Size = new Size(size.Width, size.Height - sizeTLP.Height + tlpGameFolders.Size.Height);
             }
+            else
+            {
+                foreach (var kvp in RowToGame)
+                {
+                    int row = kvp.Key + 1;
+                    Game game = kvp.Value;
+                    Label lbGameID = (Label)tlpGameFolders.GetControlFromPosition(0, row);
+                    CheckBox ckbEnabled = (CheckBox)tlpGameFolders.GetControlFromPosition(1, row);
+                    TextBox tbInstFolder = (TextBox)tlpGameFolders.GetControlFromPosition(2, row);
+                    Button btnEdit = (Button)tlpGameFolders.GetControlFromPosition(3, row);
 
-            this.Size = new Size(size.Width, size.Height - sizeTLP.Height + tlpGameFolders.Size.Height);
+                    if (game.Suppressed.HasValue)
+                    {
+                        if (ckbEnabled == null)
+                        {
+                            ckbEnabled = new CheckBox();
+                            ckbEnabled.Anchor = AnchorStyles.None;
+                            ckbEnabled.AutoSize = true;
+                            ckbEnabled.CheckedChanged += new EventHandler(ckbEnabled_CheckedChanged);
+                        }
+                        ckbEnabled.Checked = !ePsDisabled.Contains(game.Name);
+                        ckbEnabled.Visible = true;
+                    }
+                    else
+                        if (ckbEnabled != null)
+                            ckbEnabled.Visible = false;
+                    tbInstFolder.Text = this[game] == null ? "(not set)" : this[game];
+                    tbInstFolder.BackColor = tbInstFolder.Text == "(not set)" ? SystemColors.ControlDark : SystemColors.Control;
+                    btnEdit.Enabled = ckbEnabled == null || !ckbEnabled.Visible || ckbEnabled.Checked;
+                }
+            }
         }
 
         Game GameFromControl(Control c)
@@ -163,7 +203,7 @@ namespace s3pi.Filetable
                 ePsDisabled.Add(game.Name);
 
             Button btn = tlpGameFolders.GetControlFromPosition(3, tlpGameFolders.GetCellPosition((Control)sender).Row) as Button;
-            if (btn != null) btn.Enabled = ePsDisabled.Contains(game.Name);
+            if (btn != null) btn.Enabled = !ePsDisabled.Contains(game.Name);
         }
 
         private void btnEdit_Click(object sender, EventArgs e)
@@ -180,6 +220,7 @@ namespace s3pi.Filetable
 
             TextBox tb = tlpGameFolders.GetControlFromPosition(2, tlpGameFolders.GetCellPosition((Control)sender).Row) as TextBox;
             tb.Text = this[game] == null ? "(not set)" : this[game];
+            tb.BackColor = tb.Text == "(not set)" ? SystemColors.ControlDark : SystemColors.Control;
         }
 
         private void btnCCEdit_Click(object sender, EventArgs e)
