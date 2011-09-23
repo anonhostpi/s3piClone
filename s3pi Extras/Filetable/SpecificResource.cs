@@ -97,20 +97,19 @@ namespace s3pi.Filetable
     public class SpecificIndexEntry : IEquatable<SpecificIndexEntry>
     {
         /// <summary>
-        /// A short string indicating which file table was the source of this item.  Values are:<br/>
-        /// <table>
-        /// <thead>
-        /// <tr><td>Value</td><tr>Source used to resolve the request for an item.</tr></tr>
-        /// </thead>
-        /// <tbody>
-        /// <tr><td>current</td><td>The current package.</td></tr>
-        /// <tr><td>cc</td><td>A custom content package.</td></tr>
-        /// <tr><td>fb0</td><td>A game content package, excluding DDS images and thumbnail images.</td></tr>
-        /// <tr><td>dds</td><td>A DDS image package.</td></tr>
-        /// <tr><td>tmb</td><td>A thumbnail image package.</td></tr>
-        /// </tbody>
-        /// </table>
+        /// A short string indicating which file table was the source of this item.
         /// </summary>
+        /// <remarks>
+        /// <para>Values are:</para>
+        /// <list type="table">
+        /// <listheader><term>Value</term><description>Source used to resolve the request for an item.</description></listheader>
+        /// <item><term>current</term><description>The current package.</description></item>
+        /// <item><term>cc</term><description>A custom content package.</description></item>
+        /// <item><term>fb0</term><description>A primary game content package, excluding DDS images and thumbnail images.</description></item>
+        /// <item><term>dds</term><description>A DDS image package.</description></item>
+        /// <item><term>tmb</term><description>A thumbnail image package.</description></item>
+        /// </list>
+        /// </remarks>
         public string PPSource { get; private set; }
 
         /// <summary>
@@ -151,7 +150,7 @@ namespace s3pi.Filetable
 
         /// <summary>
         /// The <see cref="Game.Name"/> for the <see cref="Game"/> with the Resource Group Version
-        /// of this item.
+        /// of this item, or an empty string for the base game.  References <see cref="ResourceIndexEntry"/>.
         /// </summary>
         public string RGVsn
         {
