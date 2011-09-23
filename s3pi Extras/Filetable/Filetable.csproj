@@ -63,6 +63,7 @@
   <ItemGroup>
     <Content Include="GameFolders.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
   <ItemGroup>
