@@ -80,9 +80,10 @@ namespace s3pi.Filetable
         /// </summary>
         /// <param name="match">The matching critera.</param>
         /// <returns>All matching resources.</returns>
-        public List<SpecificResource> FindAll(Predicate<IResourceIndexEntry> match)
+        public IEnumerable<SpecificResource> FindAll(Predicate<IResourceIndexEntry> match)
         {
-            return Package.FindAll(match).ConvertAll<SpecificResource>(rie => new SpecificResource(this, rie));
+            foreach (var rie in Package.FindAll(match))
+                yield return new SpecificResource(this, rie);
         }
 
         /// <summary>
