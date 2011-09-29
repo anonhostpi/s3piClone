@@ -91,19 +91,19 @@ namespace s3pi.GenericRCOLResource
 
             #region Attributes
             float x = 0f;
-            float y = 0f;
+            float z = 0f;
             #endregion
 
             #region Constructors
             public PolygonPoint(int APIversion, EventHandler handler) : base(APIversion, handler) { }
             public PolygonPoint(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
             public PolygonPoint(int APIversion, EventHandler handler, PolygonPoint basis)
-                : this(APIversion, handler, basis.x, basis.y) { }
-            public PolygonPoint(int APIversion, EventHandler handler, float X, float Y)
+                : this(APIversion, handler, basis.x, basis.z) { }
+            public PolygonPoint(int APIversion, EventHandler handler, float X, float Z)
                 : base(APIversion, handler)
             {
                 this.x = X;
-                this.y = Y;
+                this.z = Z;
             }
             #endregion
 
@@ -112,14 +112,14 @@ namespace s3pi.GenericRCOLResource
             {
                 BinaryReader r = new BinaryReader(s);
                 this.x = r.ReadSingle();
-                this.y = r.ReadSingle();
+                this.z = r.ReadSingle();
             }
 
             internal void UnParse(Stream s)
             {
                 BinaryWriter w = new BinaryWriter(s);
                 w.Write(x);
-                w.Write(y);
+                w.Write(z);
             }
             #endregion
 
@@ -138,7 +138,7 @@ namespace s3pi.GenericRCOLResource
 
             public bool Equals(PolygonPoint other)
             {
-                return this.x == other.x && this.y == other.y;
+                return this.x == other.x && this.z == other.z;
             }
 
             public override bool Equals(object obj)
@@ -148,16 +148,16 @@ namespace s3pi.GenericRCOLResource
 
             public override int GetHashCode()
             {
-                return x.GetHashCode() ^ y.GetHashCode();
+                return x.GetHashCode() ^ z.GetHashCode();
             }
 
             #endregion
 
             #region Content Fields
             public float X { get { return x; } set { if (x != value) { x = value; OnElementChanged(); } } }
-            public float Y { get { return y; } set { if (y != value) { y = value; OnElementChanged(); } } }
+            public float Z { get { return z; } set { if (z != value) { z = value; OnElementChanged(); } } }
 
-            public string Value { get { return String.Format("[X: {0}] [Y: {1}]", x, y); } }
+            public string Value { get { return String.Format("[X: {0}] [Z: {1}]", x, z); } }
             #endregion
         }
         public class PolygonPointList : DependentList<PolygonPoint>
@@ -250,10 +250,8 @@ namespace s3pi.GenericRCOLResource
             SurfaceAttribute surfaceAttributeFlags;
             byte levelOffset;
             float elevationOffset;//FTPT.Version>=0x07
-            float lowerX;
-            float lowerY;
-            float upperX;
-            float upperY;
+            PolygonPoint lower;
+            PolygonPoint upper;
             #endregion
 
             #region Constructors
@@ -265,18 +263,18 @@ namespace s3pi.GenericRCOLResource
                 basis.allowIntersectionFlags, basis.surfaceTypeFlags, basis.surfaceAttributeFlags,
                 basis.levelOffset,
                 basis.elevationOffset,
-                basis.lowerX, basis.lowerY, basis.upperX, basis.upperY) { }
+                basis.lower, basis.upper) { }
             public Area(int APIversion, EventHandler handler, uint version,
                 uint name, byte priority, AreaType areaTypeFlags, IEnumerable<PolygonPoint> closedPolygon,
                 AllowIntersection allowIntersectionFlags, SurfaceType surfaceTypeFlags, SurfaceAttribute surfaceAttributeFlags,
                 byte levelOffset,
-                float lowerX, float lowerY, float upperX, float upperY)
+                PolygonPoint lower, PolygonPoint upper)
                 : this(APIversion, handler, version,
                 name, priority, areaTypeFlags, closedPolygon,
                 allowIntersectionFlags, surfaceTypeFlags, surfaceAttributeFlags,
                 levelOffset,
                 0,
-                lowerX, lowerY, upperX, upperY)
+                lower, upper)
             {
                 if (checking) if (version >= 0x00000007)
                         throw new InvalidOperationException(String.Format("Constructor requires ElevationOffset for version {0}", version));
@@ -286,7 +284,7 @@ namespace s3pi.GenericRCOLResource
                 AllowIntersection allowIntersectionFlags, SurfaceType surfaceTypeFlags, SurfaceAttribute surfaceAttributeFlags,
                 byte levelOffset,
                 float elevationOffset,
-                float lowerX, float lowerY, float upperX, float upperY)
+                PolygonPoint lower, PolygonPoint upper)
                 : base(APIversion, handler)
             {
                 this.version = version;
@@ -300,10 +298,8 @@ namespace s3pi.GenericRCOLResource
                 this.surfaceAttributeFlags = surfaceAttributeFlags;
                 this.levelOffset = levelOffset;
                 this.elevationOffset = elevationOffset;
-                this.lowerX = lowerX;
-                this.lowerY = lowerY;
-                this.upperX = upperX;
-                this.upperY = upperY;
+                this.lower = new PolygonPoint(APIversion, handler, lower);
+                this.upper = new PolygonPoint(APIversion, handler, upper);
             }
             #endregion
 
@@ -320,10 +316,8 @@ namespace s3pi.GenericRCOLResource
                 this.surfaceAttributeFlags = (SurfaceAttribute)r.ReadUInt32();
                 this.levelOffset = r.ReadByte();
                 this.elevationOffset = version >= 0x00000007 ? r.ReadSingle() : 0;
-                this.lowerX = r.ReadSingle();
-                this.lowerY = r.ReadSingle();
-                this.upperX = r.ReadSingle();
-                this.upperY = r.ReadSingle();
+                this.lower = new PolygonPoint(requestedApiVersion, handler, s);
+                this.upper = new PolygonPoint(requestedApiVersion, handler, s);
             }
 
             internal void UnParse(Stream s)
@@ -339,10 +333,10 @@ namespace s3pi.GenericRCOLResource
                 w.Write((uint)surfaceAttributeFlags);
                 w.Write(levelOffset);
                 if (version >= 0x00000007) w.Write(elevationOffset);
-                w.Write(lowerX);
-                w.Write(lowerY);
-                w.Write(upperX);
-                w.Write(upperY);
+                if (lower == null) lower = new PolygonPoint(requestedApiVersion, handler);
+                lower.UnParse(s);
+                if (upper == null) upper = new PolygonPoint(requestedApiVersion, handler);
+                upper.UnParse(s);
             }
             #endregion
 
@@ -375,15 +369,13 @@ namespace s3pi.GenericRCOLResource
                 return name == other.name &&
                     priority == other.priority &&
                     areaTypeFlags == other.areaTypeFlags &&
-                    closedPolygon == other.closedPolygon &&
+                    closedPolygon.Equals(other.closedPolygon) &&
                     allowIntersectionFlags == other.allowIntersectionFlags &&
                     surfaceTypeFlags == other.surfaceTypeFlags &&
                     surfaceAttributeFlags == other.surfaceAttributeFlags &&
                     levelOffset == other.levelOffset &&
-                    lowerX == other.lowerX &&
-                    lowerY == other.lowerY &&
-                    upperX == other.upperX &&
-                    upperY == other.upperY;
+                    lower.Equals(other.lower) &&
+                    upper.Equals(other.upper);
             }
 
             public override bool Equals(object obj)
@@ -401,10 +393,8 @@ namespace s3pi.GenericRCOLResource
                     surfaceTypeFlags.GetHashCode() ^
                     surfaceAttributeFlags.GetHashCode() ^
                     levelOffset.GetHashCode() ^
-                    lowerX.GetHashCode() ^
-                    lowerY.GetHashCode() ^
-                    upperX.GetHashCode() ^
-                    upperY.GetHashCode();
+                    lower.GetHashCode() ^
+                    upper.GetHashCode();
             }
 
             #endregion
@@ -433,13 +423,9 @@ namespace s3pi.GenericRCOLResource
                 set { if (version < 0x00000007) throw new InvalidOperationException(); if (elevationOffset != value) { elevationOffset = value; OnElementChanged(); } }
             }
             [ElementPriority(10)]
-            public float LowerX { get { return lowerX; } set { if (lowerX != value) { lowerX = value; OnElementChanged(); } } }
+            public PolygonPoint Lower { get { return lower; } set { if (lower != value) { lower = value; OnElementChanged(); } } }
             [ElementPriority(11)]
-            public float LowerY { get { return lowerY; } set { if (lowerY != value) { lowerY = value; OnElementChanged(); } } }
-            [ElementPriority(12)]
-            public float UpperX { get { return upperX; } set { if (upperX != value) { upperX = value; OnElementChanged(); } } }
-            [ElementPriority(13)]
-            public float UpperY { get { return upperY; } set { if (upperY != value) { upperY = value; OnElementChanged(); } } }
+            public PolygonPoint Upper { get { return upper; } set { if (upper != value) { upper = value; OnElementChanged(); } } }
 
             public string Value
             {
