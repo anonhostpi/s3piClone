@@ -121,9 +121,11 @@ namespace s3pi.Filetable
                     TextBox tbInstFolder = new TextBox();
                     Button btnEdit = new Button();
 
-                    lbGameID.Anchor = AnchorStyles.None;
+                    lbGameID.Anchor = AnchorStyles.Right;
                     lbGameID.AutoSize = true;
-                    lbGameID.Text = game.Name;
+                    lbGameID.Text = game.RGVersion > 0
+                        ? "(" + game.Longname.Replace("The Sims 3 ", "").Replace(" Stuff", "") + ") " + game.Name.ToUpper()
+                        : game.Longname;
 
                     ckbEnabled.Anchor = AnchorStyles.None;
                     ckbEnabled.AutoSize = true;
