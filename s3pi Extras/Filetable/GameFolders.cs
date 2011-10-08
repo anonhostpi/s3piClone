@@ -465,7 +465,7 @@ namespace s3pi.Filetable
         }
         internal static PathsEqual PathComparer = new PathsEqual();
 
-        IEnumerable<string> GetUserPackages() { return _game.Elements(ns + "UserPackage").Select(xe => xe.Value).Where(File.Exists).Select(Path.GetFullPath).Distinct(PathComparer); }
+        IEnumerable<string> GetUserPackages() { return _game.Elements(ns + "ExtraPackage").Select(xe => xe.Value).Where(File.Exists).Select(Path.GetFullPath).Distinct(PathComparer); }
 
         IEnumerable<string> GetDeltaPackages()
         {
