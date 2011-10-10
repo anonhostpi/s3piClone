@@ -412,88 +412,105 @@ namespace s3pi.Filetable
         public bool Enabled { get { return GameFolders.IsEnabled(this); } }
 
         /// <summary>
-        /// All packages for this <see cref="Game"/> used to contain game content
+        /// All <see cref="PackageTag"/>s for this <see cref="Game"/> used to contain game content
         /// (i.e. excluding DDS images and thumbnail images).
         /// </summary>
         /// <seealso cref="DDSImages"/>
         /// <seealso cref="Thumbnails"/>
-        public IEnumerable<string> GameContent
-        {
-            get
-            {
-                if (!Directory.Exists(UserInstallDir)) return GetUserPackages();
-
-                return GetUserPackages().Union(GetDeltaPackages(), PathComparer).Union(GetFBPackages("0"), PathComparer);
-            }
-        }
+        public IEnumerable<PackageTag> GameContent { get { return GetPackages("GameContent").Distinct(PackageComparer).OrderByDescending(p => p.Priority); } }
 
         /// <summary>
-        /// All packages for this <see cref="Game"/> used to contain DDS images.
+        /// All <see cref="PackageTag"/>s for this <see cref="Game"/> used to contain DDS images.
         /// </summary>
         /// <seealso cref="DDSImages"/>
         /// <seealso cref="Thumbnails"/>
-        public IEnumerable<string> DDSImages
-        {
-            get
-            {
-                if (!Directory.Exists(UserInstallDir)) return GetUserPackages();
-
-                return GetUserPackages().Union(GetDeltaPackages(), PathComparer).Union(GetFBPackages("2"), PathComparer);
-            }
-        }
+        public IEnumerable<PackageTag> DDSImages { get { return GetPackages("DDSImages").Distinct(PackageComparer).OrderByDescending(p => p.Priority); } }
 
         /// <summary>
-        /// All packages for this <see cref="Game"/> used to contain Thumbnail images.
+        /// All <see cref="PackageTag"/>s for this <see cref="Game"/> used to contain Thumbnail images.
         /// </summary>
         /// <seealso cref="GameContent"/>
         /// <seealso cref="DDSImages"/>
-        public IEnumerable<string> Thumbnails
-        {
-            get
-            {
-                string root = Path.Combine(UserInstallDir, "Thumbnails");
-                if (!Directory.Exists(root)) return GetUserPackages();
+        public IEnumerable<PackageTag> Thumbnails { get { return GetPackages("Thumbnails").Distinct(PackageComparer).OrderByDescending(p => p.Priority); } }
 
-                return GetUserPackages().Union(Directory.GetFiles(root, "*Thumbnails.package"), PathComparer);
+        internal class PackageEqual : IEqualityComparer<PackageTag>
+        {
+            public bool Equals(PackageTag x, PackageTag y) { return Path.GetFullPath(x.Path) == Path.GetFullPath(y.Path); }
+            public int GetHashCode(PackageTag obj) { return obj.Path.GetHashCode(); }
+        }
+        internal static PackageEqual PackageComparer = new PackageEqual();
+
+        IEnumerable<PackageTag> GetPackages(string root)
+        {
+            XElement xRoot = _game.Element(ns + root);
+            string path = "";
+            foreach (XElement xFolder in xRoot.Elements(ns + "Folder"))
+            {
+                XAttribute xPath = xFolder.Attribute("path");
+                if (xPath != null && xPath.Value != null)
+                    path = Path.Combine(UserInstallDir, xPath.Value);
+                else
+                    path = UserInstallDir;
+                foreach (PackageTag p in GetPackages(xFolder, path))
+                    yield return p;
             }
+            if (Directory.Exists(UserInstallDir))
+                foreach (PackageTag p in GetPackages(xRoot, UserInstallDir))
+                    yield return p;
         }
 
-        internal class PathsEqual : IEqualityComparer<string>
+        IEnumerable<PackageTag> GetPackages(XElement e, string path)
         {
-            public bool Equals(string x, string y) { return Path.GetFullPath(x) == Path.GetFullPath(y); }
-            public int GetHashCode(string obj) { return obj.GetHashCode(); }
-        }
-        internal static PathsEqual PathComparer = new PathsEqual();
-
-        IEnumerable<string> GetUserPackages() { return _game.Elements(ns + "ExtraPackage").Select(xe => xe.Value).Where(File.Exists).Select(Path.GetFullPath).Distinct(PathComparer); }
-
-        IEnumerable<string> GetDeltaPackages()
-        {
-            List<string> paths = new List<string>();
-            string root = Path.Combine(UserInstallDir, "GameData\\Shared\\DeltaPackages");
-            if (Directory.Exists(root))
+            foreach (XElement xPackage in e.Elements(ns + "Package"))
             {
-                for (int i = 0x20; i > 1; i--)
+                if (xPackage.Value != null && File.Exists(Path.Combine(path, xPackage.Value)))
                 {
-                    string p = string.Format("p{0:d2}", i);
-                    string db = Path.Combine(root, p);
-                    if (!Directory.Exists(db)) continue;
-                    foreach (string pkg in Directory.GetFiles(db, "DeltaBuild_" + p + ".package"))
-                        yield return pkg;
+                    bool isPatch = false;
+                    XAttribute xIsPatch = xPackage.Attribute("IsPatch");
+                    if (xIsPatch != null && xIsPatch.Value != null)
+                        bool.TryParse(xIsPatch.Value, out isPatch);
+
+                    int priority = 0;
+                    XAttribute xPriority = xPackage.Attribute("Priority");
+                    if (xPriority != null && xPriority.Value != null)
+                        int.TryParse(xPriority.Value, out priority);
+
+                    yield return new PackageTag(Path.Combine(path, xPackage.Value), isPatch, priority);
                 }
             }
         }
+    }
 
-        IEnumerable<string> GetFBPackages(string sfx)
-        {
-            string root = Path.Combine(UserInstallDir, "GameData\\Shared\\Packages");
-            if (Directory.Exists(root))
-                return RGVersion == 0
-                    ? (new string[] { "Delta", "Full", })
-                        .Select(pfx => Path.Combine(root, pfx + "Build" + sfx + ".package"))
-                        .Where(path => File.Exists(path))
-                    : Directory.GetFiles(root, "FullBuild*.package");
-            else return new string[0];
-        }
+    /// <summary>
+    /// Package represents the <c>&lt;Package/&gt;</c> tag.
+    /// </summary>
+    public class PackageTag
+    {
+        /// <summary>
+        /// The full path of package specified by the <c>&lt;Package&gt;</c> tag.
+        /// </summary>
+        /// <value>The full path of package specified by the &lt;Package&gt; tag.</value>
+        public string Path { get; private set; }
+
+        /// <summary>
+        /// True if this <see cref="PackageTag"/> belongs to a patch; otherwise false.
+        /// </summary>
+        /// <value>True if this <see cref="PackageTag"/> belongs to a patch; otherwise false.</value>
+        /// <remarks>Patch packages may be missing for a particular game.</remarks>
+        public bool IsPatch { get; private set; }
+
+        /// <summary>
+        /// Used to sort packages; higher priority packages override the content of lower priority packages.
+        /// </summary>
+        /// <value>Used to sort packages; higher priority packages override the content of lower priority packages.</value>
+        public int Priority { get; private set; }
+
+        /// <summary>
+        /// Create a new <see cref="PackageTag"/> with the given values.
+        /// </summary>
+        /// <param name="path">The full path of package specified by the <c>&lt;Package&gt;</c> tag.</param>
+        /// <param name="isPatch">True if this <see cref="PackageTag"/> belongs to a patch; otherwise false.</param>
+        /// <param name="priority">Used to sort packages; higher priority packages override the content of lower priority packages.</param>
+        public PackageTag(string path, bool isPatch, int priority) { Path = path; IsPatch = isPatch; Priority = priority; }
     }
 }

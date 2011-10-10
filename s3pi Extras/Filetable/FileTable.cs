@@ -190,11 +190,7 @@ namespace s3pi.Filetable
             {
                 if (vendorContent == null)
                 {
-                    IEnumerable<Game> games = GameFolders.Games.OrderByDescending(x => x.RGVersion);
-                    IEnumerable<Game> enabledGames = games.Where(game => game.Enabled);
-                    IEnumerable<IEnumerable<string>> ftPaths = enabledGames.Select(game => this.FTPaths(game));
-                    IEnumerable<string> allPaths = ftPaths.SelectMany(x => x).Distinct(Game.PathComparer);
-                    IEnumerable<PathPackageTuple> ppts = allPaths.Select(path => new PathPackageTuple(path, false));
+                    IEnumerable<PathPackageTuple> ppts = GamePackages.Where(p => File.Exists(p.Path)).Select(p => new PathPackageTuple(p.Path, false));
 
                     vendorContent = ppts.ToList();
                 }
@@ -202,7 +198,19 @@ namespace s3pi.Filetable
             }
         }
 
-        protected abstract IEnumerable<string> FTPaths(Game game);
+        public IEnumerable<PackageTag> GamePackages
+        {
+            get
+            {
+                IEnumerable<Game> games = GameFolders.Games.OrderByDescending(x => x.RGVersion);
+                IEnumerable<Game> enabledGames = games.Where(game => game.Enabled);
+                IEnumerable<IEnumerable<PackageTag>> ftPackageTags = enabledGames.Select(game => this.FTPaths(game));
+                IEnumerable<PackageTag> allPackageTags = ftPackageTags.SelectMany(x => x).Distinct(Game.PackageComparer);
+                return allPackageTags;
+            }
+        }
+
+        protected abstract IEnumerable<PackageTag> FTPaths(Game game);
 
         public void Reset()
         {
@@ -214,9 +222,9 @@ namespace s3pi.Filetable
         }
     }
 
-    class GameContent : FT { protected override IEnumerable<string> FTPaths(Game game) { return game.GameContent; } }
+    class GameContent : FT { protected override IEnumerable<PackageTag> FTPaths(Game game) { return game.GameContent; } }
 
-    class DDSImages : FT { protected override IEnumerable<string> FTPaths(Game game) { return game.DDSImages; } }
+    class DDSImages : FT { protected override IEnumerable<PackageTag> FTPaths(Game game) { return game.DDSImages; } }
 
-    class Thumbnails : FT { protected override IEnumerable<string> FTPaths(Game game) { return game.Thumbnails; } }
+    class Thumbnails : FT { protected override IEnumerable<PackageTag> FTPaths(Game game) { return game.Thumbnails; } }
 }
