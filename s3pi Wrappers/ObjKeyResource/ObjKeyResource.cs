@@ -521,7 +521,7 @@ namespace ObjKeyResource
     }
 
     /// <summary>
-    /// ResourceHandler for CatalogResource wrapper
+    /// ResourceHandler for ObjKeyResource wrapper
     /// </summary>
     public class ObjKeyResourceHandler : AResourceHandler
     {
