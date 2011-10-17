@@ -239,31 +239,20 @@ namespace TxtcResource
             #endregion
 
             #region Content Fields
+            [ElementPriority(1)]
             public byte ID { get { return id; } set { if (id != value) { id = value; OnElementChanged(); } } }
+            [ElementPriority(2)]
             public uint Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnElementChanged(); } } }
+            [ElementPriority(3)]
             public byte[] Unknown2 { get { return (byte[])unknown2.Clone(); } set { if (!unknown2.Equals<byte>(value)) { unknown2 = (byte[])value.Clone(); OnElementChanged(); } } }
+            [ElementPriority(4)]
             public byte Unknown3 { get { return unknown3; } set { if (unknown3 != value) { unknown3 = value; OnElementChanged(); } } }
+            [ElementPriority(5)]
             public EntryBlockList Entries { get { return entries; } set { if (entries != value) { entries = new EntryBlockList(handler, value); OnElementChanged(); } } }
+            [ElementPriority(6)]
             public uint Unknown4 { get { return unknown4; } set { if (unknown4 != value) { unknown4 = value; OnElementChanged(); } } }
 
-            public string Value
-            {
-                get
-                {
-                    return ValueBuilder;
-                    /*
-                    string s = "";
-                    s += "ID: 0x" + id.ToString("X2");
-                    s += "\nUnknown1: 0x" + unknown1.ToString("X8");
-                    s += "\nUnknown2: " + this["Unknown2"];
-                    s += "\nUnknown3: 0x" + unknown3.ToString("X2");
-                    s += "\nEntries:\n";
-                    s += entries.Value;
-                    s += "\nUnknown4: 0x" + unknown4.ToString("X8");
-                    return s;
-                    /**/
-                }
-            }
+            public string Value { get { return ValueBuilder; } }
             #endregion
         }
 
