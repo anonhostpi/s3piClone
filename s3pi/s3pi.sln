@@ -61,6 +61,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDSPanel", "..\s3pi Extras\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Filetable", "..\s3pi Extras\Filetable\Filetable.csproj", "{FEAA8674-9363-4BC7-B016-7BE984A2D185}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RigResource", "..\s3pi Wrappers\RigResource\RigResource.csproj", "{77AD91D9-4BD8-4899-9308-E6209265F636}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -187,6 +189,10 @@ Global
 		{FEAA8674-9363-4BC7-B016-7BE984A2D185}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FEAA8674-9363-4BC7-B016-7BE984A2D185}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FEAA8674-9363-4BC7-B016-7BE984A2D185}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77AD91D9-4BD8-4899-9308-E6209265F636}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77AD91D9-4BD8-4899-9308-E6209265F636}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77AD91D9-4BD8-4899-9308-E6209265F636}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77AD91D9-4BD8-4899-9308-E6209265F636}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

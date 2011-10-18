@@ -145,6 +145,10 @@
       <Project>{C0297A33-3628-46E9-9324-408A72E2E922}</Project>
       <Name>ObjKeyResource</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\s3pi Wrappers\RigResource\RigResource.csproj">
+      <Project>{77AD91D9-4BD8-4899-9308-E6209265F636}</Project>
+      <Name>RigResource</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\s3pi Wrappers\ScriptResource\ScriptResource.csproj">
       <Project>{660E9B93-FECD-4C76-893C-F9E63ADD708E}</Project>
       <Name>ScriptResource</Name>
