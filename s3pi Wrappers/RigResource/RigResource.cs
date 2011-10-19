@@ -292,7 +292,9 @@ namespace RigResource
                 switch (iktype)
                 {
                     case IKType.IKTypeRoot:
+                        return new IKRoot(APIversion, handler, s);
                     case IKType.IKTypeLimb:
+                        return new IKLimb(APIversion, handler, s);
                     default:
                         throw new InvalidDataException(String.Format("Unsupported IKType 0x{0:X2} at 0x{1:X8}", iktype, s.Position));
                 }
