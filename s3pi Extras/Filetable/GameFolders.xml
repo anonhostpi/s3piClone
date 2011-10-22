@@ -281,7 +281,7 @@
   </game>
   <game class="EP" rgversion="9">
     <Name>ep5</Name>
-    <!--Longname>The Sims 3 Generations</Longname-->
+    <Longname>The Sims 3 Pets</Longname>
     <DefaultInstallDir>Electronic Arts/The Sims 3 Pets</DefaultInstallDir>
     <Suppressed>false</Suppressed>
     <GameContent>
@@ -311,7 +311,7 @@
   </game>
   <game class="SP" rgversion="10">
     <Name>sp5</Name>
-    <Longname>The Sims 3 Town Life Stuff</Longname>
+    <!--Longname>The Sims 3 More Stuff</Longname-->
     <DefaultInstallDir>Electronic Arts/The Sims 3 More stuff</DefaultInstallDir>
     <Suppressed>false</Suppressed>
     <GameContent>
