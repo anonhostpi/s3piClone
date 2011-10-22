@@ -90,9 +90,7 @@ namespace RigResource
             minor = r.ReadUInt32();
             bones = new BoneList(OnResourceChanged, s);
             if (major >= 4)
-            {
                 skeletonName = new String(r.ReadChars(r.ReadInt32()));
-            }
             ikChains = new IKChainList(OnResourceChanged, s);
         }
 
@@ -136,9 +134,12 @@ namespace RigResource
             if (bones == null) bones = new BoneList(OnResourceChanged);
             bones.UnParse(s);
 
-            if (skeletonName == null) skeletonName = "";
-            w.Write(skeletonName.Length);
-            w.Write(skeletonName.ToCharArray());
+            if (major >= 4)
+            {
+                if (skeletonName == null) skeletonName = "";
+                w.Write(skeletonName.Length);
+                w.Write(skeletonName.ToCharArray());
+            }
 
             if (ikChains == null) ikChains = new IKChainList(OnResourceChanged);
             ikChains.UnParse(s);
@@ -164,8 +165,8 @@ namespace RigResource
             Quaternion orientation;
             Vertex scaling;
             string name;
-            uint opposingBoneIndex;
-            uint parentBoneIndex;
+            int opposingBoneIndex;
+            int parentBoneIndex;
             uint hash;
             uint unknown2;
             #endregion
@@ -178,15 +179,15 @@ namespace RigResource
                 basis.name, basis.opposingBoneIndex, basis.parentBoneIndex, basis.hash, basis.unknown2) { }
             public Bone(int APIversion, EventHandler handler,
                 Vertex position, Quaternion quaternion, Vertex scaling,
-                string name, uint unknown1, uint parent, uint hash, uint unknown2)
+                string name, int opposingBoneIndex, int parentBoneIndex, uint hash, uint unknown2)
                 : base(APIversion, handler)
             {
-                this.position = position == null ? new Vertex(requestedApiVersion, handler) : new Vertex(requestedApiVersion, handler, position);
-                this.orientation = quaternion == null ? new Quaternion(requestedApiVersion, handler) : new Quaternion(requestedApiVersion, handler, quaternion);
-                this.scaling = scaling == null ? new Vertex(requestedApiVersion, handler) : new Vertex(requestedApiVersion, handler, scaling);
-                this.name = name == null ? "" : name;
-                this.opposingBoneIndex = unknown1;
-                this.parentBoneIndex = parent;
+                this.position = new Vertex(requestedApiVersion, handler, position);
+                this.orientation = new Quaternion(requestedApiVersion, handler, quaternion);
+                this.scaling = new Vertex(requestedApiVersion, handler, scaling);
+                this.name = name;
+                this.opposingBoneIndex = opposingBoneIndex;
+                this.parentBoneIndex = parentBoneIndex;
                 this.hash = hash;
                 this.unknown2 = unknown2;
             }
@@ -200,8 +201,8 @@ namespace RigResource
                 orientation = new Quaternion(requestedApiVersion, handler, s);
                 scaling = new Vertex(requestedApiVersion, handler, s);
                 name = new String(r.ReadChars(r.ReadInt32()));
-                opposingBoneIndex = r.ReadUInt32();
-                parentBoneIndex = r.ReadUInt32();
+                opposingBoneIndex = r.ReadInt32();
+                parentBoneIndex = r.ReadInt32();
                 hash = r.ReadUInt32();
                 unknown2 = r.ReadUInt32();
             }
@@ -209,10 +210,15 @@ namespace RigResource
             internal void UnParse(Stream s)
             {
                 BinaryWriter w = new BinaryWriter(s);
+                if (position == null) position = new Vertex(requestedApiVersion, handler);
                 position.UnParse(s);
+                if (orientation == null) orientation = new Quaternion(requestedApiVersion, handler);
                 orientation.UnParse(s);
+                if (scaling == null) scaling = new Vertex(requestedApiVersion, handler);
                 scaling.UnParse(s);
-                w.Write(name);
+                if (name == null) name = "";
+                w.Write(name.Length);
+                w.Write(name.ToCharArray());
                 w.Write(opposingBoneIndex);
                 w.Write(parentBoneIndex);
                 w.Write(hash);
@@ -229,8 +235,8 @@ namespace RigResource
             #region IEquatable<Bone>
             public bool Equals(Bone other)
             {
-                return position.Equals(other.position) ^ orientation.Equals(other.orientation) ^ scaling.Equals(other.scaling) ^ name.Equals(other.name)
-                    ^ opposingBoneIndex.Equals(other.opposingBoneIndex) ^ parentBoneIndex.Equals(other.parentBoneIndex) ^ hash.Equals(other.hash) ^ unknown2.Equals(other.unknown2);
+                return position.Equals(other.position) && orientation.Equals(other.orientation) && scaling.Equals(other.scaling) && name.Equals(other.name)
+                    && opposingBoneIndex.Equals(other.opposingBoneIndex) && parentBoneIndex.Equals(other.parentBoneIndex) && hash.Equals(other.hash) && unknown2.Equals(other.unknown2);
             }
 
             public override bool Equals(object obj)
@@ -255,9 +261,9 @@ namespace RigResource
             [ElementPriority(4)]
             public String Name { get { return name; } set { if (name != value) { name = value; OnElementChanged(); } } }
             [ElementPriority(5)]
-            public uint OpposingBoneIndex { get { return opposingBoneIndex; } set { if (opposingBoneIndex != value) { opposingBoneIndex = value; OnElementChanged(); } } }
+            public int OpposingBoneIndex { get { return opposingBoneIndex; } set { if (opposingBoneIndex != value) { opposingBoneIndex = value; OnElementChanged(); } } }
             [ElementPriority(6)]
-            public uint ParentBoneIndex { get { return parentBoneIndex; } set { if (parentBoneIndex != value) { parentBoneIndex = value; OnElementChanged(); } } }
+            public int ParentBoneIndex { get { return parentBoneIndex; } set { if (parentBoneIndex != value) { parentBoneIndex = value; OnElementChanged(); } } }
             [ElementPriority(7)]
             public uint Hash { get { return hash; } set { if (hash != value) { hash = value; OnElementChanged(); } } }
             [ElementPriority(8)]
@@ -276,7 +282,7 @@ namespace RigResource
             protected override Bone CreateElement(Stream s) { return new Bone(0, elementHandler, s); }
             protected override void WriteElement(Stream s, Bone element) { element.UnParse(s); }
 
-            public override void Add() { this.Add(new Bone(0, null)); }
+            public override void Add() { this.Add(new Bone(0, null, new Vertex(0, null), new Quaternion(0, null), new Vertex(0, null), "", 0, 0, 0, 0)); }
         }
 
         public enum IKType : uint
