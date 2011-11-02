@@ -52,6 +52,7 @@ namespace CatalogResource
         float floorCutoutBoundsLength;//Version>=0x17
         UIntList buildableShellDisplayStateHashes;//Version>=0x18
         uint levelBelowOBJDIndex;//Version>=0x19
+        uint unknown23OBJDIndex;//Version >=1b
         SlotPlacement slotPlacementFlags;
         string surfaceType = "";
         string sourceMaterial = "";
@@ -293,6 +294,10 @@ namespace CatalogResource
                     if (this.version >= 0x00000019)
                     {
                         levelBelowOBJDIndex = r.ReadUInt32();
+                        if (this.version >= 0x0000001b)
+                        {
+                            unknown23OBJDIndex = r.ReadUInt32();
+                        }
                     }
                 }
             }
@@ -356,6 +361,10 @@ namespace CatalogResource
                     if (this.version >= 0x00000019)
                     {
                         w.Write(levelBelowOBJDIndex);
+                        if (this.version >= 0x0000001b)
+                        {
+                            w.Write(unknown23OBJDIndex);
+                        }
                     }
                 }
             }
@@ -389,22 +398,26 @@ namespace CatalogResource
             get
             {
                 List<string> res = base.ContentFields;
-                if (this.version < 0x0000001a)
+                if (this.version < 0x0000001b)
                 {
-                    res.Remove("Unknown22");
-                    if (this.version < 0x00000019)
+                    res.Remove("Unknown23OBJDIndex");
+                    if (this.version < 0x0000001a)
                     {
-                        res.Remove("LevelBelowOBJDIndex");
-                        if (this.version < 0x00000018)
+                        res.Remove("Unknown22");
+                        if (this.version < 0x00000019)
                         {
-                            res.Remove("BuildableShellDisplayStateHashes");
-                            if (this.version < 0x00000017)
+                            res.Remove("LevelBelowOBJDIndex");
+                            if (this.version < 0x00000018)
                             {
-                                res.Remove("FloorCutoutDDSIndex");
-                                res.Remove("FloorCutoutLevelOffset");
-                                res.Remove("FloorCutoutBoundsLength");
-                                if (this.version < 0x00000016)
-                                    res.Remove("InstanceName");
+                                res.Remove("BuildableShellDisplayStateHashes");
+                                if (this.version < 0x00000017)
+                                {
+                                    res.Remove("FloorCutoutDDSIndex");
+                                    res.Remove("FloorCutoutLevelOffset");
+                                    res.Remove("FloorCutoutBoundsLength");
+                                    if (this.version < 0x00000016)
+                                        res.Remove("InstanceName");
+                                }
                             }
                         }
                     }
@@ -1169,19 +1182,25 @@ namespace CatalogResource
             get { if (version < 0x00000019) throw new InvalidOperationException(); return levelBelowOBJDIndex; }
             set { if (version < 0x00000019) throw new InvalidOperationException(); if (levelBelowOBJDIndex != value) { levelBelowOBJDIndex = value; OnResourceChanged(this, new EventArgs()); } }
         }
-        [ElementPriority(43)]
-        public SlotPlacement SlotPlacementFlags { get { return slotPlacementFlags; } set { if (slotPlacementFlags != value) { slotPlacementFlags = value; OnResourceChanged(this, new EventArgs()); } } }
+        [ElementPriority(43), TGIBlockListContentField("TGIBlocks")]
+        public uint Unknown23OBJDIndex
+        {
+            get { if (version < 0x0000001b) throw new InvalidOperationException(); return unknown23OBJDIndex; }
+            set { if (version < 0x0000001b) throw new InvalidOperationException(); if (unknown23OBJDIndex != value) { unknown23OBJDIndex = value; OnResourceChanged(this, new EventArgs()); } }
+        }
         [ElementPriority(44)]
-        public string SurfaceType { get { return surfaceType; } set { if (surfaceType != value) { surfaceType = value; OnResourceChanged(this, new EventArgs()); } } }
+        public SlotPlacement SlotPlacementFlags { get { return slotPlacementFlags; } set { if (slotPlacementFlags != value) { slotPlacementFlags = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(45)]
-        public string SourceMaterial { get { return sourceMaterial; } set { if (sourceMaterial != value) { sourceMaterial = value; OnResourceChanged(this, new EventArgs()); } } }
+        public string SurfaceType { get { return surfaceType; } set { if (surfaceType != value) { surfaceType = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(46)]
-        public Moodlet MoodletGiven { get { return moodletGiven; } set { if (moodletGiven != value) { moodletGiven = value; OnResourceChanged(this, new EventArgs()); } } }
+        public string SourceMaterial { get { return sourceMaterial; } set { if (sourceMaterial != value) { sourceMaterial = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(47)]
-        public int MoodletScore { get { return moodletScore; } set { if (moodletScore != value) { moodletScore = value; OnResourceChanged(this, new EventArgs()); } } }
+        public Moodlet MoodletGiven { get { return moodletGiven; } set { if (moodletGiven != value) { moodletGiven = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(48)]
-        public uint Unknown21 { get { return unknown21; } set { if (unknown21 != value) { unknown21 = value; OnResourceChanged(this, new EventArgs()); } } }
+        public int MoodletScore { get { return moodletScore; } set { if (moodletScore != value) { moodletScore = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(49)]
+        public uint Unknown21 { get { return unknown21; } set { if (unknown21 != value) { unknown21 = value; OnResourceChanged(this, new EventArgs()); } } }
+        [ElementPriority(50)]
         public TopicRating[] TopicRatings
         {
             get { return topicRatings; }
@@ -1191,7 +1210,7 @@ namespace CatalogResource
                 if (!topicRatings.Equals<TopicRating>(value)) { topicRatings = value == null ? null : (TopicRating[])value.Clone(); OnResourceChanged(this, new EventArgs()); }
             }
         }
-        [ElementPriority(50), TGIBlockListContentField("TGIBlocks")]
+        [ElementPriority(51), TGIBlockListContentField("TGIBlocks")]
         public uint FallbackIndex { get { return fallbackIndex; } set { if (fallbackIndex != value) { fallbackIndex = value; OnResourceChanged(this, new EventArgs()); } } }
         //--insert TGIBlockList: no ElementPriority
         #endregion
