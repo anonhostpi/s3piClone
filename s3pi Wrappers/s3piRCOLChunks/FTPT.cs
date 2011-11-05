@@ -1,4 +1,4 @@
-﻿/***************************************************************************
+﻿    /***************************************************************************
  *  Copyright (C) 2009 by Peter L Jones                                    *
  *  pljones@users.sf.net                                                   *
  *                                                                         *
@@ -255,7 +255,14 @@ namespace s3pi.GenericRCOLResource
             #endregion
 
             #region Constructors
-            public Area(int APIversion, EventHandler handler, uint version) : base(APIversion, handler) { this.version = version; closedPolygon = new PolygonPointList(handler); }
+            public Area(int APIversion, EventHandler handler, uint version) : base(APIversion, handler)
+            {
+                this.version = version;
+                Stream ms = new MemoryStream();
+                UnParse(ms);
+                ms.Position = 0;
+                Parse(ms);
+            }
             public Area(int APIversion, EventHandler handler, Stream s, uint version) : base(APIversion, handler) { this.version = version; Parse(s); }
             public Area(int APIversion, EventHandler handler, Area basis)
                 : this(APIversion, handler, basis.version,
