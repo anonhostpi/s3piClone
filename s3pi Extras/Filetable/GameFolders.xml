@@ -3,13 +3,13 @@
   <defaultrootfolder>C:/Program Files (x86)/</defaultrootfolder>
   <rootfolder vendor="Microsoft" os="64bit">C:/Program Files (x86)/</rootfolder>
   <rootfolder vendor="Microsoft" os="32bit">C:/Program Files/</rootfolder>
-  <game class="baseGame" rgversion="0">
+  <game class="baseGame" rgversion="0" priority="99">
     <Name>base</Name>
     <Longname>The Sims 3</Longname>
     <DefaultInstallDir>Electronic Arts/The Sims 3</DefaultInstallDir>
     <Suppressed>not-allowed</Suppressed>
     <GameContent>
-      <Folder path="GameData/Shared/Packages/DeltaPackages">
+      <Folder path="GameData/Shared/DeltaPackages">
         <Package isPatch="true" priority="11">p11/DeltaBuild_p11.package</Package>
         <Package isPatch="true" priority="10">p10/DeltaBuild_p10.package</Package>
         <Package isPatch="true" priority="9">p09/DeltaBuild_p09.package</Package>
