@@ -330,6 +330,27 @@ namespace s3pi.Filetable
             }
         }
 
+        int _priority = -1;
+        /// <summary>
+        /// The Priority for the <see cref="Game"/>.  Defaults to RGVersion if not specified.
+        /// </summary>
+        public int Priority
+        {
+            get
+            {
+                if (_priority == -1)
+                {
+                    int priority = 0;
+                    XAttribute XArgversion = _game.Attribute("priority");
+                    if (XArgversion == null || XArgversion.Value == null) priority = RGVersion;
+                    else if (!int.TryParse(XArgversion.Value, out priority)) priority = RGVersion;
+                    if (priority < 0) priority = RGVersion;
+                    _priority = priority;
+                }
+                return _priority;
+            }
+        }
+
         string getElement(string elementName, string defaultValue)
         {
             XElement xe = _game.Element(ns + elementName);
@@ -451,8 +472,10 @@ namespace s3pi.Filetable
                     path = Path.Combine(UserInstallDir, xPath.Value);
                 else
                     path = UserInstallDir;
-                foreach (PackageTag p in GetPackages(xFolder, path))
-                    yield return p;
+                if (Directory.Exists(path))
+                    foreach (PackageTag p in GetPackages(xFolder, path))
+                        if (p.Priority >= 0)
+                            yield return p;
             }
             if (Directory.Exists(UserInstallDir))
                 foreach (PackageTag p in GetPackages(xRoot, UserInstallDir))
