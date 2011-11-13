@@ -202,7 +202,7 @@ namespace s3pi.Filetable
         {
             get
             {
-                IEnumerable<Game> games = GameFolders.Games.OrderByDescending(x => x.RGVersion);
+                IEnumerable<Game> games = GameFolders.Games.OrderByDescending(x => x.Priority);
                 IEnumerable<Game> enabledGames = games.Where(game => game.Enabled);
                 IEnumerable<IEnumerable<PackageTag>> ftPackageTags = enabledGames.Select(game => this.FTPaths(game));
                 IEnumerable<PackageTag> allPackageTags = ftPackageTags.SelectMany(x => x).Distinct(Game.PackageComparer);
