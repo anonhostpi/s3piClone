@@ -793,7 +793,7 @@ namespace s3pi.GenericRCOLResource
         [ElementPriority(20)]
         public ConePartList Cones { get { return cones; } set { if (cones != value) { cones = new ConePartList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(21), DataGridExpandable]
-        public SlotOffsetList ConeOffets { get { return coneOffsets; } set { if (coneOffsets != value) { coneOffsets = new SlotOffsetList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
+        public SlotOffsetList ConeOffsets { get { return coneOffsets; } set { if (coneOffsets != value) { coneOffsets = new SlotOffsetList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
 
         public string Value { get { return ValueBuilder; } }
         #endregion
