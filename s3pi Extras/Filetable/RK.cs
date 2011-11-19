@@ -102,22 +102,7 @@ namespace s3pi.Filetable
         public static bool TryParse(string value, out IResourceKey result)
         {
             result = new RK();
-
-            string[] tgi = value.Trim().ToLower().Split('-');
-            if (tgi.Length != 3) return false;
-            foreach (var x in tgi) if (!x.StartsWith("0x")) return false;
-
-            uint tg;
-            if (!uint.TryParse(tgi[0].Substring(2), System.Globalization.NumberStyles.HexNumber, null, out tg)) return false;
-            result.ResourceType = tg;
-            if (!uint.TryParse(tgi[1].Substring(2), System.Globalization.NumberStyles.HexNumber, null, out tg)) return false;
-            result.ResourceGroup = tg;
-
-            ulong i;
-            if (!ulong.TryParse(tgi[2].Substring(2), System.Globalization.NumberStyles.HexNumber, null, out i)) return false;
-            result.Instance = i;
-
-            return true;
+            return AResourceKey.TryParse(value, result);
         }
     }
 }

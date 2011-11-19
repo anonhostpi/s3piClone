@@ -167,6 +167,41 @@ namespace s3pi.Interfaces
         #endregion
 
         /// <summary>
+        /// Converts the string representation of a resource key to its <see cref="AResourceKey"/>
+        /// equivalent. A return value indicates whether the conversion succeeded.
+        /// </summary>
+        /// <param name="value">A string containing a resource key to convert.</param>
+        /// <param name="result">
+        /// When this method returns, contains the <see cref="AResourceKey"/> equivalent
+        /// to the resource key contained in <paramref name="value"/>, if the conversion succeeded, or
+        /// unchanged if the conversion failed.  The conversion fails if the <paramref name="value"/>
+        /// parameter is null or is not of the correct format.  This parameter must not be null.
+        /// </param>
+        /// <returns>true if <paramref name="value"/> was converted successfully; otherwise, false.</returns>
+        /// <exception cref="NullReferenceException">Thrown if <paramref name="result"/> is null.</exception>
+        public static bool TryParse(String value, IResourceKey result)
+        {
+            if (value == null) return false;
+
+            string[] tgi = value.Trim().ToLower().Split('-');
+            if (tgi.Length != 3) return false;
+            foreach (var x in tgi) if (!x.StartsWith("0x")) return false;
+
+            uint t;
+            if (!uint.TryParse(tgi[0].Substring(2), System.Globalization.NumberStyles.HexNumber, null, out t)) return false;
+            uint g;
+            if (!uint.TryParse(tgi[1].Substring(2), System.Globalization.NumberStyles.HexNumber, null, out g)) return false;
+            ulong i;
+            if (!ulong.TryParse(tgi[2].Substring(2), System.Globalization.NumberStyles.HexNumber, null, out i)) return false;
+
+            result.ResourceType = t;
+            result.ResourceGroup = g;
+            result.Instance = i;
+
+            return true;
+        }
+
+        /// <summary>
         /// Converts an <see cref="AResourceKey"/> to a string representation.
         /// </summary>
         /// <param name="value">The <see cref="AResourceKey"/> to convert</param>
