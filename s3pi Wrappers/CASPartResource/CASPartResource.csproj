@@ -57,6 +57,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BlendUnitResource.cs" />
     <Compile Include="CASPartResource.cs">
       <SubType>Code</SubType>
     </Compile>
