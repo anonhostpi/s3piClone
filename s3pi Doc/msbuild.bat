@@ -1,7 +1,7 @@
 @echo off
 set CopyTo=.\Help
-set OutputPath=C:\Windows\Temp\Help
-set WorkingPath=C:\Windows\Temp\HelpWork
+set OutputPath=%TEMP%\Help
+set WorkingPath=%TEMP%\HelpWork
 
 if exist "%OutputPath%\" rmdir /s/q %OutputPath%
 if exist "%WorkingPath%\" rmdir /s/q %WorkingPath%
