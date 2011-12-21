@@ -5,12 +5,16 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("RigResource")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("s3pi Rig Resource wrapper")]
+[assembly: AssemblyDescription("Wrapper for Rig resources.")]
+#if DEBUG
+[assembly: AssemblyConfiguration("[DEBUG]")]
+#else
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyProduct("RigResource")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2011")]
+#endif
+[assembly: AssemblyCompany("Peter L Jones")]
+[assembly: AssemblyProduct("s3pi")]
+[assembly: AssemblyCopyright("Copyright (C) 2011  Peter L Jones.  Released under GPL 3.  See gpl-3.0.txt")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
