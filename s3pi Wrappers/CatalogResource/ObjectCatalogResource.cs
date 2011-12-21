@@ -156,7 +156,7 @@ namespace CatalogResource
             ObjectType objectTypeFlags, WallPlacement wallPlacementFlags, Movement movementFlags, uint cutoutTilesPerLevel,
             uint levels, IEnumerable<MTDoor> mtDoorList, byte isScriptEnabled, uint diagonalIndex, uint hash,
             uint roomFlags, uint functionCategoryFlags, ulong subFunctionFlags, ulong subRoomFlags, uint buildCategoryFlags, uint sinkDDSIndex,
-            uint unknown16, uint unknown17, float unknown18,
+            uint floorCutoutDDSIndex, uint floorCutoutLevelOffset, float floorCutoutBoundsLength,
             uint slotPlacementFlags, string materialGrouping1, string materialGrouping2, Moodlet moodletGiven, int moodletScore, uint unknown21,
             TopicRating[] topicRatings, uint fallbackIndex, TGIBlockList ltgib)
             : this(APIversion,
@@ -166,7 +166,7 @@ namespace CatalogResource
             objectTypeFlags, wallPlacementFlags, movementFlags, cutoutTilesPerLevel,
             levels, mtDoorList, isScriptEnabled, diagonalIndex, hash,
             roomFlags, functionCategoryFlags, subFunctionFlags, subRoomFlags, buildCategoryFlags, sinkDDSIndex,
-            unknown16, unknown17, unknown18,
+            floorCutoutDDSIndex, floorCutoutLevelOffset, floorCutoutBoundsLength,
             new UIntList(null),
             0,
             slotPlacementFlags, materialGrouping1, materialGrouping2, moodletGiven, moodletScore, unknown21,
@@ -183,8 +183,8 @@ namespace CatalogResource
             ObjectType objectTypeFlags, WallPlacement wallPlacementFlags, Movement movementFlags, uint cutoutTilesPerLevel,
             uint levels, IEnumerable<MTDoor> mtDoorList, byte isScriptEnabled, uint diagonalIndex, uint hash,
             uint roomFlags, uint functionCategoryFlags, ulong subFunctionFlags, ulong subRoomFlags, uint buildCategoryFlags, uint sinkDDSIndex,
-            uint unknown16, uint unknown17, float unknown18,
-            UIntList tgiIndexes,
+            uint floorCutoutDDSIndex, uint floorCutoutLevelOffset, float floorCutoutBoundsLength,
+            UIntList buildableShellDisplayStateHashes,
             uint slotPlacementFlags, string materialGrouping1, string materialGrouping2, Moodlet moodletGiven, int moodletScore, uint unknown21,
             TopicRating[] topicRatings, uint fallbackIndex, TGIBlockList ltgib)
             : this(APIversion,
@@ -194,8 +194,8 @@ namespace CatalogResource
             objectTypeFlags, wallPlacementFlags, movementFlags, cutoutTilesPerLevel,
             levels, mtDoorList, isScriptEnabled, diagonalIndex, hash,
             roomFlags, functionCategoryFlags, subFunctionFlags, subRoomFlags, buildCategoryFlags, sinkDDSIndex,
-            unknown16, unknown17, unknown18,
-            tgiIndexes,
+            floorCutoutDDSIndex, floorCutoutLevelOffset, floorCutoutBoundsLength,
+            buildableShellDisplayStateHashes,
             0,
             slotPlacementFlags, materialGrouping1, materialGrouping2, moodletGiven, moodletScore, unknown21,
             topicRatings, fallbackIndex, ltgib)
@@ -210,9 +210,9 @@ namespace CatalogResource
             ObjectType objectTypeFlags, WallPlacement wallPlacementFlags, Movement movementFlags, uint cutoutTilesPerLevel,
             uint levels, IEnumerable<MTDoor> mtDoorList, byte isScriptEnabled, uint diagonalIndex, uint hash,
             uint roomFlags, uint functionCategoryFlags, ulong subFunctionFlags, ulong subRoomFlags, uint buildCategoryFlags, uint sinkDDSIndex,
-            uint unknown16, uint unknown17, float unknown18,
-            UIntList tgiIndexes,
-            uint indexV19,
+            uint floorCutoutDDSIndex, uint floorCutoutLevelOffset, float floorCutoutBoundsLength,
+            UIntList buildableShellDisplayStateHashes,
+            uint levelBelowOBJDIndex,
             uint slotPlacementFlags, string materialGrouping1, string materialGrouping2, Moodlet moodletGiven, int moodletScore, uint unknown21,
             TopicRating[] topicRatings, uint fallbackIndex, TGIBlockList ltgib)
             : base(APIversion, version, common, ltgib)
@@ -236,11 +236,11 @@ namespace CatalogResource
             this.roomSubCategoryFlags = (RoomSubCategory)subRoomFlags;
             this.buildCategoryFlags = (BuildCategory)buildCategoryFlags;
             this.surfaceCutoutDDSIndex = sinkDDSIndex;
-            this.floorCutoutDDSIndex = unknown16;
-            this.floorCutoutLevelOffset = unknown17;
-            this.floorCutoutBoundsLength = unknown18;
-            this.buildableShellDisplayStateHashes = new UIntList(OnResourceChanged, tgiIndexes);
-            this.levelBelowOBJDIndex = indexV19;
+            this.floorCutoutDDSIndex = floorCutoutDDSIndex;
+            this.floorCutoutLevelOffset = floorCutoutLevelOffset;
+            this.floorCutoutBoundsLength = floorCutoutBoundsLength;
+            this.buildableShellDisplayStateHashes = new UIntList(OnResourceChanged, buildableShellDisplayStateHashes);
+            this.levelBelowOBJDIndex = levelBelowOBJDIndex;
             this.slotPlacementFlags = (SlotPlacement)slotPlacementFlags;
             this.surfaceType = materialGrouping1;
             this.sourceMaterial = materialGrouping2;
