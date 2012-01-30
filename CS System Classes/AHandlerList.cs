@@ -43,21 +43,21 @@ namespace System.Collections.Generic
         /// <summary>
         /// Initializes a new instance of the <see cref="AHandlerList{T}"/> class
         /// that is empty
-        /// and with maximum size of <paramref name="size"/> (default is unlimited).
+        /// and with maximum size of <paramref name="maxSize"/> (default is unlimited).
         /// </summary>
         /// <param name="handler">The <see cref="EventHandler"/> to call on changes to the list.</param>
-        /// <param name="size">Optional; -1 for unlimited size, otherwise the maximum number of elements in the list.</param>
-        protected AHandlerList(EventHandler handler, long size = -1) : base() { this.handler = handler; this.maxSize = size; }
+        /// <param name="maxSize">Optional; -1 for unlimited size, otherwise the maximum number of elements in the list.</param>
+        protected AHandlerList(EventHandler handler, long maxSize = -1) : base() { this.handler = handler; this.maxSize = maxSize; }
         /// <summary>
         /// Initializes a new instance of the <see cref="AHandlerList{T}"/> class,
         /// filled with the content of <paramref name="ilt"/>.
         /// </summary>
         /// <param name="handler">The <see cref="EventHandler"/> to call on changes to the list.</param>
         /// <param name="ilt">The <see cref="IEnumerable{T}"/> to use as the initial content of the list.</param>
-        /// <param name="size">Optional; -1 for unlimited size, otherwise the maximum number of elements in the list.</param>
-        /// <remarks>Does not throw an exception if <paramref name="ilt"/>.Count is greater than <paramref name="size"/>.
+        /// <param name="maxSize">Optional; -1 for unlimited size, otherwise the maximum number of elements in the list.</param>
+        /// <remarks>Does not throw an exception if <paramref name="ilt"/>.Count is greater than <paramref name="maxSize"/>.
         /// An exception will be thrown on any attempt to add further items unless the Count is reduced first.</remarks>
-        protected AHandlerList(EventHandler handler, IEnumerable<T> ilt, long size = -1) : base(ilt) { this.handler = handler; this.maxSize = size; }
+        protected AHandlerList(EventHandler handler, IEnumerable<T> ilt, long maxSize = -1) : base(ilt) { this.handler = handler; this.maxSize = maxSize; }
         #endregion
 
         #region List<T> Members

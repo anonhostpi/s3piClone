@@ -79,6 +79,8 @@ namespace CASPartResource
             casEntries = new CASEntryList(OnResourceChanged, s);
 
             tgiBlocks = new TGIBlockList(OnResourceChanged, s, tgiPosn, tgiSize, addEight: version >= 8);
+
+            casEntries.ParentTGIBlocks = tgiBlocks;
         }
 
         protected override Stream UnParse()
@@ -110,6 +112,8 @@ namespace CASPartResource
 
             s.Flush();
 
+            casEntries.ParentTGIBlocks = tgiBlocks;
+
             return s;
         }
         #endregion
@@ -118,6 +122,8 @@ namespace CASPartResource
         public class Entry : AHandlerElement, IEquatable<Entry>
         {
             const int recommendedApiVersion = 1;
+            public DependentList<TGIBlock> ParentTGIBlocks { get; set; }
+            public override List<string> ContentFields { get { List<string> res = GetContentFields(requestedApiVersion, this.GetType()); res.Remove("ParentTGIBlocks"); return res; } }
 
             #region Attributes
             AgeGenderFlags ageGender;
@@ -126,18 +132,23 @@ namespace CASPartResource
             #endregion
 
             #region Constructors
-            public Entry(int APIversion, EventHandler handler) : base(APIversion, handler) { }
+            public Entry(int APIversion, EventHandler handler) : base(APIversion, handler) { ageGender = new AgeGenderFlags(requestedApiVersion, handler); }
             public Entry(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
             public Entry(int APIversion, EventHandler handler, Entry basis) : this(APIversion, handler, basis.ageGender, basis.amount, basis.index) { }
             public Entry(int APIversion, EventHandler handler, AgeGenderFlags ageGender, float amount, int index)
-                : base(APIversion, handler) { this.ageGender = ageGender; this.amount = amount; this.index = index; }
+                : base(APIversion, handler)
+            {
+                this.ageGender = new AgeGenderFlags(0, handler, ageGender);
+                this.amount = amount;
+                this.index = index;
+            }
             #endregion
 
             #region Data I/O
             void Parse(Stream s)
             {
                 BinaryReader r = new BinaryReader(s);
-                ageGender = (AgeGenderFlags)r.ReadUInt32();
+                ageGender = new AgeGenderFlags(0, handler, s);
                 amount = r.ReadSingle();
                 index = r.ReadInt32();
             }
@@ -145,7 +156,8 @@ namespace CASPartResource
             internal void UnParse(Stream s)
             {
                 BinaryWriter w = new BinaryWriter(s);
-                w.Write((uint)ageGender);
+                if (ageGender == null) ageGender = new AgeGenderFlags(0, handler);
+                ageGender.UnParse(s);
                 w.Write(amount);
                 w.Write(index);
             }
@@ -153,7 +165,6 @@ namespace CASPartResource
 
             #region AHandlerElement Members
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
-            public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
             public override AHandlerElement Clone(EventHandler handler) { return new Entry(requestedApiVersion, handler, this); }
             #endregion
 
@@ -162,7 +173,7 @@ namespace CASPartResource
             public bool Equals(Entry other)
             {
                 return
-                    this.ageGender == other.ageGender
+                    this.ageGender.Equals(other.ageGender)
                     && this.amount == other.amount
                     && this.index == other.index
                     ;
@@ -186,32 +197,33 @@ namespace CASPartResource
 
             #region Content Fields
             [ElementPriority(1)]
-            public AgeGenderFlags AgeGender { get { return ageGender; } set { if (ageGender != value) { ageGender = value; OnElementChanged(); } } }
+            public AgeGenderFlags AgeGender { get { return ageGender; } set { if (!ageGender.Equals(value)) { ageGender = new AgeGenderFlags(0, handler, value); OnElementChanged(); } } }
             [ElementPriority(2)]
             public float Amount { get { return amount; } set { if (amount != value) { amount = value; OnElementChanged(); } } }
-            [ElementPriority(3)]
+            [ElementPriority(3), TGIBlockListContentField("ParentTGIBlocks")]
             public int Index { get { return index; } set { if (index != value) { index = value; OnElementChanged(); } } }
 
-            public string Value
-            {
-                get
-                {
-                    return ValueBuilder.Replace("\n", "; ");
-                    /*
-                    string s = "";
-                    foreach (string field in ContentFields)
-                        if (!field.Equals("Value"))
-                            s += string.Format("{0}: {1}; ", field, this[field]);
-                    return s.TrimEnd(';', ' ');
-                    /**/
-                }
-            }
+            public string Value { get { return ValueBuilder/*.Replace("\n", "; ")/**/; } }
             #endregion
         }
 
         public class CASEntry : AHandlerElement, IEquatable<CASEntry>
         {
             const int recommendedApiVersion = 1;
+            private DependentList<TGIBlock> _ParentTGIBlocks;
+            public DependentList<TGIBlock> ParentTGIBlocks
+            {
+                get { return _ParentTGIBlocks; }
+                set
+                {
+                    if (_ParentTGIBlocks != value)
+                    {
+                        _ParentTGIBlocks = value;
+                        if (geom != null) geom.ParentTGIBlocks = _ParentTGIBlocks;
+                        if (bone != null) bone.ParentTGIBlocks = _ParentTGIBlocks;
+                    }
+                }
+            }
 
             #region Attributes
             FacialRegionFlags facialRegion;
@@ -223,7 +235,7 @@ namespace CASPartResource
             #endregion
 
             #region Constructors
-            public CASEntry(int APIversion, EventHandler handler) : base(APIversion, handler) { }
+            public CASEntry(int APIversion, EventHandler handler) : base(APIversion, handler) { geom = new Entry(requestedApiVersion, handler) { ParentTGIBlocks = ParentTGIBlocks }; bone = new Entry(requestedApiVersion, handler) { ParentTGIBlocks = ParentTGIBlocks }; }
             public CASEntry(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
             public CASEntry(int APIversion, EventHandler handler, CASEntry basis)
                 : this(APIversion, handler, basis.facialRegion, basis.andBone, basis.useGeom, basis.geom, basis.useBone, basis.bone) { }
@@ -266,7 +278,7 @@ namespace CASPartResource
                     w.Write(useGeom);
                 if (andBone != 0 || useGeom != 0)
                 {
-                    if (geom == null) geom = new Entry(requestedApiVersion, handler);
+                    if (geom == null) geom = new Entry(requestedApiVersion, handler) { ParentTGIBlocks = ParentTGIBlocks };
                     geom.UnParse(s);
                 }
                 if (andBone != 0)
@@ -274,7 +286,7 @@ namespace CASPartResource
                     w.Write(useBone);
                     if (useBone != 0)
                     {
-                        if (bone == null) bone = new Entry(requestedApiVersion, handler);
+                        if (bone == null) bone = new Entry(requestedApiVersion, handler) { ParentTGIBlocks = ParentTGIBlocks };
                         bone.UnParse(s);
                     }
                 }
@@ -283,12 +295,13 @@ namespace CASPartResource
 
             #region AHandlerElement Members
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
-            public override AHandlerElement Clone(EventHandler handler) { return new CASEntry(requestedApiVersion, handler, this); }
+            public override AHandlerElement Clone(EventHandler handler) { return new CASEntry(requestedApiVersion, handler, this) { ParentTGIBlocks = ParentTGIBlocks }; }
             public override List<string> ContentFields
             {
                 get
                 {
                     List<string> res = GetContentFields(requestedApiVersion, this.GetType());
+                    res.Remove("ParentTGIBlocks");
                     if (andBone != 0)
                         res.Remove("UseGeom");
                     else
@@ -350,16 +363,18 @@ namespace CASPartResource
             [ElementPriority(3)]
             public uint UseGeom { get { return useGeom; } set { if (useGeom != value) { useGeom = value; OnElementChanged(); } } }
             [ElementPriority(4)]
-            public Entry Geom { get { return geom; } set { if (!geom.Equals(value)) { geom = new Entry(requestedApiVersion, handler, value); OnElementChanged(); } } }
+            public Entry Geom { get { return geom; } set { if (!geom.Equals(value)) { geom = new Entry(requestedApiVersion, handler, value) { ParentTGIBlocks = ParentTGIBlocks }; OnElementChanged(); } } }
             [ElementPriority(5)]
             public uint UseBone { get { return useBone; } set { if (useBone != value) { useBone = value; OnElementChanged(); } } }
             [ElementPriority(6)]
-            public Entry Bone { get { return bone; } set { if (!bone.Equals(value)) { bone = new Entry(requestedApiVersion, handler, value); OnElementChanged(); } } }
+            public Entry Bone { get { return bone; } set { if (!bone.Equals(value)) { bone = new Entry(requestedApiVersion, handler, value) { ParentTGIBlocks = ParentTGIBlocks }; OnElementChanged(); } } }
 
             public string Value
             {
                 get
                 {
+                    return ValueBuilder;
+                    /*
                     string s = "";
                     foreach (string field in ContentFields)
                         if (field == "Value") continue;
@@ -368,12 +383,20 @@ namespace CASPartResource
                         else
                             s += string.Format("\n{0}: {1}", field, this[field]);
                     return s;
+                    /**/
                 }
             }
             #endregion
         }
         public class CASEntryList : DependentList<CASEntry>
         {
+            private DependentList<TGIBlock> _ParentTGIBlocks;
+            public DependentList<TGIBlock> ParentTGIBlocks
+            {
+                get { return _ParentTGIBlocks; }
+                set { if (_ParentTGIBlocks != value) { _ParentTGIBlocks = value; foreach (var i in this) i.ParentTGIBlocks = _ParentTGIBlocks; } }
+            }
+
             #region Constructors
             public CASEntryList(EventHandler handler) : base(handler) { }
             public CASEntryList(EventHandler handler, Stream s) : base(handler, s) { }
@@ -381,11 +404,11 @@ namespace CASPartResource
             #endregion
 
             #region Data I/O
-            protected override CASEntry CreateElement(Stream s) { return new CASEntry(0, elementHandler, s); }
+            protected override CASEntry CreateElement(Stream s) { return new CASEntry(0, elementHandler, s) { ParentTGIBlocks = ParentTGIBlocks }; }
             protected override void WriteElement(Stream s, CASEntry element) { element.UnParse(s); }
             #endregion
 
-            public override void Add() { this.Add(new CASEntry(0, null)); }
+            public override void Add() { this.Add(new CASEntry(0, null) { ParentTGIBlocks = ParentTGIBlocks }); }
         }
         #endregion
 
@@ -403,9 +426,9 @@ namespace CASPartResource
             set { if (version < 8) throw new InvalidOperationException(); if (!blendGeometry.Equals(value)) { blendGeometry = new TGIBlock(requestedApiVersion, OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } }
         }
         [ElementPriority(5)]
-        public CASEntryList CASEntries { get { return casEntries; } set { if (!casEntries.Equals(value)) { casEntries = new CASEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public CASEntryList CASEntries { get { return casEntries; } set { if (!casEntries.Equals(value)) { casEntries = new CASEntryList(OnResourceChanged, value); casEntries.ParentTGIBlocks = tgiBlocks; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(6)]
-        public TGIBlockList TGIBlocks { get { return tgiBlocks; } set { if (!tgiBlocks.Equals(value)) { tgiBlocks = new TGIBlockList(OnResourceChanged, value, true); OnResourceChanged(this, new EventArgs()); } } }
+        public TGIBlockList TGIBlocks { get { return tgiBlocks; } set { if (!tgiBlocks.Equals(value)) { tgiBlocks = new TGIBlockList(OnResourceChanged, value, true); casEntries.ParentTGIBlocks = tgiBlocks; OnResourceChanged(this, new EventArgs()); } } }
 
         public string Value
         {

@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>s3pi.Settings</RootNamespace>
     <AssemblyName>s3pi.Settings</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>
@@ -34,6 +34,7 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -97,19 +98,6 @@
   </Target>
   -->
   <PropertyGroup>
-    <PreBuildEvent>set mydate=%25date: =0%25
-set dd=%25mydate:~0,2%25
-set mm=%25mydate:~3,2%25
-set yy=%25mydate:~8,2%25
-set mytime=%25time: =0%25
-set h=%25mytime:~0,2%25
-set version="%25yy%25%25mm%25.%25dd%25.%25h%25%25m%25.*"
-
-(echo using System.Reflection;
-echo using System.Runtime.CompilerServices;
-echo using System.Runtime.InteropServices;
-echo /*"*/ [assembly: AssemblyVersion(%25version%25)] /*"*/
-)&gt;"$(ProjectDir)Properties\AssemblyVersion.cs"
-</PreBuildEvent>
+    <PreBuildEvent>$(SolutionDir)CreateAssemblyVersion\$(OutDir)CreateAssemblyVersion "$(ProjectDir)\"</PreBuildEvent>
   </PropertyGroup>
 </Project>

@@ -183,16 +183,31 @@ namespace s3pi.Interfaces
         {
             if (value == null) return false;
 
-            string[] tgi = value.Trim().ToLower().Split('-');
-            if (tgi.Length != 3) return false;
-            foreach (var x in tgi) if (!x.StartsWith("0x")) return false;
-
-            uint t;
-            if (!uint.TryParse(tgi[0].Substring(2), System.Globalization.NumberStyles.HexNumber, null, out t)) return false;
-            uint g;
-            if (!uint.TryParse(tgi[1].Substring(2), System.Globalization.NumberStyles.HexNumber, null, out g)) return false;
+            uint t, g;
             ulong i;
-            if (!ulong.TryParse(tgi[2].Substring(2), System.Globalization.NumberStyles.HexNumber, null, out i)) return false;
+
+            // Two formats 0x{X8}-0x{X8}-0x{X16} and (key:){X8}:{X8}:{X16}
+            if (value.Contains("-"))
+            {
+                string[] tgi = value.Trim().ToLower().Split('-');
+                if (tgi.Length != 3) return false;
+                foreach (var x in tgi) if (!x.StartsWith("0x")) return false;
+
+                if (!uint.TryParse(tgi[0].Substring(2), System.Globalization.NumberStyles.HexNumber, null, out t)) return false;
+                if (!uint.TryParse(tgi[1].Substring(2), System.Globalization.NumberStyles.HexNumber, null, out g)) return false;
+                if (!ulong.TryParse(tgi[2].Substring(2), System.Globalization.NumberStyles.HexNumber, null, out i)) return false;
+            }
+            else
+            {
+                string[] tgi = value.Trim().ToLower().Split(':');
+                if (tgi.Length == 4 && tgi[0].ToLower() == "key")
+                    Array.Copy(tgi, 1, tgi, 0, 3);
+                else if (tgi.Length != 3) return false;
+
+                if (!uint.TryParse(tgi[0], System.Globalization.NumberStyles.HexNumber, null, out t)) return false;
+                if (!uint.TryParse(tgi[1], System.Globalization.NumberStyles.HexNumber, null, out g)) return false;
+                if (!ulong.TryParse(tgi[2], System.Globalization.NumberStyles.HexNumber, null, out i)) return false;
+            }
 
             result.ResourceType = t;
             result.ResourceGroup = g;

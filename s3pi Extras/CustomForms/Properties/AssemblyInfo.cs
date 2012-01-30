@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("CustomForms")]
+[assembly: AssemblyTitle("Custom Forms")]
 [assembly: AssemblyDescription("Assorted Windows Forms components (no s3pi dependencies).")]
 #if DEBUG
 [assembly: AssemblyConfiguration("[DEBUG]")]
@@ -14,7 +14,7 @@ using System.Runtime.InteropServices;
 #endif
 [assembly: AssemblyCompany("Peter L Jones")]
 [assembly: AssemblyProduct("CustomForms")]
-[assembly: AssemblyCopyright("Copyright (C) 2011  Peter L Jones.  Released under GPL 3.  See gpl-3.0.txt")]
+[assembly: AssemblyCopyright("Copyright © 2011  Peter L Jones.  Released under GPL 3.  See gpl-3.0.txt")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

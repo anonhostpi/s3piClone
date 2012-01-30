@@ -7,10 +7,14 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 [assembly: AssemblyTitle("DDSPanel")]
 [assembly: AssemblyDescription("Provides support for DDS images.")]
+#if DEBUG
+[assembly: AssemblyConfiguration("[DEBUG]")]
+#else
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Dean Ashton, Delphy@MTS, Peter L Jones")]
-[assembly: AssemblyProduct("DDSPanel")]
-[assembly: AssemblyCopyright("Copyright © 2006 Dean Ashton; Copyright © 2011 Peter L Jones")]
+#endif
+[assembly: AssemblyCompany("Peter L Jones")]
+[assembly: AssemblyProduct("s3pi")]
+[assembly: AssemblyCopyright("Copyright © 2011  Peter L Jones.  Released under GPL 3.  See gpl-3.0.txt")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

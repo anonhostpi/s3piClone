@@ -31,6 +31,7 @@
             this.components = new System.ComponentModel.Container();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.label1 = new System.Windows.Forms.Label();
             this.ckbR = new System.Windows.Forms.CheckBox();
@@ -38,12 +39,15 @@
             this.ckbB = new System.Windows.Forms.CheckBox();
             this.ckbA = new System.Windows.Forms.CheckBox();
             this.ckbI = new System.Windows.Forms.CheckBox();
+            this.tlpSize = new System.Windows.Forms.TableLayoutPanel();
+            this.label2 = new System.Windows.Forms.Label();
+            this.lbSize = new System.Windows.Forms.Label();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
-            this.flowLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.flowLayoutPanel1.SuspendLayout();
+            this.tlpSize.SuspendLayout();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -61,7 +65,7 @@
             this.tableLayoutPanel1.RowCount = 2;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(379, 157);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(594, 157);
             this.tableLayoutPanel1.TabIndex = 1;
             // 
             // panel1
@@ -74,8 +78,19 @@
             this.panel1.Location = new System.Drawing.Point(0, 29);
             this.panel1.Margin = new System.Windows.Forms.Padding(0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(379, 128);
+            this.panel1.Size = new System.Drawing.Size(594, 128);
             this.panel1.TabIndex = 2;
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.BackColor = System.Drawing.SystemColors.Control;
+            this.pictureBox1.BackgroundImage = global::System.Windows.Forms.Properties.Resources.checkerboard;
+            this.pictureBox1.Location = new System.Drawing.Point(0, 0);
+            this.pictureBox1.Margin = new System.Windows.Forms.Padding(0);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(128, 128);
+            this.pictureBox1.TabIndex = 3;
+            this.pictureBox1.TabStop = false;
             // 
             // flowLayoutPanel1
             // 
@@ -87,10 +102,11 @@
             this.flowLayoutPanel1.Controls.Add(this.ckbB);
             this.flowLayoutPanel1.Controls.Add(this.ckbA);
             this.flowLayoutPanel1.Controls.Add(this.ckbI);
+            this.flowLayoutPanel1.Controls.Add(this.tlpSize);
             this.flowLayoutPanel1.Location = new System.Drawing.Point(0, 3);
             this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(379, 23);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(462, 23);
             this.flowLayoutPanel1.TabIndex = 0;
             // 
             // label1
@@ -171,20 +187,45 @@
             this.ckbI.UseVisualStyleBackColor = true;
             this.ckbI.CheckedChanged += new System.EventHandler(this.ckb_CheckedChanged);
             // 
+            // tlpSize
+            // 
+            this.tlpSize.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.tlpSize.AutoSize = true;
+            this.tlpSize.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.tlpSize.ColumnCount = 2;
+            this.tlpSize.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tlpSize.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tlpSize.Controls.Add(this.label2, 0, 0);
+            this.tlpSize.Controls.Add(this.lbSize, 1, 0);
+            this.tlpSize.Location = new System.Drawing.Point(379, 5);
+            this.tlpSize.Margin = new System.Windows.Forms.Padding(0);
+            this.tlpSize.Name = "tlpSize";
+            this.tlpSize.RowCount = 1;
+            this.tlpSize.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tlpSize.Size = new System.Drawing.Size(83, 13);
+            this.tlpSize.TabIndex = 6;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(3, 0);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(30, 13);
+            this.label2.TabIndex = 0;
+            this.label2.Text = "Size:";
+            // 
+            // lbSize
+            // 
+            this.lbSize.AutoSize = true;
+            this.lbSize.Location = new System.Drawing.Point(39, 0);
+            this.lbSize.Name = "lbSize";
+            this.lbSize.Size = new System.Drawing.Size(41, 13);
+            this.lbSize.TabIndex = 1;
+            this.lbSize.Text = "XX, YY";
+            // 
             // timer1
             // 
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
-            // 
-            // pictureBox1
-            // 
-            this.pictureBox1.BackColor = System.Drawing.SystemColors.Control;
-            this.pictureBox1.BackgroundImage = global::System.Windows.Forms.Properties.Resources.checkerboard;
-            this.pictureBox1.Location = new System.Drawing.Point(0, 0);
-            this.pictureBox1.Margin = new System.Windows.Forms.Padding(0);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(128, 128);
-            this.pictureBox1.TabIndex = 3;
-            this.pictureBox1.TabStop = false;
             // 
             // DDSPanel
             // 
@@ -192,14 +233,16 @@
             this.Controls.Add(this.tableLayoutPanel1);
             this.Margin = new System.Windows.Forms.Padding(0);
             this.Name = "DDSPanel";
-            this.Size = new System.Drawing.Size(379, 157);
+            this.Size = new System.Drawing.Size(594, 157);
             this.Resize += new System.EventHandler(this.DDSPanel_Resize);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
             this.panel1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.flowLayoutPanel1.ResumeLayout(false);
             this.flowLayoutPanel1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            this.tlpSize.ResumeLayout(false);
+            this.tlpSize.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -217,5 +260,8 @@
         private System.Windows.Forms.CheckBox ckbA;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.CheckBox ckbI;
+        private TableLayoutPanel tlpSize;
+        private Label label2;
+        private Label lbSize;
     }
 }

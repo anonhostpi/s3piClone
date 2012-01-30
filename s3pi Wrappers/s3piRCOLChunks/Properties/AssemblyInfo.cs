@@ -5,12 +5,16 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("s3piRCOLChunks")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("s3pi RCOL Chunk handlers")]
+[assembly: AssemblyDescription("A collection of RCOL chunk handlers.")]
+#if DEBUG
+[assembly: AssemblyConfiguration("[DEBUG]")]
+#else
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyProduct("s3piRCOLChunks")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2011")]
+#endif
+[assembly: AssemblyCompany("Peter L Jones")]
+[assembly: AssemblyProduct("s3pi")]
+[assembly: AssemblyCopyright("Copyright © 2010  Peter L Jones.  Released under GPL 3.  See gpl-3.0.txt")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

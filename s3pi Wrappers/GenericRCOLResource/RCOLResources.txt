@@ -3,7 +3,7 @@
 ;y=stand alone resource
 ;n=only embedded in a MODL or MLOD
 ;desc
-0x015A1849 GEOM Y Body Geometry
+0x015A1849 GEOM N Body Geometry ; lies! but the stand alone is not a GenericRCOL
 0x01661233 MODL Y Object Geometry
 0x01D0E6FB VBUF N Vertex Buffer
 0x01D0E70F IBUF N Index Buffer

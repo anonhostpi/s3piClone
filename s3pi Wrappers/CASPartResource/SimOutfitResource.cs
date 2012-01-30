@@ -34,7 +34,7 @@ namespace CASPartResource
         static bool checking = s3pi.Settings.Settings.Checking;
 
         #region Attributes
-        uint version = 0x0012;
+        uint version = 0x0014;
         XMLEntryList xmlEntries;
         int unknown1;
         int unknown2;
@@ -53,6 +53,9 @@ namespace CASPartResource
         UInt32 hairBaseColour;
         UInt32 hairHaloHighColour;
         UInt32 hairHaloLowColour;
+        float numCurls; // version >= 0x13
+        float curlPixelRadius; // version >= 0x13
+        TGIBlock furMap; // version >= 0x14
         CASEntryList caspEntries;
         byte zero;
         FaceEntryList faceEntries;
@@ -95,6 +98,15 @@ namespace CASPartResource
             hairBaseColour = r.ReadUInt32();
             hairHaloHighColour = r.ReadUInt32();
             hairHaloLowColour = r.ReadUInt32();
+            if (version >= 0x0013)
+            {
+                numCurls = r.ReadSingle();
+                curlPixelRadius = r.ReadSingle();
+                if (version >= 0x0014)
+                {
+                    furMap = new TGIBlock(requestedApiVersion, OnResourceChanged, s);
+                }
+            }
             caspEntries = new CASEntryList(OnResourceChanged, s);
 
             zero = r.ReadByte();
@@ -148,6 +160,15 @@ namespace CASPartResource
             w.Write(hairBaseColour);
             w.Write(hairHaloHighColour);
             w.Write(hairHaloLowColour);
+            if (version >= 0x0013)
+            {
+                w.Write(numCurls);
+                w.Write(curlPixelRadius);
+                if (version >= 0x0014)
+                {
+                    if (furMap == null) furMap = new TGIBlock(requestedApiVersion, OnResourceChanged); furMap.UnParse(s);
+                }
+            }
 
             if (caspEntries == null) caspEntries = new CASEntryList(OnResourceChanged); caspEntries.UnParse(s);
 
@@ -282,6 +303,8 @@ namespace CASPartResource
         public class IndexPair : AHandlerElement, IEquatable<IndexPair>
         {
             const int recommendedApiVersion = 1;
+            public DependentList<TGIBlock> ParentTGIBlocks { get; set; }
+            public override List<string> ContentFields { get { List<string> res = GetContentFields(requestedApiVersion, this.GetType()); res.Remove("ParentTGIBlocks"); return res; } }
 
             #region Attributes
             byte txtc1index;
@@ -313,7 +336,6 @@ namespace CASPartResource
 
             #region AHandlerElement Members
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
-            public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
             public override AHandlerElement Clone(EventHandler handler) { return new IndexPair(requestedApiVersion, handler, this); }
             #endregion
 
@@ -332,11 +354,12 @@ namespace CASPartResource
             #endregion
 
             #region Content Fields
-            [ElementPriority(1)]
+            [ElementPriority(1), TGIBlockListContentField("ParentTGIBlocks")]
             public byte TXTC1Index { get { return txtc1index; } set { if (txtc1index != value) { txtc1index = value; OnElementChanged(); } } }
+            [ElementPriority(2), TGIBlockListContentField("ParentTGIBlocks")]
             public byte TXTC2Index { get { return txtc2index; } set { if (txtc2index != value) { txtc2index = value; OnElementChanged(); } } }
 
-            public string Value { get { return string.Format("{0}: {1}; {2}: {3}", "TXTC1Index", this["TXTC1Index"], "TXTC2Index", this["TXTC2Index"]); } }
+            public string Value { get { return "{ " + string.Join(";", ValueBuilder.Split('\n')) +" }" /*string.Format("{0}: {1}; {2}: {3}", "TXTC1Index", this["TXTC1Index"], "TXTC2Index", this["TXTC2Index"])/**/; } }
             #endregion
         }
         public class IndexPairList : DependentList<IndexPair>
@@ -368,7 +391,7 @@ namespace CASPartResource
             #endregion
 
             #region Constructors
-            public CASEntry(int APIversion, EventHandler handler) : base(APIversion, handler) { }
+            public CASEntry(int APIversion, EventHandler handler) : base(APIversion, handler) { txtcIndexes = new IndexPairList(handler); }
             public CASEntry(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
             public CASEntry(int APIversion, EventHandler handler, CASEntry basis) : this(APIversion, handler, basis.casPartIndex, basis.clothing, basis.txtcIndexes) { }
             public CASEntry(int APIversion, EventHandler handler, byte casPartIndex, ClothingType clothing, IEnumerable<IndexPair> ibe)
@@ -572,12 +595,21 @@ namespace CASPartResource
             get
             {
                 List<string> res = GetContentFields(requestedApiVersion, this.GetType());
-                if (version < 0x00000012)
+                if (version < 0x00000014)
                 {
-                    res.Remove("BreastSlider");
-                    if (version < 0x00000011)
+                    res.Remove("FurMap");
+                    if (version < 0x00000013)
                     {
-                        res.Remove("MuscleSlider");
+                        res.Remove("NumCurls");
+                        res.Remove("CurlPixelRadius");
+                        if (version < 0x00000012)
+                        {
+                            res.Remove("BreastSlider");
+                            if (version < 0x00000011)
+                            {
+                                res.Remove("MuscleSlider");
+                            }
+                        }
                     }
                 }
                 return res;
@@ -625,10 +657,16 @@ namespace CASPartResource
         [ElementPriority(19)]
         public UInt32 HairHaloLowColour { get { return hairHaloLowColour; } set { if (!hairHaloLowColour.Equals(value)) { hairHaloLowColour = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(20)]
-        public CASEntryList CASPEntries { get { return caspEntries; } set { if (!caspEntries.Equals(value)) { caspEntries = new CASEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public TGIBlock FurMap { get { if (version < 0x00000014) throw new InvalidOperationException(); return furMap; } set { if (version < 0x00000014) throw new InvalidOperationException(); if (!furMap.Equals(value)) { furMap = new TGIBlock(requestedApiVersion, OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(21)]
-        public FaceEntryList FACEEntries { get { return faceEntries; } set { if (!faceEntries.Equals(value)) { faceEntries = new FaceEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public float NumCurls { get { if (version < 0x00000013) throw new InvalidOperationException(); return numCurls; } set { if (version < 0x00000013) throw new InvalidOperationException(); if (numCurls != value) { numCurls = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(22)]
+        public float CurlPixelRadius { get { if (version < 0x00000013) throw new InvalidOperationException(); return curlPixelRadius; } set { if (version < 0x00000013) throw new InvalidOperationException(); if (curlPixelRadius != value) { curlPixelRadius = value; OnResourceChanged(this, new EventArgs()); } } }
+        [ElementPriority(23)]
+        public CASEntryList CASPEntries { get { return caspEntries; } set { if (!caspEntries.Equals(value)) { caspEntries = new CASEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        [ElementPriority(24)]
+        public FaceEntryList FACEEntries { get { return faceEntries; } set { if (!faceEntries.Equals(value)) { faceEntries = new FaceEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        [ElementPriority(25)]
         public CountedTGIBlockList TGIBlocks { get { return tgiBlocks; } set { if (!tgiBlocks.Equals(value)) { tgiBlocks = new CountedTGIBlockList(OnResourceChanged, "IGT", value); OnResourceChanged(this, new EventArgs()); } } }
 
         public string Value
@@ -694,7 +732,7 @@ namespace CASPartResource
     {
         public SimOutfitResourceHandler()
         {
-            this.Add(typeof(SimOutfitResource), new List<string>(new string[] { "0x025ED6F4", }));
+            this.Add(typeof(SimOutfitResource), new List<string>(new string[] { "0x025ED6F4", "0xDEA2951C", }));
         }
     }
 }

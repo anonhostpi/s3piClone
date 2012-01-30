@@ -19,9 +19,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
+using System.IO;
+using System.Reflection;
 using System.Xml;
 using System.Xml.Serialization;
-using System.IO;
 
 namespace System.Configuration
 {
@@ -46,9 +47,7 @@ namespace System.Configuration
         private const string USERNODE = "userSettings";
 
         // Application Specific Node
-        private static string APPNODE = System.Diagnostics.Process.GetCurrentProcess().ProcessName + ".Properties.Settings";
-
-        private System.Xml.XmlDocument xmlDoc = null;
+        private static string APPNODE = ExecutableName + ".Properties.Settings";
 
         private static System.Xml.XmlDocument _xmlDocTemplate
         {
@@ -112,43 +111,105 @@ namespace System.Configuration
             base.Initialize(this.ApplicationName, config);
         }
 
+        private static Assembly _mainAssembly = null;
+        private static Assembly MainAssembly
+        {
+            get
+            {
+                if (_mainAssembly == null)
+                    _mainAssembly = Assembly.GetEntryAssembly() // This is what we really want
+                        ?? Assembly.GetCallingAssembly() // Not ideal
+                        ?? Assembly.GetExecutingAssembly() // Any port in a storm
+                        ?? typeof(PortableSettingsProvider).Assembly; // Should be same as above
+                ;
+                return _mainAssembly;
+            }
+        }
+
+        /// <summary>
+        /// The path to the process executable.
+        /// </summary>
+        public static string ExecutablePath { get { return MainAssembly.Location; } }
+
+        /// <summary>
+        /// The name of the process, stripped of path and extension.
+        /// </summary>
+        public static string ExecutableName { get { return Path.GetFileNameWithoutExtension(ExecutablePath); } }
+
+        /// <summary>
+        /// Return the path of the ini file named <paramref name="suffix"/>.
+        /// </summary>
+        /// <param name="suffix">Name of the ini file.</param>
+        /// <returns>The path of the ini file named <paramref name="suffix"/>.</returns>
+        public static string GetApplicationIniFile(string suffix) { return Path.Combine(Path.GetDirectoryName(ExecutablePath), ExecutableName + suffix + ".ini"); }
+
         private static string _ApplicationName = null;
         /// <summary>
         /// Return the executing assembly name without extension.
         /// </summary>
         public override string ApplicationName
         {
-            get
-            {
-                if (_ApplicationName == null)
-                    _ApplicationName = System.Diagnostics.Process.GetCurrentProcess().ProcessName;
-                return _ApplicationName;
-                // return (System.Reflection.Assembly.GetExecutingAssembly().GetName().Name);
-            }
+            get { if (_ApplicationName == null) _ApplicationName = ExecutableName; return _ApplicationName; }
             set { if (_ApplicationName == null) _ApplicationName = value; }
         }
 
+        static string ApplicationData { get { return Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData); } }
+
+        static string _Company = null;
+        static string Company
+        {
+            get
+            {
+                if (_Company == null)
+                {
+                    object[] conames = MainAssembly.GetCustomAttributes(typeof(AssemblyCompanyAttribute), false);
+                    _Company = conames.Length == 1 ? ((AssemblyCompanyAttribute)conames[0]).Company : "noCompany";
+                }
+                return _Company;
+            }
+        }
+
+        static string _Product = null;
+        static string Product
+        {
+            get
+            {
+                if (_Product == null)
+                {
+                    object[] prdnames = MainAssembly.GetCustomAttributes(typeof(AssemblyProductAttribute), false);
+                    _Product = prdnames.Length == 1 ? ((AssemblyProductAttribute)prdnames[0]).Product : "noProduct";
+                }
+                return _Product;
+            }
+        }
+
+        static string _ProgramApplicationData = null;
+        /// <summary>
+        /// Get the folder where data for the application product is held.
+        /// </summary>
+        public static string ProgramApplicationData
+        {
+            get
+            {
+                if (_ProgramApplicationData == null)
+                    _ProgramApplicationData = Path.Combine(Path.Combine(ApplicationData, Company), Product);
+                return _ProgramApplicationData;
+            }
+        }
+
+        static string _UserConfigurationData = null;
         /// <summary>
         /// Provide the application settings filename.
         /// </summary>
         /// <returns>The application settings filename.</returns>
-        public virtual string GetSettingsFilename() { return Path.Combine(GetSettingsPath(), ApplicationName + ".user.config"); }
-
-        private static string _SettingsPath = null;
-        /// <summary>
-        /// Provide the settings location for user settings.
-        /// </summary>
-        /// <returns>The settings location for user settings.</returns>
-        /// <remarks>The settings location is "%ApplicationData%\[AssemblyCompany]\getApplicationName()".</remarks>
-        public virtual string GetSettingsPath()
+        public static string UserConfigurationData
         {
-            if (_SettingsPath == null)
+            get
             {
-                object[] conames = this.GetType().Assembly.GetCustomAttributes(typeof(System.Reflection.AssemblyCompanyAttribute), false);
-                string coname = conames.Length == 1 ? ((System.Reflection.AssemblyCompanyAttribute)conames[0]).Company : "noCompany";
-                _SettingsPath = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), coname), ApplicationName);
+                if (_UserConfigurationData == null)
+                    _UserConfigurationData = Path.Combine(ProgramApplicationData, ExecutableName + ".user.config");
+                return _UserConfigurationData;
             }
-            return _SettingsPath;
         }
 
         /// <summary>
@@ -187,38 +248,38 @@ namespace System.Configuration
         {
             // Set the values in XML
             foreach (SettingsPropertyValue spVal in settingsColl)
-                SetSetting(spVal);
+                if (spVal != null && spVal.SerializedValue != null) SetSetting(spVal);
 
-            if (!Directory.Exists(GetSettingsPath()))
-                Directory.CreateDirectory(GetSettingsPath());
-            XMLConfig.Save(GetSettingsFilename());
+            if (!Directory.Exists(ProgramApplicationData))
+                Directory.CreateDirectory(ProgramApplicationData);
+            XMLConfig.Save(UserConfigurationData);
         }
 
+        private XmlDocument _XMLConfig = null;
         private XmlDocument XMLConfig
         {
             get
             {
-                // Check if we already have accessed the XML config file. If the xmlDoc object is empty, we have not.
-                if (xmlDoc == null)
+                if (_XMLConfig == null)
                 {
-                    if (File.Exists(GetSettingsFilename()))
+                    if (File.Exists(UserConfigurationData))
                     {
                         try
                         {
-                            xmlDoc = new XmlDocument();
-                            xmlDoc.Load(GetSettingsFilename());
+                            _XMLConfig = new XmlDocument();
+                            _XMLConfig.Load(UserConfigurationData);
                         }
                         catch
                         {
-                            xmlDoc = (XmlDocument)_xmlDocTemplate.Clone();
+                            _XMLConfig = (XmlDocument)_xmlDocTemplate.Clone();
                         }
                     }
                     else
                     {
-                        xmlDoc = (XmlDocument)_xmlDocTemplate.Clone();
+                        _XMLConfig = (XmlDocument)_xmlDocTemplate.Clone();
                     }
                 }
-                return xmlDoc;
+                return _XMLConfig;
             }
         }
 
@@ -319,7 +380,7 @@ namespace System.Configuration
                 XmlNode tmpNode = XMLConfig.SelectSingleNode("//" + APPNODE);
 
                 // Create a new settings node and assign its name as well as how it will be serialized
-                XmlElement newSetting = xmlDoc.CreateElement("setting");
+                XmlElement newSetting = _XMLConfig.CreateElement("setting");
                 newSetting.SetAttribute("name", setProp.Name);
 
                 if (setProp.Property.SerializeAs.ToString() == "String")
@@ -335,7 +396,7 @@ namespace System.Configuration
                 tmpNode.AppendChild(newSetting);
 
                 // Create an element under our named settings node, and assign it the value we are trying to save
-                XmlElement valueElement = xmlDoc.CreateElement("value");
+                XmlElement valueElement = _XMLConfig.CreateElement("value");
                 if (setProp.Property.SerializeAs.ToString() == "String")
                 {
                     valueElement.InnerText = setProp.SerializedValue.ToString();

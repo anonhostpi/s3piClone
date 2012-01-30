@@ -5,8 +5,8 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("s3pi CAS Part Resource wrapper")]
-[assembly: AssemblyDescription("Wrapper for CAS Part resources.")]
+[assembly: AssemblyTitle("s3pi wrappers for Sim-related resources")]
+[assembly: AssemblyDescription("Wrapper for Sim-related resources.")]
 #if DEBUG
 [assembly: AssemblyConfiguration("[DEBUG]")]
 #else
@@ -14,7 +14,7 @@ using System.Runtime.InteropServices;
 #endif
 [assembly: AssemblyCompany("Peter L Jones")]
 [assembly: AssemblyProduct("s3pi")]
-[assembly: AssemblyCopyright("Copyright (C) 2010  Peter L Jones.  Released under GPL 3.  See gpl-3.0.txt")]
+[assembly: AssemblyCopyright("Copyright © 2010  Peter L Jones.  Released under GPL 3.  See gpl-3.0.txt")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

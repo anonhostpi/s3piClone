@@ -439,14 +439,15 @@ namespace CatalogResource
             {
                 get
                 {
-                    string s = "<value key=\"" + variableName + "\" value=\"";
+                    return string.Join("; ", ValueBuilder.Split('\n')).Replace("VariableName: ", "");
+                    /*string s = "<value key=\"" + variableName + "\" value=\"";
                     foreach (string f in this.ContentFields)
                     {
                         if (f.Equals("Value")) continue;
                         if (f.Equals("VariableName")) continue;
                         s += String.Format("{0},", this[f]);
                     }
-                    return s.TrimEnd(',') + "\" />";
+                    return s.TrimEnd(',') + "\" />";/**/
                 }
             }
             #endregion
@@ -536,6 +537,9 @@ namespace CatalogResource
         [ConstructorParameters(new object[] { (byte)0x03, "TGIIndexVariable", (byte)0x00, })]
         public class TC03_TGIIndex : ComplateElement
         {
+            public DependentList<TGIBlock> ParentTGIBlocks { get; set; }
+            public override List<string> ContentFields { get { List<string> res = base.ContentFields; res.Remove("ParentTGIBlocks"); return res; } }
+
             #region Attributes
             byte tgiIndex;
             #endregion
@@ -570,6 +574,7 @@ namespace CatalogResource
 
             public override AHandlerElement Clone(EventHandler handler) { return new TC03_TGIIndex(requestedApiVersion, handler, this); }
 
+            [TGIBlockListContentField("ParentTGIBlocks")]
             public byte TGIIndex { get { return tgiIndex; } set { if (tgiIndex != value) { tgiIndex = value; OnElementChanged(); } } }
         }
 
@@ -777,6 +782,14 @@ namespace CatalogResource
 
         public class ComplateList : DependentList<ComplateElement>
         {
+            private DependentList<TGIBlock> _ParentTGIBlocks;
+            public DependentList<TGIBlock> ParentTGIBlocks
+            {
+                get { return _ParentTGIBlocks; }
+                set { if (_ParentTGIBlocks != value) { _ParentTGIBlocks = value; foreach (TC03_TGIIndex i in this.FindAll(e => e is TC03_TGIIndex)) i.ParentTGIBlocks = _ParentTGIBlocks; } }
+            }
+            //public override List<string> ContentFields { get { List<string> res = GetContentFields(0, this.GetType()); res.Remove("ParentTGIBlocks"); return res; } }
+
             #region Constructors
             public ComplateList(EventHandler handler) : base(handler) { }
             public ComplateList(EventHandler handler, Stream s) : base(handler, s) { }
@@ -831,6 +844,22 @@ namespace CatalogResource
         public class MaterialBlock : AHandlerElement,
             IComparable<MaterialBlock>, IEqualityComparer<MaterialBlock>, IEquatable<MaterialBlock>
         {
+            private DependentList<TGIBlock>  _ParentTGIBlocks = null;
+            public DependentList<TGIBlock> ParentTGIBlocks
+            {
+                get { return _ParentTGIBlocks; }
+                set
+                {
+                    if (_ParentTGIBlocks != value)
+                    {
+                        _ParentTGIBlocks = value;
+                        if (complateList != null) complateList.ParentTGIBlocks = ParentTGIBlocks;
+                        if (mbList != null) mbList.ParentTGIBlocks = ParentTGIBlocks;
+                    }
+                }
+            }
+            public override List<string> ContentFields { get { List<string> res = GetContentFields(requestedApiVersion, this.GetType()); res.Remove("ParentTGIBlocks"); return res; } }
+
             #region Attributes
             byte complateXMLIndex;
             string name;
@@ -937,15 +966,13 @@ namespace CatalogResource
             #endregion
 
             #region AHandlerElement
-            public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
-
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
 
             public override AHandlerElement Clone(EventHandler handler) { return new MaterialBlock(requestedApiVersion, handler, this); }
             #endregion
 
             #region Content Fields
-            [ElementPriority(1)]
+            [ElementPriority(1), TGIBlockListContentField("ParentTGIBlocks")]
             public byte ComplateXMLIndex { get { return complateXMLIndex; } set { if (complateXMLIndex != value) { complateXMLIndex = value; OnElementChanged(); } } }
             [ElementPriority(2)]
             public string Name { get { return name; } set { if (name != value) { name = value; OnElementChanged(); } } }
@@ -960,7 +987,8 @@ namespace CatalogResource
             {
                 get
                 {
-                    System.Text.StringBuilder sb = new StringBuilder();
+                    return ValueBuilder;
+                    /*System.Text.StringBuilder sb = new StringBuilder();
                     string xmlType = mbList.Count > 0 ? "complate" : "pattern";
                     sb.AppendFormat("<{0} Name=\"{1}\" ComplateXMLIndex=\"0x{2}\"", xmlType, name, complateXMLIndex.ToString("X2"));
                     if (mbList.Count == 0) sb.Append(" variable=\"" + pattern + "\"");
@@ -973,7 +1001,7 @@ namespace CatalogResource
                         sb.AppendLine("  " + mbList[i].Value.Replace("\n", "\n  "));
 
                     sb.AppendFormat("</{0}>", xmlType);
-                    return sb.ToString();
+                    return sb.ToString();/**/
                 }
             }
             #endregion
@@ -981,6 +1009,14 @@ namespace CatalogResource
 
         public class MaterialBlockList : DependentList<MaterialBlock>
         {
+            private DependentList<TGIBlock> _ParentTGIBlocks;
+            public DependentList<TGIBlock> ParentTGIBlocks
+            {
+                get { return _ParentTGIBlocks; }
+                set { if (_ParentTGIBlocks != value) { _ParentTGIBlocks = value; foreach (var i in this) i.ParentTGIBlocks = _ParentTGIBlocks; } }
+            }
+            //public override List<string> ContentFields { get { List<string> res = GetContentFields(0, this.GetType()); res.Remove("ParentTGIBlocks"); return res; } }
+
             #region Constructors
             public MaterialBlockList(EventHandler handler) : base(handler) { }
             internal MaterialBlockList(EventHandler handler, Stream s) : base(handler, s) { }
@@ -992,7 +1028,7 @@ namespace CatalogResource
             protected override void WriteElement(Stream s, MaterialBlock element) { element.UnParse(s); }
             #endregion
 
-            public override void Add() { this.Add(new MaterialBlock(0, null)); }
+            public override void Add() { this.Add(new MaterialBlock(0, null) { ParentTGIBlocks = ParentTGIBlocks }); }
        }
 
         public class Material : AHandlerElement,
@@ -1013,18 +1049,13 @@ namespace CatalogResource
             {
                 mb = new MaterialBlock(requestedApiVersion, handler);
                 list = new TGIBlockList(handler);
+                mb.ParentTGIBlocks = list;
             }
             internal Material(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
             public Material(int APIversion, EventHandler handler, Material basis)
-                : base(APIversion, handler)
-            {
-                this.materialType = basis.materialType;
-                this.unknown1 = basis.unknown1;
-                this.unknown2 = basis.unknown2;
-                this.mb = (MaterialBlock)basis.mb.Clone(handler);
-                this.list = new TGIBlockList(handler, basis.list);
-                this.unknown3 = basis.unknown3;
-            }
+                : this(APIversion, handler,
+                basis.materialType, basis.unknown1, basis.unknown2,
+                basis.mb, basis.list, basis.unknown3) { }
             public Material(int APIversion, EventHandler handler, byte materialType, uint unknown1, ushort unknown2,
                 MaterialBlock mb, IEnumerable<TGIBlock> ltgib, uint unknown3)
                 : base(APIversion, handler)
@@ -1035,6 +1066,8 @@ namespace CatalogResource
                 this.mb = (MaterialBlock)mb.Clone(handler);
                 this.list = new TGIBlockList(handler, ltgib);
                 this.unknown3 = unknown3;
+
+                this.mb.ParentTGIBlocks = this.list;
             }
             #endregion
 
@@ -1059,6 +1092,8 @@ namespace CatalogResource
                             oset, s.Position));
 
                 unknown3 = r.ReadUInt32();
+
+                mb.ParentTGIBlocks = list;
             }
 
             public virtual void UnParse(Stream s)
@@ -1145,20 +1180,13 @@ namespace CatalogResource
             public uint Unknown1 { get { return unknown1; } set { if (materialType == 1) throw new InvalidOperationException(); if (unknown1 != value) { unknown1 = value; OnElementChanged(); } } }
             [ElementPriority(3)]
             public ushort Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnElementChanged(); } } }
-            [ElementPriority(4), TGIBlockListContentField("TGIBlocks")]
+            [ElementPriority(4)]
             public MaterialBlock MaterialBlock { get { return mb; } set { if (mb != value) { mb = value; OnElementChanged(); } } }
             [ElementPriority(5)]
             public TGIBlockList TGIBlocks
             {
                 get { return list; }
-                set
-                {
-                    if (list != (value as TGIBlockList))
-                    {
-                        list = new TGIBlockList(handler, value);
-                        OnElementChanged();
-                    }
-                }
+                set { if (list != (value as TGIBlockList)) { list = new TGIBlockList(handler, value); mb.ParentTGIBlocks = list; OnElementChanged(); } }
             }
             [ElementPriority(6)]
             public uint Unknown3 { get { return unknown3; } set { if (unknown3 != value) { unknown3 = value; OnElementChanged(); } } }
@@ -1447,7 +1475,7 @@ namespace CatalogResource
         #endregion
 
         #region Content Fields
-        public TGIBlockList TGIBlocks { get { return list; } set { if (list != value) { list = new TGIBlockList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
+        public virtual TGIBlockList TGIBlocks { get { return list; } set { if (list != value) { list = new TGIBlockList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
         #endregion
     }
 

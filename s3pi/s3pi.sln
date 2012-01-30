@@ -47,8 +47,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CASPartResource", "..\s3pi 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helpers", "..\s3pi Extras\Helpers\Helpers.csproj", "{D9B63641-D3BE-4120-9115-7D67B1238FBF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pjMODLMLODchunks", "..\s3pi Wrappers\pjMODLMLODchunks\pjMODLMLODchunks.csproj", "{5C3CA429-65DD-436A-8D2A-162FFD45B246}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JazzResource", "..\s3pi Wrappers\JazzResource\JazzResource.csproj", "{7AFF0D94-4F70-4A1B-842C-24EA613807B7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NGMPHashMapResource", "..\s3pi Wrappers\NGMPHashMapResource\NGMPHashMapResource.csproj", "{F9D57571-FB42-455D-96DA-E1E11347A664}"
@@ -62,6 +60,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Filetable", "..\s3pi Extras\Filetable\Filetable.csproj", "{FEAA8674-9363-4BC7-B016-7BE984A2D185}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RigResource", "..\s3pi Wrappers\RigResource\RigResource.csproj", "{77AD91D9-4BD8-4899-9308-E6209265F636}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MeshChunks", "..\s3pi Wrappers\MeshChunks\MeshChunks.csproj", "{B1E4D2EC-5027-4F44-8C46-A0485DFF7060}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -161,10 +161,6 @@ Global
 		{D9B63641-D3BE-4120-9115-7D67B1238FBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D9B63641-D3BE-4120-9115-7D67B1238FBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D9B63641-D3BE-4120-9115-7D67B1238FBF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5C3CA429-65DD-436A-8D2A-162FFD45B246}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5C3CA429-65DD-436A-8D2A-162FFD45B246}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5C3CA429-65DD-436A-8D2A-162FFD45B246}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5C3CA429-65DD-436A-8D2A-162FFD45B246}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7AFF0D94-4F70-4A1B-842C-24EA613807B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7AFF0D94-4F70-4A1B-842C-24EA613807B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7AFF0D94-4F70-4A1B-842C-24EA613807B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -193,6 +189,10 @@ Global
 		{77AD91D9-4BD8-4899-9308-E6209265F636}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{77AD91D9-4BD8-4899-9308-E6209265F636}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{77AD91D9-4BD8-4899-9308-E6209265F636}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1E4D2EC-5027-4F44-8C46-A0485DFF7060}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1E4D2EC-5027-4F44-8C46-A0485DFF7060}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1E4D2EC-5027-4F44-8C46-A0485DFF7060}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1E4D2EC-5027-4F44-8C46-A0485DFF7060}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

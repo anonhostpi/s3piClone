@@ -45,18 +45,18 @@ namespace s3pi.Interfaces
         /// that is empty.
         /// </summary>
         /// <param name="handler">The <see cref="EventHandler"/> to call on changes to the list or its elements.</param>
-        /// <param name="size">Optional; -1 for unlimited size, otherwise the maximum number of elements in the list.</param>
-        protected DependentList(EventHandler handler, long size = -1) : base(handler, size) { }
+        /// <param name="maxSize">Optional; -1 for unlimited size, otherwise the maximum number of elements in the list.</param>
+        protected DependentList(EventHandler handler, long maxSize = -1) : base(handler, maxSize) { }
         /// <summary>
         /// Initializes a new instance of the <see cref="DependentList{T}"/> class
         /// filled with the content of <paramref name="ilt"/>.
         /// </summary>
         /// <param name="handler">The <see cref="EventHandler"/> to call on changes to the list or its elements.</param>
         /// <param name="ilt">The initial content of the list.</param>
-        /// <param name="size">Optional; -1 for unlimited size, otherwise the maximum number of elements in the list.</param>
+        /// <param name="maxSize">Optional; -1 for unlimited size, otherwise the maximum number of elements in the list.</param>
         /// <exception cref="System.InvalidOperationException">Thrown when list size exceeded.</exception>
         /// <remarks>Calls <c>this.Add(...)</c> to ensure a fresh instance is created, rather than passing <paramref name="ilt"/> to the base constructor.</remarks>
-        protected DependentList(EventHandler handler, IEnumerable<T> ilt, long size = -1) : base(null, size) { elementHandler = handler; foreach (var t in ilt) this.Add(t); this.handler = handler; }
+        protected DependentList(EventHandler handler, IEnumerable<T> ilt, long maxSize = -1) : base(null, maxSize) { elementHandler = handler; foreach (var t in ilt) this.Add(t); this.handler = handler; }
 
         // Add stream-based constructors and support
         /// <summary>
@@ -65,9 +65,9 @@ namespace s3pi.Interfaces
         /// </summary>
         /// <param name="handler">The <see cref="EventHandler"/> to call on changes to the list or its elements.</param>
         /// <param name="s">The <see cref="System.IO.Stream"/> to read for the initial content of the list.</param>
-        /// <param name="size">Optional; -1 for unlimited size, otherwise the maximum number of elements in the list.</param>
+        /// <param name="maxSize">Optional; -1 for unlimited size, otherwise the maximum number of elements in the list.</param>
         /// <exception cref="System.InvalidOperationException">Thrown when list size exceeded.</exception>
-        protected DependentList(EventHandler handler, Stream s, long size = -1) : base(null, size) { elementHandler = handler; Parse(s); this.handler = handler; }
+        protected DependentList(EventHandler handler, Stream s, long maxSize = -1) : base(null, maxSize) { elementHandler = handler; Parse(s); this.handler = handler; }
         #endregion
 
         #region Data I/O

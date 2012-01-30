@@ -31,125 +31,91 @@ namespace TxtcResource
     {
         const int recommendedApiVersion = 1;
         public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
-        public override List<string> ContentFields
-        {
-            get
-            {
-                List<string> res = GetContentFields(requestedApiVersion, this.GetType());
-                if (version < 8)
-                {
-                    res.Remove("Unknown4");
-                    if (version < 7)
-                    {
-                        res.Remove("SuperBlocks");
-                    }
-                }
-                return res;
-            }
-        }
+        public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
 
         static bool checking = s3pi.Settings.Settings.Checking;
 
         #region Attributes
-        uint version;
-        SuperBlockList superBlocks;
-        uint unknown1;
-        uint unknown2;
-        byte unknown3;
-        byte unknown4;
-        EntryBlockList entries;
-        CountedTGIBlockList tgiBlocks;
+        ContentType root;
         #endregion
 
         public TxtcResource(int APIversion, Stream s) : base(APIversion, s) { if (stream == null) { stream = UnParse(); OnResourceChanged(this, new EventArgs()); } stream.Position = 0; Parse(stream); }
 
         #region Data I/O
-        void Parse(Stream s)
-        {
-            BinaryReader r = new BinaryReader(s);
-
-            version = r.ReadUInt32();
-            long tgiPos = r.ReadUInt32() + s.Position;
-            if (version >= 7)
-                superBlocks = new SuperBlockList(OnResourceChanged, s);
-            unknown1 = r.ReadUInt32();
-            unknown2 = r.ReadUInt32();
-            unknown3 = r.ReadByte();
-            int count = r.ReadInt32();
-            if (version >= 8)
-                unknown4 = r.ReadByte();
-            entries = new EntryBlockList(OnResourceChanged, count, s);
-            if (checking) if (tgiPos != s.Position)
-                    throw new InvalidDataException(string.Format("TGI Block found at 0x{0:X8}; expected position 0x{1:X8}", s.Position, tgiPos));
-            tgiBlocks = new CountedTGIBlockList(OnResourceChanged, "IGT", r.ReadByte(), s, Byte.MaxValue);
-        }
+        void Parse(Stream s) { root = new ContentType(requestedApiVersion, OnResourceChanged, s); }
 
         protected override Stream UnParse()
         {
             MemoryStream ms = new MemoryStream();
-            BinaryWriter w = new BinaryWriter(ms);
-
-            w.Write(version);
-            long osetPos = ms.Position;
-            w.Write((uint)0);
-            if (version >= 7)
-            {
-                if (superBlocks == null) superBlocks = new SuperBlockList(OnResourceChanged);
-                superBlocks.UnParse(ms);
-            }
-            w.Write(unknown1);
-            w.Write(unknown2);
-            w.Write(unknown3);
-            if (entries == null) entries = new EntryBlockList(OnResourceChanged);
-            w.Write(entries.Count);
-            if (version >= 8)
-                w.Write(unknown4);
-            entries.UnParse(ms);
-            if (tgiBlocks == null) tgiBlocks = new CountedTGIBlockList(OnResourceChanged, "IGT", Byte.MaxValue);
-            long tgiPosn = ms.Position;
-            w.Write((byte)tgiBlocks.Count);
-            tgiBlocks.UnParse(ms);
-
-            ms.Position = osetPos;
-            w.Write((uint)(tgiPosn - osetPos - sizeof(uint)));
-            ms.Position = ms.Length;
-
+            if (root == null) root = new ContentType(requestedApiVersion, OnResourceChanged);
+            root.UnParse(ms);
             return ms;
         }
         #endregion
 
         #region Sub-classes
-        public class SuperBlock : AHandlerElement, IEquatable<SuperBlock>
+        public enum PatternSizeType : uint
+        {
+            Default = 0x00,
+            Large = 0x01,
+        }
+        //Copied from CASPartFlags - TODO: resolve!
+        [Flags]
+        public enum DataTypeFlags : uint
+        {
+            Hair = 0x00000001,
+            Scalp = 0x00000002,
+            FaceOverlay = 0x00000004,
+            Body = 0x00000008,
+            Accessory = 0x00000010,
+        }
+
+        public class ContentType : AHandlerElement, IEquatable<ContentType>
         {
             const int recommendedApiVersion = 1;
+            void SetTGIBlocks() { if (superBlocks != null) superBlocks.ParentTGIBlocks = tgiBlocks; if (entries != null) entries.ParentTGIBlocks = tgiBlocks; }
+            internal void SetTGIBlocks(DependentList<TGIBlock> parentTGIBlocks) { if (superBlocks != null) superBlocks.ParentTGIBlocks = parentTGIBlocks; if (entries != null) entries.ParentTGIBlocks = parentTGIBlocks; }
 
             #region Attributes
-            byte id;
-            uint unknown1;
-            byte[] unknown2 = new byte[10];
+            uint version;
+            SuperBlockList superBlocks;//if version >= 7
+            PatternSizeType patternSize;
+            DataTypeFlags dataType;
             byte unknown3;
+            byte unknown4;//if version >= 8
             EntryBlockList entries;
-            uint unknown4;
+            CountedTGIBlockList tgiBlocks;
             #endregion
 
             #region Constructors
-            public SuperBlock(int APIversion, EventHandler handler) : base(APIversion, handler) { entries = new EntryBlockList(handler); }
-            public SuperBlock(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
-            public SuperBlock(int APIversion, EventHandler handler, SuperBlock basis)
-                : this(APIversion, handler,
-                basis.id, basis.unknown1, basis.unknown2, basis.unknown3, basis.unknown4)
+            public ContentType(int APIversion, EventHandler handler) : base(APIversion, handler)
             {
-                this.entries = new EntryBlockList(handler, basis.entries);
+                superBlocks = new SuperBlockList(handler);
+                entries = new EntryBlockList(handler);
+                tgiBlocks = new CountedTGIBlockList(handler, byte.MaxValue);
+
+                SetTGIBlocks();
             }
-            public SuperBlock(int APIversion, EventHandler handler, byte id, uint unknown1, byte[] unknown2, byte unknown3, uint unknown4)
+            public ContentType(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
+            public ContentType(int APIversion, EventHandler handler, ContentType basis)
+                : this(APIversion, handler,
+                basis.version, basis.superBlocks, basis.patternSize, basis.dataType, basis.unknown3, basis.unknown4, basis.entries, basis.tgiBlocks
+                ) { }
+            public ContentType(int APIversion, EventHandler handler,
+                uint version, SuperBlockList superBlocks, PatternSizeType patternSize, DataTypeFlags dataType, byte unknown3, byte unknown4, EntryBlockList entries, CountedTGIBlockList tgiBlocks
+                )
                 : base(APIversion, handler)
             {
-                this.id = id;
-                this.unknown1 = unknown1;
-                this.unknown2 = (byte[])unknown2.Clone();
+                this.version = version;
+                this.superBlocks = superBlocks == null ? null : new SuperBlockList(handler, superBlocks);
+                this.patternSize = patternSize;
+                this.dataType = dataType;
                 this.unknown3 = unknown3;
-                this.entries = new EntryBlockList(handler);
                 this.unknown4 = unknown4;
+                this.entries = new EntryBlockList(handler, entries);
+                this.tgiBlocks = tgiBlocks == null ? null : new CountedTGIBlockList(handler, tgiBlocks);
+
+                SetTGIBlocks();
             }
             #endregion
 
@@ -157,68 +123,241 @@ namespace TxtcResource
             void Parse(Stream s)
             {
                 BinaryReader r = new BinaryReader(s);
-                id = r.ReadByte();
-                long chain = r.ReadUInt32() + s.Position;
-                unknown1 = r.ReadUInt32();
-                long offset = r.ReadUInt32() + s.Position;
-                unknown2 = r.ReadBytes(10);
-                if (checking) if (unknown2.Length != 10)
-                        throw new EndOfStreamException(String.Format("Expected 10 bytes, read {0} at 0x{1:X8}", unknown2.Length, s.Position));
-                int count = r.ReadInt32();
+
+                version = r.ReadUInt32();
+                long tgiPos = r.ReadUInt32() + s.Position;
+                if (version >= 7)
+                    superBlocks = new SuperBlockList(handler, s);
+                patternSize = (PatternSizeType)r.ReadUInt32();
+                dataType = (DataTypeFlags)r.ReadUInt32();
                 unknown3 = r.ReadByte();
+                int count = r.ReadInt32();
+                if (version >= 8)
+                    unknown4 = r.ReadByte();
                 entries = new EntryBlockList(handler, count, s);
-                if (checking) if (offset != s.Position)
-                        throw new InvalidDataException(String.Format("Expected position of final DWORD 0x{0:X8}, actual position 0x{1:X8}", offset, s.Position));
-                unknown4 = r.ReadUInt32();
-                if (checking) if (chain != s.Position)
-                        throw new InvalidDataException(String.Format("Expected position of next SuperBlock 0x{0:X8}, actual position 0x{1:X8}", chain, s.Position));
+                if (checking) if (tgiPos != s.Position)
+                        throw new InvalidDataException(string.Format("TGI Block found at 0x{0:X8}; expected position 0x{1:X8}", s.Position, tgiPos));
+                tgiBlocks = new CountedTGIBlockList(handler, "IGT", r.ReadByte(), s, Byte.MaxValue);
+
+                SetTGIBlocks();
             }
 
             internal void UnParse(Stream s)
             {
                 BinaryWriter w = new BinaryWriter(s);
-                w.Write(id);
-                long chainPos = s.Position;
-                w.Write((uint)0);//chain
-                w.Write(unknown1);
+
+                w.Write(version);
                 long osetPos = s.Position;
-                w.Write((uint)0);//offset
-                w.Write(unknown2);
+                w.Write((uint)0);
+                if (version >= 7)
+                {
+                    if (superBlocks == null) superBlocks = new SuperBlockList(handler);
+                    superBlocks.UnParse(s);
+                }
+                w.Write((uint)patternSize);
+                w.Write((uint)dataType);
+                w.Write(unknown3);
                 if (entries == null) entries = new EntryBlockList(handler);
                 w.Write(entries.Count);
-                w.Write(unknown3);
+                if (version >= 8)
+                    w.Write(unknown4);
                 entries.UnParse(s);
-                long dwPos = s.Position;
-                w.Write(unknown4);
-                long nsbPos = s.Position;
+                if (tgiBlocks == null) tgiBlocks = new CountedTGIBlockList(handler, "IGT", Byte.MaxValue);
+                long tgiPosn = s.Position;
+                w.Write((byte)tgiBlocks.Count);
+                tgiBlocks.UnParse(s);
 
-
-                s.Position = chainPos;
-                w.Write((uint)(nsbPos - chainPos - sizeof(uint)));
+                long posn = s.Position;
                 s.Position = osetPos;
-                w.Write((uint)(dwPos - osetPos - sizeof(uint)));
-                s.Position = nsbPos;
+                w.Write((uint)(tgiPosn - osetPos - sizeof(uint)));
+                s.Position = posn;
             }
             #endregion
 
             #region AHandlerElement Members
-            public override AHandlerElement Clone(EventHandler handler) { return new SuperBlock(requestedApiVersion, handler, this); }
+            public override AHandlerElement Clone(EventHandler handler) { return new ContentType(requestedApiVersion, handler, this); }
 
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
 
-            public override List<string> ContentFields { get { return AApiVersionedFields.GetContentFields(requestedApiVersion, this.GetType()); } }
+            public override List<string> ContentFields
+            {
+                get
+                {
+                    List<string> res = GetContentFields(requestedApiVersion, this.GetType());
+                    if (version < 8)
+                    {
+                        res.Remove("Unknown4");
+                        if (version < 7)
+                        {
+                            res.Remove("SuperBlocks");
+                        }
+                    }
+                    return res;
+                }
+            }
+            #endregion
+
+            #region IEquatable<ContentType> Members
+
+            public bool Equals(ContentType other)
+            {
+                return version == other.version
+                    && superBlocks.Equals(other.superBlocks)
+                    && patternSize.Equals(other.patternSize)
+                    && dataType.Equals(other.dataType)
+                    && unknown3.Equals(other.unknown3)
+                    && unknown4.Equals(other.unknown4)
+                    && entries.Equals(other.entries)
+                    && tgiBlocks.Equals(other.tgiBlocks)
+                    ;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj as ContentType != null ? this.Equals(obj as ContentType) : false;
+            }
+
+            public override int GetHashCode()
+            {
+                return version.GetHashCode()
+                    ^ superBlocks.GetHashCode()
+                    ^ patternSize.GetHashCode()
+                    ^ dataType.GetHashCode()
+                    ^ unknown3.GetHashCode()
+                    ^ unknown4.GetHashCode()
+                    ^ entries.GetHashCode()
+                    ^ tgiBlocks.GetHashCode()
+                    ;
+            }
+
+            #endregion
+
+            #region Content Fields
+            [ElementPriority(1)]
+            public uint Version { get { return version; } set { if (version != value) { version = value; OnElementChanged(); } } }
+            [ElementPriority(2)]
+            public SuperBlockList SuperBlocks
+            {
+                get { if (version < 0x00000007) throw new InvalidOperationException(); return superBlocks; }
+                set { if (version < 0x00000007) throw new InvalidOperationException(); if (superBlocks != value) { superBlocks = new SuperBlockList(handler, value) { ParentTGIBlocks = tgiBlocks }; OnElementChanged(); } }
+            }
+            [ElementPriority(3)]
+            public PatternSizeType PatternSize { get { return patternSize; } set { if (patternSize != value) { patternSize = value; OnElementChanged(); } } }
+            [ElementPriority(4)]
+            public DataTypeFlags DataType { get { return dataType; } set { if (dataType != value) { dataType = value; OnElementChanged(); } } }
+            [ElementPriority(5)]
+            public byte Unknown3 { get { return unknown3; } set { if (unknown3 != value) { unknown3 = value; OnElementChanged(); } } }
+            [ElementPriority(6)]
+            public byte Unknown4
+            {
+                get { if (version < 0x00000008) throw new InvalidOperationException(); return unknown4; }
+                set { if (version < 0x00000008) throw new InvalidOperationException(); if (unknown4 != value) { unknown4 = value; OnElementChanged(); } }
+            }
+            [ElementPriority(7)]
+            public EntryBlockList Entries { get { return entries; } set { if (entries != value) { entries = new EntryBlockList(handler, value) { ParentTGIBlocks = tgiBlocks }; OnElementChanged(); } } }
+            [ElementPriority(8)]
+            public CountedTGIBlockList TGIBlocks { get { return tgiBlocks; } set { if (tgiBlocks != value) { tgiBlocks = new CountedTGIBlockList(handler, "IGT", value); SetTGIBlocks(); OnElementChanged(); } } }
+
+            public string Value { get { return ValueBuilder; } }
+            #endregion
+        }
+
+        public class SuperBlock : AHandlerElement, IEquatable<SuperBlock>
+        {
+            const int recommendedApiVersion = 1;
+
+            DependentList<TGIBlock> _ParentTGIBlocks;
+            public DependentList<TGIBlock> ParentTGIBlocks
+            {
+                get { return _ParentTGIBlocks; }
+                set { if (_ParentTGIBlocks != value) { _ParentTGIBlocks = value; fabric.SetTGIBlocks(value); } }
+            }
+            public override List<string> ContentFields { get { List<string> res = GetContentFields(requestedApiVersion, this.GetType()); res.Remove("ParentTGIBlocks"); return res; } }
+
+            #region Attributes
+            byte tgiIndex;
+            ContentType fabric;
+            byte unknown1;
+            byte unknown2;
+            byte unknown3;
+            #endregion
+
+            #region Constructors
+            public SuperBlock(int APIversion, EventHandler handler) : base(APIversion, handler) { fabric = new ContentType(requestedApiVersion, handler); }
+            public SuperBlock(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
+            public SuperBlock(int APIversion, EventHandler handler, SuperBlock basis)
+                : this(APIversion, handler, basis.tgiIndex, basis.fabric) { }
+            public SuperBlock(int APIversion, EventHandler handler, byte tgiIndex, ContentType fabric)
+                : base(APIversion, handler)
+            {
+                this.tgiIndex = tgiIndex;
+                this.fabric = new ContentType(requestedApiVersion, handler, fabric);
+            }
+            #endregion
+
+            #region Data I/O
+            // http://simswiki.info/wiki.php?title=Sims_3:0x033A1435
+            void Parse(Stream s)
+            {
+                BinaryReader r = new BinaryReader(s);
+
+                tgiIndex = r.ReadByte();
+                uint offset = r.ReadUInt32();
+                long posn2 = s.Position;
+
+                fabric = new ContentType(requestedApiVersion, handler, s);
+                unknown1 = r.ReadByte();
+                unknown2 = r.ReadByte();
+                unknown3 = r.ReadByte();
+
+                if (posn2 + offset != s.Position)
+                    throw new InvalidDataException(
+                        "Unexpected data around position 0x" + posn2.ToString("X8") +
+                        "; read 0x" + (s.Position - posn2).ToString("X8") + " bytes" +
+                        "; expected 0x" + offset.ToString("X8") + " bytes."
+                        );
+            }
+
+            internal void UnParse(Stream s)
+            {
+                BinaryWriter w = new BinaryWriter(s);
+
+                w.Write(tgiIndex);
+
+                long before = s.Position;
+                w.Write((uint)0);
+
+                long posn = s.Position;
+                fabric.UnParse(s);
+                w.Write(unknown1);
+                w.Write(unknown2);
+                w.Write(unknown3);
+                long after = s.Position;
+
+                uint offset = (uint)(after - posn);
+
+                s.Position = before;
+                w.Write(offset);
+                s.Position = after;
+            }
+            #endregion
+
+            #region AHandlerElement Members
+            public override AHandlerElement Clone(EventHandler handler) { return new SuperBlock(requestedApiVersion, handler, this) { ParentTGIBlocks = ParentTGIBlocks }; }
+
+            public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
             #endregion
 
             #region IEquatable<SuperBlock> Members
 
             public bool Equals(SuperBlock other)
             {
-                return id == other.id
-                    && unknown1 == other.unknown1
-                    && unknown2.Equals<byte>(other.unknown2)
-                    && unknown3 == other.unknown3
-                    && entries == other.entries
-                    && unknown4 == other.unknown4;
+                return tgiIndex == other.tgiIndex
+                    && fabric.Equals(other.fabric)
+                    && unknown1.Equals(other.unknown1)
+                    && unknown2.Equals(other.unknown2)
+                    && unknown3.Equals(other.unknown3)
+                    ;
             }
 
             public override bool Equals(object obj)
@@ -228,29 +367,27 @@ namespace TxtcResource
 
             public override int GetHashCode()
             {
-                return id.GetHashCode()
+                return tgiIndex.GetHashCode()
+                    ^ fabric.GetHashCode()
                     ^ unknown1.GetHashCode()
                     ^ unknown2.GetHashCode()
                     ^ unknown3.GetHashCode()
-                    ^ entries.GetHashCode()
-                    ^ unknown4.GetHashCode();
+                    ;
             }
 
             #endregion
 
             #region Content Fields
-            [ElementPriority(1)]
-            public byte ID { get { return id; } set { if (id != value) { id = value; OnElementChanged(); } } }
+            [ElementPriority(1), TGIBlockListContentField("ParentTGIBlocks")]
+            public byte TGIIndex { get { return tgiIndex; } set { if (tgiIndex != value) { tgiIndex = value; OnElementChanged(); } } }
             [ElementPriority(2)]
-            public uint Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnElementChanged(); } } }
+            public ContentType Fabric { get { return fabric; } set { if (!fabric.Equals(value)) { fabric = new ContentType(requestedApiVersion, handler, value); OnElementChanged(); } } }
             [ElementPriority(3)]
-            public byte[] Unknown2 { get { return (byte[])unknown2.Clone(); } set { if (!unknown2.Equals<byte>(value)) { unknown2 = (byte[])value.Clone(); OnElementChanged(); } } }
+            public byte Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnElementChanged(); } } }
             [ElementPriority(4)]
-            public byte Unknown3 { get { return unknown3; } set { if (unknown3 != value) { unknown3 = value; OnElementChanged(); } } }
+            public byte Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnElementChanged(); } } }
             [ElementPriority(5)]
-            public EntryBlockList Entries { get { return entries; } set { if (entries != value) { entries = new EntryBlockList(handler, value); OnElementChanged(); } } }
-            [ElementPriority(6)]
-            public uint Unknown4 { get { return unknown4; } set { if (unknown4 != value) { unknown4 = value; OnElementChanged(); } } }
+            public byte Unknown3 { get { return unknown3; } set { if (unknown3 != value) { unknown3 = value; OnElementChanged(); } } }
 
             public string Value { get { return ValueBuilder; } }
             #endregion
@@ -258,19 +395,27 @@ namespace TxtcResource
 
         public class SuperBlockList : DependentList<SuperBlock>
         {
+            private DependentList<TGIBlock> _ParentTGIBlocks;
+            public DependentList<TGIBlock> ParentTGIBlocks
+            {
+                get { return _ParentTGIBlocks; }
+                set { if (_ParentTGIBlocks != value) { _ParentTGIBlocks = value; foreach (var i in this) i.ParentTGIBlocks = _ParentTGIBlocks; } }
+            }
+
             public SuperBlockList(EventHandler handler) : base(handler, Byte.MaxValue) { }
             public SuperBlockList(EventHandler handler, Stream s) : base(handler, s, Byte.MaxValue) { }
             public SuperBlockList(EventHandler handler, IEnumerable<SuperBlock> lsb) : base(handler, lsb, Byte.MaxValue) { }
 
             protected override int ReadCount(Stream s) { return (new BinaryReader(s)).ReadByte(); }
-            protected override SuperBlock CreateElement(Stream s) { return new SuperBlock(0, elementHandler, s); }
+            protected override SuperBlock CreateElement(Stream s) { return new SuperBlock(0, elementHandler, s) { ParentTGIBlocks = ParentTGIBlocks }; }
 
             protected override void WriteCount(Stream s, int count) { (new BinaryWriter(s)).Write((byte)count); }
             protected override void WriteElement(Stream s, SuperBlock element) { element.UnParse(s); }
 
-            public override void Add() { this.Add(new SuperBlock(0, null)); }
+            public override void Add() { this.Add(new SuperBlock(0, null) { ParentTGIBlocks = ParentTGIBlocks }); }
         }
 
+        #region Entry
         public abstract class Entry : AHandlerElement, IEquatable<Entry>
         {
             const int recommendedApiVersion = 1;
@@ -366,7 +511,7 @@ namespace TxtcResource
 
             public override bool Equals(object obj)
             {
-                return obj as Entry != null ? this.Equals(obj as Entry) : false;
+                return obj as Entry != null && this.Equals(obj as Entry);
             }
 
             public override int GetHashCode()
@@ -390,18 +535,10 @@ namespace TxtcResource
             {
                 get
                 {
-                    string entryValue = EntryValue;
-                    string fmt = "{0} ({1})" + (entryValue == null ? "" : ": {2}");
-                    return String.Format(fmt,
-                        enumType == null ? "Unset" : (Enum.IsDefined(enumType, property) ? Enum.GetName(enumType, property)
-                            : String.Format("Unknown (0x{0:X8})", (uint)property)),
-                        this.GetType().Name.Substring(5), entryValue);
-                    /*
-                    return this.GetType().Name +
-                      ": Property: 0x" + ((uint)property).ToString("X8") + (enumType != null ? (Enum.IsDefined(enumType, property) ? " (" + Enum.GetName(enumType, property) + ")" : "(undefined)") : "") +
-                      "; Unknown: 0x" + unknown.ToString("X2");
-                    /**/
-                    //s += "; DataType: 0x" + dataType.ToString("X2");
+                    return ((enumType == null)
+                        ? new TypedValue(typeof(uint), property, "X")
+                        : new TypedValue(enumType, Enum.ToObject(enumType, property), "X"))
+                        + "; " + EntryValue;
                 }
             }
             #endregion
@@ -501,13 +638,16 @@ namespace TxtcResource
                 ImageKey = 0xF6CC8471,
             }
 
+            public DependentList<TGIBlock> ParentTGIBlocks { get; set; }
+            public override List<string> ContentFields { get { List<string> res = base.ContentFields; res.Remove("ParentTGIBlocks"); return res; } }
+
             byte data;
             public EntryTGIIndex(int APIversion, EventHandler handler, EntryTGIIndex basis)
                 : this(APIversion, handler, (TGIIndexProperties)basis.property, basis.unknown, basis.dataType, basis.data) { }
             public EntryTGIIndex(int APIversion, EventHandler handler, TGIIndexProperties property, byte unknown, byte dataType, byte data)
                 : base(APIversion, handler, (uint)property, typeof(TGIIndexProperties), unknown, dataType) { this.data = data; }
             internal override void UnParse(Stream s) { base.UnParse(s); new BinaryWriter(s).Write(data); }
-            public override AHandlerElement Clone(EventHandler handler) { return new EntryTGIIndex(requestedApiVersion, handler, this); }
+            public override AHandlerElement Clone(EventHandler handler) { return new EntryTGIIndex(requestedApiVersion, handler, this) { ParentTGIBlocks = ParentTGIBlocks }; }
             [ElementPriority(1)]
             public TGIIndexProperties Property
             {
@@ -523,9 +663,10 @@ namespace TxtcResource
                     }
                 }
             }
-            [ElementPriority(4)]
+            [ElementPriority(4), TGIBlockListContentField("ParentTGIBlocks")]
             public byte Data { get { return data; } set { if (data != value) { data = value; OnElementChanged(); } } }
-            protected override string EntryValue { get { return "0x" + data.ToString("X2"); } }
+            //protected override string EntryValue { get { return "0x" + data.ToString("X2"); } }
+            protected override string EntryValue { get { return string.Format("0x{0:X2} ({1})", data, ParentTGIBlocks == null || data >= ParentTGIBlocks.Count ? "unknown" : ParentTGIBlocks[data]); } }
             //public override string Value { get { return base.Value + "; Data: 0x" + data.ToString("X2"); } }
         }
         [ConstructorParameters(new object[] { (uint)2, (byte)0, (byte)0x02, (Int16)0, })]
@@ -574,6 +715,37 @@ namespace TxtcResource
                 SourceBlend = 0xE055EE36,
             }
 
+            // see http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.graphics.blend.aspx
+            public enum Blend : int
+            {
+                Zero,
+                One,
+                SourceColor,
+                InverseSourceColor,
+                SourceAlpha,
+                InverseSourceAlpha,
+                DestinationAlpha,
+                InverseDestinationAlpha,
+                DestinationColor,
+                InverseDestinationColor,
+                SourceAlphaSaturation,
+                BlendFactor,
+                InverseBlendFactor,
+            }
+
+            [Flags]
+            public enum ColorWriteChannels : int
+            {
+                Red = 0x01,
+                Green = 0x02,
+                Blue = 0x04,
+                Alpha = 0x08,
+                // -
+                //None = 0x00,
+                //Color = 0x07,
+                //All = 0x0F,
+            }
+
             Int32 data;
             public EntryInt32(int APIversion, EventHandler handler, EntryInt32 basis)
                 : this(APIversion, handler, (Int32Properties)basis.property, basis.unknown, basis.dataType, basis.data) { }
@@ -598,7 +770,22 @@ namespace TxtcResource
             }
             [ElementPriority(4)]
             public Int32 Data { get { return data; } set { if (data != value) { data = value; OnElementChanged(); } } }
-            protected override string EntryValue { get { return "0x" + data.ToString("X8"); } }
+            protected override string EntryValue
+            {
+                get
+                {
+                    switch ((Int32Properties)property)
+                    {
+                        case Int32Properties.DestinationBlend:
+                        case Int32Properties.SourceBlend:
+                            return new TypedValue(typeof(Blend), Enum.ToObject(typeof(Blend), data), "X") + "";
+                        case Int32Properties.ColorWrite:
+                            return new TypedValue(typeof(ColorWriteChannels), Enum.ToObject(typeof(ColorWriteChannels), data), "X") + "";
+                        default:
+                            return "0x" + data.ToString("X8");
+                    }
+                }
+            }
             //public override string Value { get { return base.Value + "; Data: 0x" + data.ToString("X8"); } }
         }
         [ConstructorParameters(new object[] { UInt32Properties.Width, (byte)0, (byte)0x07, (UInt32)0, })]
@@ -873,6 +1060,13 @@ namespace TxtcResource
 
         public class EntryList : DependentList<Entry>
         {
+            private DependentList<TGIBlock> _ParentTGIBlocks;
+            public DependentList<TGIBlock> ParentTGIBlocks
+            {
+                get { return _ParentTGIBlocks; }
+                set { if (_ParentTGIBlocks != value) { _ParentTGIBlocks = value; foreach (EntryTGIIndex i in this.FindAll(e => e is EntryTGIIndex)) i.ParentTGIBlocks = _ParentTGIBlocks; } }
+            }
+
             public EntryList(int APIversion, EventHandler handler, Stream s) : base(null, -1) { elementHandler = handler; Parse(APIversion, s); this.handler = handler; }
             public EntryList(EventHandler handler) : base(handler) { }
             public EntryList(EventHandler handler, IEnumerable<Entry> le) : base(handler, le) { }
@@ -880,7 +1074,10 @@ namespace TxtcResource
             protected void Parse(int requestedApiVersion, Stream s)
             {
                 for (Entry e = Entry.CreateEntry(requestedApiVersion, elementHandler, s); !(e is EntryNull); e = Entry.CreateEntry(requestedApiVersion, elementHandler, s))
+                {
                     this.Add(e);
+                    if (e is EntryTGIIndex) (e as EntryTGIIndex).ParentTGIBlocks = ParentTGIBlocks;
+                }
             }
 
             protected override int ReadCount(Stream s) { throw new InvalidOperationException(); }
@@ -926,10 +1123,18 @@ namespace TxtcResource
                 throw new InvalidDataException(String.Format("Unsupported data type 0x{0:X2}", (byte)fields[2]));
             }
         }
+        #endregion
 
         public class EntryBlock : AHandlerElement, IEquatable<EntryBlock>
         {
             const int recommendedApiVersion = 1;
+            DependentList<TGIBlock> _ParentTGIBlocks;
+            public DependentList<TGIBlock> ParentTGIBlocks
+            {
+                get { return _ParentTGIBlocks; }
+                set { if (_ParentTGIBlocks != value) { _ParentTGIBlocks = value; if (theList != null) theList.ParentTGIBlocks = ParentTGIBlocks; } }
+            }
+            public override List<string> ContentFields { get { List<string> res = GetContentFields(requestedApiVersion, this.GetType()); res.Remove("ParentTGIBlocks"); return res; } }
 
             EntryList theList;
 
@@ -942,11 +1147,9 @@ namespace TxtcResource
             internal void UnParse(Stream s) { theList.UnParse(s); (new BinaryWriter(s)).Write((uint)0); }
 
             #region AHandlerElement Members
-            public override AHandlerElement Clone(EventHandler handler) { return new EntryBlock(requestedApiVersion, handler, this); }
+            public override AHandlerElement Clone(EventHandler handler) { return new EntryBlock(requestedApiVersion, handler, this) { ParentTGIBlocks = ParentTGIBlocks }; }
 
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
-
-            public override List<string> ContentFields { get { return AApiVersionedFields.GetContentFields(requestedApiVersion, this.GetType()); } }
             #endregion
 
             #region IEquatable<EntryBlock> Members
@@ -964,7 +1167,7 @@ namespace TxtcResource
             #endregion
 
             #region Content Fields
-            public EntryList Entries { get { return theList; } set { if (theList != value) { theList = new EntryList(handler, value); OnElementChanged(); } } }
+            public EntryList Entries { get { return theList; } set { if (theList != value) { theList = new EntryList(handler, value) { ParentTGIBlocks = ParentTGIBlocks }; OnElementChanged(); } } }
 
             public string Value { get { return ValueBuilder; } }
             #endregion
@@ -972,84 +1175,34 @@ namespace TxtcResource
 
         public class EntryBlockList : DependentList<EntryBlock>
         {
+            private DependentList<TGIBlock> _ParentTGIBlocks;
+            public DependentList<TGIBlock> ParentTGIBlocks
+            {
+                get { return _ParentTGIBlocks; }
+                set { if (_ParentTGIBlocks != value) { _ParentTGIBlocks = value; foreach (var i in this) i.ParentTGIBlocks = _ParentTGIBlocks; } }
+            }
+            //public override List<string> ContentFields { get { List<string> res = GetContentFields(0, this.GetType()); res.Remove("ParentTGIBlocks"); return res; } }
+
             int blockCount;
             public EntryBlockList(EventHandler handler) : base(handler) { }
             public EntryBlockList(EventHandler handler, int blockCount, Stream s) : base(null) { elementHandler = handler; this.blockCount = blockCount; Parse(s); this.handler = handler; }
             public EntryBlockList(EventHandler handler, IEnumerable<EntryBlock> leb) : base(handler, leb) { }
 
             protected override int ReadCount(Stream s) { return blockCount; }
-            protected override EntryBlock CreateElement(Stream s) { return new EntryBlock(0, elementHandler, s); }
+            protected override EntryBlock CreateElement(Stream s) { return new EntryBlock(0, elementHandler, s) { ParentTGIBlocks = ParentTGIBlocks }; }
 
             protected override void WriteCount(Stream s, int count) { } // List owner must do this
             protected override void WriteElement(Stream s, EntryBlock element) { element.UnParse(s); }
 
-            public override void Add() { this.Add(new EntryBlock(0, null)); }
-
-            /*
-            public string Value
-            {
-                get
-                {
-                    System.Text.StringBuilder sb = new System.Text.StringBuilder();
-                    for (int i = 0; i < Count; i++)
-                    {
-                        sb.Append("--" + i + "--");
-                        for (int j = 0; j < this[i].Entries.Count; j++)
-                            sb.Append("\n[" + j + "] " + this[i].Entries[j].Value);
-                        sb.Append("\n");
-                    }
-                    return sb.ToString();
-                }
-            }
-            /**/
+            public override void Add() { this.Add(new EntryBlock(0, null) { ParentTGIBlocks = ParentTGIBlocks }); }
         }
         #endregion
 
         #region Content Fields
-        public uint Version { get { return version; } set { if (version != value) { version = value; OnResourceChanged(this, EventArgs.Empty); } } }
-        public SuperBlockList SuperBlocks
-        {
-            get { if (version < 0x00000007) throw new InvalidOperationException(); return superBlocks; }
-            set { if (version < 0x00000007) throw new InvalidOperationException(); if (superBlocks != value) { superBlocks = new SuperBlockList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } }
-        }
-        public uint Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnResourceChanged(this, EventArgs.Empty); } } }
-        public uint Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnResourceChanged(this, EventArgs.Empty); } } }
-        public byte Unknown3 { get { return unknown3; } set { if (unknown3 != value) { unknown3 = value; OnResourceChanged(this, EventArgs.Empty); } } }
-        public byte Unknown4
-        {
-            get { if (version < 0x00000008) throw new InvalidOperationException(); return unknown4; }
-            set { if (version < 0x00000008) throw new InvalidOperationException(); if (unknown4 != value) { unknown4 = value; OnResourceChanged(this, EventArgs.Empty); } }
-        }
-        public EntryBlockList Entries { get { return entries; } set { if (entries != value) { entries = new EntryBlockList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
-        public CountedTGIBlockList TGIBlocks { get { return tgiBlocks; } set { if (tgiBlocks != value) { tgiBlocks = new CountedTGIBlockList(OnResourceChanged, "IGT", value); OnResourceChanged(this, EventArgs.Empty); } } }
+        [ElementPriority(1)]
+        public ContentType Root { get { return root; } set { if (!root.Equals(value)) { root = new ContentType(requestedApiVersion, OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
 
         public string Value { get { return ValueBuilder; } }
-        /*
-        public string Value
-        {
-            get
-            {
-                string s = "";
-                s += "Version: 0x" + version.ToString("X8");
-                if (version >= 7)
-                    for (int i = 0; i < superBlocks.Count; i++)
-                    {
-                        s += "\n--SuperBlock " + i + "--" + superBlocks[i].Value + "\n----";
-                    }
-                s += "\nUnknown1: 0x" + unknown1.ToString("X8");
-                s += "\nUnknown2: 0x" + unknown2.ToString("X8");
-                s += "\nUnknown3: 0x" + unknown3.ToString("X2");
-                if (version >= 8)
-                    s += "\nUnknown3: 0x" + unknown3.ToString("X2");
-                s += "\nEntries:\n";
-                s += entries.Value;
-                s += "\nTGI Blocks:\n";
-                string fmt = "  [{0:X" + tgiBlocks.Count.ToString("X").Length + "}]: {1}\n";
-                for (int i = 0; i < tgiBlocks.Count; i++) s += string.Format(fmt, i, tgiBlocks[i].Value);
-                return s;
-            }
-        }
-        /**/
         #endregion
     }
 

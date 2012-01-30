@@ -192,7 +192,7 @@ namespace CatalogResource
         public uint TileSpacing { get { return tileSpacing; } set { if (tileSpacing != value) { tileSpacing = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(25)]
         public byte CanWalkOver { get { return canWalkOver; } set { if (canWalkOver != value) { canWalkOver = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(26), TGIBlockListContentField("TGIBlocks")]
+        [ElementPriority(26)]
         public byte RisesAboveWall
         {
             get { if (version < 0x00000008) throw new InvalidOperationException(); return risesAboveWall; }

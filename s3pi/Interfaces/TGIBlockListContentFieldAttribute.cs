@@ -38,5 +38,21 @@ namespace s3pi.Interfaces
         /// The TGIBlockList to which this ContentField Property applies.
         /// </summary>
         public string TGIBlockListContentField { get { return tgiBlockListContentField; } set { tgiBlockListContentField = value; } }
+
+        /// <summary>
+        /// Return the TGIBlockListContentField value for a Content Field.
+        /// </summary>
+        /// <param name="t">Type on which Content Field exists.</param>
+        /// <param name="index">Content Field name.</param>
+        /// <returns>The value of the TGIBlockListContentFieldAttribute TGIBlockListContentField field, if found;
+        /// otherwise <c>null</c>.</returns>
+        public static string GetTGIBlockListContentField(Type t, string index)
+        {
+            System.Reflection.PropertyInfo pi = t.GetProperty(index);
+            if (pi != null)
+                foreach (Attribute attr in pi.GetCustomAttributes(typeof(TGIBlockListContentFieldAttribute), true))
+                    return (attr as TGIBlockListContentFieldAttribute).TGIBlockListContentField;
+            return null;
+        }
     }
 }

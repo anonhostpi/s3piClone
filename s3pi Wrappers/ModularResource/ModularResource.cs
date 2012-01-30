@@ -35,7 +35,7 @@ namespace ModularResource
         #region Attributes
         ushort unknown1;
         ushort unknown2;
-        TGIIndexList tgiIndexes;
+        Int32IndexList tgiIndexes;
         TGIBlockList tgiBlocks;
         #endregion
 
@@ -51,8 +51,10 @@ namespace ModularResource
             tgiPosn = r.ReadUInt32() + s.Position;
             tgiSize = r.ReadUInt32();
             unknown2 = r.ReadUInt16();
-            tgiIndexes = new TGIIndexList(OnResourceChanged, s);
+            tgiIndexes = new Int32IndexList(OnResourceChanged, s, Int16.MaxValue, ReadInt16, WriteInt16);
             tgiBlocks = new TGIBlockList(OnResourceChanged, s, tgiPosn, tgiSize);
+
+            tgiIndexes.ParentTGIBlocks = tgiBlocks;
         }
 
         protected override Stream UnParse()
@@ -66,31 +68,17 @@ namespace ModularResource
             w.Write((uint)0);//tgiOffset
             w.Write((uint)0);//tgiSize
             w.Write(unknown2);
-            if (tgiIndexes == null) tgiIndexes = new TGIIndexList(OnResourceChanged);
+            if (tgiIndexes == null) tgiIndexes = new Int32IndexList(OnResourceChanged, Int16.MaxValue, ReadInt16, WriteInt16);
             tgiIndexes.UnParse(ms);
             if (tgiBlocks == null) tgiBlocks = new TGIBlockList(OnResourceChanged);
             tgiBlocks.UnParse(ms, pos);
 
+            tgiIndexes.ParentTGIBlocks = tgiBlocks;
+
             return ms;
         }
-        #endregion
-
-        #region Sub-classes
-        public class TGIIndexList : SimpleList<UInt32>
-        {
-            #region Constructors
-            public TGIIndexList(EventHandler handler) : base(handler, ReadUInt32, WriteUInt32, ushort.MaxValue, ReadListCount, WriteListCount) { }
-            internal TGIIndexList(EventHandler handler, Stream s) : base(handler, s, ReadUInt32, WriteUInt32, ushort.MaxValue, ReadListCount, WriteListCount) { }
-            public TGIIndexList(EventHandler handler, IEnumerable<uint> ltgii) : base(handler, ltgii, ReadUInt32, WriteUInt32, ushort.MaxValue, ReadListCount, WriteListCount) { }
-            #endregion
-
-            #region Data I/O
-            static int ReadListCount(Stream s) { return (new BinaryReader(s)).ReadUInt16(); }
-            static void WriteListCount(Stream s, int count) { (new BinaryWriter(s)).Write((UInt16)count); }
-            static UInt32 ReadUInt32(Stream s) { return (new BinaryReader(s)).ReadUInt32(); }
-            static void WriteUInt32(Stream s, UInt32 value) { (new BinaryWriter(s)).Write(value); }
-            #endregion
-       }
+        private static int ReadInt16(Stream s) { return new BinaryReader(s).ReadInt16(); }
+        private static void WriteInt16(Stream s, int count) { new BinaryWriter(s).Write((Int16)count); }
         #endregion
 
         #region Content Fields
@@ -99,9 +87,9 @@ namespace ModularResource
         [ElementPriority(2)]
         public ushort Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(3)]
-        public TGIIndexList TGIIndexes { get { return tgiIndexes; } set { if (tgiIndexes != value) { tgiIndexes = new TGIIndexList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
+        public Int32IndexList TGIIndexes { get { return tgiIndexes; } set { if (tgiIndexes != value) { tgiIndexes = new Int32IndexList(OnResourceChanged, value, Int16.MaxValue, ReadInt16, WriteInt16) { ParentTGIBlocks = tgiBlocks }; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(4)]
-        public TGIBlockList TGIBlocks { get { return tgiBlocks; } set { if (tgiBlocks != value) { tgiBlocks = new TGIBlockList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
+        public TGIBlockList TGIBlocks { get { return tgiBlocks; } set { if (tgiBlocks != value) { tgiBlocks = new TGIBlockList(OnResourceChanged, value); tgiIndexes.ParentTGIBlocks = tgiBlocks; OnResourceChanged(this, EventArgs.Empty); } } }
 
         public String Value
         {

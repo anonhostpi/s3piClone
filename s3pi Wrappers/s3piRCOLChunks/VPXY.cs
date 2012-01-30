@@ -67,6 +67,8 @@ namespace s3pi.GenericRCOLResource
             if (modular != 0)
                 this.ftptIndex = ftptIndex;
             this.tgiBlockList = new TGIBlockList(OnRCOLChanged, tgiBlockList);
+
+            this.entryList.ParentTGIBlocks = this.tgiBlockList;
         }
         #endregion
 
@@ -105,6 +107,8 @@ namespace s3pi.GenericRCOLResource
                 ftptIndex = 0;
 
             tgiBlockList = new TGIBlockList(OnRCOLChanged, s, tgiPosn, tgiSize);
+
+            entryList.ParentTGIBlocks = tgiBlockList;
         }
 
         public override Stream UnParse()
@@ -119,7 +123,7 @@ namespace s3pi.GenericRCOLResource
             w.Write((uint)0); // tgiOffset
             w.Write((uint)0); // tgiSize
 
-            if (entryList == null) entryList = new EntryList(OnRCOLChanged);
+            if (entryList == null) entryList = new EntryList(OnRCOLChanged) { ParentTGIBlocks = tgiBlockList };
             entryList.UnParse(ms);
 
             w.Write(tc02);
@@ -135,6 +139,8 @@ namespace s3pi.GenericRCOLResource
             if (tgiBlockList == null) tgiBlockList = new TGIBlockList(OnRCOLChanged);
             tgiBlockList.UnParse(ms, pos);
 
+            entryList.ParentTGIBlocks = tgiBlockList;
+
             return ms;
         }
 
@@ -142,35 +148,20 @@ namespace s3pi.GenericRCOLResource
         #endregion
 
         #region Sub-types
-        public class IntList : SimpleList<Int32>
-        {
-            #region Constructors
-            public IntList(EventHandler handler) : base(handler, ReadInt32, WriteInt32, byte.MaxValue, ReadListCount, WriteListCount) { }
-            public IntList(EventHandler handler, Stream s) : base(handler, s, ReadInt32, WriteInt32, byte.MaxValue, ReadListCount, WriteListCount) { }
-            public IntList(EventHandler handler, IEnumerable<Int32> ltgi) : base(handler, ltgi, ReadInt32, WriteInt32, byte.MaxValue, ReadListCount, WriteListCount) { }
-            #endregion
-
-            #region Data I/O
-            static int ReadListCount(Stream s) { return (new BinaryReader(s)).ReadByte(); }
-            static void WriteListCount(Stream s, int count) { (new BinaryWriter(s)).Write((byte)count); }
-            static int ReadInt32(Stream s) { return new BinaryReader(s).ReadInt32(); }
-            static void WriteInt32(Stream s, int value) { new BinaryWriter(s).Write(value); }
-            #endregion
-        }
-
         public abstract class Entry : AHandlerElement, IEquatable<Entry>
         {
             const int recommendedApiVersion = 1;
+            public abstract DependentList<TGIBlock> ParentTGIBlocks { get; set; }
 
             #region Constructors
             protected Entry(int APIversion, EventHandler handler) : base(APIversion, handler) { }
 
-            public static Entry CreateEntry(int APIversion, EventHandler handler, Stream s)
+            public static Entry CreateEntry(int APIversion, EventHandler handler, Stream s, DependentList<TGIBlock> ParentTGIBlocks)
             {
                 BinaryReader r = new BinaryReader(s);
                 byte entryType = r.ReadByte();
-                if (entryType == 0x00) return new Entry00(APIversion, handler, 0, r.ReadByte(), new IntList(handler, s));
-                if (entryType == 0x01) return new Entry01(APIversion, handler, 1, r.ReadInt32());
+                if (entryType == 0x00) return new Entry00(APIversion, handler, 0, r.ReadByte(), s) { ParentTGIBlocks = ParentTGIBlocks };
+                if (entryType == 0x01) return new Entry01(APIversion, handler, 1, r.ReadInt32()) { ParentTGIBlocks = ParentTGIBlocks };
                 throw new InvalidDataException(String.Format("Unknown EntryType 0x{0:X2} at 0x{1:X8}", entryType, s.Position));
             }
             #endregion
@@ -185,7 +176,7 @@ namespace s3pi.GenericRCOLResource
             /// <summary>
             /// The list of available field names on this API object
             /// </summary>
-            public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
+            public override List<string> ContentFields { get { List<string> res = GetContentFields(requestedApiVersion, this.GetType()); res.Remove("ParentTGIBlocks"); return res;  } }
             #endregion
 
             #region IEquatable<Entry> Members
@@ -199,26 +190,38 @@ namespace s3pi.GenericRCOLResource
 
             #endregion
 
-            public abstract string Value { get; }
+            public virtual string Value { get { return ValueBuilder; } }
         }
         public class Entry00 : Entry
         {
+            DependentList<TGIBlock> _ParentTGIBlocks;
+            public override DependentList<TGIBlock> ParentTGIBlocks
+            {
+                get { return _ParentTGIBlocks; }
+                set { if (_ParentTGIBlocks != value) { _ParentTGIBlocks = value; tgiIndexes.ParentTGIBlocks = _ParentTGIBlocks; } }
+            }
+
             byte entryID;
-            IntList tgiIndexes;
+            Int32IndexList tgiIndexes;
 
             public Entry00(int APIversion, EventHandler handler, Entry00 basis)
                 : this(APIversion, handler, 0, basis.entryID, basis.tgiIndexes) { }
             public Entry00(int APIversion, EventHandler handler, byte entryType, byte entryID, IEnumerable<int> tgiIndexes)
-                : base(APIversion, handler) { this.entryID = entryID; this.tgiIndexes = new IntList(handler, tgiIndexes); }
+                : base(APIversion, handler) { this.entryID = entryID; this.tgiIndexes = new Int32IndexList(handler, tgiIndexes, byte.MaxValue, ReadByte, WriteByte); }
+            public Entry00(int APIversion, EventHandler handler, byte entryType, byte entryID, Stream s)
+                : base(APIversion, handler) { this.entryID = entryID; this.tgiIndexes = new Int32IndexList(handler, s, byte.MaxValue, ReadByte, WriteByte); }
 
             internal override void UnParse(Stream s)
             {
                 BinaryWriter w = new BinaryWriter(s);
                 w.Write((byte)0x00);
                 w.Write(entryID);
-                if (tgiIndexes == null) tgiIndexes = new IntList(handler);
+                if (tgiIndexes == null) tgiIndexes = new Int32IndexList(handler, byte.MaxValue, ReadByte, WriteByte);
                 tgiIndexes.UnParse(s);
+                tgiIndexes.ParentTGIBlocks = ParentTGIBlocks;
             }
+            static int ReadByte(Stream s) { return (new BinaryReader(s)).ReadByte(); }
+            static void WriteByte(Stream s, int count) { (new BinaryWriter(s)).Write((byte)count); }
 
             public override bool Equals(Entry other)
             {
@@ -230,13 +233,13 @@ namespace s3pi.GenericRCOLResource
                 return entryID.GetHashCode() ^ tgiIndexes.GetHashCode();
             }
 
-            public override AHandlerElement Clone(EventHandler handler) { return new Entry00(requestedApiVersion, handler, this); }
+            public override AHandlerElement Clone(EventHandler handler) { return new Entry00(requestedApiVersion, handler, this) { ParentTGIBlocks = ParentTGIBlocks }; }
 
             #region Content Fields
             public byte EntryID { get { return entryID; } set { if (entryID != value) { entryID = value; if (handler != null) handler(this, EventArgs.Empty); } } }
-            public IntList TGIIndexes { get { return tgiIndexes; } set { if (tgiIndexes != value) { tgiIndexes = new IntList(handler, value); if (handler != null) handler(this, EventArgs.Empty); } } }
+            public Int32IndexList TGIIndexes { get { return tgiIndexes; } set { if (tgiIndexes != value) { tgiIndexes = new Int32IndexList(handler, value, byte.MaxValue, ReadByte, WriteByte); if (handler != null) handler(this, EventArgs.Empty); } } }
 
-            public override string Value
+            /*public override string Value
             {
                 get
                 {
@@ -246,11 +249,13 @@ namespace s3pi.GenericRCOLResource
                     for (int i = 0; i < tgiIndexes.Count; i++) sb.Append(String.Format(fmt, i, tgiIndexes[i]));
                     return sb.ToString().TrimEnd(';', ' ');
                 }
-            }
+            }/**/
             #endregion
         }
         public class Entry01 : Entry
         {
+            public override DependentList<TGIBlock> ParentTGIBlocks { get; set; }
+
             int tgiIndex;
             public Entry01(int APIversion, EventHandler handler, Entry01 basis) : this(APIversion, handler, 1, basis.tgiIndex) { }
             public Entry01(int APIversion, EventHandler handler, byte entryType, int tgiIndex) : base(APIversion, handler) { this.tgiIndex = tgiIndex; }
@@ -270,14 +275,22 @@ namespace s3pi.GenericRCOLResource
             public override AHandlerElement Clone(EventHandler handler) { return new Entry01(requestedApiVersion, handler, this); }
 
             #region Content Fields
+            [TGIBlockListContentField("ParentTGIBlocks")]
             public Int32 TGIIndex { get { return tgiIndex; } set { if (tgiIndex != value) { tgiIndex = value; if (handler != null) handler(this, EventArgs.Empty); } } }
 
-            public override string Value { get { return "TGIIndex: 0x" + tgiIndex.ToString("X8") + ""; } }
+            //public override string Value { get { return "TGIIndex: 0x" + tgiIndex.ToString("X8") + ""; } }
             #endregion
         }
 
         public class EntryList : DependentList<Entry>
         {
+            private DependentList<TGIBlock> _ParentTGIBlocks;
+            public DependentList<TGIBlock> ParentTGIBlocks
+            {
+                get { return _ParentTGIBlocks; }
+                set { if (_ParentTGIBlocks != value) { _ParentTGIBlocks = value; foreach (var i in this) i.ParentTGIBlocks = _ParentTGIBlocks; } }
+            }
+
             #region Constructors
             public EntryList(EventHandler handler) : base(handler, Byte.MaxValue) { }
             public EntryList(EventHandler handler, Stream s) : base(handler, s, Byte.MaxValue) { }
@@ -288,7 +301,7 @@ namespace s3pi.GenericRCOLResource
             protected override int ReadCount(Stream s) { return (new BinaryReader(s)).ReadByte(); }
             protected override void WriteCount(Stream s, int count) { (new BinaryWriter(s)).Write((byte)count); }
 
-            protected override Entry CreateElement(Stream s) { return Entry.CreateEntry(0, elementHandler, s); }
+            protected override Entry CreateElement(Stream s) { return Entry.CreateEntry(0, elementHandler, s, ParentTGIBlocks); }
 
             protected override void WriteElement(Stream s, Entry element) { element.UnParse(s); }
             #endregion
@@ -313,7 +326,7 @@ namespace s3pi.GenericRCOLResource
         [ElementPriority(11)]
         public uint Version { get { return version; } /*set { if (version != value) { version = value; OnRCOLChanged(this, EventArgs.Empty); } }/**/ }
         [ElementPriority(12)]
-        public EntryList Entries { get { return entryList; } set { if (entryList != value) { entryList = new EntryList(OnRCOLChanged, value); OnRCOLChanged(this, EventArgs.Empty); } } }
+        public EntryList Entries { get { return entryList; } set { if (entryList != value) { entryList = new EntryList(OnRCOLChanged, value) { ParentTGIBlocks = tgiBlockList }; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(13)]
         public byte TC02 { get { return tc02; } /*set { if (tc02 != value) { tc02 = value; OnRCOLChanged(this, EventArgs.Empty); } }/**/ }
         [ElementPriority(14)]
@@ -337,7 +350,7 @@ namespace s3pi.GenericRCOLResource
         }
         [ElementPriority(16)]
         public bool Modular { get { return modular != 0; } set { if (Modular != value) { modular = (byte)(value ? 0x01 : 0x00); OnRCOLChanged(this, EventArgs.Empty); } } }
-        [ElementPriority(17)]
+        [ElementPriority(17), TGIBlockListContentField("TGIBlocks")]
         public int FTPTIndex
         {
             get { return ftptIndex; }
@@ -346,7 +359,7 @@ namespace s3pi.GenericRCOLResource
         public TGIBlockList TGIBlocks
         {
             get { return tgiBlockList; }
-            set { if (tgiBlockList != value) { tgiBlockList = new TGIBlockList(OnRCOLChanged, value); OnRCOLChanged(this, EventArgs.Empty); } }
+            set { if (!tgiBlockList.Equals(value)) { tgiBlockList = new TGIBlockList(OnRCOLChanged, value); if (entryList != null) entryList.ParentTGIBlocks = tgiBlockList; OnRCOLChanged(this, EventArgs.Empty); } }
         }
 
         public string Value

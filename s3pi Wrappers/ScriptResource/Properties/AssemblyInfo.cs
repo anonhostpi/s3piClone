@@ -14,7 +14,7 @@ using System.Runtime.InteropServices;
 #endif
 [assembly: AssemblyCompany("Peter L Jones")]
 [assembly: AssemblyProduct("s3pi")]
-[assembly: AssemblyCopyright("Copyright (C) 2009  Peter L Jones.  Released under GPL 3.  See gpl-3.0.txt")]
+[assembly: AssemblyCopyright("Copyright © 2009  Peter L Jones.  Released under GPL 3.  See gpl-3.0.txt")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

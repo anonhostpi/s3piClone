@@ -469,14 +469,13 @@ namespace meshExpImp.ModelBlocks
 
             int voffset = (int)offset / vrtf.Stride;
             if (offset != 0)
-                foreach (var m in mlod.Meshes.FindAll(m => m.IndexBufferIndex.Equals(myVBI)))
-                    if (m.StreamOffset > beforeLength)
-                    {
-                        m.StreamOffset = (uint)(m.StreamOffset + offset);
-                        foreach (var g in m.GeometryStates)
-                            if (g.MinVertexIndex * vrtf.Stride > beforeLength)
-                                g.MinVertexIndex += voffset;
-                    }
+                foreach (var m in mlod.Meshes.Where(m => m.VertexBufferIndex.Equals(myVBI) && m.StreamOffset > beforeLength))
+                {
+                    m.StreamOffset = (uint)(m.StreamOffset + offset);
+                    foreach (var g in m.GeometryStates)
+                        if (g.MinVertexIndex * vrtf.Stride > beforeLength)
+                            g.MinVertexIndex += voffset;
+                }
             return okay;
         }
 
@@ -494,8 +493,19 @@ namespace meshExpImp.ModelBlocks
                 if (fs != null)
                     positionFloats.AddRange(fs);
 
-            positionMin = positionFloats.Count > 0 ? positionFloats.Min(x => Math.Abs(x)) : 0;
-            positionMax = positionFloats.Count > 0 ? positionFloats.Max(x => Math.Abs(x)) : 0;
+            if (positionFloats.Count > 0)
+            {
+                positionMax = positionMin = Math.Abs(positionFloats[0]);
+                foreach (float f in positionFloats)
+                {
+                    float x = Math.Abs(f);
+                    if (positionMin > x) positionMin = x;
+                    if (positionMax < x) positionMax = x;
+                }
+            }
+
+            //positionMin = positionFloats.Count > 0 ? positionFloats.Min(x => Math.Abs(x)) : 0;
+            //positionMax = positionFloats.Count > 0 ? positionFloats.Max(x => Math.Abs(x)) : 0;
         }
         static float[] defaultUVScales = new float[] { 1f / 32767f, 1f / 32767f, 1f / 32767f, };
         private static bool SetVertices(MemoryStream s, VRTF vrtf, IEnumerable<Vertex> vertices, float[] uvscales)

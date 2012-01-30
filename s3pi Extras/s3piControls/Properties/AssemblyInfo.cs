@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("s3piControls")]
+[assembly: AssemblyTitle("s3pi Controls")]
 [assembly: AssemblyDescription("Assorted Windows Forms components related to s3pi objects.")]
 #if DEBUG
 [assembly: AssemblyConfiguration("[DEBUG]")]
@@ -13,8 +13,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 #endif
 [assembly: AssemblyCompany("Peter L Jones")]
-[assembly: AssemblyProduct("s3piControls")]
-[assembly: AssemblyCopyright("Copyright (C) 2011  Peter L Jones.  Released under GPL 3.  See gpl-3.0.txt")]
+[assembly: AssemblyProduct("s3pi")]
+[assembly: AssemblyCopyright("Copyright © 2011  Peter L Jones.  Released under GPL 3.  See gpl-3.0.txt")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

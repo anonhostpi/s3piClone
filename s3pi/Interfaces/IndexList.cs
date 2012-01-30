@@ -1,5 +1,5 @@
 ﻿/***************************************************************************
- *  Copyright (C) 2010 by Peter L Jones                                    *
+ *  Copyright (C) 2012 by Peter L Jones                                    *
  *  pljones@users.sf.net                                                   *
  *                                                                         *
  *  This file is part of the Sims 3 Package Interface (s3pi)               *
@@ -21,52 +21,28 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
+using System.Text;
 
 namespace s3pi.Interfaces
 {
     /// <summary>
-    /// A flexible generic list that implements <see cref="DependentList{T}"/> for
-    /// a simple data type (such as <see cref="UInt32"/>).
+    /// A flexible generic list of <see cref="DependentList{TGIBlock}"/> indices.
     /// </summary>
-    /// <typeparam name="T">A simple data type (such as <see cref="UInt32"/>).</typeparam>
-    /// <example>
-    /// The following method shows a way to create a list of UInt32 values, with an Int32 entry count
-    /// stored in the stream immediately before the list.
-    /// <code>
-    /// <![CDATA[
-    /// SimpleList<UInt32> ReadUInt32List(EventHandler e, Stream s)
-    /// {
-    ///     return new SimpleList<UInt32>(e, s,
-    ///         s => new BinaryReader(s).ReadUInt32(),
-    ///         (s, value) => new BinaryWriter(s).Write(value));
-    /// }
-    /// ]]>
-    /// </code>
-    /// For more complex cases, or where repeated use of the same kind of <see cref="SimpleList{T}"/> is needed in different contexts,
-    /// it can be worthwhile extending the class, as shown below.  This example is for a list of byte values prefixed
-    /// by a one byte count.  It shows that the list length can also be specified (here using <c>Byte.MaxValue</c>
-    /// <code>
-    /// <![CDATA[
-    /// public class ByteList : SimpleList<Byte>
-    /// {
-    ///     public ByteList(EventHandler handler) : base(handler, ReadByte, WriteByte, Byte.MaxValue, ReadListCount, WriteListCount) { }
-    ///     public ByteList(EventHandler handler, Stream s) : base(handler, s, ReadByte, WriteByte, Byte.MaxValue, ReadListCount, WriteListCount) { }
-    ///     public ByteList(EventHandler handler, IList<Byte> le) : base(handler, le, ReadByte, WriteByte Byte.MaxValue, ReadListCount, WriteListCount) { }
-    ///     
-    ///     static uint ReadListCount(Stream s) { return new BinaryReader(s).ReadByte(); }
-    ///     static void WriteListCount(Stream s, uint count) { new BinaryWriter(s).Write((byte)count); }
-    ///     static byte ReadByte(Stream s) { return new BinaryReader(s).ReadByte(); }
-    ///     static void WriteByte(Stream s, byte value) { new BinaryWriter(s).Write(value); }
-    /// }
-    /// ]]>
-    /// </code>
-    /// </example>
-    /// <seealso cref="HandlerElement{T}"/>
-    /// <seealso cref="IndexList{T}"/>
-    public class SimpleList<T> : DependentList<HandlerElement<T>>, IEnumerable<T>
+    /// <typeparam name="T">A simple data type (such as <see cref="int"/> or <see cref="byte"/>).</typeparam>
+    /// <seealso cref="SimpleList{T}"/>
+    public class IndexList<T> : DependentList<TGIBlockListIndex<T>>, IEnumerable<T>
         where T : struct, IComparable, IConvertible, IEquatable<T>, IComparable<T>
     {
+        private DependentList<TGIBlock> _ParentTGIBlocks;
+        /// <summary>
+        /// Reference to TGIBlockList into which this is an index.
+        /// </summary>
+        public DependentList<TGIBlock> ParentTGIBlocks
+        {
+            get { return _ParentTGIBlocks; }
+            set { if (_ParentTGIBlocks != value) { _ParentTGIBlocks = value; foreach (var i in this as DependentList<TGIBlockListIndex<T>>) i.ParentTGIBlocks = _ParentTGIBlocks; } }
+        }
+
         #region Attributes
         CreateElementMethod createElement;
         WriteElementMethod writeElement;
@@ -82,15 +58,15 @@ namespace s3pi.Interfaces
         public class Enumerator<U> : IEnumerator<U>
             where U : struct, IComparable, IConvertible, IEquatable<U>, IComparable<U>
         {
-            DependentList<HandlerElement<U>> list;
-            DependentList<HandlerElement<U>>.Enumerator enumerator;
+            DependentList<TGIBlockListIndex<U>> list;
+            DependentList<TGIBlockListIndex<U>>.Enumerator enumerator;
 
-            internal Enumerator(DependentList<HandlerElement<U>> list) { this.list = list; Reset(); }
+            internal Enumerator(DependentList<TGIBlockListIndex<U>> list) { this.list = list; Reset(); }
 
             /// <summary>
             /// Gets the element at the current position of the enumerator.
             /// </summary>
-            public U Current { get { return enumerator.Current; } }
+            public U Current { get { return enumerator.Current.Data; } }
 
             /// <summary>
             /// Releases all resources used by the enumerator.
@@ -101,7 +77,7 @@ namespace s3pi.Interfaces
                 list = null;
             }
 
-            object System.Collections.IEnumerator.Current { get { return enumerator.Current; } }
+            object System.Collections.IEnumerator.Current { get { return enumerator.Current.Data; } }
 
             /// <summary>
             /// Advances the enumerator to the next element of the collection.
@@ -132,7 +108,7 @@ namespace s3pi.Interfaces
         /// <param name="size">Optional maximum number of elements in the list.</param>
         /// <param name="readCount">Optional; default is to read a <see cref="Int32"/> from the <see cref="Stream"/>.</param>
         /// <param name="writeCount">Optional; default is to write a <see cref="Int32"/> to the <see cref="Stream"/>.</param>
-        public SimpleList(EventHandler handler, CreateElementMethod createElement = null, WriteElementMethod writeElement = null, long size = -1, ReadCountMethod readCount = null, WriteCountMethod writeCount = null) : base(handler, size) { this.createElement = createElement; this.writeElement = writeElement; this.readCount = readCount; this.writeCount = writeCount; }
+        public IndexList(EventHandler handler, CreateElementMethod createElement = null, WriteElementMethod writeElement = null, long size = -1, ReadCountMethod readCount = null, WriteCountMethod writeCount = null) : base(handler, size) { this.createElement = createElement; this.writeElement = writeElement; this.readCount = readCount; this.writeCount = writeCount; }
         /// <summary>
         /// Initializes a new instance of the <see cref="SimpleList{T}"/> class
         /// from <paramref name="s"/>.
@@ -144,10 +120,10 @@ namespace s3pi.Interfaces
         /// <param name="size">Optional maximum number of elements in the list.</param>
         /// <param name="readCount">Optional; default is to read a <see cref="Int32"/> from the <see cref="Stream"/>.</param>
         /// <param name="writeCount">Optional; default is to write a <see cref="Int32"/> to the <see cref="Stream"/>.</param>
-        public SimpleList(EventHandler handler, Stream s, CreateElementMethod createElement, WriteElementMethod writeElement, long size = -1, ReadCountMethod readCount = null, WriteCountMethod writeCount = null) : this(null, createElement, writeElement, size, readCount, writeCount) { elementHandler = handler; Parse(s); this.handler = handler; }
+        public IndexList(EventHandler handler, Stream s, CreateElementMethod createElement, WriteElementMethod writeElement, long size = -1, ReadCountMethod readCount = null, WriteCountMethod writeCount = null) : this(null, createElement, writeElement, size, readCount, writeCount) { elementHandler = handler; Parse(s); this.handler = handler; }
         /// <summary>
         /// Initializes a new instance of the <see cref="SimpleList{T}"/> class
-        /// from <paramref name="collection"/>, wrapping each entry in a <see cref="HandlerElement{T}"/> instance.
+        /// from <paramref name="collection"/>, wrapping each entry in a <see cref="TGIBlockListIndex{T}"/> instance.
         /// </summary>
         /// <param name="handler">The <see cref="EventHandler"/> to call on changes to the list or its elements.</param>
         /// <param name="collection">The source to use as the initial content of the list.</param>
@@ -156,7 +132,7 @@ namespace s3pi.Interfaces
         /// <param name="size">Optional maximum number of elements in the list.</param>
         /// <param name="readCount">Optional; default is to read a <see cref="Int32"/> from the <see cref="Stream"/>.</param>
         /// <param name="writeCount">Optional; default is to write a <see cref="Int32"/> to the <see cref="Stream"/>.</param>
-        public SimpleList(EventHandler handler, IEnumerable<T> collection, CreateElementMethod createElement = null, WriteElementMethod writeElement = null, long size = -1, ReadCountMethod readCount = null, WriteCountMethod writeCount = null) : this(null, createElement, writeElement, size, readCount, writeCount) { elementHandler = handler; this.AddRange(collection); this.handler = handler; }
+        public IndexList(EventHandler handler, IEnumerable<T> collection, CreateElementMethod createElement = null, WriteElementMethod writeElement = null, long size = -1, ReadCountMethod readCount = null, WriteCountMethod writeCount = null) : this(null, createElement, writeElement, size, readCount, writeCount) { elementHandler = handler; this.AddRange(collection); this.handler = handler; }
         /// <summary>
         /// Initializes a new instance of the <see cref="SimpleList{T}"/> class from the existing <paramref name="collection"/>.
         /// </summary>
@@ -167,7 +143,7 @@ namespace s3pi.Interfaces
         /// <param name="size">Optional maximum number of elements in the list.</param>
         /// <param name="readCount">Optional; default is to read a <see cref="Int32"/> from the <see cref="Stream"/>.</param>
         /// <param name="writeCount">Optional; default is to write a <see cref="Int32"/> to the <see cref="Stream"/>.</param>
-        private SimpleList(EventHandler handler, IEnumerable<HandlerElement<T>> collection, CreateElementMethod createElement = null, WriteElementMethod writeElement = null, long size = -1, ReadCountMethod readCount = null, WriteCountMethod writeCount = null) : this(null, createElement, writeElement, size, readCount, writeCount) { elementHandler = handler; base.AddRange(collection); this.handler = handler; }
+        private IndexList(EventHandler handler, IEnumerable<TGIBlockListIndex<T>> collection, CreateElementMethod createElement = null, WriteElementMethod writeElement = null, long size = -1, ReadCountMethod readCount = null, WriteCountMethod writeCount = null) : this(null, createElement, writeElement, size, readCount, writeCount) { elementHandler = handler; base.AddRange(collection); this.handler = handler; }
         #endregion
 
         #region Data I/O
@@ -189,13 +165,13 @@ namespace s3pi.Interfaces
         /// </summary>
         /// <param name="s"><see cref="Stream"/> containing data.</param>
         /// <returns>New list element.</returns>
-        protected override HandlerElement<T> CreateElement(Stream s) { return new HandlerElement<T>(0, elementHandler, createElement == null ? default(T) : createElement(s)); }
+        protected override TGIBlockListIndex<T> CreateElement(Stream s) { return new TGIBlockListIndex<T>(0, elementHandler, createElement == null ? default(T) : createElement(s)); }
         /// <summary>
         /// Writes the value of a list element to <paramref name="s"/>.
         /// </summary>
         /// <param name="s"><see cref="Stream"/> containing data.</param>
         /// <param name="element">List element for which to write the value to the <see cref="Stream"/>.</param>
-        protected override void WriteElement(Stream s, HandlerElement<T> element) { if (writeElement != null) writeElement(s, element.Val); }
+        protected override void WriteElement(Stream s, TGIBlockListIndex<T> element) { if (writeElement != null) writeElement(s, element.Data); }
         #endregion
 
         #region Sub-classes
@@ -225,7 +201,7 @@ namespace s3pi.Interfaces
         public delegate void WriteCountMethod(Stream s, int count);
         #endregion
 
-        #region DependentList<HandlerElement<T>>
+        #region DependentList<TGIBlockListIndex<T>>
         /// <summary>
         /// Add a default element to a <see cref="SimpleList{T}"/>.
         /// </summary>
@@ -233,7 +209,7 @@ namespace s3pi.Interfaces
         /// with a NotImplementedException.</exception>
         /// <exception cref="InvalidOperationException">Thrown when list size exceeded.</exception>
         /// <exception cref="NotSupportedException">The <see cref="SimpleList{T}"/> is read-only.</exception>
-        public override void Add() { this.Add(default(T)); }
+        public override void Add() { this.Add(new TGIBlockListIndex<T>(0, elementHandler, default(T)) { ParentTGIBlocks = ParentTGIBlocks }); }
         #endregion
 
         #region List<T>
@@ -244,7 +220,7 @@ namespace s3pi.Interfaces
         /// <returns>True on success</returns>
         /// <exception cref="InvalidOperationException">Thrown when list size exceeded.</exception>
         /// <exception cref="NotSupportedException">The <see cref="SimpleList{T}"/> is read-only.</exception>
-        public virtual void Add(T item) { base.Add(new HandlerElement<T>(0, elementHandler, item)); }
+        public virtual void Add(T item) { base.Add(new TGIBlockListIndex<T>(0, elementHandler, item) { ParentTGIBlocks = ParentTGIBlocks }); }
 
         /// <summary>
         /// Adds the elements of the specified collection to the end of the <see cref="SimpleList{T}"/>.
@@ -352,7 +328,7 @@ namespace s3pi.Interfaces
         ///     cannot find an implementation of the <see cref="System.IComparable{T}"/> generic interface
         ///     or the <see cref="System.IComparable"/> interface for type T.
         /// </exception>
-        public int BinarySearch(int index, int count, T item, IComparer<T> comparer) { return base.BinarySearch(index, count, new HandlerElement<T>(0, null, item), new SimpleComparer(comparer)); }
+        public int BinarySearch(int index, int count, T item, IComparer<T> comparer) { return base.BinarySearch(index, count, new TGIBlockListIndex<T>(0, null, item), new SimpleComparer(comparer)); }
 
         /// <summary>
         ///     Converts the elements in the current <see cref="SimpleList{T}"/> to
@@ -372,7 +348,7 @@ namespace s3pi.Interfaces
         /// <exception cref="System.ArgumentNullException">
         ///     <paramref name="converter"/> is null.
         /// </exception>
-        public List<TOutput> ConvertAll<TOutput>(Converter<T, TOutput> converter) { return base.ConvertAll<TOutput>(x => converter(x.Val)); }
+        public List<TOutput> ConvertAll<TOutput>(Converter<T, TOutput> converter) { return base.ConvertAll<TOutput>(x => converter(x.Data)); }
 
         /// <summary>
         ///     Copies the entire <see cref="SimpleList{T}"/> to
@@ -456,7 +432,7 @@ namespace s3pi.Interfaces
         ///     <paramref name="index"/> to the end of the source <see cref="SimpleList{T}"/> is greater
         ///     than the available space from <paramref name="arrayIndex"/> to the end of the destination <paramref name="array"/>.
         /// </exception>
-        public void CopyTo(int index, T[] array, int arrayIndex, int count) { base.ConvertAll<T>(e => e.Val).CopyTo(index, array, arrayIndex, count); }
+        public void CopyTo(int index, T[] array, int arrayIndex, int count) { base.ConvertAll<T>(e => e.Data).CopyTo(index, array, arrayIndex, count); }
 
 
         /// <summary>
@@ -464,7 +440,7 @@ namespace s3pi.Interfaces
         /// </summary>
         /// <param name="item">The object to locate in the <see cref="SimpleList{T}"/>.</param>
         /// <returns>true if item is found in the <see cref="SimpleList{T}"/>; otherwise, false.</returns>
-        public bool Contains(T item) { return base.Exists(e => e.Val.Equals(item)); }
+        public bool Contains(T item) { return base.Exists(e => e.Data.Equals(item)); }
         /// <summary>
         ///     Determines whether the <see cref="SimpleList{T}"/> contains elements
         ///     that match the conditions defined by the specified predicate.
@@ -481,7 +457,7 @@ namespace s3pi.Interfaces
         /// <exception cref="System.ArgumentNullException">
         ///     match is null.
         /// </exception>
-        public bool Exists(Predicate<T> match) { return base.Exists(e => match(e.Val)); }
+        public bool Exists(Predicate<T> match) { return base.Exists(e => match(e.Data)); }
 
         /// <summary>
         ///     Searches for an element that matches the conditions defined by the specified
@@ -498,7 +474,7 @@ namespace s3pi.Interfaces
         /// <exception cref="System.ArgumentNullException">
         ///     <paramref name="match"/> is null.
         /// </exception>
-        public T Find(Predicate<T> match) { return base.Find(e => match(e.Val)).Val; }
+        public T Find(Predicate<T> match) { return base.Find(e => match(e.Data)).Data; }
         /// <summary>
         ///     Retrieves all the elements that match the conditions defined by the specified predicate.
         /// </summary>
@@ -514,7 +490,7 @@ namespace s3pi.Interfaces
         /// <exception cref="System.ArgumentNullException">
         ///     <paramref name="match"/> is null.
         /// </exception>
-        public List<T> FindAll(Predicate<T> match) { return base.FindAll(e => match(e.Val)).ConvertAll<T>(e => e.Val); }
+        public List<T> FindAll(Predicate<T> match) { return base.FindAll(e => match(e.Data)).ConvertAll<T>(e => e.Data); }
         /// <summary>
         ///     Retrieves all the elements that match the conditions defined by the specified predicate.
         ///     Searches for an element that matches the conditions defined by the specified
@@ -603,7 +579,7 @@ namespace s3pi.Interfaces
         /// <exception cref="System.ArgumentNullException">
         ///     <paramref name="match"/> is null.
         /// </exception>
-        public T FindLast(Predicate<T> match) { return base.FindLast(e => match(e.Val)).Val; }
+        public T FindLast(Predicate<T> match) { return base.FindLast(e => match(e.Data)).Data; }
         /// <summary>
         ///     Searches for an element that matches the conditions defined by the specified
         ///     predicate, and returns the zero-based index of the last occurrence within
@@ -686,7 +662,7 @@ namespace s3pi.Interfaces
         /// <exception cref="System.ArgumentNullException">
         ///     <paramref name="action"/> is null.
         /// </exception>
-        public void ForEach(Action<T> action) { base.ForEach(e => action(e.Val)); }
+        public void ForEach(Action<T> action) { base.ForEach(e => action(e.Data)); }
 
         /// <summary>
         /// Inserts the elements of a collection into the <see cref="SimpleList{T}"/> at the specified index.
@@ -764,7 +740,7 @@ namespace s3pi.Interfaces
         ///     <br/>-or-<br/>
         ///     index and count do not specify a valid section in the <see cref="SimpleList{T}"/>.
         /// </exception>
-        public int IndexOf(T item, int index, int count) { return base.IndexOf(base.Find(e => e.Val.Equals(item)), index, count); }
+        public int IndexOf(T item, int index, int count) { return base.IndexOf(base.Find(e => e.Data.Equals(item)), index, count); }
         /// <summary>
         ///     Searches for the specified object and returns the zero-based index of the
         ///     last occurrence within the entire <see cref="SimpleList{T}"/>.
@@ -825,7 +801,7 @@ namespace s3pi.Interfaces
         ///     <br/>-or-<br/>
         ///     index and count do not specify a valid section in the <see cref="SimpleList{T}"/>.
         /// </exception>
-        public int LastIndexOf(T item, int index, int count) { return base.LastIndexOf(base.FindLast(e => e.Val.Equals(item)), index, count); }
+        public int LastIndexOf(T item, int index, int count) { return base.LastIndexOf(base.FindLast(e => e.Data.Equals(item)), index, count); }
 
         /// <summary>
         /// Removes the first occurrence of an entry from the <see cref="SimpleList{T}"/> with the value given.
@@ -845,7 +821,7 @@ namespace s3pi.Interfaces
         /// <returns>The number of elements removed from the <see cref="SimpleList{T}"/>.</returns>
         /// <exception cref="System.ArgumentNullException"><paramref name="match"/> is null.</exception>
         /// <exception cref="System.NotSupportedException">The <see cref="SimpleList{T}"/> is read-only.</exception>
-        public virtual int RemoveAll(Predicate<T> match) { return base.RemoveAll(e => match(e.Val)); }
+        public virtual int RemoveAll(Predicate<T> match) { return base.RemoveAll(e => match(e.Data)); }
 
         /// <summary>
         /// Sorts the elements in the entire <see cref="SimpleList{T}"/> using the specified <see cref="Comparison{T}"/>.
@@ -855,7 +831,7 @@ namespace s3pi.Interfaces
         /// For example, <paramref name="comparison"/> might not return 0 when comparing an item with itself.</exception>
         /// <exception cref="System.ArgumentNullException"><paramref name="comparison"/> is null.</exception>
         /// <exception cref="System.NotSupportedException">The <see cref="SimpleList{T}"/> is read-only.</exception>
-        public virtual void Sort(Comparison<T> comparison) { base.Sort((x, y) => comparison(x.Val, y.Val)); }
+        public virtual void Sort(Comparison<T> comparison) { base.Sort((x, y) => comparison(x.Data, y.Data)); }
         /// <summary>
         /// Sorts the elements in the entire <see cref="SimpleList{T}"/> using the specified comparer.
         /// </summary>
@@ -896,10 +872,10 @@ namespace s3pi.Interfaces
         /// <exception cref="System.NotSupportedException">The <see cref="SimpleList{T}"/> is read-only.</exception>
         public virtual void Sort(int index, int count, IComparer<T> comparer) { base.Sort(index, count, new SimpleComparer(comparer)); }
         #region SimpleComparer
-        class SimpleComparer : IComparer<HandlerElement<T>>
+        class SimpleComparer : IComparer<TGIBlockListIndex<T>>
         {
             IComparer<T> comparer; public SimpleComparer(IComparer<T> comparer) { this.comparer = comparer != null ? comparer : System.Collections.Generic.Comparer<T>.Default; }
-            public int Compare(HandlerElement<T> x, HandlerElement<T> y) { return comparer.Compare(x.Val, y.Val); }
+            public int Compare(TGIBlockListIndex<T> x, TGIBlockListIndex<T> y) { return comparer.Compare(x.Data, y.Data); }
         }
         #endregion
 
@@ -909,7 +885,7 @@ namespace s3pi.Interfaces
         /// <returns>
         ///     An array containing copies of the elements of the <see cref="SimpleList{T}"/>.
         /// </returns>
-        public new T[] ToArray() { return base.ConvertAll<T>(e => e.Val).ToArray(); }
+        public new T[] ToArray() { return base.ConvertAll<T>(e => e.Data).ToArray(); }
 
         /// <summary>
         ///     Determines whether every element in the <see cref="SimpleList{T}"/>
@@ -922,7 +898,7 @@ namespace s3pi.Interfaces
         ///     has no elements, the return value is true.
         /// </returns>
         /// <exception cref="System.ArgumentNullException"><paramref name="match"/> is null.</exception>
-        public bool TrueForAll(Predicate<T> match) { return base.TrueForAll(e => match(e.Val)); }
+        public bool TrueForAll(Predicate<T> match) { return base.TrueForAll(e => match(e.Data)); }
         #endregion
 
         #region IList<T>
@@ -933,7 +909,7 @@ namespace s3pi.Interfaces
         /// <returns>The element at the specified index.</returns>
         /// <exception cref="System.ArgumentOutOfRangeException"><paramref name="index"/> is not a valid index in the <see cref="SimpleList{T}"/>.</exception>
         /// <exception cref="System.NotSupportedException">The <see cref="SimpleList{T}"/> is read-only.</exception>
-        public new virtual T this[int index] { get { return base[index].Val; } set { if (!base[index].Val.Equals(value)) { base[index].Val = value; OnListChanged(); } } }
+        public new virtual T this[int index] { get { return base[index].Data; } set { if (!base[index].Data.Equals(value)) { base[index].Data = value; OnListChanged(); } } }
 
         /// <summary>
         ///     Searches for the specified object and returns the zero-based index of the
@@ -955,7 +931,7 @@ namespace s3pi.Interfaces
         /// <exception cref="System.ArgumentOutOfRangeException"><paramref name="index"/> is not a valid index in the <see cref="SimpleList{T}"/>.</exception>
         /// <exception cref="System.InvalidOperationException">Thrown when list size exceeded.</exception>
         /// <exception cref="System.NotSupportedException">The <see cref="SimpleList{T}"/> is read-only.</exception>
-        public virtual void Insert(int index, T item) { base.Insert(index, new HandlerElement<T>(0, elementHandler, item)); }
+        public virtual void Insert(int index, T item) { base.Insert(index, new TGIBlockListIndex<T>(0, elementHandler, item) { ParentTGIBlocks = ParentTGIBlocks }); }
         #endregion
 
         #region IEnumerable<T>
@@ -971,9 +947,49 @@ namespace s3pi.Interfaces
     }
 
     /// <summary>
-    /// Commonly used simple list.  The list count is an integer stored immediately before the list.  The elements are UInt32.
+    /// A byte-size use of <see cref="IndexList{T}"/>.
     /// </summary>
-    public class UIntList : SimpleList<uint>
+    public class ByteIndexList : IndexList<Byte>
+    {
+        #region Constructors
+        /// <summary>
+        /// Create an empty UIntList.
+        /// </summary>
+        /// <param name="handler">Event handler.</param>
+        /// <param name="readCount">Optional; default is to read a <see cref="Int32"/> from the <see cref="Stream"/>.</param>
+        /// <param name="writeCount">Optional; default is to write a <see cref="Int32"/> to the <see cref="Stream"/>.</param>
+        /// <param name="size">Optional list size (should be <c>byte.MaxValue</c> or below).</param>
+        public ByteIndexList(EventHandler handler, ReadCountMethod readCount = null, WriteCountMethod writeCount = null, long size = byte.MaxValue) : base(handler, ReadByte, WriteByte, size, readCount, writeCount) { }
+        /// <summary>
+        /// Create a UIntList populated from an existing set of values.
+        /// </summary>
+        /// <param name="handler">Event handler.</param>
+        /// <param name="basis">Basis on which to populate the list.</param>
+        /// <param name="readCount">Optional; default is to read a <see cref="Int32"/> from the <see cref="Stream"/>.</param>
+        /// <param name="writeCount">Optional; default is to write a <see cref="Int32"/> to the <see cref="Stream"/>.</param>
+        /// <param name="size">Optional list size (should be <c>byte.MaxValue</c> or below).</param>
+        public ByteIndexList(EventHandler handler, IEnumerable<Byte> basis, ReadCountMethod readCount = null, WriteCountMethod writeCount = null, long size = byte.MaxValue) : base(handler, basis, ReadByte, WriteByte, size, readCount, writeCount) { }
+        /// <summary>
+        /// Create a UIntList populated from a <see cref="Stream"/>.
+        /// </summary>
+        /// <param name="handler">Event handler.</param>
+        /// <param name="s"><see cref="Stream"/> from which to read elements.</param>
+        /// <param name="readCount">Optional; default is to read a <see cref="Int32"/> from the <see cref="Stream"/>.</param>
+        /// <param name="writeCount">Optional; default is to write a <see cref="Int32"/> to the <see cref="Stream"/>.</param>
+        /// <param name="size">Optional list size (should be <c>byte.MaxValue</c> or below).</param>
+        public ByteIndexList(EventHandler handler, Stream s, ReadCountMethod readCount = null, WriteCountMethod writeCount = null, long size = byte.MaxValue) : base(handler, s, ReadByte, WriteByte, size, readCount, writeCount) { }
+        #endregion
+
+        #region Data I/O
+        static Byte ReadByte(Stream s) { return new BinaryReader(s).ReadByte(); }
+        static void WriteByte(Stream s, Byte value) { new BinaryWriter(s).Write(value); }
+        #endregion
+    }
+
+    /// <summary>
+    /// <see cref="IndexList{T}"/> with <see cref="Int32"/> entries.
+    /// </summary>
+    public class Int32IndexList : IndexList<Int32>
     {
         #region Constructors
         /// <summary>
@@ -981,56 +997,27 @@ namespace s3pi.Interfaces
         /// </summary>
         /// <param name="handler">Event handler.</param>
         /// <param name="size">Optional list size.</param>
-        public UIntList(EventHandler handler, long size = -1) : base(handler, ReadUInt32, WriteUInt32, size) { }
+        /// <param name="readCount">Optional; default is to read a <see cref="Int32"/> from the <see cref="Stream"/>.</param>
+        /// <param name="writeCount">Optional; default is to write a <see cref="Int32"/> to the <see cref="Stream"/>.</param>
+        public Int32IndexList(EventHandler handler, long size = -1, ReadCountMethod readCount = null, WriteCountMethod writeCount = null) : base(handler, ReadInt32, WriteInt32, size, readCount, writeCount) { }
         /// <summary>
         /// Create a UIntList populated from an existing set of values.
         /// </summary>
         /// <param name="handler">Event handler.</param>
         /// <param name="basis">Basis on which to populate the list.</param>
         /// <param name="size">Optional list size.</param>
-        public UIntList(EventHandler handler, IEnumerable<uint> basis, long size = -1) : base(handler, basis, ReadUInt32, WriteUInt32, size) { }
+        /// <param name="readCount">Optional; default is to read a <see cref="Int32"/> from the <see cref="Stream"/>.</param>
+        /// <param name="writeCount">Optional; default is to write a <see cref="Int32"/> to the <see cref="Stream"/>.</param>
+        public Int32IndexList(EventHandler handler, IEnumerable<Int32> basis, long size = -1, ReadCountMethod readCount = null, WriteCountMethod writeCount = null) : base(handler, basis, ReadInt32, WriteInt32, size, readCount, writeCount) { }
         /// <summary>
         /// Create a UIntList populated from a <see cref="Stream"/>.
         /// </summary>
         /// <param name="handler">Event handler.</param>
         /// <param name="s"><see cref="Stream"/> from which to read elements.</param>
         /// <param name="size">Optional list size.</param>
-        public UIntList(EventHandler handler, Stream s, long size = -1) : base(handler, s, ReadUInt32, WriteUInt32, size) { }
-        #endregion
-
-        #region Data I/O
-        static UInt32 ReadUInt32(Stream s) { return new BinaryReader(s).ReadUInt32(); }
-        static void WriteUInt32(Stream s, UInt32 value) { new BinaryWriter(s).Write(value); }
-        #endregion
-    }
-
-    /// <summary>
-    /// Commonly used simple list.  The list count is an integer stored immediately before the list.  The elements are Int32.
-    /// </summary>
-    /// <seealso cref="Int32IndexList"/>
-    public class IntList : SimpleList<int>
-    {
-        #region Constructors
-        /// <summary>
-        /// Create an empty IntList.
-        /// </summary>
-        /// <param name="handler">Event handler.</param>
-        /// <param name="size">Optional list size.</param>
-        public IntList(EventHandler handler, long size = -1) : base(handler, ReadInt32, WriteInt32, size) { }
-        /// <summary>
-        /// Create an IntList populated from an existing set of values.
-        /// </summary>
-        /// <param name="handler">Event handler.</param>
-        /// <param name="basis">Basis on which to populate the list.</param>
-        /// <param name="size">Optional list size.</param>
-        public IntList(EventHandler handler, IEnumerable<int> basis, long size = -1) : base(handler, basis, ReadInt32, WriteInt32, size) { }
-        /// <summary>
-        /// Create an IntList populated from a <see cref="Stream"/>.
-        /// </summary>
-        /// <param name="handler">Event handler.</param>
-        /// <param name="s"><see cref="Stream"/> from which to read elements.</param>
-        /// <param name="size">Optional list size.</param>
-        public IntList(EventHandler handler, Stream s, long size = -1) : base(handler, s, ReadInt32, WriteInt32, size) { }
+        /// <param name="readCount">Optional; default is to read a <see cref="Int32"/> from the <see cref="Stream"/>.</param>
+        /// <param name="writeCount">Optional; default is to write a <see cref="Int32"/> to the <see cref="Stream"/>.</param>
+        public Int32IndexList(EventHandler handler, Stream s, long size = -1, ReadCountMethod readCount = null, WriteCountMethod writeCount = null) : base(handler, s, ReadInt32, WriteInt32, size, readCount, writeCount) { }
         #endregion
 
         #region Data I/O

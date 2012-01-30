@@ -135,7 +135,7 @@ namespace CatalogResource
         #region Content Fields
         //--insert Version: ElementPriority(1)
         //--insert CommonBlock: ElementPriority(11)
-        [ElementPriority(21)]
+        [ElementPriority(21), TGIBlockListContentField("TGIBlocks")]
         public ShapeType Shape { get { return shape; } set { if (shape != value) { shape = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(22), TGIBlockListContentField("TGIBlocks")]
         public uint CWSTIndex { get { return cwstIndex; } set { if (cwstIndex != value) { cwstIndex = value; OnResourceChanged(this, new EventArgs()); } } }

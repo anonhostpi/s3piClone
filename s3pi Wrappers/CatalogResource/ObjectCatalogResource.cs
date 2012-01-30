@@ -173,7 +173,7 @@ namespace CatalogResource
             topicRatings, fallbackIndex, ltgib)
         {
             if (checking) if (version >= 0x00000018)
-                    throw new InvalidOperationException(String.Format("Constructor requires TGIIndexes for version {0}", version));
+                    throw new InvalidOperationException(String.Format("Constructor requires BuildableShellDisplayStateHashes for version {0}", version));
         }
         // Version <0x19
         public ObjectCatalogResource(int APIversion,
@@ -217,16 +217,16 @@ namespace CatalogResource
             TopicRating[] topicRatings, uint fallbackIndex, TGIBlockList ltgib)
             : base(APIversion, version, common, ltgib)
         {
-            this.materialList = new MaterialList(OnResourceChanged, materialList);
+            this.materialList = materialList == null ? null : new MaterialList(OnResourceChanged, materialList);
             this.instanceName = unknown1;
-            this.common = new Common(requestedApiVersion, OnResourceChanged, common);
+            this.common = common == null ? null : new Common(requestedApiVersion, OnResourceChanged, common);
             this.objkIndex = objkIndex;
             this.objectTypeFlags = objectTypeFlags;
             this.wallPlacementFlags = wallPlacementFlags;
             this.movementFlags = movementFlags;
             this.cutoutTilesPerLevel = cutoutTilesPerLevel;
             this.levels = levels;
-            this.mtDoorList = new MTDoorList(OnResourceChanged, mtDoorList);
+            this.mtDoorList = mtDoorList == null ? null : new MTDoorList(OnResourceChanged, mtDoorList) { ParentTGIBlocks = list };
             this.isScriptEnabled = isScriptEnabled;
             this.diagonalIndex = diagonalIndex;
             this.ambienceTypeHash = hash;
@@ -239,7 +239,7 @@ namespace CatalogResource
             this.floorCutoutDDSIndex = floorCutoutDDSIndex;
             this.floorCutoutLevelOffset = floorCutoutLevelOffset;
             this.floorCutoutBoundsLength = floorCutoutBoundsLength;
-            this.buildableShellDisplayStateHashes = new UIntList(OnResourceChanged, buildableShellDisplayStateHashes);
+            this.buildableShellDisplayStateHashes = buildableShellDisplayStateHashes == null ? null : new UIntList(OnResourceChanged, buildableShellDisplayStateHashes);
             this.levelBelowOBJDIndex = levelBelowOBJDIndex;
             this.slotPlacementFlags = (SlotPlacement)slotPlacementFlags;
             this.surfaceType = materialGrouping1;
@@ -316,6 +316,8 @@ namespace CatalogResource
             if (checking) if (this.GetType().Equals(typeof(ObjectCatalogResource)) && s.Position != s.Length)
                     throw new InvalidDataException(String.Format("Data stream length 0x{0:X8} is {1:X8} bytes longer than expected at {2:X8}",
                         s.Length, s.Length - s.Position, s.Position));
+
+            mtDoorList.ParentTGIBlocks = list;
         }
 
         protected override Stream UnParse()
@@ -999,6 +1001,9 @@ namespace CatalogResource
 
         public class MTDoor : AHandlerElement, IEquatable<MTDoor>
         {
+            public DependentList<TGIBlock> ParentTGIBlocks { get; set; }
+            public override List<string> ContentFields { get { List<string> res = GetContentFields(requestedApiVersion, this.GetType()); res.Remove("ParentTGIBlocks"); return res; } }
+
             #region Attributes
             float[] unknown1 = new float[4];
             uint levelOffset;
@@ -1058,8 +1063,6 @@ namespace CatalogResource
             #endregion
 
             #region AHandlerElement
-            public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
-
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
 
             public override AHandlerElement Clone(EventHandler handler) { return new MTDoor(requestedApiVersion, handler, this); }
@@ -1078,7 +1081,7 @@ namespace CatalogResource
             }
             [ElementPriority(2)]
             public uint LevelOffset { get { return levelOffset; } set { if (levelOffset != value) { levelOffset = value; OnElementChanged(); } } }
-            [ElementPriority(3)]
+            [ElementPriority(3), TGIBlockListContentField("ParentTGIBlocks")]
             public uint WallMaskIndex { get { return wallMaskIndex; } set { if (wallMaskIndex != value) { wallMaskIndex = value; OnElementChanged(); } } }
 
             public String Value { get { return ValueBuilder; } }
@@ -1087,6 +1090,14 @@ namespace CatalogResource
 
         public class MTDoorList : DependentList<MTDoor>
         {
+            private DependentList<TGIBlock> _ParentTGIBlocks;
+            public DependentList<TGIBlock> ParentTGIBlocks
+            {
+                get { return _ParentTGIBlocks; }
+                set { if (_ParentTGIBlocks != value) { _ParentTGIBlocks = value; foreach (var i in this) i.ParentTGIBlocks = _ParentTGIBlocks; } }
+            }
+            //public override List<string> ContentFields { get { List<string> res = GetContentFields(0, this.GetType()); res.Remove("ParentTGIBlocks"); return res; } }
+
             #region Constructors
             public MTDoorList(EventHandler handler) : base(handler, Byte.MaxValue) { }
             public MTDoorList(EventHandler handler, Stream s) : base(handler, s, Byte.MaxValue) { }
@@ -1100,7 +1111,7 @@ namespace CatalogResource
             protected override void WriteElement(Stream s, MTDoor element) { element.UnParse(s); }
             #endregion
 
-            public override void Add() { this.Add(new MTDoor(0, null)); }
+            public override void Add() { this.Add(new MTDoor(0, null) { ParentTGIBlocks = ParentTGIBlocks }); }
         }
         #endregion
 
@@ -1133,7 +1144,23 @@ namespace CatalogResource
         [ElementPriority(27)]
         public uint Levels { get { return levels; } set { if (levels != value) { levels = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(28)]
-        public MTDoorList MTDoors { get { return mtDoorList; } set { if (mtDoorList != value) { mtDoorList = value == null ? null : new MTDoorList(OnResourceChanged, value); } OnResourceChanged(this, new EventArgs()); } }
+        public MTDoorList MTDoors
+        {
+            get { return mtDoorList; }
+            set
+            {
+                if (!mtDoorList.Equals(value))
+                {
+                    if (value == null)
+                        mtDoorList = value;
+                    else
+                    {
+                        mtDoorList = new MTDoorList(OnResourceChanged, value) { ParentTGIBlocks = list };
+                        OnResourceChanged(this, new EventArgs());
+                    }
+                }
+            }
+        }
         [ElementPriority(29)]
         public bool IsScriptEnabled { get { return isScriptEnabled != 0; } set { if (IsScriptEnabled != value) { isScriptEnabled = (byte)(value ? 1 : 0); OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(30), TGIBlockListContentField("TGIBlocks")]
@@ -1212,7 +1239,8 @@ namespace CatalogResource
         }
         [ElementPriority(51), TGIBlockListContentField("TGIBlocks")]
         public uint FallbackIndex { get { return fallbackIndex; } set { if (fallbackIndex != value) { fallbackIndex = value; OnResourceChanged(this, new EventArgs()); } } }
-        //--insert TGIBlockList: no ElementPriority
+
+        public override TGIBlockList TGIBlocks { get { return list; } set { if (list != value) { list = new TGIBlockList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); mtDoorList.ParentTGIBlocks = list; } } }
         #endregion
     }
 }

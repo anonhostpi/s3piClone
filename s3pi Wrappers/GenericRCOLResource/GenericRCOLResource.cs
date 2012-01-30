@@ -334,6 +334,15 @@ namespace s3pi.GenericRCOLResource
             IComparer<ChunkReference>, IComparable<ChunkReference>
         {
             const Int32 recommendedApiVersion = 1;
+            /// <summary>
+            /// Reference to <see cref="TGIBlockList"/> into which <see cref="TGIBlockIndex"/> is an index.
+            /// </summary>
+            public DependentList<TGIBlock> ParentTGIBlocks { get; set; }
+            /// <summary>
+            /// Returns the list of fields for the type.
+            /// </summary>
+            public override List<string> ContentFields { get { List<string> res = GetContentFields(requestedApiVersion, this.GetType()); res.Remove("ParentTGIBlocks"); return res; } }
+
 
             #region Attributes
             uint chunkReference;
@@ -389,11 +398,6 @@ namespace s3pi.GenericRCOLResource
             /// </summary>
             /// <remarks>This wrapper returns <c>1</c> and is not sensitive to API version.</remarks>
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
-
-            /// <summary>
-            /// The list of API-visible fields.
-            /// </summary>
-            public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
             #endregion
 
             #region IEquatable<ChunkReference> Members
@@ -577,7 +581,7 @@ namespace s3pi.GenericRCOLResource
             /// The index into either the <see cref="GenericRCOLResource.Resources"/>
             /// or <see cref="GenericRCOLResource.ChunkEntries"/> lists.
             /// </summary>
-            [ElementPriority(1)]
+            [ElementPriority(1), TGIBlockListContentField("ParentTGIBlocks")]
             public int TGIBlockIndex { get { return (int)(chunkReference & 0x0FFFFFFF) - 1; } set { if (TGIBlockIndex != value) { if (value == -1) chunkReference = 0; else chunkReference = (chunkReference & 0xF0000000) | (uint)((value + 1) & 0x0FFFFFFF); OnElementChanged(); } } }
             /// <summary>
             /// The <see cref="ReferenceType"/> of the instance.
@@ -588,7 +592,18 @@ namespace s3pi.GenericRCOLResource
             /// <summary>
             /// A displayable string for the instance.
             /// </summary>
-            public string Value { get { return chunkReference > 0 ? this["TGIBlockIndex"] + " (" + this["RefType"] + ")" : "(unset)"; } }
+            public string Value
+            {
+                get
+                {
+                    return chunkReference > 0
+                        ? this["TGIBlockIndex"] + " (" + this["RefType"] + "" + (ParentTGIBlocks == null
+                            ? ")"
+                            : " - " + ParentTGIBlocks[TGIBlockIndex] + ")")
+                        : "(unset)"
+                        ;
+                }
+            }
             #endregion
         }
 

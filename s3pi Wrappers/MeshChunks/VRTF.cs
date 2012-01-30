@@ -222,11 +222,12 @@ namespace meshExpImp.ModelBlocks
             {
                 get
                 {
-                    return String.Format(
+                    return ValueBuilder;
+                    /*return String.Format(
                         //"Usage: 0x{0:X2} ({1,-11})[{2}]; Format: 0x{3:X2} ({4,-11}); Offset: 0x{5:X2}",
-                        "{1,11} (0x{0:X2})[{2}]; {4,-11} (0x{3:X2}); Offset: 0x{5:X2}",
+                        //"{1,11} (0x{0:X2})[{2}]; {4,-11} (0x{3:X2}); Offset: 0x{5:X2}",
+                        "0x{0:X2} ({1,-11})[{2}]; 0x{3:X2} ({4,-11}); Offset: 0x{5:X2}",
                         (int)Usage, Usage + "", mUsageIndex, (int)Format, Format, mOffset);
-                    //return ValueBuilder;
                     /*
                     StringBuilder sb = new StringBuilder();
                     sb.AppendFormat("Usage:\t{0}\n", mUsage);

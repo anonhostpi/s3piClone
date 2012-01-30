@@ -141,7 +141,7 @@ namespace CatalogResource
         #region Content Fields
         //--insert Version: ElementPriority(1)
         //--insert CommonBlock: ElementPriority(11)
-        [ElementPriority(21)]
+        [ElementPriority(21), TGIBlockListContentField("TGIBlocks")]
         public FoundationType Foundation { get { return foundation; } set { if (foundation != value) { foundation = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(22), TGIBlockListContentField("TGIBlocks")]
         public uint WallCatalogIndex { get { return wallCatalogIndex; } set { if (wallCatalogIndex != value) { wallCatalogIndex = value; OnResourceChanged(this, new EventArgs()); } } }
@@ -149,13 +149,13 @@ namespace CatalogResource
         public uint FloorCatalogIndex { get { return floorCatalogIndex; } set { if (floorCatalogIndex != value) { floorCatalogIndex = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(24), TGIBlockListContentField("TGIBlocks")]
         public uint Index3 { get { return index3; } set { if (index3 != value) { index3 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(25)]
+        [ElementPriority(25), TGIBlockListContentField("TGIBlocks")]
         public uint Index4 { get { return index4; } set { if (index4 != value) { index4 = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(26)]
         public uint Unknown5 { get { return unknown5; } set { if (unknown5 != value) { unknown5 = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(26)]
         public uint Unknown6 { get { return unknown6; } set { if (unknown6 != value) { unknown6 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(28), TGIBlockListContentField("TGIBlocks")]
+        [ElementPriority(28)]
         public ShapeType Shape { get { return shape; } set { if (shape != value) { shape = value; OnResourceChanged(this, new EventArgs()); } } }
         //--insert TGIBlockList: no ElementPriority
         #endregion

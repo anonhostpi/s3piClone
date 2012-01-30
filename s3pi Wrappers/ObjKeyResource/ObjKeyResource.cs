@@ -60,6 +60,8 @@ namespace ObjKeyResource
             unknown1 = r.ReadByte();
 
             tgiBlocks = new TGIBlockList(OnResourceChanged, s, tgiPosn, tgiSize);
+
+            componentData.ParentTGIBlocks = tgiBlocks;
         }
 
         protected override Stream UnParse()
@@ -84,6 +86,8 @@ namespace ObjKeyResource
             tgiBlocks.UnParse(s, posn);
 
             s.Flush();
+
+            componentData.ParentTGIBlocks = tgiBlocks;
 
             return s;
         }
@@ -323,6 +327,7 @@ namespace ObjKeyResource
 
             public override int GetHashCode(ComponentDataType obj) { return key.GetHashCode() ^ controlCode ^ data.GetHashCode(); }
 
+            [ElementPriority(2)]
             public string Data { get { return data; } set { if (data != value) { data = value; OnElementChanged(); } } }
 
             public override string Value { get { return base.Value + "; Data: " + "\"" + data + "\""; } }
@@ -330,6 +335,9 @@ namespace ObjKeyResource
         [ConstructorParameters(new object[] { "", (byte)0x01, (Int32)0, })]
         public class CDTResourceKey : ComponentDataType
         {
+            public DependentList<TGIBlock> ParentTGIBlocks { get; set; }
+            public override List<string> ContentFields { get { List<string> res = base.ContentFields; res.Remove("ParentTGIBlocks"); return res; } }
+
             #region Attributes
             protected int data;
             #endregion
@@ -362,9 +370,11 @@ namespace ObjKeyResource
 
             public override int GetHashCode(ComponentDataType obj) { return key.GetHashCode() ^ controlCode ^ data; }
 
+            [ElementPriority(2)]
+            [TGIBlockListContentField("ParentTGIBlocks")]
             public int Data { get { return data; } set { if (data != value) { data = value; OnElementChanged(); } } }
 
-            public override string Value { get { return base.Value + "; Data: " + "0x" + data.ToString("X8"); } }
+            public override string Value { get { return base.Value + "; Data: " + "0x" + data.ToString("X8") + " (" + (ParentTGIBlocks == null ? "unknown" : ParentTGIBlocks[data]) + ")"; } }
         }
         [ConstructorParameters(new object[] { "", (byte)0x02, (Int32)0, })]
         public class CDTAssetResourceName : CDTResourceKey
@@ -423,6 +433,7 @@ namespace ObjKeyResource
 
             public override int GetHashCode(ComponentDataType obj) { return (int)(key.GetHashCode() ^ controlCode ^ data); }
 
+            [ElementPriority(2)]
             public uint Data { get { return data; } set { if (data != value) { data = value; OnElementChanged(); } } }
 
             public override string Value { get { return base.Value + "; Data: " + "0x" + data.ToString("X8"); } }
@@ -430,6 +441,13 @@ namespace ObjKeyResource
 
         public class ComponentDataList : DependentList<ComponentDataType>
         {
+            private DependentList<TGIBlock> _ParentTGIBlocks;
+            public DependentList<TGIBlock> ParentTGIBlocks
+            {
+                get { return _ParentTGIBlocks; }
+                set { if (_ParentTGIBlocks != value) { _ParentTGIBlocks = value; foreach (var i in this.FindAll(e => e is CDTResourceKey)) (i as CDTResourceKey).ParentTGIBlocks = _ParentTGIBlocks; } }
+            }
+
             #region Constructors
             public ComponentDataList(EventHandler handler) : base(handler, Byte.MaxValue) { }
             public ComponentDataList(EventHandler handler, IEnumerable<ComponentDataType> luint) : base(handler, luint, Byte.MaxValue) { }
@@ -480,11 +498,16 @@ namespace ObjKeyResource
         #endregion
 
         #region Content Fields
+        [ElementPriority(1)]
         public uint Format { get { return format; } set { if (format != value) { format = value; OnResourceChanged(this, new EventArgs()); } } }
+        [ElementPriority(2)]
         public ComponentList Components { get { return components; } set { if (components != value) { components = new ComponentList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
-        public ComponentDataList ComponentData { get { return componentData; } set { if (componentData != value) { componentData = new ComponentDataList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        [ElementPriority(3)]
+        public ComponentDataList ComponentData { get { return componentData; } set { if (componentData != value) { componentData = new ComponentDataList(OnResourceChanged, value) { ParentTGIBlocks = tgiBlocks }; OnResourceChanged(this, new EventArgs()); } } }
+        [ElementPriority(4)]
         public byte Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnResourceChanged(this, new EventArgs()); } } }
-        public TGIBlockList TGIBlocks { get { return tgiBlocks; } set { if (tgiBlocks != value) { tgiBlocks = new TGIBlockList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        [ElementPriority(5)]
+        public TGIBlockList TGIBlocks { get { return tgiBlocks; } set { if (tgiBlocks != value) { tgiBlocks = new TGIBlockList(OnResourceChanged, value); componentData.ParentTGIBlocks = tgiBlocks; OnResourceChanged(this, new EventArgs()); } } }
 
         public string Value
         {

@@ -53,13 +53,13 @@ namespace CASPartResource
         byte blendInfoThinIndex;
         byte blendInfoSpecialIndex;
         uint unknown3;
-        ByteEntryList vpxyIndexes;
+        ByteIndexList vpxyIndexes;
         LODInfoEntryList lodInfo;
-        ByteEntryList diffuse1Indexes;
-        ByteEntryList specular1Indexes;
-        ByteEntryList diffuse2Indexes;
-        ByteEntryList specular2Indexes;
-        ByteEntryList bondIndexes;
+        ByteIndexList diffuse1Indexes;
+        ByteIndexList specular1Indexes;
+        ByteIndexList diffuse2Indexes;
+        ByteIndexList specular2Indexes;
+        ByteIndexList bondIndexes;
         string unknown4 = "";
         CountedTGIBlockList tgiBlocks;
 
@@ -82,7 +82,7 @@ namespace CASPartResource
             unknown2 = r.ReadByte();
             clothing = (ClothingType)r.ReadUInt32();
             dataType = (DataTypeFlags)r.ReadUInt32();
-            ageGender = (AgeGenderFlags)r.ReadUInt32();
+            ageGender = new AgeGenderFlags(0, OnResourceChanged, s);
             clothingCategory = (ClothingCategoryFlags)r.ReadUInt32();
             casPart1Index = r.ReadByte();
             casPart2Index = r.ReadByte();
@@ -91,13 +91,13 @@ namespace CASPartResource
             blendInfoThinIndex = r.ReadByte();
             blendInfoSpecialIndex = r.ReadByte();
             unknown3 = r.ReadUInt32();
-            vpxyIndexes = new ByteEntryList(OnResourceChanged, s);
+            vpxyIndexes = new ByteIndexList(OnResourceChanged, s, ReadByte, WriteByte);
             lodInfo = new LODInfoEntryList(OnResourceChanged, s);
-            diffuse1Indexes = new ByteEntryList(OnResourceChanged, s);
-            specular1Indexes = new ByteEntryList(OnResourceChanged, s);
-            diffuse2Indexes = new ByteEntryList(OnResourceChanged, s);
-            specular2Indexes = new ByteEntryList(OnResourceChanged, s);
-            bondIndexes = new ByteEntryList(OnResourceChanged, s);
+            diffuse1Indexes = new ByteIndexList(OnResourceChanged, s, ReadByte, WriteByte);
+            specular1Indexes = new ByteIndexList(OnResourceChanged, s, ReadByte, WriteByte);
+            diffuse2Indexes = new ByteIndexList(OnResourceChanged, s, ReadByte, WriteByte);
+            specular2Indexes = new ByteIndexList(OnResourceChanged, s, ReadByte, WriteByte);
+            bondIndexes = new ByteIndexList(OnResourceChanged, s, ReadByte, WriteByte);
             unknown4 = BigEndianUnicodeString.Read(s);
 
             if (checking) if (tgiPosn != s.Position)
@@ -106,6 +106,9 @@ namespace CASPartResource
 
             byte count = r.ReadByte();
             tgiBlocks = new CountedTGIBlockList(OnResourceChanged, "IGT", count, s);
+
+            vpxyIndexes.ParentTGIBlocks = diffuse1Indexes.ParentTGIBlocks = specular1Indexes.ParentTGIBlocks =
+                diffuse2Indexes.ParentTGIBlocks = specular2Indexes.ParentTGIBlocks = bondIndexes.ParentTGIBlocks = tgiBlocks;
         }
 
         protected override Stream UnParse()
@@ -126,7 +129,8 @@ namespace CASPartResource
             w.Write(unknown2);
             w.Write((uint)clothing);
             w.Write((uint)dataType);
-            w.Write((uint)ageGender);
+            if (ageGender == null) ageGender = new AgeGenderFlags(0, OnResourceChanged);
+            ageGender.UnParse(s);
             w.Write((uint)clothingCategory);
             w.Write(casPart1Index);
             w.Write(casPart2Index);
@@ -136,13 +140,13 @@ namespace CASPartResource
             w.Write(blendInfoSpecialIndex);
             w.Write(unknown3);
 
-            if (vpxyIndexes == null) vpxyIndexes = new ByteEntryList(OnResourceChanged); vpxyIndexes.UnParse(s);
+            if (vpxyIndexes == null) vpxyIndexes = new ByteIndexList(OnResourceChanged, ReadByte, WriteByte) { ParentTGIBlocks = tgiBlocks }; vpxyIndexes.UnParse(s);
             if (lodInfo == null) lodInfo = new LODInfoEntryList(OnResourceChanged); lodInfo.UnParse(s);
-            if (diffuse1Indexes == null) diffuse1Indexes = new ByteEntryList(OnResourceChanged); diffuse1Indexes.UnParse(s);
-            if (specular1Indexes == null) specular1Indexes = new ByteEntryList(OnResourceChanged); specular1Indexes.UnParse(s);
-            if (diffuse2Indexes == null) diffuse2Indexes = new ByteEntryList(OnResourceChanged); diffuse2Indexes.UnParse(s);
-            if (specular2Indexes == null) specular2Indexes = new ByteEntryList(OnResourceChanged); specular2Indexes.UnParse(s);
-            if (bondIndexes == null) bondIndexes = new ByteEntryList(OnResourceChanged); bondIndexes.UnParse(s);
+            if (diffuse1Indexes == null) diffuse1Indexes = new ByteIndexList(OnResourceChanged, ReadByte, WriteByte) { ParentTGIBlocks = tgiBlocks }; diffuse1Indexes.UnParse(s);
+            if (specular1Indexes == null) specular1Indexes = new ByteIndexList(OnResourceChanged, ReadByte, WriteByte) { ParentTGIBlocks = tgiBlocks }; specular1Indexes.UnParse(s);
+            if (diffuse2Indexes == null) diffuse2Indexes = new ByteIndexList(OnResourceChanged, ReadByte, WriteByte) { ParentTGIBlocks = tgiBlocks }; diffuse2Indexes.UnParse(s);
+            if (specular2Indexes == null) specular2Indexes = new ByteIndexList(OnResourceChanged, ReadByte, WriteByte) { ParentTGIBlocks = tgiBlocks }; specular2Indexes.UnParse(s);
+            if (bondIndexes == null) bondIndexes = new ByteIndexList(OnResourceChanged, ReadByte, WriteByte) { ParentTGIBlocks = tgiBlocks }; bondIndexes.UnParse(s);
             BigEndianUnicodeString.Write(s, unknown4);
 
             tgiPosn = s.Position;
@@ -156,9 +160,15 @@ namespace CASPartResource
             w.Write((int)(tgiPosn - posn - sizeof(int)));
             s.Position = end;
 
+            vpxyIndexes.ParentTGIBlocks = diffuse1Indexes.ParentTGIBlocks = specular1Indexes.ParentTGIBlocks =
+                diffuse2Indexes.ParentTGIBlocks = specular2Indexes.ParentTGIBlocks = bondIndexes.ParentTGIBlocks = tgiBlocks;
+
             s.Flush();
             return s;
         }
+
+        static int ReadByte(Stream s) { return new BinaryReader(s).ReadByte(); }
+        static void WriteByte(Stream s, int count) { new BinaryWriter(s).Write((byte)count); }
         #endregion
 
         #region Sub-types
@@ -206,8 +216,8 @@ namespace CASPartResource
             public bool Equals(Preset other)
             {
                 return
-                    this.xml == other.xml
-                    && this.unknown1 == other.unknown1
+                    this.xml.Equals(other.xml)
+                    && this.unknown1.Equals(other.unknown1)
                     ;
             }
             public override bool Equals(object obj)
@@ -267,22 +277,6 @@ namespace CASPartResource
             public override void Add() { this.Add(new Preset(0, null)); }
         }
 
-        public class ByteEntryList : SimpleList<byte>
-        {
-            #region Constructors
-            public ByteEntryList(EventHandler handler) : base(handler, ReadByte, WriteByte, byte.MaxValue, ReadListCount, WriteListCount) { }
-            public ByteEntryList(EventHandler handler, Stream s) : base(handler, s, ReadByte, WriteByte, byte.MaxValue, ReadListCount, WriteListCount) { }
-            public ByteEntryList(EventHandler handler, IEnumerable<byte> le) : base(handler, le, ReadByte, WriteByte, byte.MaxValue, ReadListCount, WriteListCount) { }
-            #endregion
-
-            #region Data I/O
-            static int ReadListCount(Stream s) { return new BinaryReader(s).ReadByte(); }
-            static void WriteListCount(Stream s, int count) { new BinaryWriter(s).Write((byte)count); }
-            static byte ReadByte(Stream s) { return new BinaryReader(s).ReadByte(); }
-            static void WriteByte(Stream s, byte value) { new BinaryWriter(s).Write(value); }
-            #endregion
-        }
-
         public class LODInfoEntry : AHandlerElement, IEquatable<LODInfoEntry>
         {
             const int recommendedApiVersion = 1;
@@ -294,7 +288,7 @@ namespace CASPartResource
             #endregion
 
             #region Constructors
-            public LODInfoEntry(int APIversion, EventHandler handler) : base(APIversion, handler) { }
+            public LODInfoEntry(int APIversion, EventHandler handler) : base(APIversion, handler) { lodAssets = new LODAssetList(handler); }
             public LODInfoEntry(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
             public LODInfoEntry(int APIversion, EventHandler handler, LODInfoEntry basis)
                 : this(APIversion, handler, basis.level, basis.destTexture, basis.lodAssets) { }
@@ -520,7 +514,7 @@ namespace CASPartResource
         [ElementPriority(7)]
         public DataTypeFlags DataType { get { return dataType; } set { if (dataType != value) { dataType = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(8)]
-        public AgeGenderFlags AgeGender { get { return ageGender; } set { if (ageGender != value) { ageGender = value; OnResourceChanged(this, new EventArgs()); } } }
+        public AgeGenderFlags AgeGender { get { return ageGender; } set { if (!ageGender.Equals(value)) { ageGender = new AgeGenderFlags(0, OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(9)]
         public ClothingCategoryFlags ClothingCategory { get { return clothingCategory; } set { if (clothingCategory != value) { clothingCategory = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(10), TGIBlockListContentField("TGIBlocks")]
@@ -538,24 +532,39 @@ namespace CASPartResource
         [ElementPriority(16)]
         public uint Unknown3 { get { return unknown3; } set { if (unknown3 != value) { unknown3 = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(17), DataGridExpandable]
-        public ByteEntryList VPXYIndexes { get { return vpxyIndexes; } set { if (!vpxyIndexes.Equals(value)) { vpxyIndexes = new ByteEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public ByteIndexList VPXYIndexes { get { return vpxyIndexes; } set { if (!vpxyIndexes.Equals(value)) { vpxyIndexes = new ByteIndexList(OnResourceChanged, value, ReadByte, WriteByte) { ParentTGIBlocks = tgiBlocks }; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(18)]
         public LODInfoEntryList LODInfo { get { return lodInfo; } set { if (!lodInfo.Equals(value)) { lodInfo = new LODInfoEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(19), DataGridExpandable]
-        public ByteEntryList Diffuse1Indexes { get { return diffuse1Indexes; } set { if (!diffuse1Indexes.Equals(value)) { diffuse1Indexes = new ByteEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public ByteIndexList Diffuse1Indexes { get { return diffuse1Indexes; } set { if (!diffuse1Indexes.Equals(value)) { diffuse1Indexes = new ByteIndexList(OnResourceChanged, value, ReadByte, WriteByte) { ParentTGIBlocks = tgiBlocks }; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(20), DataGridExpandable]
-        public ByteEntryList Specular1Indexes { get { return specular1Indexes; } set { if (!specular1Indexes.Equals(value)) { specular1Indexes = new ByteEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public ByteIndexList Specular1Indexes { get { return specular1Indexes; } set { if (!specular1Indexes.Equals(value)) { specular1Indexes = new ByteIndexList(OnResourceChanged, value, ReadByte, WriteByte) { ParentTGIBlocks = tgiBlocks }; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(21), DataGridExpandable]
-        public ByteEntryList Diffuse2Indexes { get { return diffuse2Indexes; } set { if (!diffuse2Indexes.Equals(value)) { diffuse2Indexes = new ByteEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public ByteIndexList Diffuse2Indexes { get { return diffuse2Indexes; } set { if (!diffuse2Indexes.Equals(value)) { diffuse2Indexes = new ByteIndexList(OnResourceChanged, value, ReadByte, WriteByte) { ParentTGIBlocks = tgiBlocks }; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(22), DataGridExpandable]
-        public ByteEntryList Specular2Indexes { get { return specular2Indexes; } set { if (!specular2Indexes.Equals(value)) { specular2Indexes = new ByteEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public ByteIndexList Specular2Indexes { get { return specular2Indexes; } set { if (!specular2Indexes.Equals(value)) { specular2Indexes = new ByteIndexList(OnResourceChanged, value, ReadByte, WriteByte) { ParentTGIBlocks = tgiBlocks }; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(23), DataGridExpandable]
-        public ByteEntryList BONDIndexes { get { return bondIndexes; } set { if (!bondIndexes.Equals(value)) { bondIndexes = new ByteEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public ByteIndexList BONDIndexes { get { return bondIndexes; } set { if (!bondIndexes.Equals(value)) { bondIndexes = new ByteIndexList(OnResourceChanged, value, ReadByte, WriteByte) { ParentTGIBlocks = tgiBlocks }; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(24)]
         public string Unknown4 { get { return unknown4; } set { if (unknown4 != value) { unknown4 = value; OnResourceChanged(this, new EventArgs()); } } }
 
         [ElementPriority(25)]
-        public CountedTGIBlockList TGIBlocks { get { return tgiBlocks; } set { if (!tgiBlocks.Equals(value)) { tgiBlocks = new CountedTGIBlockList(OnResourceChanged, "IGT", value); OnResourceChanged(this, new EventArgs()); } } }
+        public CountedTGIBlockList TGIBlocks
+        {
+            get { return tgiBlocks; }
+            set
+            {
+                if (!tgiBlocks.Equals(value))
+                {
+                    tgiBlocks = new CountedTGIBlockList(OnResourceChanged, "IGT", value);
+
+                    vpxyIndexes.ParentTGIBlocks = diffuse1Indexes.ParentTGIBlocks = specular1Indexes.ParentTGIBlocks =
+                        diffuse2Indexes.ParentTGIBlocks = specular2Indexes.ParentTGIBlocks = bondIndexes.ParentTGIBlocks = tgiBlocks;
+                    
+                    OnResourceChanged(this, new EventArgs());
+                }
+            }
+        }
 
         public string Value { get { return ValueBuilder; } }
         #endregion

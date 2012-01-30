@@ -29,8 +29,8 @@ namespace CatalogResource
         #region Attributes
         MaterialList materialList = null;
         uint railing4xModelVPXYIndex;
-        uint railing1xModelVPXYIndexIndex;
-        uint postModelVPXYIndexIndex;
+        uint railing1xModelVPXYIndex;
+        uint postModelVPXYIndex;
         #endregion
 
         #region Constructors
@@ -41,8 +41,8 @@ namespace CatalogResource
             this.materialList = (basis.version >= 0x00000003) ? new MaterialList(OnResourceChanged, basis.materialList) : null;
             this.common = new Common(requestedApiVersion, OnResourceChanged, basis.common);
             this.railing4xModelVPXYIndex = basis.railing4xModelVPXYIndex;
-            this.railing1xModelVPXYIndexIndex = basis.railing1xModelVPXYIndexIndex;
-            this.postModelVPXYIndexIndex = basis.postModelVPXYIndexIndex;
+            this.railing1xModelVPXYIndex = basis.railing1xModelVPXYIndex;
+            this.postModelVPXYIndex = basis.postModelVPXYIndex;
         }
         public RailingCatalogResource(int APIversion, uint version,
             Common common, uint railing4xModelIndex, uint railing1xModelIndex, uint postModelIndex,
@@ -64,8 +64,8 @@ namespace CatalogResource
             this.materialList = materialList != null ? new MaterialList(OnResourceChanged, materialList) : null;
             this.common = new Common(requestedApiVersion, OnResourceChanged, common);
             this.railing4xModelVPXYIndex = railing4xModelIndex;
-            this.railing1xModelVPXYIndexIndex = railing1xModelIndex;
-            this.postModelVPXYIndexIndex = postModelIndex;
+            this.railing1xModelVPXYIndex = railing1xModelIndex;
+            this.postModelVPXYIndex = postModelIndex;
         }
         #endregion
 
@@ -77,8 +77,8 @@ namespace CatalogResource
             this.materialList = (this.version >= 0x00000003) ? new MaterialList(OnResourceChanged, s) : null;
             this.common = new Common(requestedApiVersion, OnResourceChanged, s);
             this.railing4xModelVPXYIndex = r.ReadUInt32();
-            this.railing1xModelVPXYIndexIndex = r.ReadUInt32();
-            this.postModelVPXYIndexIndex = r.ReadUInt32();
+            this.railing1xModelVPXYIndex = r.ReadUInt32();
+            this.postModelVPXYIndex = r.ReadUInt32();
 
             list = new TGIBlockList(OnResourceChanged, s, tgiPosn, tgiSize);
 
@@ -101,8 +101,8 @@ namespace CatalogResource
             common.UnParse(s);
 
             w.Write(railing4xModelVPXYIndex);
-            w.Write(railing1xModelVPXYIndexIndex);
-            w.Write(postModelVPXYIndexIndex);
+            w.Write(railing1xModelVPXYIndex);
+            w.Write(postModelVPXYIndex);
 
             base.UnParse(s);
 
@@ -133,15 +133,15 @@ namespace CatalogResource
         public MaterialList Materials
         {
             get { if (version < 0x00000003) throw new InvalidOperationException(); return materialList; }
-            set { if (version < 0x00000003) throw new InvalidOperationException(); if (materialList != value) { materialList = value == null ? null : new MaterialList(OnResourceChanged, value); } OnResourceChanged(this, new EventArgs()); }
+            set { if (version < 0x00000003) throw new InvalidOperationException(); if (materialList != value) { materialList = value == null ? null : new MaterialList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } }
         }
         //--insert CommonBlock: ElementPriority(11)
         [ElementPriority(21), TGIBlockListContentField("TGIBlocks")]
-        public uint Railing4xModelVPXYIndexIndex { get { return railing4xModelVPXYIndex; } set { if (railing4xModelVPXYIndex != value) { railing4xModelVPXYIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint Railing4xModelVPXYIndex { get { return railing4xModelVPXYIndex; } set { if (railing4xModelVPXYIndex != value) { railing4xModelVPXYIndex = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(22), TGIBlockListContentField("TGIBlocks")]
-        public uint Railing1xModelVPXYIndexIndex { get { return railing1xModelVPXYIndexIndex; } set { if (railing1xModelVPXYIndexIndex != value) { railing1xModelVPXYIndexIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint Railing1xModelVPXYIndex { get { return railing1xModelVPXYIndex; } set { if (railing1xModelVPXYIndex != value) { railing1xModelVPXYIndex = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(23), TGIBlockListContentField("TGIBlocks")]
-        public uint PostModelVPXYIndexIndex { get { return postModelVPXYIndexIndex; } set { if (postModelVPXYIndexIndex != value) { postModelVPXYIndexIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint PostModelVPXYIndex { get { return postModelVPXYIndex; } set { if (postModelVPXYIndex != value) { postModelVPXYIndex = value; OnResourceChanged(this, new EventArgs()); } } }
         //--insert TGIBlockList: no ElementPriority
         #endregion
     }
