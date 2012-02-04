@@ -1005,7 +1005,7 @@ namespace System.Drawing
         /// </summary>
         /// <param name="image"><see cref="T:Image"/> from which to extract image pixels.</param>
         /// <param name="supportHSV">When true, create an HSVa-encoded version of the image.</param>
-        public void CreateImage(Image image, bool supportHSV) { CreateImage(new Bitmap(image), supportHSV); }
+        public void CreateImage(Image image, bool supportHSV) { CreateImage(new Bitmap(image), supportHSV, image.PixelFormat); }
 
         /// <summary>
         /// Creates an image from a given <see cref="T:Bitmap"/>.
@@ -1013,9 +1013,11 @@ namespace System.Drawing
         /// </summary>
         /// <param name="image"><see cref="T:Bitmap"/> from which to extract image pixels.</param>
         /// <param name="supportHSV">When true, create an HSVa-encoded version of the image.</param>
-        public void CreateImage(Bitmap image, bool supportHSV)
+        /// <param name="fmt">(Optional) Override the <paramref name="image"/> <see cref="T:Imaging.PixelFormat"/> value.</param>
+        public void CreateImage(Bitmap image, bool supportHSV, Imaging.PixelFormat? fmt = null)
         {
-            ddsHeader = new DdsHeader((image.PixelFormat & Imaging.PixelFormat.Alpha) == 0
+            if (!fmt.HasValue) fmt = image.PixelFormat;
+            ddsHeader = new DdsHeader((fmt & Imaging.PixelFormat.Alpha) == 0
                 ? DdsFileFormat.DDS_FORMAT_DXT1
                 : DdsFileFormat.DDS_FORMAT_DXT5
                 , image.Width, image.Height);
