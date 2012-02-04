@@ -317,15 +317,19 @@ namespace s3pi.Interfaces
                     {
                         string suffix = "";
                         DependentList<TGIBlock> tgis = GetTGIBlocks(f);
-                        if (tgis != null)
+                        if (tgis != null && tgis.Count > 0)
                             try
                             {
-                                TGIBlock tgi = tgis[Convert.ToInt32(tv.Value)];
-                                suffix = " (" + tgi + ")";
+                                int i = Convert.ToInt32(tv.Value);
+                                if (i >= 0 && i < tgis.Count)
+                                {
+                                    TGIBlock tgi = tgis[i];
+                                    suffix = " (" + tgi + ")";
+                                }
                             }
                             catch (Exception e)
                             {
-                                sb.Append(e.Message + "\n" + e.StackTrace + "\n----");
+                                sb.Append(" (Exception: " + e.Message + ")");
                             }
                         sb.Append("\n" + f + ": " + tv + suffix);
                     }
