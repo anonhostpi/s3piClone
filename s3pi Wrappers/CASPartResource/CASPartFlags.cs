@@ -355,7 +355,25 @@ namespace CASPartResource
         BodyHairForearms = 0x0000002C,
         BodyHairLegsCalves = 0x0000002D,
         BodyHairLegsFeet = 0x0000002E,
-        Unknown2F = 0x0000002F,
+        PetBody = 0x0000002F,
+
+        PetTail = 0x00000030,
+        PetEars = 0x00000031,
+        PetMane = 0x00000032,
+        PetCollarBridle = 0x00000033,
+        PetSaddle = 0x00000034,
+        PeltLayer = 0x00000035,
+        BasePeltLayer = 0x00000036,
+        PetHooves = 0x00000037,
+
+        PetHorn = 0x00000038,
+        PetBlanket = 0x00000039,
+        PetBreastCollar = 0x0000003A,
+        PetBeard = 0x0000003B,
+        Unknown3C = 0x0000003C,
+        Unknown3D = 0x0000003D,
+        Unknown3E = 0x0000003E,
+        Unknown3F = 0x0000003F,
     }
 
     [Flags]
