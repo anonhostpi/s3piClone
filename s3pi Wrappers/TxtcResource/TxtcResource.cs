@@ -877,6 +877,7 @@ namespace TxtcResource
                             return new TypedValue(typeof(DetailLevel), Enum.ToObject(typeof(DetailLevel), data), "X") + "";
                         case UInt32Properties.ID:
                             return new TypedValue(typeof(StepType), Enum.ToObject(typeof(StepType), data), "X") + "";
+                        case UInt32Properties.ImageSource:
                         case UInt32Properties.RenderTarget:
                             return new TypedValue(typeof(RenderTarget), Enum.ToObject(typeof(RenderTarget), data), "X") + "";
                         default:
