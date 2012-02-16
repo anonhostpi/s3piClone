@@ -19,6 +19,7 @@
  ***************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace System.Security.Cryptography
 {
@@ -119,5 +120,69 @@ namespace System.Security.Cryptography
         /// <param name="text">the text to get the hash for</param>
         /// <returns>the hash value</returns>
         public static ulong GetHash(string text) { return BitConverter.ToUInt64(new System.Security.Cryptography.FNV64().ComputeHash(text), 0); }
+    }
+
+
+    /// <summary>
+    /// FNV64CLIP hash routine
+    /// </summary>
+    public class FNV64CLIP : FNV64
+    {
+        /// <summary>
+        /// Initialise the hash algorithm
+        /// </summary>
+        public FNV64CLIP() : base() { }
+
+        /// <summary>
+        /// Get the FNV64 hash for use as the IID for a CLIP of a given name.
+        /// </summary>
+        /// <param name="text">the CLIP name to get the hash for</param>
+        /// <returns>the hash value</returns>
+        public static new ulong GetHash(string text)
+        {
+            string value = text;
+            ulong mask = 0;
+
+            string[] split = text.Split(new char[] { '_', }, 2);
+            if (split.Length > 1)
+            {
+                if (split[0].Length == 1)
+                {
+                    if (ao.Contains(split[0][0])) { }
+                    else { value = string.Join("_", new string[] { "a", split[1], }); mask = (ulong)(0x8000 | Mask(split[0][0]) << 8); }
+                }
+                else if (split[0].Length == 3 && split[0][1] == '2')
+                {
+                    if (ao.Contains(split[0][0]) && ao.Contains(split[0][2])) { }
+                    else
+                    {
+                        value = string.Join("_", new string[] { (split[0][0] == 'o' ? "o" : "a") + "2" + (split[0][2] == 'o' ? "o" : "a"), split[1], });
+                        mask = (ulong)(0x8000 | Mask(split[0][0]) << 8 | Mask(split[0][2]));
+                    }
+                }
+            }
+
+            ulong hash = FNV64.GetHash(value);
+            hash &= 0x7FFFFFFFFFFFFFFF;
+            hash ^= mask << 48;
+
+            return hash;
+        }
+
+        static char[] ao = new char[] { 'a', 'o', };
+        static byte Mask(char age)
+        {
+            switch (age)
+            {
+                case 'b': return 0x01;
+                case 'p': return 0x02;
+                case 'c': return 0x03;
+                case 't': return 0x04;
+                case 'h': return 0x05;
+                case 'e': return 0x06;
+                default: return 0x00;
+            }
+        }
+
     }
 }
