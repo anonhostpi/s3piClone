@@ -130,7 +130,7 @@ namespace CASPartResource
             handedness = (HandednessFlags)r.ReadUInt16();
         }
 
-        internal void UnParse(Stream s)
+        public void UnParse(Stream s)
         {
             BinaryWriter w = new BinaryWriter(s);
             w.Write((byte)age);
@@ -229,9 +229,10 @@ namespace CASPartResource
         Makeover = 0x00000400,
         SkinnyDippingTowel = 0x00000800,
 
-        Unknown0C = 0x00001000,
-        Unknown0D = 0x00002000,
-        Unknown0E = 0x00004000,
+        Racing = 0x00001000,
+        Jumping = 0x00002000,
+        Bridle = 0x00004000,
+        //Markings = 0x00007000,
         Unknown0F = 0x00008000,
 
         Unknown10 = 0x00010000,
@@ -247,14 +248,66 @@ namespace CASPartResource
         IsRevealing = 0x00800000,
 
         IsHiddenInCAS = 0x01000000,
-        Unknown19 = 0x02000000,
-        Unknown1A = 0x04000000,
-        Unknown1B = 0x08000000,
 
-        Unknown1C = 0x10000000,
+        //  C BA9
+        //  0 001x - head
+        //  0 010x - chest
+        //  0 011x - belly
+        //  0 100x - back
+        //  0 101x - tail
+        //  0 110x - front left leg
+        //  0 111x - front right leg
+        //  1 000x - rear left leg
+        //  1 001x - rear right leg
+        //  1 010x - all
+        //Unknown19 = 0x02000000,
+        //Unknown1A = 0x04000000,
+        //Unknown1B = 0x08000000,
+        //Unknown1C = 0x10000000,
+        RegionHead = 0x02000000,
+        RegionChest = 0x04000000,
+        RegionBelly = 0x06000000,
+        RegionBack = 0x08000000,
+        RegionTail = 0x0A000000,
+        RegionFrontLeftLeg = 0x0C000000,
+        RegionFrontRightLeg = 0x0E000000,
+        RegionRearLeftLeg = 0x10000000,
+        RegionRearRightLeg = 0x12000000,
+        RegionAll = 0x14000000,
+        //RegionMask = 0x1E000000,
+
         Unknown1D = 0x20000000,
         Unknown1E = 0x40000000,
         Unknown1F = 0x80000000,
+    }
+
+    public enum RegionType : byte
+    {
+        None = 0x00,
+        Head = 0x01,
+        Chest = 0x02,
+        Belly = 0x03,
+        Back = 0x04,
+        Tail = 0x05,
+        FrontLeftLeg = 0x06,
+        FrontRightLeg = 0x07,
+        RearLeftLeg = 0x08,
+        RearRightLeg = 0x09,
+        All = 0x0A,
+    }
+    public static class Extensions
+    {
+        public static RegionType GetRegionType(ClothingCategoryFlags value)
+        {
+            uint raw = (uint)value;
+            raw >>= 25;
+            return (RegionType)(raw & 0x0F);
+        }
+        public static ClothingCategoryFlags ToClothingCategoryFlags(RegionType value)
+        {
+            uint raw = (uint)value;
+            return (ClothingCategoryFlags)(raw << 25);
+        }
     }
 
     [Flags]
