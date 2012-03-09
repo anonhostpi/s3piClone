@@ -144,21 +144,29 @@ namespace System.Security.Cryptography
             ulong mask = 0;
 
             string[] split = text.Split(new char[] { '_', }, 2);
-            if (split.Length > 1)
+            if (split.Length > 1 && split[0].Length <= 5)
             {
-                if (split[0].Length == 1)
+                string[] x2y = split[0].Split(new char[] { '2', }, 2);
+                if (x2y[0].Length > 0 && x2y[0].Length <= 2)
                 {
-                    if (ao.Contains(split[0][0])) { }
-                    else { value = string.Join("_", new string[] { "a", split[1], }); mask = (ulong)(0x8000 | Mask(split[0][0]) << 8); }
-                }
-                else if (split[0].Length == 3 && split[0][1] == '2')
-                {
-                    if (ao.Contains(split[0][0]) && ao.Contains(split[0][2])) { }
-                    else
+
+                    byte xAge = Mask(x2y[0]);
+
+                    if (x2y.Length > 1 && x2y[1].Length > 0 && x2y[1].Length <= 2)
                     {
-                        value = string.Join("_", new string[] { (split[0][0] == 'o' ? "o" : "a") + "2" + (split[0][2] == 'o' ? "o" : "a"), split[1], });
-                        mask = (ulong)(0x8000 | Mask(split[0][0]) << 8 | Mask(split[0][2]));
+                        if (!(ao.Contains(x2y[0]) && ao.Contains(x2y[1])))
+                        {
+                            byte yAge = Mask(x2y[1]);
+                            value = string.Join("_", new string[] { (x2y[0][0] == 'o' ? "o" : "a") + "2" + (x2y[1][0] == 'o' ? "o" : "a"), split[1], });
+                            mask = (ulong)(0x8000 | xAge << 8 | yAge);
+                        }
                     }
+                    else if (!ao.Contains(x2y[0]))
+                    {
+                        value = string.Join("_", new string[] { "a", split[1], });
+                        mask = (ulong)(0x8000 | xAge << 8);
+                    }
+
                 }
             }
 
@@ -169,20 +177,62 @@ namespace System.Security.Cryptography
             return hash;
         }
 
-        static char[] ao = new char[] { 'a', 'o', };
-        static byte Mask(char age)
+        /// <summary>
+        /// Get the FNV64 hash for use as the IID for a CLIP but ignoring age and species.
+        /// </summary>
+        /// <param name="text">The CLIP name to get the generic hash for.</param>
+        /// <returns>The generic hash value</returns>
+        public static ulong GetHashGeneric(string text)
         {
-            switch (age)
+            string value = text;
+
+            string[] split = text.Split(new char[] { '_', }, 2);
+            if (split.Length > 1 && split[0].Length <= 5)
             {
-                case 'b': return 0x01;
-                case 'p': return 0x02;
-                case 'c': return 0x03;
-                case 't': return 0x04;
-                case 'h': return 0x05;
-                case 'e': return 0x06;
+                string[] x2y = split[0].Split(new char[] { '2', }, 2);
+                if (x2y[0].Length > 0 && x2y[0].Length <= 2)
+                {
+
+                    if (x2y.Length > 1 && x2y[1].Length > 0 && x2y[1].Length <= 2)
+                    {
+                        if (!(ao.Contains(x2y[0]) && ao.Contains(x2y[1])))
+                        {
+                            value = string.Join("_", new string[] { (x2y[0][0] == 'o' ? "o" : "a") + "2" + (x2y[1][0] == 'o' ? "o" : "a"), split[1], });
+                        }
+                    }
+                    else if (!ao.Contains(x2y[0]))
+                    {
+                        value = string.Join("_", new string[] { "a", split[1], });
+                    }
+
+                }
+            }
+
+            ulong hash = FNV64.GetHash(value);
+            hash &= 0x7FFFFFFFFFFFFFFF;
+
+            return hash;
+        }
+
+        static string[] ao = { "a", "o", };
+        static byte Mask(string actor)
+        {
+            switch (actor)
+            {
+                case "b": return 0x01;
+                case "p": return 0x02;
+                case "c": return 0x03;
+                case "t": return 0x04;
+                case "h": return 0x05;
+                case "e": return 0x06;
+                case "ad": return 0x08;
+                case "al": return 0x0A;
+                case "ac": return 0x0D;
+                case "ah": return 0x10;
+                case "ab": return 0x12;
+                case "ar": return 0x13;
                 default: return 0x00;
             }
         }
-
     }
 }
