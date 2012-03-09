@@ -288,50 +288,61 @@ namespace System.Configuration
         private object GetSetting(SettingsProperty setProp)
         {
             object retVal;
-            try
+
+            // Search for the specific settings node we are looking for in the configuration file.
+            XmlNode SettingNode = XMLConfig.SelectSingleNode("//setting[@name='" + setProp.Name + "']");
+            SettingNode = SettingNode == null ? null : SettingNode.FirstChild;
+
+            // If it exists, return the InnerText or InnerXML of its first child node, depending on the setting type.
+            if (SettingNode != null)
             {
-                // Search for the specific settings node we are looking for in the configuration file.
-                // If it exists, return the InnerText or InnerXML of its first child node, depending on the setting type.
 
-                // If the setting is serialized as a string, return the text stored in the config
-                if (setProp.SerializeAs.ToString() == "String")
+                switch (setProp.SerializeAs)
                 {
-                    return XMLConfig.SelectSingleNode("//setting[@name='" + setProp.Name + "']").FirstChild.InnerText;
+                    case SettingsSerializeAs.String:
+                        return SettingNode.InnerText;
+                    case SettingsSerializeAs.Xml:
+                        string xmlData = SettingNode.InnerXml;
+                        return @"" + xmlData;
+                    case SettingsSerializeAs.Binary:
+                    default:
+                        throw new NotSupportedException();
+                        //break;
                 }
 
-                // If the setting is stored as XML, deserialize it and return the proper object.
-                else
-                {
-                    string xmlData = XMLConfig.SelectSingleNode("//setting[@name='" + setProp.Name + "']").FirstChild.InnerXml;
-                    return @"" + xmlData;
-                }
             }
-            catch (Exception)
+            else
             {
                 // Check to see if a default value is defined by the application.
-                // If so, return that value, using the same rules for settings stored as Strings and XML as above
                 if ((setProp.DefaultValue != null))
                 {
-                    if (setProp.SerializeAs.ToString() == "String")
+                    // If so, return that value, using the same rules for settings stored as Strings and XML as above
+                    switch (setProp.SerializeAs)
                     {
-                        retVal = setProp.DefaultValue.ToString();
-                    }
-                    else
-                    {
-                        string settingType = setProp.PropertyType.ToString();
-                        string xmlData = setProp.DefaultValue.ToString();
+                        case SettingsSerializeAs.String:
+                            retVal = setProp.DefaultValue.ToString();
+                            break;
+                        case SettingsSerializeAs.Xml:
+                            retVal = setProp.DefaultValue.ToString().Replace(@"<?xml version=""1.0"" encoding=""utf-16""?>", "");
+                            break;
+                        /*string xmlData = setProp.DefaultValue.ToString();
                         XmlSerializer xs = new XmlSerializer(typeof(string[]));
-                        string[] data = (string[])xs.Deserialize(new XmlTextReader(xmlData, XmlNodeType.Element, null));
-
-                        switch (settingType)
+                        StringCollection sc = new StringCollection();
+                        object property = xs.Deserialize(new XmlTextReader(xmlData, XmlNodeType.Element, null));
+                        if (setProp.PropertyType == typeof(System.Collections.Specialized.StringCollection))
                         {
-                            case "System.Collections.Specialized.StringCollection":
-                                StringCollection sc = new StringCollection();
-                                sc.AddRange(data);
-                                return sc;
-
-                            default: return "";
+                            string[] data = (string[])property;
+                            sc.AddRange(data);
+                            return sc;
                         }
+                        throw new NotSupportedException();**/
+                        //retVal = "";
+                        //break;
+                        case SettingsSerializeAs.Binary:
+                        default:
+                            throw new NotSupportedException();
+                        //retVal = "";
+                        //break;
                     }
                 }
                 else
@@ -344,33 +355,30 @@ namespace System.Configuration
 
         private void SetSetting(SettingsPropertyValue setProp)
         {
-            // Define the XML path under which we want to write our settings if they do not already exist
-            XmlNode SettingNode = null;
-
-            try
-            {
-                // Search for the specific settings node we want to update.
-                // If it exists, return its first child node, (the <value>data here</value> node)
-                SettingNode = XMLConfig.SelectSingleNode("//setting[@name='" + setProp.Name + "']").FirstChild;
-            }
-            catch (Exception)
-            {
-                SettingNode = null;
-            }
+            // Search for the specific settings node we are looking for in the configuration file.
+            XmlNode SettingNode = XMLConfig.SelectSingleNode("//setting[@name='" + setProp.Name + "']");
+            SettingNode = SettingNode == null ? null : SettingNode.FirstChild;
 
             // If we have a pointer to an actual XML node, update the value stored there
-            if ((SettingNode != null))
+            if (SettingNode != null)
             {
-                if (setProp.Property.SerializeAs.ToString() == "String")
+
+                switch (setProp.Property.SerializeAs)
                 {
-                    SettingNode.InnerText = setProp.SerializedValue.ToString();
+                    case SettingsSerializeAs.String:
+                        SettingNode.InnerText = setProp.SerializedValue.ToString();
+                        break;
+                    case SettingsSerializeAs.Xml:
+                        // Write the object to the config serialized as Xml - we must remove the Xml declaration when writing
+                        // the value, otherwise .Net's configuration system complains about the additional declaration.
+                        SettingNode.InnerXml = setProp.SerializedValue.ToString().Replace(@"<?xml version=""1.0"" encoding=""utf-16""?>", "");
+                        break;
+                    case SettingsSerializeAs.Binary:
+                    default:
+                        throw new NotSupportedException();
+                    //break;
                 }
-                else
-                {
-                    // Write the object to the config serialized as Xml - we must remove the Xml declaration when writing
-                    // the value, otherwise .Net's configuration system complains about the additional declaration.
-                    SettingNode.InnerXml = setProp.SerializedValue.ToString().Replace(@"<?xml version=""1.0"" encoding=""utf-16""?>", "");
-                }
+
             }
             else
             {
@@ -381,32 +389,31 @@ namespace System.Configuration
 
                 // Create a new settings node and assign its name as well as how it will be serialized
                 XmlElement newSetting = _XMLConfig.CreateElement("setting");
+
+                // Create an element under our named settings node, and assign it the value we are trying to save
+                XmlElement valueElement = _XMLConfig.CreateElement("value");
                 newSetting.SetAttribute("name", setProp.Name);
 
-                if (setProp.Property.SerializeAs.ToString() == "String")
+                switch (setProp.Property.SerializeAs)
                 {
-                    newSetting.SetAttribute("serializeAs", "String");
-                }
-                else
-                {
-                    newSetting.SetAttribute("serializeAs", "Xml");
+                    case SettingsSerializeAs.String:
+                        newSetting.SetAttribute("serializeAs", "String");
+                        valueElement.InnerText = setProp.SerializedValue.ToString();
+                        break;
+                    case SettingsSerializeAs.Xml:
+                        newSetting.SetAttribute("serializeAs", "Xml");
+                        // Write the object to the config serialized as Xml - we must remove the Xml declaration when writing
+                        // the value, otherwise .Net's configuration system complains about the additional declaration
+                        valueElement.InnerXml = setProp.SerializedValue.ToString().Replace(@"<?xml version=""1.0"" encoding=""utf-16""?>", "");
+                        break;
+                    case SettingsSerializeAs.Binary:
+                    default:
+                        throw new NotSupportedException();
+                    //break;
                 }
 
                 // Append this node to the application settings node (<Appname.Properties.Settings>)
                 tmpNode.AppendChild(newSetting);
-
-                // Create an element under our named settings node, and assign it the value we are trying to save
-                XmlElement valueElement = _XMLConfig.CreateElement("value");
-                if (setProp.Property.SerializeAs.ToString() == "String")
-                {
-                    valueElement.InnerText = setProp.SerializedValue.ToString();
-                }
-                else
-                {
-                    // Write the object to the config serialized as Xml - we must remove the Xml declaration when writing
-                    // the value, otherwise .Net's configuration system complains about the additional declaration
-                    valueElement.InnerXml = setProp.SerializedValue.ToString().Replace(@"<?xml version=""1.0"" encoding=""utf-16""?>", "");
-                }
 
                 //Append this new element under the setting node we created above
                 newSetting.AppendChild(valueElement);
