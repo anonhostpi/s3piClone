@@ -1046,7 +1046,7 @@ namespace s3pi.GenericRCOLResource
 
             #region Content Fields
             [ElementPriority(11)]
-            public IResourceKey Data { get { return data; } set { if (data != value) { data = new TGIBlock(requestedApiVersion, handler, value); OnElementChanged(); } } }
+            public IResourceKey Data { get { return data; } set { if (!data.Equals(value)) { data = new TGIBlock(requestedApiVersion, handler, value); OnElementChanged(); } } }
             #endregion
         }
 
