@@ -36,7 +36,7 @@
             this.btnClose = new System.Windows.Forms.Button();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.btnReset = new System.Windows.Forms.Button();
-            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.tlpCustomContent = new System.Windows.Forms.TableLayoutPanel();
             this.ckbCustomContent = new System.Windows.Forms.CheckBox();
             this.tbCCFolder = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
@@ -46,7 +46,7 @@
             this.label12 = new System.Windows.Forms.Label();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.tlpGameFolders.SuspendLayout();
-            this.tableLayoutPanel1.SuspendLayout();
+            this.tlpCustomContent.SuspendLayout();
             this.SuspendLayout();
             // 
             // tlpGameFolders
@@ -144,31 +144,31 @@
             this.btnReset.UseVisualStyleBackColor = true;
             this.btnReset.Click += new System.EventHandler(this.btnReset_Click);
             // 
-            // tableLayoutPanel1
+            // tlpCustomContent
             // 
-            this.tableLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.tlpCustomContent.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tableLayoutPanel1.ColumnCount = 4;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tableLayoutPanel1.Controls.Add(this.ckbCustomContent, 1, 1);
-            this.tableLayoutPanel1.Controls.Add(this.tbCCFolder, 2, 1);
-            this.tableLayoutPanel1.Controls.Add(this.label6, 1, 0);
-            this.tableLayoutPanel1.Controls.Add(this.label7, 2, 0);
-            this.tableLayoutPanel1.Controls.Add(this.label5, 0, 0);
-            this.tableLayoutPanel1.Controls.Add(this.btnCCEdit, 3, 1);
-            this.tableLayoutPanel1.Controls.Add(this.label12, 3, 0);
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(12, 12);
-            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 3;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 28F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(604, 59);
-            this.tableLayoutPanel1.TabIndex = 3;
+            this.tlpCustomContent.ColumnCount = 4;
+            this.tlpCustomContent.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tlpCustomContent.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tlpCustomContent.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tlpCustomContent.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tlpCustomContent.Controls.Add(this.ckbCustomContent, 1, 1);
+            this.tlpCustomContent.Controls.Add(this.tbCCFolder, 2, 1);
+            this.tlpCustomContent.Controls.Add(this.label6, 1, 0);
+            this.tlpCustomContent.Controls.Add(this.label7, 2, 0);
+            this.tlpCustomContent.Controls.Add(this.label5, 0, 0);
+            this.tlpCustomContent.Controls.Add(this.btnCCEdit, 3, 1);
+            this.tlpCustomContent.Controls.Add(this.label12, 3, 0);
+            this.tlpCustomContent.Location = new System.Drawing.Point(12, 12);
+            this.tlpCustomContent.Name = "tlpCustomContent";
+            this.tlpCustomContent.RowCount = 3;
+            this.tlpCustomContent.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tlpCustomContent.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tlpCustomContent.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 28F));
+            this.tlpCustomContent.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tlpCustomContent.Size = new System.Drawing.Size(604, 59);
+            this.tlpCustomContent.TabIndex = 3;
             // 
             // ckbCustomContent
             // 
@@ -260,7 +260,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(628, 138);
-            this.Controls.Add(this.tableLayoutPanel1);
+            this.Controls.Add(this.tlpCustomContent);
             this.Controls.Add(this.btnReset);
             this.Controls.Add(this.btnClose);
             this.Controls.Add(this.tlpGameFolders);
@@ -272,8 +272,8 @@
             this.Load += new System.EventHandler(this.GameFoldersForm_Load);
             this.tlpGameFolders.ResumeLayout(false);
             this.tlpGameFolders.PerformLayout();
-            this.tableLayoutPanel1.ResumeLayout(false);
-            this.tableLayoutPanel1.PerformLayout();
+            this.tlpCustomContent.ResumeLayout(false);
+            this.tlpCustomContent.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -289,7 +289,7 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
         private System.Windows.Forms.Button btnReset;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.TableLayoutPanel tlpCustomContent;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label7;

@@ -54,6 +54,15 @@ namespace s3pi.Filetable
         }
 
         /// <summary>
+        /// Whether to display the option to allow user-created content to be included in the file table.
+        /// </summary>
+        public bool CCSettable
+        {
+            get { return tlpCustomContent.Enabled; }
+            set { tlpCustomContent.Enabled = value; }
+        }
+
+        /// <summary>
         /// Whether the user wants to have their user-created content available.
         /// </summary>
         public bool CCEnabled
