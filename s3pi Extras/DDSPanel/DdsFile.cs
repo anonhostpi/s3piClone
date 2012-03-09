@@ -64,8 +64,10 @@ namespace System.Drawing
         // Used to identify the resource as a DDS
         const uint fourccDDS_ = 0x20534444;//'DDS '
 
-        // DdsHeader describes the DDS resource
-        DdsHeader ddsHeader;
+        /// <summary>
+        /// Header of the DDS image.
+        /// </summary>
+        public DdsHeader ddsHeader { get; private set; }
 
         // ARGB data as extracted from the DDS resource
         uint[] baseImage = null;
@@ -78,53 +80,143 @@ namespace System.Drawing
         HSVShift hsvShift;
 
 
-        #region Internal values
-        const uint fourccDXT1 = 0x31545844;//'DXT1'
-        const uint fourccDXT3 = 0x33545844;//'DXT3'
-        const uint fourccDXT5 = 0x35545844;//'DXT5'
+        #region DDS header
+        /// <summary>
+        /// DXT1 tag
+        /// </summary>
+        public const uint fourccDXT1 = 0x31545844;
+        /// <summary>
+        /// DXT3 tag
+        /// </summary>
+        public const uint fourccDXT3 = 0x33545844;
+        /// <summary>
+        /// DXT5 tag
+        /// </summary>
+        public const uint fourccDXT5 = 0x35545844;
 
-        enum DdsFileFormat
+        /// <summary>
+        /// Describes the DDS file format
+        /// </summary>
+        public enum DdsFileFormat
         {
+            /// <summary>
+            /// DXT1
+            /// </summary>
             DDS_FORMAT_DXT1,
+            /// <summary>
+            /// DXT3
+            /// </summary>
             DDS_FORMAT_DXT3,
+            /// <summary>
+            /// DXT5
+            /// </summary>
             DDS_FORMAT_DXT5,
+            /// <summary>
+            /// 32bit A8R8G8B8
+            /// </summary>
             DDS_FORMAT_A8R8G8B8,
+            /// <summary>
+            /// 32bit, top 8 ignored X8R8G8B8
+            /// </summary>
             DDS_FORMAT_X8R8G8B8,
+            /// <summary>
+            /// 32bit A8B8G8R8
+            /// </summary>
             DDS_FORMAT_A8B8G8R8,
+            /// <summary>
+            /// 32bit, top 8 ignored X8B8G8R8
+            /// </summary>
             DDS_FORMAT_X8B8G8R8,
+            /// <summary>
+            /// 16bit A1R5G5B5
+            /// </summary>
             DDS_FORMAT_A1R5G5B5,
+            /// <summary>
+            /// 16bit A4R4G4B4
+            /// </summary>
             DDS_FORMAT_A4R4G4B4,
+            /// <summary>
+            /// 24bit R8G8B8
+            /// </summary>
             DDS_FORMAT_R8G8B8,
+            /// <summary>
+            /// 16bit R5G6B5
+            /// </summary>
             DDS_FORMAT_R5G6B5,
         }
 
-        class DdsPixelFormat
+        /// <summary>
+        /// Pixel format
+        /// </summary>
+        public class DdsPixelFormat
         {
+            /// <summary>
+            /// Pixel format flags
+            /// </summary>
             public enum PixelFormatFlags : uint
             {
+                /// <summary>
+                /// Format supports alpha bit(s)
+                /// </summary>
                 DDS_ALPHAPIXELS = 0x00000001,
+                /// <summary>
+                /// Format supports alpha value
+                /// </summary>
                 DDS_ALPHA = 0x00000002,
+                /// <summary>
+                /// Format supports four channels
+                /// </summary>
                 DDS_FOURCC = 0x00000004,
+                /// <summary>
+                /// Format supports RGB values
+                /// </summary>
                 DDS_RGB = 0x00000040,
+                /// <summary>
+                /// Format supports YUV values
+                /// </summary>
                 DDS_YUV = 0x00000200,
+                /// <summary>
+                /// Format supports luminance value
+                /// </summary>
                 DDS_LUMINANCE = 0x00020000,
             }
 
-            public uint m_size;
-            public PixelFormatFlags m_flags;
-            public uint m_fourCC;
-            public int m_rgbBitCount;
-            public uint m_rBitMask;
-            public uint m_gBitMask;
-            public uint m_bBitMask;
-            public uint m_aBitMask;
+            internal uint m_size;
+            /// <summary>
+            /// Flags
+            /// </summary>
+            public PixelFormatFlags m_flags { get; private set; }
+            /// <summary>
+            /// Four CC
+            /// </summary>
+            public uint m_fourCC { get; private set; }
+            /// <summary>
+            /// Number of bits
+            /// </summary>
+            public int m_rgbBitCount { get; private set; }
+            /// <summary>
+            /// Location in the pixel of the red channel bits
+            /// </summary>
+            public uint m_rBitMask { get; private set; }
+            /// <summary>
+            /// Location in the pixel of the green channel bits
+            /// </summary>
+            public uint m_gBitMask { get; private set; }
+            /// <summary>
+            /// Location in the pixel of the blue channel bits
+            /// </summary>
+            public uint m_bBitMask { get; private set; }
+            /// <summary>
+            /// Location in the pixel of the alpha channel bits
+            /// </summary>
+            public uint m_aBitMask { get; private set; }
 
-            public uint Size()
+            uint Size()
             {
                 return 8 * 4;
             }
 
-            public DdsPixelFormat(DdsFileFormat fileFormat)
+            internal DdsPixelFormat(DdsFileFormat fileFormat)
             {
                 m_size = Size();
                 switch (fileFormat)
@@ -232,7 +324,7 @@ namespace System.Drawing
                 }
             }
 
-            public DdsPixelFormat(DdsPixelFormat basis)
+            internal DdsPixelFormat(DdsPixelFormat basis)
             {
                 m_size = basis.m_size;
                 m_flags = basis.m_flags;
@@ -244,7 +336,7 @@ namespace System.Drawing
                 m_aBitMask = basis.m_aBitMask;
             }
 
-            public DdsPixelFormat(BinaryReader input)
+            internal DdsPixelFormat(BinaryReader input)
             {
                 this.m_size = input.ReadUInt32();
                 this.m_flags = (PixelFormatFlags)input.ReadUInt32();
@@ -254,9 +346,12 @@ namespace System.Drawing
                 this.m_gBitMask = input.ReadUInt32();
                 this.m_bBitMask = input.ReadUInt32();
                 this.m_aBitMask = input.ReadUInt32();
+
+                if ((m_rgbBitCount & 0xFF) / 8 > 4)
+                    throw new FormatException("Pixel size must be four bytes or less.");
             }
 
-            public void Write(BinaryWriter output)
+            internal void Write(BinaryWriter output)
             {
                 output.Write(this.m_size);
                 output.Write((uint)this.m_flags);
@@ -268,7 +363,7 @@ namespace System.Drawing
                 output.Write(this.m_aBitMask);
             }
 
-            public bool IsFourChannel
+            internal bool IsFourChannel
             {
                 get
                 {
@@ -278,9 +373,9 @@ namespace System.Drawing
                 }
             }
 
-            public int PixelSize { get { return m_rgbBitCount / 8; } }
+            internal int PixelSize { get { return m_rgbBitCount / 8; } }
 
-            public void codecFromPixelFormat(out ToARGB toARGB, out ToPixel toPixel)
+            internal void codecFromPixelFormat(out ToARGB toARGB, out ToPixel toPixel)
             {
                 toARGB = null;
                 toPixel = null;
@@ -354,7 +449,7 @@ namespace System.Drawing
             #region Supported non-DXT1/3/5 conversion methods - decompress
             static uint fromDDS_A8R8G8B8(uint pixelColour) { return pixelColour; }
             static uint fromDDS_X8R8G8B8(uint pixelColour) { return 0xFF000000 | pixelColour; }
-            public static uint fromDDS_A8B8G8R8(uint pixelColour) { return (pixelColour & 0xFF00FF00) | (pixelColour & 0x00FF0000) >> 16 | (pixelColour & 0x000000FF) << 16; }
+            internal static uint fromDDS_A8B8G8R8(uint pixelColour) { return (pixelColour & 0xFF00FF00) | (pixelColour & 0x00FF0000) >> 16 | (pixelColour & 0x000000FF) << 16; }
             static uint fromDDS_X8B8G8R8(uint pixelColour) { return 0xFF000000 | (pixelColour & 0x00FF0000) >> 16 | (pixelColour & 0x000000FF) << 16; }
             static uint fromDDS_A1R5G5B5(uint pixelColour)
             {
@@ -388,7 +483,7 @@ namespace System.Drawing
             #region Supported non-DXT1/3/5 conversion methods - compress
             static uint toDDS_A8R8G8B8(uint argb) { return argb; }
             static uint toDDS_X8R8G8B8(uint argb) { return argb & 0x00FFFFFF; }
-            public static uint toDDS_A8B8G8R8(uint argb) { return (argb & 0xFF00FF00) | (argb & 0x00FF0000) >> 16 | (argb & 0x000000FF) << 16; }
+            internal static uint toDDS_A8B8G8R8(uint argb) { return (argb & 0xFF00FF00) | (argb & 0x00FF0000) >> 16 | (argb & 0x000000FF) << 16; }
             static uint toDDS_X8B8G8R8(uint argb) { return (argb & 0x0000FF00) | (argb & 0x00FF0000) >> 16 | (argb & 0x000000FF) << 16; }
             static uint toDDS_A1R5G5B5(uint argb)
             {
@@ -417,50 +512,127 @@ namespace System.Drawing
             #endregion
         }
 
-        class DdsHeader
+        /// <summary>
+        /// Header of a DDS image
+        /// </summary>
+        public class DdsHeader
         {
+            /// <summary>
+            /// About the image header
+            /// </summary>
             public enum HeaderFlags
             {
+                /// <summary>
+                /// Texture
+                /// </summary>
                 DDS_HEADER_FLAGS_TEXTURE = 0x00001007,	// DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT 
+                /// <summary>
+                /// MIP map
+                /// </summary>
                 DDS_HEADER_FLAGS_MIPMAP = 0x00020000,	// DDSD_MIPMAPCOUNT
+                /// <summary>
+                /// Volume
+                /// </summary>
                 DDS_HEADER_FLAGS_VOLUME = 0x00800000,	// DDSD_DEPTH
+                /// <summary>
+                /// Uses pitch
+                /// </summary>
                 DDS_HEADER_FLAGS_PITCH = 0x00000008,	// DDSD_PITCH
+                /// <summary>
+                /// Uses linear size
+                /// </summary>
                 DDS_HEADER_FLAGS_LINEARSIZE = 0x00080000,	// DDSD_LINEARSIZE
             }
-
+            /// <summary>
+            /// About the image
+            /// </summary>
             public enum SurfaceFlags
             {
+                /// <summary>
+                /// Is a texture
+                /// </summary>
                 DDS_SURFACE_FLAGS_TEXTURE = 0x00001000,	// DDSCAPS_TEXTURE
+                /// <summary>
+                /// Is a MIP map
+                /// </summary>
                 DDS_SURFACE_FLAGS_MIPMAP = 0x00400008,	// DDSCAPS_COMPLEX | DDSCAPS_MIPMAP
+                /// <summary>
+                /// Is a cube map
+                /// </summary>
                 DDS_SURFACE_FLAGS_CUBEMAP = 0x00000008,	// DDSCAPS_COMPLEX
             }
-
+            /// <summary>
+            /// About a cubemap image
+            /// </summary>
             public enum CubemapFlags
             {
+                /// <summary>
+                /// Has +X face
+                /// </summary>
                 DDS_CUBEMAP_POSITIVEX = 0x00000600, // DDSCAPS2_CUBEMAP | DDSCAPS2_CUBEMAP_POSITIVEX
+                /// <summary>
+                /// Has -X face
+                /// </summary>
                 DDS_CUBEMAP_NEGATIVEX = 0x00000a00, // DDSCAPS2_CUBEMAP | DDSCAPS2_CUBEMAP_NEGATIVEX
+                /// <summary>
+                /// Has +Y face
+                /// </summary>
                 DDS_CUBEMAP_POSITIVEY = 0x00001200, // DDSCAPS2_CUBEMAP | DDSCAPS2_CUBEMAP_POSITIVEY
+                /// <summary>
+                /// Has -Y face
+                /// </summary>
                 DDS_CUBEMAP_NEGATIVEY = 0x00002200, // DDSCAPS2_CUBEMAP | DDSCAPS2_CUBEMAP_NEGATIVEY
+                /// <summary>
+                /// Has +Z face
+                /// </summary>
                 DDS_CUBEMAP_POSITIVEZ = 0x00004200, // DDSCAPS2_CUBEMAP | DDSCAPS2_CUBEMAP_POSITIVEZ
+                /// <summary>
+                /// Has -Z face
+                /// </summary>
                 DDS_CUBEMAP_NEGATIVEZ = 0x00008200, // DDSCAPS2_CUBEMAP | DDSCAPS2_CUBEMAP_NEGATIVEZ
-
+                /// <summary>
+                /// Has all faces
+                /// </summary>
                 DDS_CUBEMAP_ALLFACES = (DDS_CUBEMAP_POSITIVEX | DDS_CUBEMAP_NEGATIVEX |
                                                     DDS_CUBEMAP_POSITIVEY | DDS_CUBEMAP_NEGATIVEY |
                                                     DDS_CUBEMAP_POSITIVEZ | DDS_CUBEMAP_NEGATIVEZ)
             }
-
+            /// <summary>
+            /// About a volume image
+            /// </summary>
             public enum VolumeFlags
             {
+                /// <summary>
+                /// Is a volume
+                /// </summary>
                 DDS_FLAGS_VOLUME = 0x00200000,	// DDSCAPS2_VOLUME
             }
 
             uint m_size;
-            public HeaderFlags m_headerFlags;
-            public int m_height;
-            public int m_width;
-            public int m_pitchOrLinearSize;
-            public uint m_depth;
-            public uint m_mipMapCount;
+            /// <summary>
+            /// About the image header
+            /// </summary>
+            public HeaderFlags m_headerFlags { get; private set; }
+            /// <summary>
+            /// Stores the height read
+            /// </summary>
+            public int m_height { get; private set; }
+            /// <summary>
+            /// Stores the width read
+            /// </summary>
+            public int m_width { get; private set; }
+            /// <summary>
+            /// Stores the pitch or linear size read
+            /// </summary>
+            public int m_pitchOrLinearSize { get; private set; }
+            /// <summary>
+            /// Stores the pixel depth read
+            /// </summary>
+            public uint m_depth { get; private set; }
+            /// <summary>
+            /// Stores the MIP map count read
+            /// </summary>
+            public uint m_mipMapCount { get; private set; }
             uint m_reserved1_0;
             uint m_reserved1_1;
             uint m_reserved1_2;
@@ -472,14 +644,23 @@ namespace System.Drawing
             uint m_reserved1_8;
             uint m_reserved1_9;
             uint m_reserved1_10;
-            public DdsPixelFormat m_pixelFormat;
-            public uint m_surfaceFlags;
-            public uint m_cubemapFlags;
+            /// <summary>
+            /// Pixel format
+            /// </summary>
+            public DdsPixelFormat m_pixelFormat { get; private set; }
+            /// <summary>
+            /// About the image
+            /// </summary>
+            public SurfaceFlags m_surfaceFlags { get; private set; }
+            /// <summary>
+            /// About a cubemap image
+            /// </summary>
+            public CubemapFlags m_cubemapFlags { get; private set; }
             uint m_reserved2_0;
             uint m_reserved2_1;
             uint m_reserved2_2;
 
-            public DdsHeader(DdsFileFormat ddsFileFormat, int width, int height)
+            internal DdsHeader(DdsFileFormat ddsFileFormat, int width, int height)
             {
                 m_size = 124;
                 m_headerFlags = HeaderFlags.DDS_HEADER_FLAGS_TEXTURE;//minimum
@@ -488,7 +669,7 @@ namespace System.Drawing
                 SetDdsFileFormat(ddsFileFormat);
             }
 
-            public DdsHeader(DdsHeader basis)
+            internal DdsHeader(DdsHeader basis)
             {
                 m_size = basis.m_size;
                 m_headerFlags = basis.m_headerFlags;
@@ -516,7 +697,7 @@ namespace System.Drawing
                 m_reserved2_2 = basis.m_reserved2_2;
             }
 
-            public DdsHeader(System.IO.Stream input)
+            internal DdsHeader(System.IO.Stream input)
             {
                 BinaryReader br = new BinaryReader(input);
 
@@ -539,17 +720,14 @@ namespace System.Drawing
                 this.m_reserved1_9 = br.ReadUInt32();
                 this.m_reserved1_10 = br.ReadUInt32();
                 this.m_pixelFormat = new DdsPixelFormat(br);
-                this.m_surfaceFlags = br.ReadUInt32();
-                this.m_cubemapFlags = br.ReadUInt32();
+                this.m_surfaceFlags = (SurfaceFlags)br.ReadUInt32();
+                this.m_cubemapFlags = (CubemapFlags)br.ReadUInt32();
                 this.m_reserved2_0 = br.ReadUInt32();
                 this.m_reserved2_1 = br.ReadUInt32();
                 this.m_reserved2_2 = br.ReadUInt32();
-
-                if (m_pixelFormat.PixelSize > 4)
-                    throw new FormatException("Pixel size must be four bytes or less.");
             }
 
-            public void Write(Stream output)
+            internal void Write(Stream output)
             {
                 BinaryWriter writer = new BinaryWriter(output);
                 writer.Write(this.m_size);
@@ -571,16 +749,14 @@ namespace System.Drawing
                 writer.Write(this.m_reserved1_9);
                 writer.Write(this.m_reserved1_10);
                 this.m_pixelFormat.Write(writer);
-                writer.Write(this.m_surfaceFlags);
-                writer.Write(this.m_cubemapFlags);
+                writer.Write((uint)this.m_surfaceFlags);
+                writer.Write((uint)this.m_cubemapFlags);
                 writer.Write(this.m_reserved2_0);
                 writer.Write(this.m_reserved2_1);
                 writer.Write(this.m_reserved2_2);
             }
 
-            public bool IsFourChannel { get { return m_pixelFormat.IsFourChannel; } }
-
-            public void SetDdsFileFormat(DdsFileFormat ddsFileFormat)
+            internal void SetDdsFileFormat(DdsFileFormat ddsFileFormat)
             {
                 switch (ddsFileFormat)
                 {
@@ -610,7 +786,7 @@ namespace System.Drawing
                 return (m_width * m_pixelFormat.m_rgbBitCount + 7) / 8;
             }
 
-            public int getRowPitch()
+            internal int getRowPitch()
             {
                 if ((m_headerFlags & DdsHeader.HeaderFlags.DDS_HEADER_FLAGS_PITCH) != 0)
                 {
@@ -888,8 +1064,8 @@ namespace System.Drawing
             output.Flush();
         }
 
-        delegate uint ToARGB(uint pixelColour);
-        delegate uint ToPixel(uint argb);
+        internal delegate uint ToARGB(uint pixelColour);
+        internal delegate uint ToPixel(uint argb);
         #endregion
 
         #region "Constructors", really
@@ -1163,7 +1339,7 @@ namespace System.Drawing
         /// <summary>
         /// When true, indicates the DDS image is encoded with an alpha channel.
         /// </summary>
-        public bool HasAlphaChannel { get { return ddsHeader.IsFourChannel; } }
+        public bool HasAlphaChannel { get { return ddsHeader.m_pixelFormat.IsFourChannel; } }
 
         /// <summary>
         /// Extract a <see cref="T:Image"/> representing the current image, subject to the filtering requested.

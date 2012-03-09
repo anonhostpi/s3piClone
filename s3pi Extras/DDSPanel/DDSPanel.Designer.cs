@@ -67,6 +67,7 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.Size = new System.Drawing.Size(594, 157);
             this.tableLayoutPanel1.TabIndex = 1;
+            this.tableLayoutPanel1.Click += new System.EventHandler(this.control_Click);
             // 
             // panel1
             // 
@@ -80,6 +81,7 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(594, 128);
             this.panel1.TabIndex = 2;
+            this.panel1.Click += new System.EventHandler(this.control_Click);
             // 
             // pictureBox1
             // 
@@ -91,6 +93,7 @@
             this.pictureBox1.Size = new System.Drawing.Size(128, 128);
             this.pictureBox1.TabIndex = 3;
             this.pictureBox1.TabStop = false;
+            this.pictureBox1.Click += new System.EventHandler(this.control_Click);
             // 
             // flowLayoutPanel1
             // 
@@ -108,6 +111,7 @@
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
             this.flowLayoutPanel1.Size = new System.Drawing.Size(462, 23);
             this.flowLayoutPanel1.TabIndex = 0;
+            this.flowLayoutPanel1.Click += new System.EventHandler(this.control_Click);
             // 
             // label1
             // 
@@ -118,6 +122,7 @@
             this.label1.Size = new System.Drawing.Size(89, 13);
             this.label1.TabIndex = 4;
             this.label1.Text = "Enable channels:";
+            this.label1.Click += new System.EventHandler(this.control_Click);
             // 
             // ckbR
             // 
@@ -204,6 +209,7 @@
             this.tlpSize.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tlpSize.Size = new System.Drawing.Size(83, 13);
             this.tlpSize.TabIndex = 6;
+            this.tlpSize.Click += new System.EventHandler(this.control_Click);
             // 
             // label2
             // 
@@ -213,6 +219,7 @@
             this.label2.Size = new System.Drawing.Size(30, 13);
             this.label2.TabIndex = 0;
             this.label2.Text = "Size:";
+            this.label2.Click += new System.EventHandler(this.control_Click);
             // 
             // lbSize
             // 
@@ -222,6 +229,7 @@
             this.lbSize.Size = new System.Drawing.Size(41, 13);
             this.lbSize.TabIndex = 1;
             this.lbSize.Text = "XX, YY";
+            this.lbSize.Click += new System.EventHandler(this.control_Click);
             // 
             // timer1
             // 

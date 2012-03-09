@@ -268,6 +268,18 @@ namespace System.Windows.Forms
         }
 
         /// <summary>
+        /// Return the header for a DDS image in a stream.
+        /// </summary>
+        /// <param name="stream"><see cref="Stream"/> containing a DDS-encoded image.</param>
+        /// <returns>Contains the dds header information.</returns>
+        public DdsFile.DdsHeader DDSInfo(Stream stream)
+        {
+            DdsFile dds = new DdsFile();
+            dds.GetInfo(stream);
+            return dds.ddsHeader;
+        }
+
+        /// <summary>
         /// Load a DDS image from a <see cref="System.IO.Stream"/>;
         /// if <paramref name="supportHSV"/> is passed and true (default is false), the image will
         /// support HSV shift operations.
@@ -850,6 +862,11 @@ namespace System.Windows.Forms
                 if (sender == ckbA) Channel4 = ckbA.Checked;
                 if (sender == ckbI) InvertCh4 = ckbI.Checked;
             }
+        }
+
+        private void control_Click(object sender, EventArgs e)
+        {
+            this.OnClick(e);
         }
 
         Image doResize()

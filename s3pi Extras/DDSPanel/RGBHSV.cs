@@ -127,6 +127,22 @@ namespace System.Drawing
         }
 
         /// <summary>
+        /// Determine whether two <see cref="T:ColorHSVA"/> objects have the same value.
+        /// </summary>
+        /// <param name="val1">First object.</param>
+        /// <param name="val2">Second object.</param>
+        /// <returns>True if the Equals method on <paramref name="val1"/> returns true when passed <paramref name="val2"/>.</returns>
+        public static bool operator ==(ColorHSVA val1, ColorHSVA val2) { return val1.Equals(val2); }
+
+        /// <summary>
+        /// Determine whether two <see cref="T:ColorHSVA"/> objects do not have the same value.
+        /// </summary>
+        /// <param name="val1">First object.</param>
+        /// <param name="val2">Second object.</param>
+        /// <returns>True if the Equals method on <paramref name="val1"/> returns false when passed <paramref name="val2"/>.</returns>
+        public static bool operator !=(ColorHSVA val1, ColorHSVA val2) { return !val1.Equals(val2); }
+
+        /// <summary>
         /// Return the current <see cref="ColorHSVA"/> adjusted by a given <see cref="HSVShift"/> value.
         /// </summary>
         /// <param name="hsvShift">The <see cref="HSVShift"/> value by which to adjust this <see cref="ColorHSVA"/>.</param>
@@ -201,6 +217,22 @@ namespace System.Drawing
         {
             return h.GetHashCode() ^ s.GetHashCode() ^ v.GetHashCode();
         }
+
+        /// <summary>
+        /// Determine whether two <see cref="T:HSVShift"/> objects have the same value.
+        /// </summary>
+        /// <param name="val1">First object.</param>
+        /// <param name="val2">Second object.</param>
+        /// <returns>True if the Equals method on <paramref name="val1"/> returns true when passed <paramref name="val2"/>.</returns>
+        public static bool operator ==(HSVShift val1, HSVShift val2) { return val1.Equals(val2); }
+
+        /// <summary>
+        /// Determine whether two <see cref="T:HSVShift"/> objects do not have the same value.
+        /// </summary>
+        /// <param name="val1">First object.</param>
+        /// <param name="val2">Second object.</param>
+        /// <returns>True if the Equals method on <paramref name="val1"/> returns false when passed <paramref name="val2"/>.</returns>
+        public static bool operator !=(HSVShift val1, HSVShift val2) { return !val1.Equals(val2); }
 
         /// <summary>
         /// True if this HSVShift is non-zero.
