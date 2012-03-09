@@ -177,9 +177,9 @@ namespace s3pi.Filetable
         {
             if (FileTable.Current == ppt) PPSource = "current";
             else if (FileTable.CustomContentEnabled && FileTable.CustomContent.Contains(ppt)) PPSource = "cc";
-            else if (FileTable.GameContent.Contains(ppt)) PPSource = "fb0";
-            else if (FileTable.DDSImages.Contains(ppt)) PPSource = "dds";
-            else if (FileTable.Thumbnails.Contains(ppt)) PPSource = "tmb";
+            else if (FileTable.GameContent != null && FileTable.GameContent.Contains(ppt)) PPSource = "fb0";
+            else if (FileTable.DDSImages != null && FileTable.DDSImages.Contains(ppt)) PPSource = "dds";
+            else if (FileTable.Thumbnails != null && FileTable.Thumbnails.Contains(ppt)) PPSource = "tmb";
             else PPSource = "unk";
 
             if (ppt.Package.Find(rie => rie.Equals(resourceIndexEntry)) == null) // Avoid recursive call to ppt.Find()
