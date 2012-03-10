@@ -32,9 +32,9 @@ namespace CatalogResource
         string instanceName = "";//Version>=0x16
         uint objkIndex;
         ObjectType objectTypeFlags;
+        ObjectTypeExt objectTypeFlags2;//Version>=0x1a
         WallPlacement wallPlacementFlags;
         Movement movementFlags;
-        uint unknown22;//Version>=0x1a
         uint cutoutTilesPerLevel;
         uint levels;
         MTDoorList mtDoorList = null;
@@ -44,6 +44,7 @@ namespace CatalogResource
         RoomCategory roomCategoryFlags;
         FunctionCategory functionCategoryFlags;
         FunctionSubCategory functionSubCategoryFlags;
+        FunctionSubCategory2 functionSubCategoryFlags2;//Version>=1c
         RoomSubCategory roomSubCategoryFlags;
         BuildCategory buildCategoryFlags;
         uint surfaceCutoutDDSIndex;
@@ -52,7 +53,7 @@ namespace CatalogResource
         float floorCutoutBoundsLength;//Version>=0x17
         UIntList buildableShellDisplayStateHashes;//Version>=0x18
         uint levelBelowOBJDIndex;//Version>=0x19
-        uint unknown23OBJDIndex;//Version >=1b
+        uint proxyOBJDIndex;//Version>=1b
         SlotPlacement slotPlacementFlags;
         string surfaceType = "";
         string sourceMaterial = "";
@@ -68,11 +69,12 @@ namespace CatalogResource
         public ObjectCatalogResource(int APIversion, Stream unused, ObjectCatalogResource basis)
             : base(APIversion, basis.version, basis.common, basis.list)
         {
-            this.instanceName = (this.version >= 0x00000016) ? basis.instanceName : null;
             this.materialList = new MaterialList(OnResourceChanged, basis.materialList);
-            this.common = new Common(requestedApiVersion, OnResourceChanged, basis.common);
+            this.instanceName = (this.version >= 0x00000016) ? basis.instanceName : null;
+            //this.common = new Common(requestedApiVersion, OnResourceChanged, basis.common);
             this.objkIndex = basis.objkIndex;
             this.objectTypeFlags = basis.objectTypeFlags;
+            this.objectTypeFlags2 = (this.version >= 0x0000001a) ? basis.objectTypeFlags2 : 0;
             this.wallPlacementFlags = basis.wallPlacementFlags;
             this.movementFlags = basis.movementFlags;
             this.cutoutTilesPerLevel = basis.cutoutTilesPerLevel;
@@ -84,9 +86,16 @@ namespace CatalogResource
             this.roomCategoryFlags = basis.roomCategoryFlags;
             this.functionCategoryFlags = basis.functionCategoryFlags;
             this.functionSubCategoryFlags = basis.functionSubCategoryFlags;
+            this.functionSubCategoryFlags2 = (this.version >= 0x0000001a) ? basis.functionSubCategoryFlags2 : 0;
             this.roomSubCategoryFlags = basis.roomSubCategoryFlags;
             this.buildCategoryFlags = basis.buildCategoryFlags;
             this.surfaceCutoutDDSIndex = basis.surfaceCutoutDDSIndex;
+            this.floorCutoutDDSIndex = (this.version >= 0x00000017) ? basis.floorCutoutDDSIndex : 0;
+            this.floorCutoutLevelOffset = (this.version >= 0x00000017) ? basis.floorCutoutLevelOffset : 0;
+            this.floorCutoutBoundsLength = (this.version >= 0x00000017) ? basis.floorCutoutBoundsLength : 0;
+            this.buildableShellDisplayStateHashes = (this.version >= 0x00000018) ? new UIntList(OnResourceChanged, basis.buildableShellDisplayStateHashes) : null;
+            this.levelBelowOBJDIndex = (this.version >= 0x00000019) ? basis.levelBelowOBJDIndex : 0;
+            this.proxyOBJDIndex = (this.version >= 0x0000001b) ? basis.proxyOBJDIndex : 0;
             this.slotPlacementFlags = basis.slotPlacementFlags;
             this.surfaceType = basis.surfaceType;
             this.sourceMaterial = basis.sourceMaterial;
@@ -97,131 +106,30 @@ namespace CatalogResource
             this.fallbackIndex = basis.fallbackIndex;
         }
 
-        // Version <0x16
-        public ObjectCatalogResource(int APIversion,
-            uint version, IEnumerable<Material> materialList,
-            Common common, uint objkIndex,
-            ObjectType objectTypeFlags, WallPlacement wallPlacementFlags, Movement movementFlags, uint cutoutTilesPerLevel,
-            uint levels, IEnumerable<MTDoor> mtDoorList, byte isScriptEnabled, uint diagonalIndex, uint hash,
-            uint roomFlags, uint functionCategoryFlags, ulong subFunctionFlags, ulong subRoomFlags, uint buildCategoryFlags, uint sinkDDSIndex,
-            uint slotPlacementFlags, string materialGrouping1, string materialGrouping2, Moodlet moodletGiven, int moodletScore, uint unknown21,
-            TopicRating[] topicRatings, uint fallbackIndex, TGIBlockList ltgib)
-            : this(APIversion,
-            version, materialList,
-            "",
-            common, objkIndex,
-            objectTypeFlags, wallPlacementFlags, movementFlags, cutoutTilesPerLevel,
-            levels, mtDoorList, isScriptEnabled, diagonalIndex, hash,
-            roomFlags, functionCategoryFlags, subFunctionFlags, subRoomFlags, buildCategoryFlags, sinkDDSIndex,
-            0, 0, 0,
-            new UIntList(null),
-            0,
-            slotPlacementFlags, materialGrouping1, materialGrouping2, moodletGiven, moodletScore, unknown21,
-            topicRatings, fallbackIndex, ltgib)
-        {
-            if (checking) if (version >= 0x00000016)
-                    throw new InvalidOperationException(String.Format("Constructor requires Unknown1 for version {0}", version));
-        }
-        // Version <0x17
-        public ObjectCatalogResource(int APIversion,
-            uint version, IEnumerable<Material> materialList,
-            string unknown1,
-            Common common, uint objkIndex,
-            ObjectType objectTypeFlags, WallPlacement wallPlacementFlags, Movement movementFlags, uint cutoutTilesPerLevel,
-            uint levels, IEnumerable<MTDoor> mtDoorList, byte isScriptEnabled, uint diagonalIndex, uint hash,
-            uint roomFlags, uint functionCategoryFlags, ulong subFunctionFlags, ulong subRoomFlags, uint buildCategoryFlags, uint sinkDDSIndex,
-            uint slotPlacementFlags, string materialGrouping1, string materialGrouping2, Moodlet moodletGiven, int moodletScore, uint unknown21,
-            TopicRating[] topicRatings, uint fallbackIndex, TGIBlockList ltgib)
-            : this(APIversion,
-            version, materialList,
-            unknown1,
-            common, objkIndex,
-            objectTypeFlags, wallPlacementFlags, movementFlags, cutoutTilesPerLevel,
-            levels, mtDoorList, isScriptEnabled, diagonalIndex, hash,
-            roomFlags, functionCategoryFlags, subFunctionFlags, subRoomFlags, buildCategoryFlags, sinkDDSIndex,
-            0, 0, 0,
-            new UIntList(null),
-            0,
-            slotPlacementFlags, materialGrouping1, materialGrouping2, moodletGiven, moodletScore, unknown21,
-            topicRatings, fallbackIndex, ltgib)
-        {
-            if (checking) if (version >= 0x00000017)
-                    throw new InvalidOperationException(String.Format("Constructor requires Unknown16, Unknown17 and Unknown18 for version {0}", version));
-        }
-        // Version <0x18
-        public ObjectCatalogResource(int APIversion,
-            uint version, IEnumerable<Material> materialList,
-            string unknown1,
-            Common common, uint objkIndex,
-            ObjectType objectTypeFlags, WallPlacement wallPlacementFlags, Movement movementFlags, uint cutoutTilesPerLevel,
-            uint levels, IEnumerable<MTDoor> mtDoorList, byte isScriptEnabled, uint diagonalIndex, uint hash,
-            uint roomFlags, uint functionCategoryFlags, ulong subFunctionFlags, ulong subRoomFlags, uint buildCategoryFlags, uint sinkDDSIndex,
-            uint floorCutoutDDSIndex, uint floorCutoutLevelOffset, float floorCutoutBoundsLength,
-            uint slotPlacementFlags, string materialGrouping1, string materialGrouping2, Moodlet moodletGiven, int moodletScore, uint unknown21,
-            TopicRating[] topicRatings, uint fallbackIndex, TGIBlockList ltgib)
-            : this(APIversion,
-            version, materialList,
-            unknown1,
-            common, objkIndex,
-            objectTypeFlags, wallPlacementFlags, movementFlags, cutoutTilesPerLevel,
-            levels, mtDoorList, isScriptEnabled, diagonalIndex, hash,
-            roomFlags, functionCategoryFlags, subFunctionFlags, subRoomFlags, buildCategoryFlags, sinkDDSIndex,
-            floorCutoutDDSIndex, floorCutoutLevelOffset, floorCutoutBoundsLength,
-            new UIntList(null),
-            0,
-            slotPlacementFlags, materialGrouping1, materialGrouping2, moodletGiven, moodletScore, unknown21,
-            topicRatings, fallbackIndex, ltgib)
-        {
-            if (checking) if (version >= 0x00000018)
-                    throw new InvalidOperationException(String.Format("Constructor requires BuildableShellDisplayStateHashes for version {0}", version));
-        }
-        // Version <0x19
-        public ObjectCatalogResource(int APIversion,
-            uint version, IEnumerable<Material> materialList,
-            string unknown1,
-            Common common, uint objkIndex,
-            ObjectType objectTypeFlags, WallPlacement wallPlacementFlags, Movement movementFlags, uint cutoutTilesPerLevel,
-            uint levels, IEnumerable<MTDoor> mtDoorList, byte isScriptEnabled, uint diagonalIndex, uint hash,
-            uint roomFlags, uint functionCategoryFlags, ulong subFunctionFlags, ulong subRoomFlags, uint buildCategoryFlags, uint sinkDDSIndex,
-            uint floorCutoutDDSIndex, uint floorCutoutLevelOffset, float floorCutoutBoundsLength,
-            UIntList buildableShellDisplayStateHashes,
-            uint slotPlacementFlags, string materialGrouping1, string materialGrouping2, Moodlet moodletGiven, int moodletScore, uint unknown21,
-            TopicRating[] topicRatings, uint fallbackIndex, TGIBlockList ltgib)
-            : this(APIversion,
-            version, materialList,
-            unknown1,
-            common, objkIndex,
-            objectTypeFlags, wallPlacementFlags, movementFlags, cutoutTilesPerLevel,
-            levels, mtDoorList, isScriptEnabled, diagonalIndex, hash,
-            roomFlags, functionCategoryFlags, subFunctionFlags, subRoomFlags, buildCategoryFlags, sinkDDSIndex,
-            floorCutoutDDSIndex, floorCutoutLevelOffset, floorCutoutBoundsLength,
-            buildableShellDisplayStateHashes,
-            0,
-            slotPlacementFlags, materialGrouping1, materialGrouping2, moodletGiven, moodletScore, unknown21,
-            topicRatings, fallbackIndex, ltgib)
-        {
-            if (checking) if (version >= 0x00000019)
-                    throw new InvalidOperationException(String.Format("Constructor requires IndexV19 for version {0}", version));
-        }
-        public ObjectCatalogResource(int APIversion,
-            uint version, IEnumerable<Material> materialList,
-            string unknown1,
-            Common common, uint objkIndex,
-            ObjectType objectTypeFlags, WallPlacement wallPlacementFlags, Movement movementFlags, uint cutoutTilesPerLevel,
-            uint levels, IEnumerable<MTDoor> mtDoorList, byte isScriptEnabled, uint diagonalIndex, uint hash,
-            uint roomFlags, uint functionCategoryFlags, ulong subFunctionFlags, ulong subRoomFlags, uint buildCategoryFlags, uint sinkDDSIndex,
-            uint floorCutoutDDSIndex, uint floorCutoutLevelOffset, float floorCutoutBoundsLength,
-            UIntList buildableShellDisplayStateHashes,
-            uint levelBelowOBJDIndex,
-            uint slotPlacementFlags, string materialGrouping1, string materialGrouping2, Moodlet moodletGiven, int moodletScore, uint unknown21,
-            TopicRating[] topicRatings, uint fallbackIndex, TGIBlockList ltgib)
+        // Current version
+        public ObjectCatalogResource(int APIversion, uint version, IEnumerable<Material> materialList,
+            string instanceName,//Version>=0x16
+            Common common, uint objkIndex, ObjectType objectTypeFlags,
+            ObjectTypeExt objectTypeFlags2,//Version>=0x1a
+            WallPlacement wallPlacementFlags, Movement movementFlags, uint cutoutTilesPerLevel, uint levels, IEnumerable<MTDoor> mtDoorList,
+            byte isScriptEnabled, uint diagonalIndex, uint ambienceTypeHash, RoomCategory roomCategoryFlags,
+            FunctionCategory functionCategoryFlags, FunctionSubCategory functionSubCategoryFlags,
+            FunctionSubCategory2 functionSubCategoryFlags2,//Version>=1c
+            RoomSubCategory roomSubCategoryFlags, BuildCategory buildCategoryFlags, uint surfaceCutoutDDSIndex,
+            uint floorCutoutDDSIndex, uint floorCutoutLevelOffset, float floorCutoutBoundsLength,//Version>=0x17
+            IEnumerable<uint> buildableShellDisplayStateHashes,//Version>=0x18
+            uint levelBelowOBJDIndex,//Version>=0x19
+            uint proxyOBJDIndex,//Version>=1b
+            SlotPlacement slotPlacementFlags, string surfaceType, string sourceMaterial, Moodlet moodletGiven, int moodletScore,
+            uint unknown21, TopicRating[] topicRatings, uint fallbackIndex, TGIBlockList ltgib)
             : base(APIversion, version, common, ltgib)
         {
             this.materialList = materialList == null ? null : new MaterialList(OnResourceChanged, materialList);
-            this.instanceName = unknown1;
-            this.common = common == null ? null : new Common(requestedApiVersion, OnResourceChanged, common);
+            this.instanceName = instanceName;
+            //this.common = common == null ? null : new Common(requestedApiVersion, OnResourceChanged, common);
             this.objkIndex = objkIndex;
             this.objectTypeFlags = objectTypeFlags;
+            this.objectTypeFlags2 = objectTypeFlags2;
             this.wallPlacementFlags = wallPlacementFlags;
             this.movementFlags = movementFlags;
             this.cutoutTilesPerLevel = cutoutTilesPerLevel;
@@ -229,21 +137,23 @@ namespace CatalogResource
             this.mtDoorList = mtDoorList == null ? null : new MTDoorList(OnResourceChanged, mtDoorList) { ParentTGIBlocks = list };
             this.isScriptEnabled = isScriptEnabled;
             this.diagonalIndex = diagonalIndex;
-            this.ambienceTypeHash = hash;
-            this.roomCategoryFlags = (RoomCategory)roomFlags;
-            this.functionCategoryFlags = (FunctionCategory)functionCategoryFlags;
-            this.functionSubCategoryFlags = (FunctionSubCategory)subFunctionFlags;
-            this.roomSubCategoryFlags = (RoomSubCategory)subRoomFlags;
-            this.buildCategoryFlags = (BuildCategory)buildCategoryFlags;
-            this.surfaceCutoutDDSIndex = sinkDDSIndex;
+            this.ambienceTypeHash = ambienceTypeHash;
+            this.roomCategoryFlags = roomCategoryFlags;
+            this.functionCategoryFlags = functionCategoryFlags;
+            this.functionSubCategoryFlags = functionSubCategoryFlags;
+            this.functionSubCategoryFlags2 = functionSubCategoryFlags2;
+            this.roomSubCategoryFlags = roomSubCategoryFlags;
+            this.buildCategoryFlags = buildCategoryFlags;
+            this.surfaceCutoutDDSIndex = surfaceCutoutDDSIndex;
             this.floorCutoutDDSIndex = floorCutoutDDSIndex;
             this.floorCutoutLevelOffset = floorCutoutLevelOffset;
             this.floorCutoutBoundsLength = floorCutoutBoundsLength;
             this.buildableShellDisplayStateHashes = buildableShellDisplayStateHashes == null ? null : new UIntList(OnResourceChanged, buildableShellDisplayStateHashes);
             this.levelBelowOBJDIndex = levelBelowOBJDIndex;
-            this.slotPlacementFlags = (SlotPlacement)slotPlacementFlags;
-            this.surfaceType = materialGrouping1;
-            this.sourceMaterial = materialGrouping2;
+            this.proxyOBJDIndex = proxyOBJDIndex;
+            this.slotPlacementFlags = slotPlacementFlags;
+            this.surfaceType = surfaceType;
+            this.sourceMaterial = sourceMaterial;
             this.moodletGiven = moodletGiven;
             this.moodletScore = moodletScore;
             this.unknown21 = unknown21;
@@ -251,6 +161,252 @@ namespace CatalogResource
                     throw new ArgumentLengthException("TopicRatings", this.topicRatings.Length);
             this.topicRatings = (TopicRating[])topicRatings.Clone();
             this.fallbackIndex = fallbackIndex;
+        }
+
+        // Version <0x1c
+        public ObjectCatalogResource(int APIversion, uint version, IEnumerable<Material> materialList,
+            string instanceName,//Version>=0x16
+            Common common, uint objkIndex, ObjectType objectTypeFlags,
+            ObjectTypeExt objectTypeFlags2,//Version>=0x1a
+            WallPlacement wallPlacementFlags, Movement movementFlags, uint cutoutTilesPerLevel, uint levels, IEnumerable<MTDoor> mtDoorList,
+            byte isScriptEnabled, uint diagonalIndex, uint ambienceTypeHash, RoomCategory roomCategoryFlags,
+            FunctionCategory functionCategoryFlags, FunctionSubCategory functionSubCategoryFlags,
+            //FunctionSubCategory2 functionSubCategoryFlags2,Version>=1c
+            RoomSubCategory roomSubCategoryFlags, BuildCategory buildCategoryFlags, uint surfaceCutoutDDSIndex,
+            uint floorCutoutDDSIndex, uint floorCutoutLevelOffset, float floorCutoutBoundsLength,//Version>=0x17
+            IEnumerable<uint> buildableShellDisplayStateHashes,//Version>=0x18
+            uint levelBelowOBJDIndex,//Version>=0x19
+            uint proxyOBJDIndex,//Version>=1b
+            SlotPlacement slotPlacementFlags, string surfaceType, string sourceMaterial, Moodlet moodletGiven, int moodletScore,
+            uint unknown21, TopicRating[] topicRatings, uint fallbackIndex, TGIBlockList ltgib)
+            : this(APIversion, version, materialList,
+            instanceName,
+            common, objkIndex, objectTypeFlags,
+            objectTypeFlags2,
+            wallPlacementFlags, movementFlags, cutoutTilesPerLevel, levels, mtDoorList,
+            isScriptEnabled, diagonalIndex, ambienceTypeHash, roomCategoryFlags,
+            functionCategoryFlags, functionSubCategoryFlags,
+            0,//Version>=0x1c
+            roomSubCategoryFlags, buildCategoryFlags, surfaceCutoutDDSIndex,
+            floorCutoutDDSIndex, floorCutoutLevelOffset, floorCutoutBoundsLength,
+            buildableShellDisplayStateHashes,
+            levelBelowOBJDIndex,
+            proxyOBJDIndex,
+            slotPlacementFlags, surfaceType, sourceMaterial, moodletGiven, moodletScore,
+            unknown21, topicRatings, fallbackIndex, ltgib)
+        {
+            if (checking) if (version >= 0x0000001c)
+                    throw new InvalidOperationException(String.Format("Constructor requires FunctionSubCategoryFlags2 for version {0}", version));
+        }
+        // Version <0x1b
+        public ObjectCatalogResource(int APIversion, uint version, IEnumerable<Material> materialList,
+            string instanceName,//Version>=0x16
+            Common common, uint objkIndex, ObjectType objectTypeFlags,
+            ObjectTypeExt objectTypeFlags2,//Version>=0x1a
+            WallPlacement wallPlacementFlags, Movement movementFlags, uint cutoutTilesPerLevel, uint levels, IEnumerable<MTDoor> mtDoorList,
+            byte isScriptEnabled, uint diagonalIndex, uint ambienceTypeHash, RoomCategory roomCategoryFlags,
+            FunctionCategory functionCategoryFlags, FunctionSubCategory functionSubCategoryFlags,
+            //FunctionSubCategory2 functionSubCategoryFlags2,Version>=1c
+            RoomSubCategory roomSubCategoryFlags, BuildCategory buildCategoryFlags, uint surfaceCutoutDDSIndex,
+            uint floorCutoutDDSIndex, uint floorCutoutLevelOffset, float floorCutoutBoundsLength,//Version>=0x17
+            IEnumerable<uint> buildableShellDisplayStateHashes,//Version>=0x18
+            uint levelBelowOBJDIndex,//Version>=0x19
+            //uint proxyOBJDIndex,Version>=1b
+            SlotPlacement slotPlacementFlags, string surfaceType, string sourceMaterial, Moodlet moodletGiven, int moodletScore,
+            uint unknown21, TopicRating[] topicRatings, uint fallbackIndex, TGIBlockList ltgib)
+            : this(APIversion, version, materialList,
+            instanceName,
+            common, objkIndex, objectTypeFlags,
+            objectTypeFlags2,
+            wallPlacementFlags, movementFlags, cutoutTilesPerLevel, levels, mtDoorList,
+            isScriptEnabled, diagonalIndex, ambienceTypeHash, roomCategoryFlags,
+            functionCategoryFlags, functionSubCategoryFlags,
+            0,//Version>=0x1c
+            roomSubCategoryFlags, buildCategoryFlags, surfaceCutoutDDSIndex,
+            floorCutoutDDSIndex, floorCutoutLevelOffset, floorCutoutBoundsLength,
+            buildableShellDisplayStateHashes,
+            levelBelowOBJDIndex,
+            0,//Version>=0x1b
+            slotPlacementFlags, surfaceType, sourceMaterial, moodletGiven, moodletScore,
+            unknown21, topicRatings, fallbackIndex, ltgib)
+        {
+            if (checking) if (version >= 0x0000001b)
+                    throw new InvalidOperationException(String.Format("Constructor requires ProxyOBJDIndex for version {0}", version));
+        }
+        // Version <0x1a
+        public ObjectCatalogResource(int APIversion, uint version, IEnumerable<Material> materialList,
+            string instanceName,//Version>=0x16
+            Common common, uint objkIndex, ObjectType objectTypeFlags,
+            //ObjectTypeExt objectTypeFlags2,Version>=0x1a
+            WallPlacement wallPlacementFlags, Movement movementFlags, uint cutoutTilesPerLevel, uint levels, IEnumerable<MTDoor> mtDoorList,
+            byte isScriptEnabled, uint diagonalIndex, uint ambienceTypeHash, RoomCategory roomCategoryFlags,
+            FunctionCategory functionCategoryFlags, FunctionSubCategory functionSubCategoryFlags,
+            //FunctionSubCategory2 functionSubCategoryFlags2,Version>=1c
+            RoomSubCategory roomSubCategoryFlags, BuildCategory buildCategoryFlags, uint surfaceCutoutDDSIndex,
+            uint floorCutoutDDSIndex, uint floorCutoutLevelOffset, float floorCutoutBoundsLength,//Version>=0x17
+            IEnumerable<uint> buildableShellDisplayStateHashes,//Version>=0x18
+            uint levelBelowOBJDIndex,//Version>=0x19
+            //uint proxyOBJDIndex,Version>=1b
+            SlotPlacement slotPlacementFlags, string surfaceType, string sourceMaterial, Moodlet moodletGiven, int moodletScore,
+            uint unknown21, TopicRating[] topicRatings, uint fallbackIndex, TGIBlockList ltgib)
+            : this(APIversion, version, materialList,
+            instanceName,
+            common, objkIndex, objectTypeFlags,
+            0,//Version>=0x1a
+            wallPlacementFlags, movementFlags, cutoutTilesPerLevel, levels, mtDoorList,
+            isScriptEnabled, diagonalIndex, ambienceTypeHash, roomCategoryFlags,
+            functionCategoryFlags, functionSubCategoryFlags,
+            0,//Version>=0x1c
+            roomSubCategoryFlags, buildCategoryFlags, surfaceCutoutDDSIndex,
+            floorCutoutDDSIndex, floorCutoutLevelOffset, floorCutoutBoundsLength,
+            buildableShellDisplayStateHashes,
+            levelBelowOBJDIndex,
+            0,//Version>=0x1b
+            slotPlacementFlags, surfaceType, sourceMaterial, moodletGiven, moodletScore,
+            unknown21, topicRatings, fallbackIndex, ltgib)
+        {
+            if (checking) if (version >= 0x0000001a)
+                    throw new InvalidOperationException(String.Format("Constructor requires ObjectTypeFlags2 for version {0}", version));
+        }
+        // Version <0x19
+        public ObjectCatalogResource(int APIversion, uint version, IEnumerable<Material> materialList,
+            string instanceName,//Version>=0x16
+            Common common, uint objkIndex, ObjectType objectTypeFlags,
+            //ObjectTypeExt objectTypeFlags2,Version>=0x1a
+            WallPlacement wallPlacementFlags, Movement movementFlags, uint cutoutTilesPerLevel, uint levels, IEnumerable<MTDoor> mtDoorList,
+            byte isScriptEnabled, uint diagonalIndex, uint ambienceTypeHash, RoomCategory roomCategoryFlags,
+            FunctionCategory functionCategoryFlags, FunctionSubCategory functionSubCategoryFlags,
+            //FunctionSubCategory2 functionSubCategoryFlags2,Version>=1c
+            RoomSubCategory roomSubCategoryFlags, BuildCategory buildCategoryFlags, uint surfaceCutoutDDSIndex,
+            uint floorCutoutDDSIndex, uint floorCutoutLevelOffset, float floorCutoutBoundsLength,//Version>=0x17
+            IEnumerable<uint> buildableShellDisplayStateHashes,//Version>=0x18
+            //uint levelBelowOBJDIndex,Version>=0x19
+            //uint proxyOBJDIndex,Version>=1b
+            SlotPlacement slotPlacementFlags, string surfaceType, string sourceMaterial, Moodlet moodletGiven, int moodletScore,
+            uint unknown21, TopicRating[] topicRatings, uint fallbackIndex, TGIBlockList ltgib)
+            : this(APIversion, version, materialList,
+            instanceName,
+            common, objkIndex, objectTypeFlags,
+            0,//Version>=0x1a
+            wallPlacementFlags, movementFlags, cutoutTilesPerLevel, levels, mtDoorList,
+            isScriptEnabled, diagonalIndex, ambienceTypeHash, roomCategoryFlags,
+            functionCategoryFlags, functionSubCategoryFlags,
+            0,//Version>=0x1c
+            roomSubCategoryFlags, buildCategoryFlags, surfaceCutoutDDSIndex,
+            floorCutoutDDSIndex, floorCutoutLevelOffset, floorCutoutBoundsLength,
+            buildableShellDisplayStateHashes,
+            0,//Version>=0x19
+            0,//Version>=0x1b
+            slotPlacementFlags, surfaceType, sourceMaterial, moodletGiven, moodletScore,
+            unknown21, topicRatings, fallbackIndex, ltgib)
+        {
+            if (checking) if (version >= 0x00000019)
+                    throw new InvalidOperationException(String.Format("Constructor requires LevelBelowOBJDIndex for version {0}", version));
+        }
+        // Version <0x18
+        public ObjectCatalogResource(int APIversion, uint version, IEnumerable<Material> materialList,
+            string instanceName,//Version>=0x16
+            Common common, uint objkIndex, ObjectType objectTypeFlags,
+            //ObjectTypeExt objectTypeFlags2,Version>=0x1a
+            WallPlacement wallPlacementFlags, Movement movementFlags, uint cutoutTilesPerLevel, uint levels, IEnumerable<MTDoor> mtDoorList,
+            byte isScriptEnabled, uint diagonalIndex, uint ambienceTypeHash, RoomCategory roomCategoryFlags,
+            FunctionCategory functionCategoryFlags, FunctionSubCategory functionSubCategoryFlags,
+            //FunctionSubCategory2 functionSubCategoryFlags2,Version>=1c
+            RoomSubCategory roomSubCategoryFlags, BuildCategory buildCategoryFlags, uint surfaceCutoutDDSIndex,
+            uint floorCutoutDDSIndex, uint floorCutoutLevelOffset, float floorCutoutBoundsLength,//Version>=0x17
+            //IEnumerable<uint> buildableShellDisplayStateHashes,Version>=0x18
+            //uint levelBelowOBJDIndex,Version>=0x19
+            //uint proxyOBJDIndex,Version>=1b
+            SlotPlacement slotPlacementFlags, string surfaceType, string sourceMaterial, Moodlet moodletGiven, int moodletScore,
+            uint unknown21, TopicRating[] topicRatings, uint fallbackIndex, TGIBlockList ltgib)
+            : this(APIversion, version, materialList,
+            instanceName,
+            common, objkIndex, objectTypeFlags,
+            0,//Version>=0x1a
+            wallPlacementFlags, movementFlags, cutoutTilesPerLevel, levels, mtDoorList,
+            isScriptEnabled, diagonalIndex, ambienceTypeHash, roomCategoryFlags,
+            functionCategoryFlags, functionSubCategoryFlags,
+            0,//Version>=0x1c
+            roomSubCategoryFlags, buildCategoryFlags, surfaceCutoutDDSIndex,
+            floorCutoutDDSIndex, floorCutoutLevelOffset, floorCutoutBoundsLength,
+            new UIntList(null),//Version>=0x18
+            0,//Version>=0x19
+            0,//Version>=0x1b
+            slotPlacementFlags, surfaceType, sourceMaterial, moodletGiven, moodletScore,
+            unknown21, topicRatings, fallbackIndex, ltgib)
+        {
+            if (checking) if (version >= 0x00000018)
+                    throw new InvalidOperationException(String.Format("Constructor requires BuildableShellDisplayStateHashes for version {0}", version));
+        }
+        // Version <0x17
+        public ObjectCatalogResource(int APIversion, uint version, IEnumerable<Material> materialList,
+            string instanceName,//Version>=0x16
+            Common common, uint objkIndex, ObjectType objectTypeFlags,
+            //ObjectTypeExt objectTypeFlags2,Version>=0x1a
+            WallPlacement wallPlacementFlags, Movement movementFlags, uint cutoutTilesPerLevel, uint levels, IEnumerable<MTDoor> mtDoorList,
+            byte isScriptEnabled, uint diagonalIndex, uint ambienceTypeHash, RoomCategory roomCategoryFlags,
+            FunctionCategory functionCategoryFlags, FunctionSubCategory functionSubCategoryFlags,
+            //FunctionSubCategory2 functionSubCategoryFlags2,Version>=1c
+            RoomSubCategory roomSubCategoryFlags, BuildCategory buildCategoryFlags, uint surfaceCutoutDDSIndex,
+            //uint floorCutoutDDSIndex, uint floorCutoutLevelOffset, float floorCutoutBoundsLength,Version>=0x17
+            //IEnumerable<uint> buildableShellDisplayStateHashes,Version>=0x18
+            //uint levelBelowOBJDIndex,Version>=0x19
+            //uint proxyOBJDIndex,Version>=1b
+            SlotPlacement slotPlacementFlags, string surfaceType, string sourceMaterial, Moodlet moodletGiven, int moodletScore,
+            uint unknown21, TopicRating[] topicRatings, uint fallbackIndex, TGIBlockList ltgib)
+            : this(APIversion, version, materialList,
+            instanceName,
+            common, objkIndex, objectTypeFlags,
+            0,//Version>=0x1a
+            wallPlacementFlags, movementFlags, cutoutTilesPerLevel, levels, mtDoorList,
+            isScriptEnabled, diagonalIndex, ambienceTypeHash, roomCategoryFlags,
+            functionCategoryFlags, functionSubCategoryFlags,
+            0,//Version>=0x1c
+            roomSubCategoryFlags, buildCategoryFlags, surfaceCutoutDDSIndex,
+            0, 0, 0,//Version>=0x17
+            new UIntList(null),//Version>=0x18
+            0,//Version>=0x19
+            0,//Version>=0x1b
+            slotPlacementFlags, surfaceType, sourceMaterial, moodletGiven, moodletScore,
+            unknown21, topicRatings, fallbackIndex, ltgib)
+        {
+            if (checking) if (version >= 0x00000017)
+                    throw new InvalidOperationException(String.Format("Constructor requires FloorCutoutDDSIndex, FloorCutoutLevelOffset and FloorCutoutBoundsLength for version {0}", version));
+        }
+        // Version <0x16
+        public ObjectCatalogResource(int APIversion, uint version, IEnumerable<Material> materialList,
+            //string instanceName,Version>=0x16
+            Common common, uint objkIndex, ObjectType objectTypeFlags,
+            //ObjectTypeExt objectTypeFlags2,Version>=0x1a
+            WallPlacement wallPlacementFlags, Movement movementFlags, uint cutoutTilesPerLevel, uint levels, IEnumerable<MTDoor> mtDoorList,
+            byte isScriptEnabled, uint diagonalIndex, uint ambienceTypeHash, RoomCategory roomCategoryFlags,
+            FunctionCategory functionCategoryFlags, FunctionSubCategory functionSubCategoryFlags,
+            //FunctionSubCategory2 functionSubCategoryFlags2,Version>=1c
+            RoomSubCategory roomSubCategoryFlags, BuildCategory buildCategoryFlags, uint surfaceCutoutDDSIndex,
+            //uint floorCutoutDDSIndex, uint floorCutoutLevelOffset, float floorCutoutBoundsLength,Version>=0x17
+            //IEnumerable<uint> buildableShellDisplayStateHashes,Version>=0x18
+            //uint levelBelowOBJDIndex,Version>=0x19
+            //uint proxyOBJDIndex,Version>=1b
+            SlotPlacement slotPlacementFlags, string surfaceType, string sourceMaterial, Moodlet moodletGiven, int moodletScore,
+            uint unknown21, TopicRating[] topicRatings, uint fallbackIndex, TGIBlockList ltgib)
+            : this(APIversion, version, materialList,
+            "",//Version>=0x16
+            common, objkIndex, objectTypeFlags,
+            0,//Version>=0x1a
+            wallPlacementFlags, movementFlags, cutoutTilesPerLevel, levels, mtDoorList,
+            isScriptEnabled, diagonalIndex, ambienceTypeHash, roomCategoryFlags,
+            functionCategoryFlags, functionSubCategoryFlags,
+            0,//Version>=0x1c
+            roomSubCategoryFlags, buildCategoryFlags, surfaceCutoutDDSIndex,
+            0, 0, 0,//Version>=0x17
+            new UIntList(null),//Version>=0x18
+            0,//Version>=0x19
+            0,//Version>=0x1b
+            slotPlacementFlags, surfaceType, sourceMaterial, moodletGiven, moodletScore,
+            unknown21, topicRatings, fallbackIndex, ltgib)
+        {
+            if (checking) if (version >= 0x00000016)
+                    throw new InvalidOperationException(String.Format("Constructor requires InstanceName for version {0}", version));
         }
         #endregion
 
@@ -265,12 +421,12 @@ namespace CatalogResource
             this.common = new Common(requestedApiVersion, OnResourceChanged, s);
             this.objkIndex = r.ReadUInt32();
             this.objectTypeFlags = (ObjectType)r.ReadUInt32();
-            this.wallPlacementFlags = (WallPlacement)r.ReadUInt32();
-            this.movementFlags = (Movement)r.ReadUInt32();
             if (this.version >= 0x0000001a)
             {
-                this.Unknown22 = r.ReadUInt32();
+                this.objectTypeFlags2 = (ObjectTypeExt)r.ReadUInt32();
             }
+            this.wallPlacementFlags = (WallPlacement)r.ReadUInt32();
+            this.movementFlags = (Movement)r.ReadUInt32();
             this.cutoutTilesPerLevel = r.ReadUInt32();
             this.levels = r.ReadUInt32();
             this.mtDoorList = new MTDoorList(OnResourceChanged, s);
@@ -280,6 +436,10 @@ namespace CatalogResource
             this.roomCategoryFlags = (RoomCategory)r.ReadUInt32();
             this.functionCategoryFlags = (FunctionCategory)r.ReadUInt32();
             this.functionSubCategoryFlags = (FunctionSubCategory)r.ReadUInt64();
+            if (this.version >= 0x0000001c)
+            {
+                this.functionSubCategoryFlags2 = (FunctionSubCategory2)r.ReadUInt64();
+            }
             this.roomSubCategoryFlags = (RoomSubCategory)r.ReadUInt64();
             this.buildCategoryFlags = (BuildCategory)r.ReadUInt32();
             this.surfaceCutoutDDSIndex = r.ReadUInt32();
@@ -296,7 +456,7 @@ namespace CatalogResource
                         levelBelowOBJDIndex = r.ReadUInt32();
                         if (this.version >= 0x0000001b)
                         {
-                            unknown23OBJDIndex = r.ReadUInt32();
+                            proxyOBJDIndex = r.ReadUInt32();
                         }
                     }
                 }
@@ -332,12 +492,12 @@ namespace CatalogResource
             common.UnParse(s);
             w.Write(objkIndex);
             w.Write((uint)objectTypeFlags);
-            w.Write((uint)wallPlacementFlags);
-            w.Write((uint)movementFlags);
             if (this.version >= 0x0000001a)
             {
-                w.Write(unknown22);
+                w.Write((uint)objectTypeFlags2);
             }
+            w.Write((uint)wallPlacementFlags);
+            w.Write((uint)movementFlags);
             w.Write(cutoutTilesPerLevel);
             w.Write(levels);
             if (mtDoorList == null) mtDoorList = new MTDoorList(OnResourceChanged);
@@ -348,6 +508,10 @@ namespace CatalogResource
             w.Write((uint)roomCategoryFlags);
             w.Write((uint)functionCategoryFlags);
             w.Write((ulong)functionSubCategoryFlags);
+            if (this.version >= 0x0000001c)
+            {
+                w.Write((ulong)functionSubCategoryFlags2);
+            }
             w.Write((ulong)roomSubCategoryFlags);
             w.Write((uint)buildCategoryFlags);
             w.Write(surfaceCutoutDDSIndex);
@@ -365,7 +529,7 @@ namespace CatalogResource
                         w.Write(levelBelowOBJDIndex);
                         if (this.version >= 0x0000001b)
                         {
-                            w.Write(unknown23OBJDIndex);
+                            w.Write(proxyOBJDIndex);
                         }
                     }
                 }
@@ -400,25 +564,29 @@ namespace CatalogResource
             get
             {
                 List<string> res = base.ContentFields;
-                if (this.version < 0x0000001b)
+                if (this.version < 0x0000001c)
                 {
-                    res.Remove("Unknown23OBJDIndex");
-                    if (this.version < 0x0000001a)
+                    res.Remove("FunctionSubCategoryFlags2");
+                    if (this.version < 0x0000001b)
                     {
-                        res.Remove("Unknown22");
-                        if (this.version < 0x00000019)
+                        res.Remove("ProxyOBJDIndex");
+                        if (this.version < 0x0000001a)
                         {
-                            res.Remove("LevelBelowOBJDIndex");
-                            if (this.version < 0x00000018)
+                            res.Remove("ObjectTypeFlags2");
+                            if (this.version < 0x00000019)
                             {
-                                res.Remove("BuildableShellDisplayStateHashes");
-                                if (this.version < 0x00000017)
+                                res.Remove("LevelBelowOBJDIndex");
+                                if (this.version < 0x00000018)
                                 {
-                                    res.Remove("FloorCutoutDDSIndex");
-                                    res.Remove("FloorCutoutLevelOffset");
-                                    res.Remove("FloorCutoutBoundsLength");
-                                    if (this.version < 0x00000016)
-                                        res.Remove("InstanceName");
+                                    res.Remove("BuildableShellDisplayStateHashes");
+                                    if (this.version < 0x00000017)
+                                    {
+                                        res.Remove("FloorCutoutDDSIndex");
+                                        res.Remove("FloorCutoutLevelOffset");
+                                        res.Remove("FloorCutoutBoundsLength");
+                                        if (this.version < 0x00000016)
+                                            res.Remove("InstanceName");
+                                    }
                                 }
                             }
                         }
@@ -472,6 +640,37 @@ namespace CatalogResource
             IgnorePlatformElevation = 0x20000000,
             CantBePlacedOnPlatform = 0x40000000,
             IsShellDoor = 0x80000000,
+        }
+
+        [Flags]
+        public enum ObjectTypeExt : uint
+        {
+            SpiralStaircase = 0x00000001,
+            CantBePlacedOnDeckOrFoundation = 0x00000002,
+            PetCannotSitUnder = 0x00000004,
+            PetsCannotJumpOn = 0x00000008,
+
+            LargeAnimalsCannotUse = 0x00000010,
+            MustFaceCardinalDirection = 0x00000020,
+            IsRug = 0x00000040,
+            //Unknown07 = 0x00000080,
+            //...
+            //Unknown13 = 0x00080000,
+
+            //Unknown14 = 0x00100000,
+            //Unknown15 = 0x00200000,
+            //Unknown16 = 0x00400000,
+            //Unknown17 = 0x00800000,
+
+            //Unknown18 = 0x01000000,
+            //Unknown19 = 0x02000000,
+            //Unknown1A = 0x04000000,
+            //Unknown1B = 0x08000000,
+
+            //Unknown1C = 0x10000000,
+            //Unknown1D = 0x20000000,
+            //Unknown1E = 0x40000000,
+            //Unknown1F = 0x80000000,
         }
 
         [Flags]
@@ -709,7 +908,7 @@ namespace CatalogResource
             EntertainmentHobbiesSkills = 0x00001000,
             EntertainmentSports = 0x00002000,
             ComfortLivingChairs = 0x00004000,
-            ComfortDeskChairs = 0x00008000,
+            PetsHorses = 0x00008000,
 
             DebugInsectSpawners = 0x00010000,
             EntertainmentParties = 0x00020000,
@@ -733,7 +932,7 @@ namespace CatalogResource
 
             //High DWORD
             DecorMirrors = 0x0000000100000000,
-            Unused34 = 0x0000000200000000,
+            PetsDogs = 0x0000000200000000,
             DebugMisc = 0x0000000400000000,
             StorageBookshelves = 0x0000000800000000,
 
@@ -762,15 +961,26 @@ namespace CatalogResource
             DecorWindowDecor = 0x0040000000000000,
             KidsMisc = 0x0080000000000000,
 
-            MiscLighting = 0x0100000000000000,
-            MiscPlumbing = 0x0200000000000000,
-            MiscStorage = 0x0400000000000000,
-            MiscSurfaces = 0x0800000000000000,
+            LightingMisc = 0x0100000000000000,
+            PlumbingMisc = 0x0200000000000000,
+            StorageMisc = 0x0400000000000000,
+            SurfacesMisc = 0x0800000000000000,
 
-            MiscVehicles = 0x1000000000000000,
+            VehiclesMisc = 0x1000000000000000,
             DecorRugs = 0x2000000000000000,
-            Unused63 = 0x4000000000000000,
+            PetsCats = 0x4000000000000000,
             Default = 0x8000000000000000,
+        }
+        [Flags]
+        public enum FunctionSubCategory2 : ulong
+        {
+            //Low DWORD
+            Unused1 = 0x00000001,
+            FXAndLights = 0x00000002,
+            Props = 0x00000004,
+            MiscellaneousShowStage = 0x00000008,
+
+            //...
         }
 
         [Flags]
@@ -1131,14 +1341,15 @@ namespace CatalogResource
         [ElementPriority(22)]
         public ObjectType ObjectTypeFlags { get { return objectTypeFlags; } set { if (objectTypeFlags != value) { objectTypeFlags = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(23)]
-        public WallPlacement WallPlacementFlags { get { return wallPlacementFlags; } set { if (wallPlacementFlags != value) { wallPlacementFlags = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(24)]
-        public Movement MovementFlags { get { return movementFlags; } set { if (movementFlags != value) { movementFlags = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(25)]
-        public uint Unknown22 {
-            get { if (version < 0x0000001a) throw new InvalidOperationException(); return unknown22; }
-            set { if (version < 0x0000001a) throw new InvalidOperationException(); if (unknown22 != value) { unknown22 = value; OnResourceChanged(this, new EventArgs()); } }
+        public ObjectTypeExt ObjectTypeFlags2
+        {
+            get { if (version < 0x0000001a) throw new InvalidOperationException(); return objectTypeFlags2; }
+            set { if (version < 0x0000001a) throw new InvalidOperationException(); if (objectTypeFlags2 != value) { objectTypeFlags2 = value; OnResourceChanged(this, new EventArgs()); } }
         }
+        [ElementPriority(24)]
+        public WallPlacement WallPlacementFlags { get { return wallPlacementFlags; } set { if (wallPlacementFlags != value) { wallPlacementFlags = value; OnResourceChanged(this, new EventArgs()); } } }
+        [ElementPriority(25)]
+        public Movement MovementFlags { get { return movementFlags; } set { if (movementFlags != value) { movementFlags = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(26)]
         public uint CutoutTilesPerLevel { get { return cutoutTilesPerLevel; } set { if (cutoutTilesPerLevel != value) { cutoutTilesPerLevel = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(27)]
@@ -1174,60 +1385,66 @@ namespace CatalogResource
         [ElementPriority(34)]
         public FunctionSubCategory FunctionSubCategoryFlags { get { return functionSubCategoryFlags; } set { if (functionSubCategoryFlags != value) { functionSubCategoryFlags = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(35)]
-        public RoomSubCategory RoomSubCategoryFlags { get { return roomSubCategoryFlags; } set { if (roomSubCategoryFlags != value) { roomSubCategoryFlags = value; OnResourceChanged(this, new EventArgs()); } } }
+        public FunctionSubCategory2 FunctionSubCategoryFlags2
+        {
+            get { if (version < 0x0000001c) throw new InvalidOperationException(); return functionSubCategoryFlags2; }
+            set { if (version < 0x0000001c) throw new InvalidOperationException(); if (functionSubCategoryFlags2 != value) { functionSubCategoryFlags2 = value; OnResourceChanged(this, new EventArgs()); } }
+        }
         [ElementPriority(36)]
+        public RoomSubCategory RoomSubCategoryFlags { get { return roomSubCategoryFlags; } set { if (roomSubCategoryFlags != value) { roomSubCategoryFlags = value; OnResourceChanged(this, new EventArgs()); } } }
+        [ElementPriority(37)]
         public BuildCategory BuildCategoryFlags { get { return buildCategoryFlags; } set { if (buildCategoryFlags != value) { buildCategoryFlags = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(37), TGIBlockListContentField("TGIBlocks")]
-        public uint SurfaceCutoutDDSIndex { get { return surfaceCutoutDDSIndex; } set { if (surfaceCutoutDDSIndex != value) { surfaceCutoutDDSIndex = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(38), TGIBlockListContentField("TGIBlocks")]
+        public uint SurfaceCutoutDDSIndex { get { return surfaceCutoutDDSIndex; } set { if (surfaceCutoutDDSIndex != value) { surfaceCutoutDDSIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        [ElementPriority(39), TGIBlockListContentField("TGIBlocks")]
         public uint FloorCutoutDDSIndex
         {
             get { if (version < 0x00000017) throw new InvalidOperationException(); return floorCutoutDDSIndex; }
             set { if (version < 0x00000017) throw new InvalidOperationException(); if (floorCutoutDDSIndex != value) { floorCutoutDDSIndex = value; OnResourceChanged(this, new EventArgs()); } }
         }
-        [ElementPriority(39)]
+        [ElementPriority(40)]
         public uint FloorCutoutLevelOffset
         {
             get { if (version < 0x00000017) throw new InvalidOperationException(); return floorCutoutLevelOffset; }
             set { if (version < 0x00000017) throw new InvalidOperationException(); if (floorCutoutLevelOffset != value) { floorCutoutLevelOffset = value; OnResourceChanged(this, new EventArgs()); } }
         }
-        [ElementPriority(40)]
+        [ElementPriority(41)]
         public float FloorCutoutBoundsLength
         {
             get { if (version < 0x00000017) throw new InvalidOperationException(); return floorCutoutBoundsLength; }
             set { if (version < 0x00000017) throw new InvalidOperationException(); if (floorCutoutBoundsLength != value) { floorCutoutBoundsLength = value; OnResourceChanged(this, new EventArgs()); } }
         }
-        [ElementPriority(41)]
+        [ElementPriority(42)]
         public UIntList BuildableShellDisplayStateHashes
         {
             get { if (version < 0x00000018) throw new InvalidOperationException(); return buildableShellDisplayStateHashes; }
             set { if (version < 0x00000018) throw new InvalidOperationException(); if (buildableShellDisplayStateHashes != value) { buildableShellDisplayStateHashes = value == null ? null : new UIntList(OnResourceChanged, value); } OnResourceChanged(this, new EventArgs()); }
         }
-        [ElementPriority(42), TGIBlockListContentField("TGIBlocks")]
+        [ElementPriority(43), TGIBlockListContentField("TGIBlocks")]
         public uint LevelBelowOBJDIndex
         {
             get { if (version < 0x00000019) throw new InvalidOperationException(); return levelBelowOBJDIndex; }
             set { if (version < 0x00000019) throw new InvalidOperationException(); if (levelBelowOBJDIndex != value) { levelBelowOBJDIndex = value; OnResourceChanged(this, new EventArgs()); } }
         }
-        [ElementPriority(43), TGIBlockListContentField("TGIBlocks")]
-        public uint Unknown23OBJDIndex
+        [ElementPriority(44), TGIBlockListContentField("TGIBlocks")]
+        public uint ProxyOBJDIndex
         {
-            get { if (version < 0x0000001b) throw new InvalidOperationException(); return unknown23OBJDIndex; }
-            set { if (version < 0x0000001b) throw new InvalidOperationException(); if (unknown23OBJDIndex != value) { unknown23OBJDIndex = value; OnResourceChanged(this, new EventArgs()); } }
+            get { if (version < 0x0000001b) throw new InvalidOperationException(); return proxyOBJDIndex; }
+            set { if (version < 0x0000001b) throw new InvalidOperationException(); if (proxyOBJDIndex != value) { proxyOBJDIndex = value; OnResourceChanged(this, new EventArgs()); } }
         }
-        [ElementPriority(44)]
-        public SlotPlacement SlotPlacementFlags { get { return slotPlacementFlags; } set { if (slotPlacementFlags != value) { slotPlacementFlags = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(45)]
-        public string SurfaceType { get { return surfaceType; } set { if (surfaceType != value) { surfaceType = value; OnResourceChanged(this, new EventArgs()); } } }
+        public SlotPlacement SlotPlacementFlags { get { return slotPlacementFlags; } set { if (slotPlacementFlags != value) { slotPlacementFlags = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(46)]
-        public string SourceMaterial { get { return sourceMaterial; } set { if (sourceMaterial != value) { sourceMaterial = value; OnResourceChanged(this, new EventArgs()); } } }
+        public string SurfaceType { get { return surfaceType; } set { if (surfaceType != value) { surfaceType = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(47)]
-        public Moodlet MoodletGiven { get { return moodletGiven; } set { if (moodletGiven != value) { moodletGiven = value; OnResourceChanged(this, new EventArgs()); } } }
+        public string SourceMaterial { get { return sourceMaterial; } set { if (sourceMaterial != value) { sourceMaterial = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(48)]
-        public int MoodletScore { get { return moodletScore; } set { if (moodletScore != value) { moodletScore = value; OnResourceChanged(this, new EventArgs()); } } }
+        public Moodlet MoodletGiven { get { return moodletGiven; } set { if (moodletGiven != value) { moodletGiven = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(49)]
-        public uint Unknown21 { get { return unknown21; } set { if (unknown21 != value) { unknown21 = value; OnResourceChanged(this, new EventArgs()); } } }
+        public int MoodletScore { get { return moodletScore; } set { if (moodletScore != value) { moodletScore = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(50)]
+        public uint Unknown21 { get { return unknown21; } set { if (unknown21 != value) { unknown21 = value; OnResourceChanged(this, new EventArgs()); } } }
+        [ElementPriority(51)]
         public TopicRating[] TopicRatings
         {
             get { return topicRatings; }
@@ -1237,7 +1454,7 @@ namespace CatalogResource
                 if (!topicRatings.Equals<TopicRating>(value)) { topicRatings = value == null ? null : (TopicRating[])value.Clone(); OnResourceChanged(this, new EventArgs()); }
             }
         }
-        [ElementPriority(51), TGIBlockListContentField("TGIBlocks")]
+        [ElementPriority(52), TGIBlockListContentField("TGIBlocks")]
         public uint FallbackIndex { get { return fallbackIndex; } set { if (fallbackIndex != value) { fallbackIndex = value; OnResourceChanged(this, new EventArgs()); } } }
 
         public override TGIBlockList TGIBlocks { get { return list; } set { if (list != value) { list = new TGIBlockList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); mtDoorList.ParentTGIBlocks = list; } } }
