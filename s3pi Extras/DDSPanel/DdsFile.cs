@@ -367,8 +367,10 @@ namespace System.Drawing
             {
                 get
                 {
-                    if ((m_flags & DdsPixelFormat.PixelFormatFlags.DDS_FOURCC) != 0 && m_fourCC != fourccDXT1) return true;
-                    if (m_flags == (DdsPixelFormat.PixelFormatFlags.DDS_RGB | DdsPixelFormat.PixelFormatFlags.DDS_ALPHA)) return true;
+                    if ((m_flags & DdsPixelFormat.PixelFormatFlags.DDS_FOURCC) != 0
+                        && m_fourCC != fourccDXT1) return true;
+                    if ((m_flags & (DdsPixelFormat.PixelFormatFlags.DDS_RGB | DdsPixelFormat.PixelFormatFlags.DDS_ALPHAPIXELS | DdsPixelFormat.PixelFormatFlags.DDS_ALPHA)) != 0
+                        && m_aBitMask != 0) return true;
                     return false;
                 }
             }
