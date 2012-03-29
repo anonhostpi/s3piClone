@@ -75,7 +75,7 @@ namespace meshExpImp.ModelBlocks
 
         public Int32[] GetIndices(ModelPrimitiveType type, Int32 startIndex, Int32 count)
         {
-            return GetIndices(MLOD.IndexCountFromPrimitiveType(type), startIndex, count);
+            return GetIndices(IndexCountFromPrimitiveType(type), startIndex, count);
         }
         public Int32[] GetIndices(int sizePerPrimitive, Int32 startIndex, Int32 count)
         {
@@ -87,7 +87,7 @@ namespace meshExpImp.ModelBlocks
         public void SetIndices(MLOD mlod, MLOD.Mesh mesh, Int32[] indices)
         {
             SetIndices(mlod, mesh.IndexBufferIndex, mesh.PrimitiveType, mesh.StartIndex, mesh.PrimitiveCount, indices);
-            mesh.PrimitiveCount = indices.Length / MLOD.IndexCountFromPrimitiveType(mesh.PrimitiveType);
+            mesh.PrimitiveCount = indices.Length / IndexCountFromPrimitiveType(mesh.PrimitiveType);
         }
 
         public void SetIndices(MLOD mlod, MLOD.Mesh mesh, int geoStateIndex, Int32[] indices)
@@ -99,11 +99,11 @@ namespace meshExpImp.ModelBlocks
         {
             SetIndices(mlod, mesh.IndexBufferIndex, mesh.PrimitiveType, geometryState.StartIndex, geometryState.PrimitiveCount,
                 indices.Select(x => x + geometryState.MinVertexIndex).ToArray());
-            geometryState.PrimitiveCount = indices.Length / MLOD.IndexCountFromPrimitiveType(mesh.PrimitiveType);
+            geometryState.PrimitiveCount = indices.Length / IndexCountFromPrimitiveType(mesh.PrimitiveType);
         }
         void SetIndices(MLOD mlod, s3pi.GenericRCOLResource.GenericRCOLResource.ChunkReference myIBI, ModelPrimitiveType type, Int32 startIndex, Int32 primCount, Int32[] indices)
         {
-            SetIndices(mlod, myIBI, startIndex, startIndex + primCount * MLOD.IndexCountFromPrimitiveType(type), indices);
+            SetIndices(mlod, myIBI, startIndex, startIndex + primCount * IndexCountFromPrimitiveType(type), indices);
         }
         void SetIndices(MLOD mlod, s3pi.GenericRCOLResource.GenericRCOLResource.ChunkReference myIBI, Int32 beforeLength, Int32 afterPos, Int32[] indices)
         {
@@ -265,5 +265,16 @@ namespace meshExpImp.ModelBlocks
             get { return "IBUF"; }
         }
         static bool checking = Settings.Checking;
+
+        public static int IndexCountFromPrimitiveType(ModelPrimitiveType t)
+        {
+            switch (t)
+            {
+                case ModelPrimitiveType.TriangleList:
+                    return 3;
+                default:
+                    throw new NotImplementedException();
+            }
+        }
     }
 }
