@@ -1215,7 +1215,10 @@ namespace CatalogResource
             public override List<string> ContentFields { get { List<string> res = GetContentFields(requestedApiVersion, this.GetType()); res.Remove("ParentTGIBlocks"); return res; } }
 
             #region Attributes
-            float[] unknown1 = new float[4];
+            float leftX;
+            float leftZ;
+            float rightX;
+            float rightZ;
             uint levelOffset;
             uint wallMaskIndex;
             #endregion
@@ -1224,13 +1227,15 @@ namespace CatalogResource
             public MTDoor(int APIversion, EventHandler handler) : base(APIversion, handler) { }
             public MTDoor(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
             public MTDoor(int APIversion, EventHandler handler, MTDoor basis)
-                : this(APIversion, handler, basis.unknown1, basis.levelOffset, basis.wallMaskIndex) { }
-            public MTDoor(int APIversion, EventHandler handler, float[] unknown1, uint unknownX, uint wallMaskIndex)
+                : this(APIversion, handler, basis.leftX, basis.leftZ, basis.rightX, basis.rightZ, basis.levelOffset, basis.wallMaskIndex) { }
+            public MTDoor(int APIversion, EventHandler handler, float leftX, float leftZ, float rightX, float rightZ, uint levelOffset, uint wallMaskIndex)
                 : base(APIversion, handler)
             {
-                if (unknown1.Length != this.unknown1.Length) throw new ArgumentLengthException("unknown1", this.unknown1.Length);
-                this.unknown1 = (float[])unknown1.Clone();
-                this.levelOffset = unknownX;
+                this.leftX = leftX;
+                this.leftZ = leftZ;
+                this.rightX = rightX;
+                this.rightZ = rightZ;
+                this.levelOffset = levelOffset;
                 this.wallMaskIndex = wallMaskIndex;
             }
             #endregion
@@ -1239,14 +1244,20 @@ namespace CatalogResource
             private void Parse(Stream s)
             {
                 BinaryReader r = new BinaryReader(s);
-                this.unknown1 = new float[4]; for (int i = 0; i < unknown1.Length; i++) unknown1[i] = r.ReadSingle();
+                this.leftX = r.ReadSingle();
+                this.leftZ = r.ReadSingle();
+                this.rightX = r.ReadSingle();
+                this.rightZ = r.ReadSingle();
                 this.levelOffset = r.ReadUInt32();
                 this.wallMaskIndex = r.ReadUInt32();
             }
             public void UnParse(Stream s)
             {
                 BinaryWriter w = new BinaryWriter(s);
-                foreach (float f in unknown1) w.Write(f);
+                w.Write(leftX);
+                w.Write(leftZ);
+                w.Write(rightX);
+                w.Write(rightZ);
                 w.Write(levelOffset);
                 w.Write(wallMaskIndex);
             }
@@ -1256,8 +1267,14 @@ namespace CatalogResource
 
             public bool Equals(MTDoor other)
             {
-                for (int i = 0; i < unknown1.Length; i++) if (unknown1[i] != other.unknown1[i]) return false;
-                return (levelOffset == other.levelOffset && wallMaskIndex == other.wallMaskIndex);
+                return true
+                    && leftX == other.leftX
+                    && leftZ == other.leftZ
+                    && rightX == other.rightX
+                    && rightZ == other.rightZ
+                    && levelOffset == other.levelOffset
+                    && wallMaskIndex == other.wallMaskIndex
+                    ;
             }
 
             public override bool Equals(object obj)
@@ -1267,7 +1284,14 @@ namespace CatalogResource
 
             public override int GetHashCode()
             {
-                return unknown1.GetHashCode() ^ levelOffset.GetHashCode() ^ wallMaskIndex.GetHashCode();
+                return 0
+                    ^ leftX.GetHashCode()
+                    ^ leftZ.GetHashCode()
+                    ^ rightX.GetHashCode()
+                    ^ rightZ.GetHashCode()
+                    ^ levelOffset.GetHashCode()
+                    ^ wallMaskIndex.GetHashCode()
+                    ;
             }
 
             #endregion
@@ -1280,18 +1304,16 @@ namespace CatalogResource
 
             #region Content Fields
             [ElementPriority(1)]
-            public float[] Unknown1
-            {
-                get { return (float[])unknown1.Clone(); }
-                set
-                {
-                    if (value.Length != unknown1.Length) throw new ArgumentLengthException("unknown1", this.unknown1.Length);
-                    if (!unknown1.Equals<float>(value)) { unknown1 = (float[])value.Clone(); OnElementChanged(); }
-                }
-            }
+            public float LeftX { get { return leftX; } set { if (leftX != value) { leftX = value; OnElementChanged(); } } }
             [ElementPriority(2)]
+            public float LeftZ { get { return leftZ; } set { if (leftZ != value) { leftZ = value; OnElementChanged(); } } }
+            [ElementPriority(3)]
+            public float RightX { get { return rightX; } set { if (rightX != value) { rightX = value; OnElementChanged(); } } }
+            [ElementPriority(4)]
+            public float RightZ { get { return rightZ; } set { if (rightZ != value) { rightZ = value; OnElementChanged(); } } }
+            [ElementPriority(5)]
             public uint LevelOffset { get { return levelOffset; } set { if (levelOffset != value) { levelOffset = value; OnElementChanged(); } } }
-            [ElementPriority(3), TGIBlockListContentField("ParentTGIBlocks")]
+            [ElementPriority(6), TGIBlockListContentField("ParentTGIBlocks")]
             public uint WallMaskIndex { get { return wallMaskIndex; } set { if (wallMaskIndex != value) { wallMaskIndex = value; OnElementChanged(); } } }
 
             public String Value { get { return ValueBuilder; } }
