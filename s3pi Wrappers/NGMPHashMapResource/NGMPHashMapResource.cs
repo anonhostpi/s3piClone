@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using s3pi.Interfaces;
 
 namespace NGMPHashMapResource
@@ -27,13 +28,13 @@ namespace NGMPHashMapResource
     /// <summary>
     /// A resource wrapper that understands 0x0166038C resources
     /// </summary>
-    [ConstructorParameters(new object[] {(ulong)0, (ulong)0})]
-    public class NGMPHashMapResource : AResource, IDictionary<ulong, ulong>, System.Collections.IDictionary
+    public class NGMPHashMapResource : AResource
     {
         static bool checking = s3pi.Settings.Settings.Checking;
         const Int32 recommendedApiVersion = 1;
         uint version = 1;
-        Dictionary<ulong, ulong> data = new Dictionary<ulong, ulong>();
+
+        NGMPPairList data;
 
         #region AApiVersionedFields
         public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
@@ -64,8 +65,7 @@ namespace NGMPHashMapResource
             if (checking) if (version != 1)
                     throw new InvalidDataException(String.Format("{0}: unsupported 'version'.  Read '0x{1:X8}', supported: '0x00000001'", this.GetType().Name, version));
 
-            for (int i = br.ReadInt32(); i > 0; i--)
-                data.Add(br.ReadUInt64(), br.ReadUInt64());
+            data = new NGMPPairList(OnResourceChanged, s);
 
             if (checking) if (s.Position != s.Length)
                     throw new InvalidDataException(String.Format("{0}: Length {1} bytes, parsed {2} bytes", this.GetType().Name, s.Length, s.Position));
@@ -76,127 +76,77 @@ namespace NGMPHashMapResource
             MemoryStream ms = new MemoryStream();
             BinaryWriter w = new BinaryWriter(ms);
             w.Write(version);
-            w.Write(Count);
-            foreach (KeyValuePair<ulong, ulong> kvp in this)
-            {
-                w.Write(kvp.Key);
-                w.Write(kvp.Value);
-            }
+            data.UnParse(ms);
             w.Flush();
             return ms;
         }
 
+        public class NGMPPair : AHandlerElement, IEquatable<NGMPPair>
+        {
+            const Int32 recommendedApiVersion = 1;
 
+            ulong nameHash;
+            ulong instance;
+
+            public NGMPPair(int APIversion, EventHandler handler) : base(APIversion, handler) { }
+            public NGMPPair(int APIversion, EventHandler handler, NGMPPair basis) : this(APIversion, handler, basis.nameHash, basis.instance) { }
+            public NGMPPair(int APIversion, EventHandler handler, ulong nameHash, ulong instance) : base(APIversion, handler) { this.nameHash = nameHash; this.instance = instance; }
+            public NGMPPair(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
+
+            void Parse(Stream s)
+            {
+                BinaryReader r = new BinaryReader(s);
+                nameHash = r.ReadUInt64();
+                instance = r.ReadUInt64();
+            }
+            internal void UnParse(Stream s)
+            {
+                BinaryWriter w = new BinaryWriter(s);
+                w.Write(nameHash);
+                w.Write(instance);
+            }
+
+            #region AHandlerElement
+            public override AHandlerElement Clone(EventHandler handler) { return new NGMPPair(requestedApiVersion, handler, this); }
+            public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
+            public override List<string> ContentFields { get { return GetContentFields(0, this.GetType()); } }
+            #endregion
+
+            #region IEquatable<NGMPPair>
+            public bool Equals(NGMPPair other) { return nameHash.Equals(other.nameHash) && instance.Equals(other.instance); }
+            #endregion
+
+            #region Content Fields
+            [ElementPriority(1)]
+            public ulong NameHash { get { return nameHash; } set { if (nameHash != value) { nameHash = value; OnElementChanged(); } } }
+            [ElementPriority(2)]
+            public ulong Instance { get { return instance; } set { if (instance != value) { instance = value; OnElementChanged(); } } }
+
+            public string Value { get { return ValueBuilder.Replace("\n", "; "); } }
+            #endregion
+        }
+
+        public class NGMPPairList : DependentList<NGMPPair>
+        {
+            public NGMPPairList(EventHandler handler) : base(handler) { }
+            public NGMPPairList(EventHandler handler, Stream s) : base(handler, s) { }
+            public NGMPPairList(EventHandler handler, IEnumerable<NGMPPair> ln) : base(handler, ln) { }
+
+            #region DependentList<NGMPPair>
+            protected override NGMPPair CreateElement(Stream s) { return new NGMPPair(0, elementHandler, s); }
+            protected override void WriteElement(Stream s, NGMPPair element) { element.UnParse(s); }
+            public override void Add() { Add(new NGMPPair(0, elementHandler)); }
+            #endregion
+        }
 
         [MinimumVersion(1)]
         [MaximumVersion(recommendedApiVersion)]
-        public uint Version { get { return version; } set { if (Version == value) return; version = value; OnResourceChanged(this, new EventArgs()); } }
+        [ElementPriority(1)]
+        public uint Version { get { return version; } set { if (version != value) { version = value; OnResourceChanged(this, new EventArgs()); } } }
+        [ElementPriority(2)]
+        public NGMPPairList Data { get { return data; } set { if (!data.Equals(value)) { data = new NGMPPairList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
 
         public String Value { get { return ValueBuilder; } }
-
-        #region IDictionary<ulong,ulong> Members
-
-        public void Add(ulong key, ulong value)
-        {
-            data.Add(key, value);
-            OnResourceChanged(this, new EventArgs());
-        }
-
-        public bool ContainsKey(ulong key) { return data.ContainsKey(key); }
-
-        public ICollection<ulong> Keys { get { return data.Keys; } }
-
-        public bool Remove(ulong key)
-        {
-            bool res = data.Remove(key);
-            if (res)
-                OnResourceChanged(this, new EventArgs());
-            return res;
-        }
-
-        public bool TryGetValue(ulong key, out ulong value) { return data.TryGetValue(key, out value); }
-
-        public ICollection<ulong> Values { get { return data.Values; } }
-
-        public ulong this[ulong key]
-        {
-            get { return data[key]; }
-            set
-            {
-                if (data[key] == value) return;
-                data[key] = value;
-                OnResourceChanged(this, new EventArgs());
-            }
-        }
-
-        #endregion
-
-        #region ICollection<KeyValuePair<ulong,ulong>> Members
-
-        public void Add(KeyValuePair<ulong, ulong> item) { this.Add(item.Key, item.Value); }
-
-        public void Clear()
-        {
-            data.Clear();
-            OnResourceChanged(this, new EventArgs());
-        }
-
-        public bool Contains(KeyValuePair<ulong, ulong> item) { return data.ContainsKey(item.Key) && data[item.Key].Equals(item.Value); }
-
-        public void CopyTo(KeyValuePair<ulong, ulong>[] array, int arrayIndex)
-        {
-            foreach (KeyValuePair<ulong, ulong> kvp in data) array[arrayIndex++] = new KeyValuePair<ulong, ulong>(kvp.Key, kvp.Value);
-        }
-
-        public int Count { get { return data.Count; } }
-
-        public bool IsReadOnly { get { return false; } }
-
-        public bool Remove(KeyValuePair<ulong, ulong> item) { return Contains(item) ? this.Remove(item.Key) : false; }
-
-        #endregion
-
-        #region IEnumerable<KeyValuePair<ulong,ulong>> Members
-
-        public IEnumerator<KeyValuePair<ulong, ulong>> GetEnumerator() { return data.GetEnumerator(); }
-
-        #endregion
-
-        #region IEnumerable Members
-
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { return data.GetEnumerator(); }
-
-        #endregion
-
-        #region IDictionary Members
-
-        public void Add(object key, object value) { this.Add((ulong)key, (ulong)value); }
-
-        public bool Contains(object key) { return ContainsKey((ulong)key); }
-
-        System.Collections.IDictionaryEnumerator System.Collections.IDictionary.GetEnumerator() { return data.GetEnumerator(); }
-
-        public bool IsFixedSize { get { return false; } }
-
-        System.Collections.ICollection System.Collections.IDictionary.Keys { get { return data.Keys; } }
-
-        public void Remove(object key) { Remove((ulong)key); }
-
-        System.Collections.ICollection System.Collections.IDictionary.Values { get { return data.Values; } }
-
-        public object this[object key] { get { return this[(ulong)key]; } set { this[(ulong)key] = (ulong)value; } }
-
-        #endregion
-
-        #region ICollection Members
-
-        public void CopyTo(Array array, int index) { CopyTo((KeyValuePair<ulong, ulong>[])array, index); }
-
-        public bool IsSynchronized { get { return false; } }
-
-        public object SyncRoot { get { return null; } }
-
-        #endregion
     }
 
     /// <summary>
