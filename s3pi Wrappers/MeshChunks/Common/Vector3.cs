@@ -63,5 +63,7 @@ namespace meshExpImp.ModelBlocks
         {
             return new Vector3(0, handler, this);
         }
+
+        public new string Value { get { return ValueBuilder.Replace("\n", "; "); } }
     }
 }

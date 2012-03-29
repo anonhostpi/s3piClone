@@ -74,5 +74,7 @@ namespace meshExpImp.ModelBlocks
         {
             get { return 1; }
         }
+
+        public string Value { get { return ValueBuilder.Replace("\n", "; "); } }
     }
 }
