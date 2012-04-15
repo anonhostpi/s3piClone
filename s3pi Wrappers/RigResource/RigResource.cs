@@ -492,7 +492,7 @@ namespace RigResource
             protected override IKElement CreateElement(Stream s) { return new IKElement(0, elementHandler, s); }
             protected override void WriteElement(Stream s, IKElement element) { element.UnParse(s); }
 
-            public override void Add() { this.Add(new Bone(0, null)); }
+            public override void Add() { this.Add(new IKElement(0, null)); }
         }
 
         #endregion
