@@ -89,7 +89,7 @@ namespace System.Windows.Forms.TGIBlockListEditorForm
 
         private void btnAdd_Click(object sender, EventArgs e)
         {
-            items.Add((uint)0, (uint)0, (ulong)0);
+            items.Add(new TGIBlock(0, null));
             ListViewItem lvi = CreateListViewItem(items[items.Count - 1]);
             lvi.Tag = items[items.Count - 1];
             listView1.Items.Add(lvi);
