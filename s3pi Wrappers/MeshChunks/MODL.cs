@@ -48,25 +48,13 @@ namespace meshExpImp.ModelBlocks
             public BoundingBoxList(EventHandler handler) : base(handler) { }
             public BoundingBoxList(EventHandler handler, Stream s) : base(handler, s) { }
             public BoundingBoxList(EventHandler handler, IEnumerable<BoundingBox> ilt) : base(handler, ilt) { }
-            public override void Add()
-            {
-                base.Add(new object[] { });
-            }
-            protected override BoundingBox CreateElement(Stream s)
-            {
-                return new BoundingBox(0, this.handler, s);
-            }
-            protected override void WriteElement(Stream s, BoundingBox element)
-            {
-                element.UnParse(s);
-            }
+            public override void Add() { base.Add(new BoundingBox(0, null)); }
+            protected override BoundingBox CreateElement(Stream s) { return new BoundingBox(0, this.handler, s); }
+            protected override void WriteElement(Stream s, BoundingBox element) { element.UnParse(s); }
         }
         public class LODEntryList : DependentList<LODEntry>
         {
-            public LODEntryList(EventHandler handler)
-                : base(handler)
-            {
-            }
+            public LODEntryList(EventHandler handler) : base(handler) { }
             public LODEntryList(EventHandler handler, Stream s, int count)
                 : base(handler)
             {
@@ -89,20 +77,11 @@ namespace meshExpImp.ModelBlocks
                     WriteElement(s, element);
                 }
             }
-            public override void Add()
-            {
-                base.Add(new object[] { });
-            }
+            public override void Add() { base.Add(new LODEntry(0, null)); }
 
-            protected override LODEntry CreateElement(Stream s)
-            {
-                return new LODEntry(0, handler, s);
-            }
+            protected override LODEntry CreateElement(Stream s) { return new LODEntry(0, handler, s); }
 
-            protected override void WriteElement(Stream s, LODEntry element)
-            {
-                element.UnParse(s);
-            }
+            protected override void WriteElement(Stream s, LODEntry element) { element.UnParse(s); }
         }
 
         public class LODEntry : AHandlerElement, IEquatable<LODEntry>

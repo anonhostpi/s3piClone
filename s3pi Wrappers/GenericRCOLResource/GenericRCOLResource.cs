@@ -262,7 +262,7 @@ namespace s3pi.GenericRCOLResource
                     ms.Write(data, 0, data.Length);
                     ms.Position = 0;
 
-                    this.Add(chunks[i], GenericRCOLResourceHandler.RCOLDealer(requestedApiVersion, elementHandler, chunks[i].ResourceType, ms));
+                    this.Add(new ChunkEntry(0, null, chunks[i], GenericRCOLResourceHandler.RCOLDealer(requestedApiVersion, elementHandler, chunks[i].ResourceType, ms)));
                 }
 
                 this.handler = handler;

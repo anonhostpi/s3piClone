@@ -115,7 +115,7 @@ namespace meshExpImp.ModelBlocks
             }
             public override void Add()
             {
-                base.Add(new object[] { });
+                base.Add(new SwizzleEntry(0, null));
             }
             protected override void WriteCount(Stream s, int count) { }
             protected override SwizzleEntry CreateElement(Stream s)
@@ -135,7 +135,7 @@ namespace meshExpImp.ModelBlocks
             public SegmentList(EventHandler handler, IEnumerable<SegmentInfo> ilt) : base(handler, ilt) { }
             public override void Add()
             {
-                base.Add(new object[] { });
+                base.Add(new SegmentInfo(0, null));
             }
             protected override SegmentInfo CreateElement(Stream s)
             {

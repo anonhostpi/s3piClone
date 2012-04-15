@@ -156,7 +156,7 @@ namespace meshExpImp.ModelBlocks
 
             public override void Add()
             {
-                base.Add(new object[] { });
+                base.Add(new ElementLayout(0, null));
             }
             protected override void WriteCount(Stream s, int count){}
             private void Parse(Stream s, int count)

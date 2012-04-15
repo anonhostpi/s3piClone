@@ -34,7 +34,7 @@ namespace meshExpImp.ModelBlocks
             public BoneList(EventHandler handler, IEnumerable<Bone> ilt) : base(handler, ilt) { }
             public override void Add()
             {
-                base.Add(new object[] { });
+                base.Add(new Bone(0, null));
             }
             protected override Bone CreateElement(Stream s)
             {

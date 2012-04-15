@@ -635,7 +635,7 @@ namespace meshExpImp.ModelBlocks
             protected override Mesh CreateElement(Stream s) { return new Mesh(0, handler, mOwner, s); }
             protected override void WriteElement(Stream s, Mesh element) { element.UnParse(s); }
 
-            public override void Add() { base.Add(new object[] { mOwner }); }
+            public override void Add() { base.Add(new Mesh(0, null, mOwner)); }
             public override void Add(Mesh item)
             {
                 base.Add(item);

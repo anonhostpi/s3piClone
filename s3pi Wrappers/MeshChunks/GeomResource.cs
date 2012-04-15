@@ -40,7 +40,7 @@ namespace meshExpImp.ModelBlocks
                 ms.Flush();
                 ms.Position = 0;
                 GEOM geom = new GEOM(requestedApiVersion, OnResourceChanged, ms);
-                ChunkEntries.Add(chunk.TGIBlock, geom);
+                ChunkEntries.Add(new ChunkEntry(0, null, chunk.TGIBlock, geom));
             }
         }
     }
