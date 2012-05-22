@@ -264,7 +264,8 @@ namespace meshExpImp.ModelBlocks
                 {
                     var u = uv[j];
                     float[] uvPoints = new float[VRTF.FloatCountFromFormat(u.Format)];
-                    ReadUVData(data, u, ref uvPoints, uvscales);
+                    var scale = i < uvscales.Length && uvscales[i] != 0 ? uvscales[i] : uvscales[0];
+                    ReadUVData(data, u, ref uvPoints, scale);
                     v.UV[j] = uvPoints;
                 }
                 if (blendIndices != null)
@@ -295,7 +296,7 @@ namespace meshExpImp.ModelBlocks
             }
             return verts;
         }
-        public static void ReadUVData(byte[] data, VRTF.ElementLayout layout, ref float[] output, float[] uvscales)
+        public static void ReadUVData(byte[] data, VRTF.ElementLayout layout, ref float[] output, float scale)
         {
             byte[] element = new byte[VRTF.ByteSizeFromFormat(layout.Format)];
             Array.Copy(data, layout.Offset, element, 0, element.Length);
@@ -305,7 +306,6 @@ namespace meshExpImp.ModelBlocks
                 case VRTF.ElementFormat.Short2:
                     for (int i = 0; i < output.Length; i++)
                     {
-                        var scale = i < uvscales.Length && uvscales[i] != 0 ? uvscales[i] : uvscales[0];
                         output[i] += (float)BitConverter.ToInt16(element, i * sizeof(short)) * scale;
                     }
                     break;
