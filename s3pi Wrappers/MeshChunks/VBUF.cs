@@ -264,7 +264,7 @@ namespace meshExpImp.ModelBlocks
                 {
                     var u = uv[j];
                     float[] uvPoints = new float[VRTF.FloatCountFromFormat(u.Format)];
-                    var scale = i < uvscales.Length && uvscales[i] != 0 ? uvscales[i] : uvscales[0];
+                    var scale = j < uvscales.Length && uvscales[j] != 0 ? uvscales[j] : uvscales[0];
                     ReadUVData(data, u, ref uvPoints, scale);
                     v.UV[j] = uvPoints;
                 }
@@ -535,9 +535,12 @@ namespace meshExpImp.ModelBlocks
                 if (v.Position != null) WritePositionData(v.Position, position, output, positionMax);
                 if (v.Normal != null) WriteFloatData(v.Normal, normal, output);
                 for (int u = 0; u < uv.Length; u++)
+                {
+                    var scale = u < uvscales.Length && uvscales[u] != 0 ? uvscales[u] : uvscales[0];
                     if (v.UV[u] != null)
-                        if (!WriteUVData(v.UV[u], uv[u], output, uvscales))
+                        if (!WriteUVData(v.UV[u], uv[u], output, scale))
                             okay = false;
+                }
                 if (v.BlendIndices != null) Array.Copy(v.BlendIndices, 0, output, blendIndices.Offset, VRTF.ByteSizeFromFormat(blendIndices.Format));
                 if (v.BlendWeights != null) WriteFloatData(v.BlendWeights, blendWeights, output);
                 if (v.Tangents != null) WriteFloatData(v.Tangents, tangents, output);
@@ -567,7 +570,7 @@ namespace meshExpImp.ModelBlocks
                     break;
             }
         }
-        private static bool WriteUVData(float[] input, VRTF.ElementLayout layout, byte[] output, float[] uvscales)
+        private static bool WriteUVData(float[] input, VRTF.ElementLayout layout, byte[] output, float scale)
         {
             bool okay = true;
             switch (layout.Format)
@@ -575,7 +578,6 @@ namespace meshExpImp.ModelBlocks
                 case VRTF.ElementFormat.Short2:
                     for (int i = 0; i < input.Length; i++)
                     {
-                        var scale = i < uvscales.Length && uvscales[i] != 0 ? uvscales[i] : uvscales[0];
                         if ((short)Math.Round(input[i] / scale) != (long)Math.Round(input[i] / scale)) okay = false;
                         Array.Copy(BitConverter.GetBytes((short)Math.Round(input[i] / scale)), 0, output, layout.Offset + i * sizeof(short), sizeof(short));
                     }
