@@ -154,6 +154,7 @@
 0xD9BD0909  WDNM   .wdescname
 0xDD3223A7  BUFF   .xml
 0xDEA2951C  PETB   .breed
+0xE5105067  RMLS   .xml
 0xEA5118B0  _SWB   .effects
 0xF0FF5598  TRIG   .triggers
 0xF1EDBD86  CRMT   .roofmatrl
