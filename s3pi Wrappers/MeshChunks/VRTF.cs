@@ -53,8 +53,11 @@ namespace meshExpImp.ModelBlocks
         {
             VRTF v = new Default(0, null);
             v.Layouts.Add(new ElementLayout(0, null, ElementFormat.UShort4N, 0, ElementUsage.Position, 0));
-            v.Layouts.Add(new ElementLayout(0, null, ElementFormat.Short2, (byte)v.Layouts.Select(x => VRTF.ByteSizeFromFormat(x.Format)).Sum(), ElementUsage.UV, 0));
-            v.Layouts.Add(new ElementLayout(0, null, ElementFormat.Short2, (byte)v.Layouts.Select(x => VRTF.ByteSizeFromFormat(x.Format)).Sum(), ElementUsage.UV, 1));
+            v.Layouts.Add(new ElementLayout(0, null, ElementFormat.Short4_DropShadow, (byte)v.Layouts.Select(x => VRTF.ByteSizeFromFormat(x.Format)).Sum(), ElementUsage.UV, 0));
+            // above replaces following two lines, following discussion with Atavera on 25 May 2012.
+            //v.Layouts.Add(new ElementLayout(0, null, ElementFormat.Short2, (byte)v.Layouts.Select(x => VRTF.ByteSizeFromFormat(x.Format)).Sum(), ElementUsage.UV, 0));
+            //v.Layouts.Add(new ElementLayout(0, null, ElementFormat.Short2, (byte)v.Layouts.Select(x => VRTF.ByteSizeFromFormat(x.Format)).Sum(), ElementUsage.UV, 1));
+            //--
             //v.Layouts.Add(new ElementLayout(0, null, ElementFormat.ColorUByte4, (byte)v.Layouts.Select(x => VRTF.ByteSizeFromFormat(x.Format)).Sum(), ElementUsage.Normal, 0));
             v.Stride = v.Layouts.Select(x => VRTF.ByteSizeFromFormat(x.Format)).Sum();
             return v;
@@ -87,9 +90,8 @@ namespace meshExpImp.ModelBlocks
             Dec3N,
             UDec3N,
             Float16_2,
-            Float16_4
-
-
+            Float16_4,
+            Short4_DropShadow = 0xFF,
         }
         public static int FloatCountFromFormat(VRTF.ElementFormat format)
         {
@@ -109,6 +111,7 @@ namespace meshExpImp.ModelBlocks
                     return 3;
                 case ElementFormat.ColorUByte4:
                 case ElementFormat.Float4:
+                case ElementFormat.Short4_DropShadow:
                     return 4;
                 default:
                     throw new NotImplementedException();
@@ -130,6 +133,7 @@ namespace meshExpImp.ModelBlocks
                 case ElementFormat.Float2:
                 case ElementFormat.Short4:
                 case ElementFormat.Short4N:
+                case ElementFormat.Short4_DropShadow:
                     return 8;
                 case ElementFormat.Float3:
                     return 12;

@@ -313,6 +313,11 @@ namespace meshExpImp.ModelBlocks
                     for (int i = 0; i < output.Length; i++)
                         output[i] += (float)BitConverter.ToInt16(element, i * sizeof(short)) / short.MaxValue;
                     break;
+                case VRTF.ElementFormat.Short4_DropShadow:
+                    for (int i = 0; i < output.Length - 1; i++)
+                        output[i] += (float)BitConverter.ToInt16(element, i * sizeof(short)) / short.MaxValue;
+                    output[output.Length - 1] += (float)BitConverter.ToInt16(element, (output.Length - 1) * sizeof(short)) / 511;
+                    break;
                 default:
                     ReadFloatData(data, layout, ref output);
                     break;
@@ -586,6 +591,11 @@ namespace meshExpImp.ModelBlocks
                 case VRTF.ElementFormat.Short4:
                     for (int i = 0; i < input.Length; i++)
                         Array.Copy(BitConverter.GetBytes((short)Math.Round(input[i] * short.MaxValue)), 0, output, layout.Offset + i * sizeof(short), sizeof(short));
+                    break;
+                case VRTF.ElementFormat.Short4_DropShadow:
+                    for (int i = 0; i < input.Length - 1; i++)
+                        Array.Copy(BitConverter.GetBytes((short)Math.Round(input[i] * short.MaxValue)), 0, output, layout.Offset + i * sizeof(short), sizeof(short));
+                    Array.Copy(BitConverter.GetBytes((short)Math.Round(input[input.Length - 1] * 511)), 0, output, layout.Offset + (input.Length - 1) * sizeof(short), sizeof(short));
                     break;
                 default:
                     WriteFloatData(input, layout, output);
