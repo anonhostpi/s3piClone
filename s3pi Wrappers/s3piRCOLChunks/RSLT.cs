@@ -56,13 +56,13 @@ namespace s3pi.GenericRCOLResource
         {
             this.version = basis.version;
             this.routes = new PartList(handler, basis.routes);
-            this.routeOffsets = new SlotOffsetList(handler, basis.routeOffsets);
-            this.containers = new SlottedPartList(handler, basis.containers);
-            this.containerOffsets = new SlotOffsetList(handler, basis.containerOffsets);
-            this.effects = new PartList(handler, basis.effects);
-            this.effectOffsets = new SlotOffsetList(handler, basis.effectOffsets);
-            this.inverseKineticsTargets = new PartList(handler, basis.inverseKineticsTargets);
-            this.inverseKineticsTargetOffsets = new SlotOffsetList(handler, basis.inverseKineticsTargetOffsets);
+            this.routeOffsets = basis.routeOffsets == null ? null : new SlotOffsetList(handler, basis.routeOffsets);
+            this.containers = basis.containers == null ? null : new SlottedPartList(handler, basis.containers);
+            this.containerOffsets = basis.containerOffsets == null ? null : new SlotOffsetList(handler, basis.containerOffsets);
+            this.effects = basis.effects == null ? null : new PartList(handler, basis.effects);
+            this.effectOffsets = basis.effectOffsets == null ? null : new SlotOffsetList(handler, basis.effectOffsets);
+            this.inverseKineticsTargets = basis.inverseKineticsTargets == null ? null : new PartList(handler, basis.inverseKineticsTargets);
+            this.inverseKineticsTargetOffsets = basis.inverseKineticsTargetOffsets == null ? null : new SlotOffsetList(handler, basis.inverseKineticsTargetOffsets);
         }
         #endregion
 
@@ -510,6 +510,8 @@ namespace s3pi.GenericRCOLResource
                 TransformElement tX, TransformElement tY, TransformElement tZ)
                 : base(APIversion, handler, slotName, boneName, tX, tY, tZ) { this.slotPlacementFlags = slotPlacementFlags; }
 
+            public override AHandlerElement Clone(EventHandler handler) { return new SlottedPart(requestedApiVersion, handler, this); }
+
             public bool Equals(SlottedPart other) { return ((Part)this).Equals((Part)other) && slotPlacementFlags.Equals(other.slotPlacementFlags); }
             public override bool Equals(object obj)
             {
@@ -777,23 +779,23 @@ namespace s3pi.GenericRCOLResource
         [ElementPriority(12)]
         public PartList Routes { get { return routes; } set { if (routes != value) { routes = new PartList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(13), DataGridExpandable]
-        public SlotOffsetList RouteOffsets { get { return routeOffsets; } set { if (routeOffsets != value) { routeOffsets = new SlotOffsetList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
+        public SlotOffsetList RouteOffsets { get { return routeOffsets; } set { if (routeOffsets != value) { routeOffsets = value == null ? null : new SlotOffsetList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(14)]
-        public SlottedPartList Containers { get { return containers; } set { if (containers != value) { containers = new SlottedPartList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
+        public SlottedPartList Containers { get { return containers; } set { if (containers != value) { containers = value == null ? null : new SlottedPartList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(15), DataGridExpandable]
-        public SlotOffsetList ContainerOffsets { get { return containerOffsets; } set { if (containerOffsets != value) { containerOffsets = new SlotOffsetList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
+        public SlotOffsetList ContainerOffsets { get { return containerOffsets; } set { if (containerOffsets != value) { containerOffsets = value == null ? null : new SlotOffsetList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(16)]
-        public PartList Effects { get { return effects; } set { if (effects != value) { effects = new PartList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
+        public PartList Effects { get { return effects; } set { if (effects != value) { effects = value == null ? null : new PartList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(17), DataGridExpandable]
-        public SlotOffsetList EffectOffsets { get { return effectOffsets; } set { if (effectOffsets != value) { effectOffsets = new SlotOffsetList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
+        public SlotOffsetList EffectOffsets { get { return effectOffsets; } set { if (effectOffsets != value) { effectOffsets = value == null ? null : new SlotOffsetList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(18)]
-        public PartList InverseKineticsTargets { get { return inverseKineticsTargets; } set { if (inverseKineticsTargets != value) { inverseKineticsTargets = new PartList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
+        public PartList InverseKineticsTargets { get { return inverseKineticsTargets; } set { if (inverseKineticsTargets != value) { inverseKineticsTargets = value == null ? null : new PartList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(19), DataGridExpandable]
-        public SlotOffsetList InverseKineticsTargetOffsets { get { return inverseKineticsTargetOffsets; } set { if (inverseKineticsTargetOffsets != value) { inverseKineticsTargetOffsets = new SlotOffsetList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
+        public SlotOffsetList InverseKineticsTargetOffsets { get { return inverseKineticsTargetOffsets; } set { if (inverseKineticsTargetOffsets != value) { inverseKineticsTargetOffsets = value == null ? null : new SlotOffsetList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(20)]
-        public ConePartList Cones { get { return cones; } set { if (cones != value) { cones = new ConePartList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
+        public ConePartList Cones { get { return cones; } set { if (cones != value) { cones = value == null ? null : new ConePartList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(21), DataGridExpandable]
-        public SlotOffsetList ConeOffsets { get { return coneOffsets; } set { if (coneOffsets != value) { coneOffsets = new SlotOffsetList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
+        public SlotOffsetList ConeOffsets { get { return coneOffsets; } set { if (coneOffsets != value) { coneOffsets = value == null ? null : new SlotOffsetList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
 
         public string Value { get { return ValueBuilder; } }
         #endregion
