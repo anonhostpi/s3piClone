@@ -131,31 +131,78 @@ namespace s3pi.Interfaces
         /// Adds an entry to an <see cref="DependentList{T}"/>.
         /// </summary>
         /// <param name="fields">
-        /// Either the object to add or the generic type&apos;s constructor arguments.
+        /// The object to add: either an instance or, for abstract generic lists,
+        /// a concrete type or (to be deprecated) the concrete type constructor arguments.  See 'remarks'.
         /// </param>
         /// <returns>True on success</returns>
         /// <exception cref="InvalidOperationException">Thrown when list size exceeded.</exception>
         /// <exception cref="NotSupportedException">The <see cref="DependentList{T}"/> is read-only.</exception>
+        /// <remarks>
+        /// <para>As at 27 April 2012, changes are afoot in how this works.
+        /// Using <see cref="ConstructorParametersAttribute"/> will soon be deprecated.
+        /// Concrete implementations of abstract types will be expected to have a default constructor taking only <c>APIversion</c> and <c>elementHandler</c>.</para>
+        /// <para>Currently, this method supports the following invocations:</para>
+        /// <list type="bullet">
+        /// <item><term><c>Add(T newElement)</c></term><description>Create a new instance from the one supplied.</description></item>
+        /// <item><term><c>Add(Type concreteOfT)</c></term>
+        /// <description>Create a default instance of the given concrete implementation of an abstract class.
+        /// Where <c>concreteOfT</c> has a <see cref="ConstructorParametersAttribute"/>, these will additionally be passed to the constructor (to be deprecated).</description>
+        /// </item>
+        /// <item><term><c>Add(param object[] parameters)</c></term>
+        /// <description>(to be deprecated)
+        /// For abstract types, the concrete type will be looked up from the supplied parameters.
+        /// A new instance will be created, passing the supplied parameters.</description>
+        /// </item>
+        /// </list>
+        /// <para>The new instance will be created passing a zero APIversion and the list's change handler.</para>
+        /// </remarks>
+        /// <seealso cref="Activator.CreateInstance(Type, object[])"/>
         public virtual bool Add(params object[] fields)
         {
             if (fields == null) return false;
 
-            Type[] types = new Type[2 + fields.Length];
-            types[0] = typeof(int);
-            types[1] = typeof(EventHandler);
-            for (int i = 0; i < fields.Length; i++) types[2 + i] = fields[i].GetType();
-
-            object[] args = new object[2 + fields.Length];
-            args[0] = (int)0;
-            args[1] = elementHandler;
-            Array.Copy(fields, 0, args, 2, fields.Length);
-
             Type elementType = typeof(T);
-            if (elementType.IsAbstract) elementType = GetElementType(fields);
-            System.Reflection.ConstructorInfo ci = elementType.GetConstructor(types);
-            if (ci == null) return false;
-            base.Add((T)ci.Invoke(args));
-            return true;
+
+            if (fields.Length == 1)
+            {
+                if (fields[0] is T) // Add(new ConcreteType(0, null, foo, bar))
+                {
+                    AHandlerElement element = fields[0] as AHandlerElement;
+                    base.Add(element.Clone(elementHandler) as T);
+                    return true;
+                }
+            }
+
+            if (elementType.IsAbstract)
+            {
+                if (fields.Length == 1 && fields[0] is Type && elementType.IsAssignableFrom(fields[0] as Type)) // Add(typeof(ConcreteType))
+                {
+                    elementType = fields[0] as Type;
+                    ConstructorParametersAttribute[] constructorParametersArray = elementType.GetCustomAttributes(typeof(ConstructorParametersAttribute), true) as ConstructorParametersAttribute[];
+                    if (constructorParametersArray.Length == 1) // ConstructorParametersAttribute present
+                        fields = constructorParametersArray[0].parameters;
+                    else // ConstructorParametersAttribute absent: this will become the only way
+                        fields = new object[] { };
+                }
+                else // Add(foo, bar) -- will be deprecated
+                {
+                    elementType = GetElementType(fields);
+                }
+            }
+
+            try
+            {
+                object[] args = new object[fields.Length + 2];
+                args[0] = (int)0;
+                args[1] = elementHandler;
+                Array.Copy(fields, 0, args, 2, fields.Length);
+                T newElement = Activator.CreateInstance(elementType, args) as T;
+                //T newElement = Activator.CreateInstance(elementType, new object[] { 0, elementHandler, }) as T; // eventually...
+                base.Add(newElement);
+                return true;
+            }
+            catch (MissingMethodException) { } // That's allowed... for now
+            return false;
         }
 
         /// <summary>
