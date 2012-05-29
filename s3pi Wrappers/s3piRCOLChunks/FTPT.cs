@@ -299,7 +299,7 @@ namespace s3pi.GenericRCOLResource
                 this.name = name;
                 this.priority = priority;
                 this.areaTypeFlags = areaTypeFlags;
-                this.closedPolygon = new PolygonPointList(handler, closedPolygon);
+                this.closedPolygon = closedPolygon == null ? null : new PolygonPointList(handler, closedPolygon);
                 this.allowIntersectionFlags = allowIntersectionFlags;
                 this.surfaceTypeFlags = surfaceTypeFlags;
                 this.surfaceAttributeFlags = surfaceAttributeFlags;
@@ -414,7 +414,7 @@ namespace s3pi.GenericRCOLResource
             [ElementPriority(3)]
             public AreaType AreaTypeFlags { get { return areaTypeFlags; } set { if (areaTypeFlags != value) { areaTypeFlags = value; OnElementChanged(); } } }
             [ElementPriority(4)]
-            public PolygonPointList ClosedPolygon { get { return closedPolygon; } set { if (closedPolygon != value) { closedPolygon = new PolygonPointList(handler, value); OnElementChanged(); } } }
+            public PolygonPointList ClosedPolygon { get { return closedPolygon; } set { if (closedPolygon != value) { closedPolygon = value == null ? null : new PolygonPointList(handler, value); OnElementChanged(); } } }
             [ElementPriority(5)]
             public AllowIntersection AllowIntersectionFlags { get { return allowIntersectionFlags; } set { if (allowIntersectionFlags != value) { allowIntersectionFlags = value; OnElementChanged(); } } }
             [ElementPriority(6)]

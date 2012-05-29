@@ -260,25 +260,9 @@ namespace s3pi.GenericRCOLResource
         [ElementPriority(11)]
         public uint Version { get { return version; } set { if (version != value) { version = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(12)]
-        public AdjustmentList Adjustments { get { return adjustments; } set { if (adjustments != value) { adjustments = new AdjustmentList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
+        public AdjustmentList Adjustments { get { return adjustments; } set { if (adjustments != value) { adjustments = value == null ? null : new AdjustmentList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
         
-        public string Value
-        {
-            get
-            {
-                return ValueBuilder;
-                /*
-                string s = "";
-                //s += "Tag: 0x" + tag.ToString("X8");
-                s += "Version: 0x" + version.ToString("X8");
-                s += String.Format("\nAdjustments ({0:X}):", adjustments.Count);
-                string fmt = "\n--[{0:X" + adjustments.Count.ToString("X").Length + "}]--\n{1}";
-                for (int i = 0; i < adjustments.Count; i++) s += String.Format(fmt, i, adjustments[i].Value);
-                s += "\n----";
-                return s;
-                /**/
-            }
-        }
+        public string Value { get { return ValueBuilder; } }
         #endregion
     }
 }

@@ -55,7 +55,7 @@ namespace s3pi.GenericRCOLResource
             this.version = version;
             if (checking) if (version != 4)
                     throw new ArgumentException(String.Format("Invalid Version: 0x{0:X8}; expected 0x00000004", version));
-            this.entryList = new EntryList(OnRCOLChanged, entryList);
+            this.entryList = entryList == null ? null : new EntryList(OnRCOLChanged, entryList);
             this.tc02 = tc02;
             if (checking) if (tc02 != 0x02)
                     throw new ArgumentException(String.Format("Invalid TC02: 0x{0:X2}; expected 0x02", tc02));
@@ -66,7 +66,7 @@ namespace s3pi.GenericRCOLResource
             this.modular = modular;
             if (modular != 0)
                 this.ftptIndex = ftptIndex;
-            this.tgiBlockList = new TGIBlockList(OnRCOLChanged, tgiBlockList);
+            this.tgiBlockList = tgiBlockList == null ? null : new TGIBlockList(OnRCOLChanged, tgiBlockList);
 
             this.entryList.ParentTGIBlocks = this.tgiBlockList;
         }
@@ -326,7 +326,7 @@ namespace s3pi.GenericRCOLResource
         [ElementPriority(11)]
         public uint Version { get { return version; } /*set { if (version != value) { version = value; OnRCOLChanged(this, EventArgs.Empty); } }/**/ }
         [ElementPriority(12)]
-        public EntryList Entries { get { return entryList; } set { if (entryList != value) { entryList = new EntryList(OnRCOLChanged, value) { ParentTGIBlocks = tgiBlockList }; OnRCOLChanged(this, EventArgs.Empty); } } }
+        public EntryList Entries { get { return entryList; } set { if (entryList != value) { entryList = value == null ? null : new EntryList(OnRCOLChanged, value) { ParentTGIBlocks = tgiBlockList }; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(13)]
         public byte TC02 { get { return tc02; } /*set { if (tc02 != value) { tc02 = value; OnRCOLChanged(this, EventArgs.Empty); } }/**/ }
         [ElementPriority(14)]
@@ -359,7 +359,7 @@ namespace s3pi.GenericRCOLResource
         public TGIBlockList TGIBlocks
         {
             get { return tgiBlockList; }
-            set { if (!tgiBlockList.Equals(value)) { tgiBlockList = new TGIBlockList(OnRCOLChanged, value); if (entryList != null) entryList.ParentTGIBlocks = tgiBlockList; OnRCOLChanged(this, EventArgs.Empty); } }
+            set { if (!tgiBlockList.Equals(value)) { tgiBlockList = value == null ? null : new TGIBlockList(OnRCOLChanged, value); if (entryList != null) entryList.ParentTGIBlocks = tgiBlockList; OnRCOLChanged(this, EventArgs.Empty); } }
         }
 
         public string Value

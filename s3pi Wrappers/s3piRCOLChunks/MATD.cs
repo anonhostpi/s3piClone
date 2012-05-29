@@ -254,7 +254,7 @@ namespace s3pi.GenericRCOLResource
                 this.mtrlUnknown1 = basis.mtrlUnknown1;
                 this.mtrlUnknown2 = basis.mtrlUnknown2;
                 this.mtrlUnknown3 = basis.mtrlUnknown3;
-                this.sdList = new ShaderDataList(handler, basis.sdList);
+                this.sdList = basis.sdList == null ? null : new ShaderDataList(handler, basis.sdList);
             }
             public MTRL(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
             public MTRL(int APIversion, EventHandler handler) : base(APIversion, handler) { }
@@ -343,7 +343,7 @@ namespace s3pi.GenericRCOLResource
             [ElementPriority(3)]
             public ushort MTRLUnknown3 { get { return mtrlUnknown3; } set { if (mtrlUnknown3 != value) { mtrlUnknown3 = value; OnElementChanged(); } } }
             [ElementPriority(4)]
-            public ShaderDataList SData { get { return sdList; } set { if (sdList != value) { sdList = new ShaderDataList(handler, value); OnElementChanged(); } } }
+            public ShaderDataList SData { get { return sdList; } set { if (sdList != value) { sdList = value == null ? null : new ShaderDataList(handler, value); OnElementChanged(); } } }
 
             public string Value
             {
@@ -377,7 +377,7 @@ namespace s3pi.GenericRCOLResource
                 : base(APIversion, handler)
             {
                 this.mtnfUnknown1 = basis.mtnfUnknown1;
-                this.sdList = new ShaderDataList(handler, basis.sdList);
+                this.sdList = basis.sdList == null ? null : new ShaderDataList(handler, basis.sdList);
             }
             public MTNF(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
             public MTNF(int APIversion, EventHandler handler) : base(APIversion, handler) { }
@@ -463,7 +463,7 @@ namespace s3pi.GenericRCOLResource
             [ElementPriority(1)]
             public uint MTNFUnknown1 { get { return mtnfUnknown1; } set { if (mtnfUnknown1 != value) { mtnfUnknown1 = value; OnElementChanged(); } } }
             [ElementPriority(2)]
-            public ShaderDataList SData { get { return sdList; } set { if (sdList != value) { sdList = new ShaderDataList(handler, value); OnElementChanged(); } } }
+            public ShaderDataList SData { get { return sdList; } set { if (sdList != value) { sdList = value == null ? null : new ShaderDataList(handler, value); OnElementChanged(); } } }
 
             public string Value { get { return ValueBuilder; } }
             #endregion

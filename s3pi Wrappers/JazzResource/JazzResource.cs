@@ -840,8 +840,8 @@ namespace s3pi.GenericRCOLResource
             this.unknown1 = unknown1;
             this.unknown2 = unknown2;
             this.unknown3 = unknown3;
-            this.actorSlots = new ActorSlotList(handler, actorSlots);
-            this.actorSuffixes = new ActorSuffixList(handler, actorSuffixes);
+            this.actorSlots = actorSlots == null ? null : new ActorSlotList(handler, actorSlots);
+            this.actorSuffixes = actorSuffixes == null ? null : new ActorSuffixList(handler, actorSuffixes);
             this.unknown4 = unknown4;
             this.unknown5 = unknown5;
             this.unknown6 = unknown6;
@@ -863,7 +863,7 @@ namespace s3pi.GenericRCOLResource
             this.unknown16 = unknown16;
             this.unknown17 = unknown17;
             this.unknown18 = unknown18;
-            this.decisionGraphIndexes = new ChunkReferenceList(handler, decisionGraphIndexes);
+            this.decisionGraphIndexes = decisionGraphIndexes == null ? null : new ChunkReferenceList(handler, decisionGraphIndexes);
         }
         #endregion
 
@@ -1178,9 +1178,9 @@ namespace s3pi.GenericRCOLResource
         [ElementPriority(16)]
         public uint Unknown3 { get { return unknown3; } set { if (unknown3 != value) { unknown3 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(17)]
-        public ActorSlotList ActorSlots { get { return actorSlots; } set { if (actorSlots != value) { actorSlots = new ActorSlotList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
+        public ActorSlotList ActorSlots { get { return actorSlots; } set { if (actorSlots != value) { actorSlots = value == null ? null : new ActorSlotList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(18)]
-        public ActorSuffixList ActorSuffixes { get { return actorSuffixes; } set { if (actorSuffixes != value) { actorSuffixes = new ActorSuffixList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
+        public ActorSuffixList ActorSuffixes { get { return actorSuffixes; } set { if (actorSuffixes != value) { actorSuffixes = value == null ? null : new ActorSuffixList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(19)]
         public uint Unknown4 { get { return unknown4; } set { if (unknown4 != value) { unknown4 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(20)]
@@ -1224,7 +1224,7 @@ namespace s3pi.GenericRCOLResource
         [ElementPriority(39)]
         public uint Unknown18 { get { return unknown18; } set { if (unknown18 != value) { unknown18 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(40)]
-        public ChunkReferenceList DecisionGraphIndexes { get { return decisionGraphIndexes; } set { if (decisionGraphIndexes != value) { decisionGraphIndexes = new ChunkReferenceList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
+        public ChunkReferenceList DecisionGraphIndexes { get { return decisionGraphIndexes; } set { if (decisionGraphIndexes != value) { decisionGraphIndexes = value == null ? null : new ChunkReferenceList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
 
         public string Value { get { return ValueBuilder; } }
         #endregion

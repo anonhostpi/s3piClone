@@ -891,8 +891,8 @@ namespace CatalogResource
                 this.complateXMLIndex = xmlindex;
                 this.name = unknown1;
                 this.pattern = unknown2;
-                complateList = new ComplateList(handler, ltc);
-                mbList = new MaterialBlockList(handler, lmb);
+                complateList = ltc == null ? null : new ComplateList(handler, ltc);
+                mbList = lmb == null ? null : new MaterialBlockList(handler, lmb);
             }
             #endregion
 
@@ -979,9 +979,9 @@ namespace CatalogResource
             [ElementPriority(3)]
             public string Pattern { get { return pattern; } set { if (pattern != value) { pattern = value; OnElementChanged(); } } }
             [ElementPriority(4)]
-            public ComplateList ComplateOverrides { get { return complateList; } set { if (complateList != value) { complateList = new ComplateList(handler, value); OnElementChanged(); } } }
+            public ComplateList ComplateOverrides { get { return complateList; } set { if (complateList != value) { complateList = value == null ? null : new ComplateList(handler, value); OnElementChanged(); } } }
             [ElementPriority(5)]
-            public MaterialBlockList MaterialBlocks { get { return mbList; } set { if (mbList != value) { mbList = new MaterialBlockList(handler, value); OnElementChanged(); } } }
+            public MaterialBlockList MaterialBlocks { get { return mbList; } set { if (mbList != value) { mbList = value == null ? null : new MaterialBlockList(handler, value); OnElementChanged(); } } }
 
             public String Value
             {
@@ -1064,7 +1064,7 @@ namespace CatalogResource
                 this.unknown1 = unknown1;
                 this.unknown2 = unknown2;
                 this.mb = (MaterialBlock)mb.Clone(handler);
-                this.list = new TGIBlockList(handler, ltgib);
+                this.list = ltgib == null ? null : new TGIBlockList(handler, ltgib);
                 this.unknown3 = unknown3;
 
                 this.mb.ParentTGIBlocks = this.list;
@@ -1186,7 +1186,7 @@ namespace CatalogResource
             public TGIBlockList TGIBlocks
             {
                 get { return list; }
-                set { if (list != (value as TGIBlockList)) { list = new TGIBlockList(handler, value); mb.ParentTGIBlocks = list; OnElementChanged(); } }
+                set { if (list != (value as TGIBlockList)) { list = value == null ? null : new TGIBlockList(handler, value); mb.ParentTGIBlocks = list; OnElementChanged(); } }
             }
             [ElementPriority(6)]
             public uint Unknown3 { get { return unknown3; } set { if (unknown3 != value) { unknown3 = value; OnElementChanged(); } } }
@@ -1444,7 +1444,10 @@ namespace CatalogResource
 
         #region Constructors
         public CatalogResourceTGIBlockList(int APIversion, Stream s) : base(APIversion, s) { }
-        public CatalogResourceTGIBlockList(int APIversion, uint version, Common common, IEnumerable<TGIBlock> tgibl) : base(APIversion, version, common) { this.list = new TGIBlockList(OnResourceChanged, tgibl); }
+        public CatalogResourceTGIBlockList(int APIversion, uint version, Common common, IEnumerable<TGIBlock> tgibl) : base(APIversion, version, common)
+        {
+            this.list = tgibl == null ? null : new TGIBlockList(OnResourceChanged, tgibl);
+        }
         #endregion
 
         #region Data I/O
@@ -1475,7 +1478,7 @@ namespace CatalogResource
         #endregion
 
         #region Content Fields
-        public virtual TGIBlockList TGIBlocks { get { return list; } set { if (list != value) { list = new TGIBlockList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
+        public virtual TGIBlockList TGIBlocks { get { return list; } set { if (list != value) { list = value == null ? null : new TGIBlockList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
         #endregion
     }
 

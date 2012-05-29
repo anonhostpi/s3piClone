@@ -47,7 +47,7 @@ namespace s3pi.GenericRCOLResource
         {
             this.nameHash = nameHash;
             this.index = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, index);
-            this.list = new EntryList(OnRCOLChanged, list);
+            this.list = list == null ? null : new EntryList(OnRCOLChanged, list);
         }
         #endregion
 
@@ -186,7 +186,7 @@ namespace s3pi.GenericRCOLResource
         [ElementPriority(13)]
         public GenericRCOLResource.ChunkReference Index { get { return index; } set { if (index != value) { new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(14)]
-        public EntryList Entries { get { return list; } set { if (list != value) { list = new EntryList(OnRCOLChanged, value); OnRCOLChanged(this, EventArgs.Empty); } } }
+        public EntryList Entries { get { return list; } set { if (list != value) { list = value == null ? null : new EntryList(OnRCOLChanged, value); OnRCOLChanged(this, EventArgs.Empty); } } }
 
         public string Value { get { return ValueBuilder; } }
         #endregion

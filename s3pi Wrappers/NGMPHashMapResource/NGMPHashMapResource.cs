@@ -144,7 +144,7 @@ namespace NGMPHashMapResource
         [ElementPriority(1)]
         public uint Version { get { return version; } set { if (version != value) { version = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(2)]
-        public NGMPPairList Data { get { return data; } set { if (!data.Equals(value)) { data = new NGMPPairList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public NGMPPairList Data { get { return data; } set { if (!data.Equals(value)) { data = value == null ? null : new NGMPPairList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
 
         public String Value { get { return ValueBuilder; } }
     }

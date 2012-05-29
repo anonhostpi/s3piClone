@@ -539,11 +539,11 @@ namespace CASPartResource
         [ElementPriority(5)]
         public uint X0C { get { return x0C; } set { if (value != 0x0C) throw new ArgumentException(); if (!x0C.Equals(value)) { x0C = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(6)]
-        public Section1EntryList Section1Entries { get { return section1Entries; } set { if (!section1Entries.Equals(value)) { section1Entries = new Section1EntryList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
+        public Section1EntryList Section1Entries { get { return section1Entries; } set { if (!section1Entries.Equals(value)) { section1Entries = value == null ? null : new Section1EntryList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(7)]
-        public Section2EntryList Section2Entries { get { return section2Entries; } set { if (!section2Entries.Equals(value)) { section2Entries = new Section2EntryList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
+        public Section2EntryList Section2Entries { get { return section2Entries; } set { if (!section2Entries.Equals(value)) { section2Entries = value == null ? null : new Section2EntryList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(8)]
-        public Section3EntryList Section3Entries { get { return section3Entries; } set { if (!section3Entries.Equals(value)) { section3Entries = new Section3EntryList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
+        public Section3EntryList Section3Entries { get { return section3Entries; } set { if (!section3Entries.Equals(value)) { section3Entries = value == null ? null : new Section3EntryList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
 
         public string Value { get { return ValueBuilder; } }
         #endregion

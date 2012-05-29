@@ -426,9 +426,9 @@ namespace CASPartResource
             set { if (version < 8) throw new InvalidOperationException(); if (!blendGeometry.Equals(value)) { blendGeometry = new TGIBlock(requestedApiVersion, OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } }
         }
         [ElementPriority(5)]
-        public CASEntryList CASEntries { get { return casEntries; } set { if (!casEntries.Equals(value)) { casEntries = new CASEntryList(OnResourceChanged, value); casEntries.ParentTGIBlocks = tgiBlocks; OnResourceChanged(this, new EventArgs()); } } }
+        public CASEntryList CASEntries { get { return casEntries; } set { if (!casEntries.Equals(value)) { casEntries = value == null ? null : new CASEntryList(OnResourceChanged, value); casEntries.ParentTGIBlocks = tgiBlocks; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(6)]
-        public TGIBlockList TGIBlocks { get { return tgiBlocks; } set { if (!tgiBlocks.Equals(value)) { tgiBlocks = new TGIBlockList(OnResourceChanged, value, true); casEntries.ParentTGIBlocks = tgiBlocks; OnResourceChanged(this, new EventArgs()); } } }
+        public TGIBlockList TGIBlocks { get { return tgiBlocks; } set { if (!tgiBlocks.Equals(value)) { tgiBlocks = value == null ? null : new TGIBlockList(OnResourceChanged, value, true); casEntries.ParentTGIBlocks = tgiBlocks; OnResourceChanged(this, new EventArgs()); } } }
 
         public string Value
         {

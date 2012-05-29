@@ -545,11 +545,11 @@ namespace RigResource
         [ElementPriority(2)]
         public uint Minor { get { return minor; } set { if (minor != value) { minor = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(3)]
-        public BoneList Bones { get { return bones; } set { if (!bones.Equals(value)) { bones = new BoneList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
+        public BoneList Bones { get { return bones; } set { if (!bones.Equals(value)) { bones = value == null ? null : new BoneList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(4)]
         public String SkeletonName { get { return skeletonName; } set { if (skeletonName != value) { skeletonName = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(5)]
-        public IKChainList IKChains { get { if (major < 4) throw new InvalidOperationException(); return ikChains; } set { if (major < 4) throw new InvalidOperationException(); if (!ikChains.Equals(value)) { ikChains = new IKChainList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
+        public IKChainList IKChains { get { if (major < 4) throw new InvalidOperationException(); return ikChains; } set { if (major < 4) throw new InvalidOperationException(); if (!ikChains.Equals(value)) { ikChains = value == null ? null : new IKChainList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
 
         public string Value { get { return ValueBuilder; } }
         #endregion

@@ -154,7 +154,7 @@ namespace meshExpImp.ModelBlocks
             private SwizzleList mSwizzles;
 
             public SegmentInfo(int APIversion, EventHandler handler) : this(APIversion, handler, 0, 0, 0, new SwizzleList(handler)) { }
-            public SegmentInfo(int APIversion, EventHandler handler, SegmentInfo basis) : this(APIversion, handler, basis.VertexSize, basis.VertexCount, basis.ByteOffset, new SwizzleList(handler, basis.Swizzles)) { }
+            public SegmentInfo(int APIversion, EventHandler handler, SegmentInfo basis) : this(APIversion, handler, basis.VertexSize, basis.VertexCount, basis.ByteOffset, basis.Swizzles) { }
             public SegmentInfo(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
             public SegmentInfo(int APIversion, EventHandler handler, Int32 vertexSize, Int32 vertexCount, UInt32 byteOffset, SwizzleList swizzles)
                 : base(APIversion, handler)
@@ -162,7 +162,7 @@ namespace meshExpImp.ModelBlocks
                 mVertexSize = vertexSize;
                 mVertexCount = vertexCount;
                 mByteOffset = byteOffset;
-                mSwizzles = swizzles;
+                mSwizzles = swizzles == null ? null : new SwizzleList(handler, swizzles);
             }
             public static SegmentInfo FromMesh(MLOD.Mesh mesh,VRTF vrtf)
             {
@@ -237,7 +237,7 @@ namespace meshExpImp.ModelBlocks
             public SwizzleList Swizzles
             {
                 get { return mSwizzles; }
-                set { if (mSwizzles != value) { mSwizzles = value; OnElementChanged(); } }
+                set { if (mSwizzles != value) { mSwizzles = value == null ? null : new SwizzleList(handler, value); OnElementChanged(); } }
             }
 
             public string Value

@@ -230,10 +230,10 @@ namespace meshExpImp.ModelBlocks
         {
             mVersion = version;
             mBounds = bounds;
-            mExtraBounds = extraBounds;
+            mExtraBounds = extraBounds == null ? null : extraBounds;
             mFadeType = fadeType;
             mCustomFadeDistance = customFadeDistance;
-            mEntries = entries;
+            mEntries = entries == null ? null : entries;
         }
         [ElementPriority(1)]
         public uint Version
@@ -251,7 +251,7 @@ namespace meshExpImp.ModelBlocks
         public BoundingBoxList ExtraBounds
         {
             get { return mExtraBounds; }
-            set { if (mExtraBounds != value) { mExtraBounds = value; OnRCOLChanged(this, new EventArgs()); } }
+            set { if (mExtraBounds != value) { mExtraBounds = value == null ? null : new BoundingBoxList(handler, value); OnRCOLChanged(this, new EventArgs()); } }
         }
         [ElementPriority(4)]
         public uint FadeType
@@ -269,7 +269,7 @@ namespace meshExpImp.ModelBlocks
         public LODEntryList Entries
         {
             get { return mEntries; }
-            set { if (mEntries != value) { mEntries = value; OnRCOLChanged(this, new EventArgs()); } }
+            set { if (mEntries != value) { mEntries = value == null ? null : new LODEntryList(handler, value); OnRCOLChanged(this, new EventArgs()); } }
         }
 
         public override AHandlerElement Clone(EventHandler handler)

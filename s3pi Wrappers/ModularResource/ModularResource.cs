@@ -89,7 +89,7 @@ namespace ModularResource
         [ElementPriority(3)]
         public Int32IndexList TGIIndexes { get { return tgiIndexes; } set { if (tgiIndexes != value) { tgiIndexes = new Int32IndexList(OnResourceChanged, value, Int16.MaxValue, ReadInt16, WriteInt16) { ParentTGIBlocks = tgiBlocks }; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(4)]
-        public TGIBlockList TGIBlocks { get { return tgiBlocks; } set { if (tgiBlocks != value) { tgiBlocks = new TGIBlockList(OnResourceChanged, value); tgiIndexes.ParentTGIBlocks = tgiBlocks; OnResourceChanged(this, EventArgs.Empty); } } }
+        public TGIBlockList TGIBlocks { get { return tgiBlocks; } set { if (tgiBlocks != value) { tgiBlocks = value == null ? null : new TGIBlockList(OnResourceChanged, value); tgiIndexes.ParentTGIBlocks = tgiBlocks; OnResourceChanged(this, EventArgs.Empty); } } }
 
         public String Value
         {

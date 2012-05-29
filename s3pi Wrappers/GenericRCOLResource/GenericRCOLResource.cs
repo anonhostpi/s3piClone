@@ -629,12 +629,12 @@ namespace s3pi.GenericRCOLResource
         /// The list of <see cref="TGIBlock"/>s referenced for resources external to this resource.
         /// </summary>
         [ElementPriority(4)]
-        public CountedTGIBlockList Resources { get { return resources; } set { if (resources != value) { resources = new CountedTGIBlockList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
+        public CountedTGIBlockList Resources { get { return resources; } set { if (resources != value) { resources = value == null ? null : new CountedTGIBlockList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
         /// <summary>
         /// The list of <see cref="ChunkEntry"/> values for RCOL blocks within this resource.
         /// </summary>
         [ElementPriority(5)]
-        public ChunkEntryList ChunkEntries { get { return blockList; } set { if (blockList != value) { blockList = new ChunkEntryList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
+        public ChunkEntryList ChunkEntries { get { return blockList; } set { if (blockList != value) { blockList = value == null ? null : new ChunkEntryList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
 
         /// <summary>
         /// A displayable string representing the content of this resource.

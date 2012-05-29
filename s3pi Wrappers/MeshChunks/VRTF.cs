@@ -306,12 +306,12 @@ namespace meshExpImp.ModelBlocks
         {
             mVersion = 0x00000002;
         }
-        public VRTF(int APIversion, EventHandler handler, VRTF basis): this(APIversion, handler,basis.Version,basis.Stride,new VertexElementLayoutList(handler,basis.Layouts), basis.ExtendedFormat){}
+        public VRTF(int APIversion, EventHandler handler, VRTF basis): this(APIversion, handler,basis.Version,basis.Stride, basis.Layouts, basis.ExtendedFormat){}
         public VRTF(int APIversion, EventHandler handler, Stream s): base(APIversion, handler, s){}
         public VRTF(int APIversion, EventHandler handler, uint version, int stride, VertexElementLayoutList layouts, bool extendedFormat) : base(APIversion, handler, null)
         {
             mExtendedFormat = extendedFormat;
-            mLayouts = layouts;
+            mLayouts = layouts == null ? null : new VertexElementLayoutList(handler, layouts);
             mStride = stride;
             mVersion = version;
         }
@@ -343,7 +343,7 @@ namespace meshExpImp.ModelBlocks
         public VertexElementLayoutList Layouts
         {
             get { return mLayouts; }
-            set { if(mLayouts!=value){mLayouts = value; OnRCOLChanged(this, new EventArgs());} }
+            set { if (mLayouts != value) { mLayouts = value == null ? null : new VertexElementLayoutList(handler, value); OnRCOLChanged(this, new EventArgs()); } }
         }
 
         public string Value

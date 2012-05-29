@@ -137,7 +137,7 @@ namespace meshExpImp.ModelBlocks
         public SKIN(int APIversion, EventHandler handler, Stream s): base(APIversion, handler, s){}
         public SKIN(int APIversion, EventHandler handler, BoneList bones, uint version) : base(APIversion, handler, null)
         {
-            mBones = bones;
+            mBones = bones == null ? null : new BoneList(handler, bones);
             mVersion = version;
         }
 
@@ -152,7 +152,7 @@ namespace meshExpImp.ModelBlocks
         public BoneList Bones
         {
             get { return mBones; }
-            set { if(mBones!=value){mBones = value; OnRCOLChanged(this, new EventArgs());} }
+            set { if (mBones != value) { mBones = value == null ? null : new BoneList(handler, value); OnRCOLChanged(this, new EventArgs()); } }
         }
 
         public string Value

@@ -751,6 +751,8 @@ namespace CatalogResource
             Residential = 0x00000400,
             Pool = 0x00000800,
 
+            Fountain = 0x00001000,
+
             Default = 0x80000000,
 
             //All         = 0xFFFFFFFF,
@@ -834,7 +836,7 @@ namespace CatalogResource
             MiscDecor = 0x0100000000000000,
             Rugs = 0x0200000000000000,
             Laundry = 0x0400000000000000,
-            Unused60 = 0x0800000000000000,
+            PetEssentials = 0x0800000000000000,
 
             Unused61 = 0x1000000000000000,
             Unused62 = 0x2000000000000000,
@@ -862,13 +864,13 @@ namespace CatalogResource
 
             Surfaces = 0x00001000,
             Vehicles = 0x00002000,
-            Unused15 = 0x00004000,
-            Unused16 = 0x00008000,
+            Pets = 0x00004000,
+            ShowStage = 0x00008000,
 
-            //
-            //
-            //
-            //
+            //Unused17 = 0x00010000,
+            //Unused18 = 0x00020000,
+            //Unused19 = 0x00040000,
+            //Unused20 = 0x00080000,
 
             //
             //
@@ -1007,6 +1009,7 @@ namespace CatalogResource
             Landmark = 0x00008000,
 
             Elevator = 0x00010000,
+            SpiralStaircase = 0x00010000,
 
             //
             //
@@ -1377,23 +1380,7 @@ namespace CatalogResource
         [ElementPriority(27)]
         public uint Levels { get { return levels; } set { if (levels != value) { levels = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(28)]
-        public MTDoorList MTDoors
-        {
-            get { return mtDoorList; }
-            set
-            {
-                if (!mtDoorList.Equals(value))
-                {
-                    if (value == null)
-                        mtDoorList = value;
-                    else
-                    {
-                        mtDoorList = new MTDoorList(OnResourceChanged, value) { ParentTGIBlocks = list };
-                        OnResourceChanged(this, new EventArgs());
-                    }
-                }
-            }
-        }
+        public MTDoorList MTDoors { get { return mtDoorList; } set { if (!mtDoorList.Equals(value)) { mtDoorList = value == null ? null : new MTDoorList(OnResourceChanged, value) { ParentTGIBlocks = list }; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(29)]
         public bool IsScriptEnabled { get { return isScriptEnabled != 0; } set { if (IsScriptEnabled != value) { isScriptEnabled = (byte)(value ? 1 : 0); OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(30), TGIBlockListContentField("TGIBlocks")]

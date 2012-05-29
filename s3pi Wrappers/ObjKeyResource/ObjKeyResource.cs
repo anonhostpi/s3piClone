@@ -501,45 +501,15 @@ namespace ObjKeyResource
         [ElementPriority(1)]
         public uint Format { get { return format; } set { if (format != value) { format = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(2)]
-        public ComponentList Components { get { return components; } set { if (components != value) { components = new ComponentList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public ComponentList Components { get { return components; } set { if (components != value) { components = value == null ? null : new ComponentList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(3)]
-        public ComponentDataList ComponentData { get { return componentData; } set { if (componentData != value) { componentData = new ComponentDataList(OnResourceChanged, value) { ParentTGIBlocks = tgiBlocks }; OnResourceChanged(this, new EventArgs()); } } }
+        public ComponentDataList ComponentData { get { return componentData; } set { if (componentData != value) { componentData = value == null ? null : new ComponentDataList(OnResourceChanged, value) { ParentTGIBlocks = tgiBlocks }; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(4)]
         public byte Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(5)]
-        public TGIBlockList TGIBlocks { get { return tgiBlocks; } set { if (tgiBlocks != value) { tgiBlocks = new TGIBlockList(OnResourceChanged, value); componentData.ParentTGIBlocks = tgiBlocks; OnResourceChanged(this, new EventArgs()); } } }
+        public TGIBlockList TGIBlocks { get { return tgiBlocks; } set { if (tgiBlocks != value) { tgiBlocks = value == null ? null : new TGIBlockList(OnResourceChanged, value); componentData.ParentTGIBlocks = tgiBlocks; OnResourceChanged(this, new EventArgs()); } } }
 
-        public string Value
-        {
-            get
-            {
-                return ValueBuilder;
-                /*
-                string s = "";
-                s += String.Format("Format: 0x{0:X8}", format);
-
-                s += "\n\nComponents:";
-                foreach (ComponentElement c in components)
-                {
-                    s += "\n  " + c.Value;
-                    TypedValue tv = c.Data(componentData, tgiBlocks);
-                    if (tv != null)
-                        s += "; Data: " + tv;
-                }
-
-                s += String.Format("\n\nUnknown1: 0x{0:X2}", unknown1);
-
-                s += "\n\nComponent Data:";
-                foreach (ComponentDataType cdt in componentData)
-                    s += "\n  " + cdt.Value;
-
-                s += "\n\nTGI Blocks:";
-                for (int i = 0; i < tgiBlocks.Count; i++)
-                    s += "\n  [0x" + i.ToString("X8") + "]: " + tgiBlocks[i];
-                return s;
-                /**/
-            }
-        }
+        public string Value { get { return ValueBuilder; } }
         #endregion
     }
 

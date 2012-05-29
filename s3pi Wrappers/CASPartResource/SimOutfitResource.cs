@@ -395,7 +395,7 @@ namespace CASPartResource
             public CASEntry(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
             public CASEntry(int APIversion, EventHandler handler, CASEntry basis) : this(APIversion, handler, basis.casPartIndex, basis.clothing, basis.txtcIndexes) { }
             public CASEntry(int APIversion, EventHandler handler, byte casPartIndex, ClothingType clothing, IEnumerable<IndexPair> ibe)
-                : base(APIversion, handler) { this.casPartIndex = casPartIndex; this.clothing = clothing; this.txtcIndexes = new IndexPairList(handler, ibe); }
+                : base(APIversion, handler) { this.casPartIndex = casPartIndex; this.clothing = clothing; this.txtcIndexes = ibe == null ? null : new IndexPairList(handler, ibe); }
             #endregion
 
             #region Data I/O
@@ -451,7 +451,7 @@ namespace CASPartResource
             [ElementPriority(2)]
             public ClothingType Clothing { get { return clothing; } set { if (clothing != value) { clothing = value; OnElementChanged(); } } }
             [ElementPriority(3)]
-            public IndexPairList TXTCIndexes { get { return txtcIndexes; } set { if (!txtcIndexes.Equals(value)) { txtcIndexes = new IndexPairList(handler, value); OnElementChanged(); } } }
+            public IndexPairList TXTCIndexes { get { return txtcIndexes; } set { if (!txtcIndexes.Equals(value)) { txtcIndexes = value == null ? null : new IndexPairList(handler, value); OnElementChanged(); } } }
 
             public string Value
             {
@@ -621,7 +621,7 @@ namespace CASPartResource
         [ElementPriority(1)]
         public uint Version { get { return version; } set { if (version != value) { version = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(2)]
-        public XMLEntryList XmlEntries { get { return xmlEntries; } set { if (!xmlEntries.Equals(value)) { xmlEntries = new XMLEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public XMLEntryList XmlEntries { get { return xmlEntries; } set { if (!xmlEntries.Equals(value)) { xmlEntries = value == null ? null : new XMLEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(3)]
         public int Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(4)]
@@ -663,11 +663,11 @@ namespace CASPartResource
         [ElementPriority(22)]
         public float CurlPixelRadius { get { if (version < 0x00000013) throw new InvalidOperationException(); return curlPixelRadius; } set { if (version < 0x00000013) throw new InvalidOperationException(); if (curlPixelRadius != value) { curlPixelRadius = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(23)]
-        public CASEntryList CASPEntries { get { return caspEntries; } set { if (!caspEntries.Equals(value)) { caspEntries = new CASEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public CASEntryList CASPEntries { get { return caspEntries; } set { if (!caspEntries.Equals(value)) { caspEntries = value == null ? null : new CASEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(24)]
-        public FaceEntryList FACEEntries { get { return faceEntries; } set { if (!faceEntries.Equals(value)) { faceEntries = new FaceEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public FaceEntryList FACEEntries { get { return faceEntries; } set { if (!faceEntries.Equals(value)) { faceEntries = value == null ? null : new FaceEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(25)]
-        public CountedTGIBlockList TGIBlocks { get { return tgiBlocks; } set { if (!tgiBlocks.Equals(value)) { tgiBlocks = new CountedTGIBlockList(OnResourceChanged, "IGT", value); OnResourceChanged(this, new EventArgs()); } } }
+        public CountedTGIBlockList TGIBlocks { get { return tgiBlocks; } set { if (!tgiBlocks.Equals(value)) { tgiBlocks = value == null ? null : new CountedTGIBlockList(OnResourceChanged, "IGT", value); OnResourceChanged(this, new EventArgs()); } } }
 
         public string Value
         {

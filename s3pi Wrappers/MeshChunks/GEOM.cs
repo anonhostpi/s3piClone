@@ -931,12 +931,12 @@ namespace meshExpImp.ModelBlocks
             this.mtnf = shader == 0 ? null : new MATD.MTNF(requestedApiVersion, handler, mtnf);
             this.mergeGroup = mergeGroup;
             this.sortOrder = sortOrder;
-            this.vertexFormats = new VertexFormatList(handler, vertexFormats);
-            this.vertexData = new VertexDataList(handler, vertexData, this.vertexFormats);
-            this.faces = new FaceList(handler, facePoints);
+            this.vertexFormats = vertexFormats == null ? null : new VertexFormatList(handler, vertexFormats);
+            this.vertexData = vertexData == null ? null : new VertexDataList(handler, vertexData, this.vertexFormats);
+            this.faces = facePoints == null ? null : new FaceList(handler, facePoints);
             this.skinIndex = skinIndex;
-            this.boneHashes = new UIntList(handler, boneHashes);
-            this.tgiBlockList = new TGIBlockList(handler, tgiBlockList);
+            this.boneHashes = boneHashes == null ? null : new UIntList(handler, boneHashes);
+            this.tgiBlockList = tgiBlockList == null ? null : new TGIBlockList(handler, tgiBlockList);
         }
         #endregion
 
@@ -1623,19 +1623,19 @@ namespace meshExpImp.ModelBlocks
         public VertexFormatList VertexFormats
         {
             get { return vertexFormats; }
-            set { if (!vertexFormats.Equals(value)) { vertexFormats = new VertexFormatList(OnRCOLChanged, value); OnRCOLChanged(this, EventArgs.Empty); } }
+            set { if (!vertexFormats.Equals(value)) { vertexFormats = value == null ? null : new VertexFormatList(OnRCOLChanged, value); OnRCOLChanged(this, EventArgs.Empty); } }
         }
         [ElementPriority(7)]
         public VertexDataList VertexData
         {
             get { return vertexData; }
-            set { if (!vertexData.Equals(value)) { vertexData = new VertexDataList(OnRCOLChanged, value, this.vertexFormats); OnRCOLChanged(this, EventArgs.Empty); } }
+            set { if (!vertexData.Equals(value)) { vertexData = value == null ? null : new VertexDataList(OnRCOLChanged, value, this.vertexFormats); OnRCOLChanged(this, EventArgs.Empty); } }
         }
         [ElementPriority(8)]
         public FaceList Faces
         {
             get { return faces; }
-            set { if (!faces.Equals(value)) { faces = new FaceList(OnRCOLChanged, value); OnRCOLChanged(this, EventArgs.Empty); } }
+            set { if (!faces.Equals(value)) { faces = value == null ? null : new FaceList(OnRCOLChanged, value); OnRCOLChanged(this, EventArgs.Empty); } }
         }
         [ElementPriority(9), TGIBlockListContentField("TGIBlocks")]
         public int SkinIndex { get { return skinIndex; } set { if (skinIndex != value) { skinIndex = value; OnRCOLChanged(this, EventArgs.Empty); } } }
@@ -1643,13 +1643,13 @@ namespace meshExpImp.ModelBlocks
         public UIntList BoneHashes
         {
             get { return boneHashes; }
-            set { if (!boneHashes.Equals(value)) { boneHashes = new UIntList(OnRCOLChanged, value); OnRCOLChanged(this, EventArgs.Empty); } }
+            set { if (!boneHashes.Equals(value)) { boneHashes = value == null ? null : new UIntList(OnRCOLChanged, value); OnRCOLChanged(this, EventArgs.Empty); } }
         }
 
         public TGIBlockList TGIBlocks
         {
             get { return tgiBlockList; }
-            set { if (!tgiBlockList.Equals(value)) { tgiBlockList = new TGIBlockList(OnRCOLChanged, value); /*hand me down*/ OnRCOLChanged(this, EventArgs.Empty); } }
+            set { if (!tgiBlockList.Equals(value)) { tgiBlockList = value == null ? null : new TGIBlockList(OnRCOLChanged, value); /*hand me down*/ OnRCOLChanged(this, EventArgs.Empty); } }
         }
 
         public string Value { get { return ValueBuilder; } }

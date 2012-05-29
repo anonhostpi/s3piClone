@@ -46,8 +46,8 @@ namespace s3pi.GenericRCOLResource
         {
             this.version = basis.version;
             this.unknown1 = basis.unknown1;
-            this.lightSources = new LightSourceList(handler, basis.lightSources);
-            this.occluders = new OccluderList(handler, basis.occluders);
+            this.lightSources = basis.lightSources == null ? null : new LightSourceList(handler, basis.lightSources);
+            this.occluders = basis.occluders == null ? null : new OccluderList(handler, basis.occluders);
             this.unknown2 = basis.unknown2;
         }
         #endregion
@@ -765,9 +765,9 @@ namespace s3pi.GenericRCOLResource
         [ElementPriority(13)]
         public ushort Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(14)]
-        public LightSourceList LightSources { get { return lightSources; } set { if (lightSources != value) { lightSources = new LightSourceList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
+        public LightSourceList LightSources { get { return lightSources; } set { if (lightSources != value) { lightSources = value == null ? null : new LightSourceList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(15)]
-        public OccluderList Occluders { get { return occluders; } set { if (occluders != value) { occluders = new OccluderList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
+        public OccluderList Occluders { get { return occluders; } set { if (occluders != value) { occluders = value == null ? null : new OccluderList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
 
         public string Value { get { return ValueBuilder; } }
         #endregion

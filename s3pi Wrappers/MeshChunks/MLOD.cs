@@ -309,8 +309,8 @@ namespace meshExpImp.ModelBlocks
                 mPrimitiveCount = primitiveCount;
                 mBounds = new BoundingBox(requestedApiVersion, handler, bounds);
                 mSkinControllerIndex = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, skinControllerIndex);
-                mJointReferences = new UIntList(handler, jointReferences);
-                mGeometryStates = new GeometryStateList(handler, geometryStates);
+                mJointReferences = jointReferences == null ? null : new UIntList(handler, jointReferences);
+                mGeometryStates = geometryStates == null ? null : new GeometryStateList(handler, geometryStates);
                 mScaleOffsetIndex = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, scaleOffsetIndex);
                 mParentName = parentName;//mOwner.Version > 0x00000201
                 mMirrorPlane = new Vector4(requestedApiVersion, handler, mirrorPlane);//mOwner.Version > 0x00000201
@@ -588,13 +588,13 @@ namespace meshExpImp.ModelBlocks
             public UIntList JointReferences
             {
                 get { return mJointReferences; }
-                set { if (mJointReferences != value) { mJointReferences = value; OnElementChanged(); } }
+                set { if (mJointReferences != value) { mJointReferences = value == null ? null : new UIntList(handler, value); OnElementChanged(); } }
             }
             [ElementPriority(18)]
             public GeometryStateList GeometryStates
             {
                 get { return mGeometryStates; }
-                set { if (mGeometryStates != value) { mGeometryStates = value; OnElementChanged(); } }
+                set { if (mGeometryStates != value) { mGeometryStates = value == null ? null : new GeometryStateList(handler, value); OnElementChanged(); } }
             }
             [ElementPriority(19)]
             public UInt32 ParentName
