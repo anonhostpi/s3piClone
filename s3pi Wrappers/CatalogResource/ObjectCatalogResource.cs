@@ -1008,11 +1008,9 @@ namespace CatalogResource
             Shell = 0x00004000,
             Landmark = 0x00008000,
 
-            Elevator = 0x00010000,
-            SpiralStaircase = 0x00010000,
 
-            //
-            //
+            Elevator = 0x00010000,
+            SpiralStaircase = 0x00020000,
             //
             //
 
