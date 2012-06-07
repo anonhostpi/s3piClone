@@ -184,6 +184,21 @@ namespace System.Security.Cryptography
         /// <returns>The generic hash value</returns>
         public static ulong GetHashGeneric(string text)
         {
+            string value = GetGenericValue(text);
+
+            ulong hash = FNV64.GetHash(value);
+            hash &= 0x7FFFFFFFFFFFFFFF;
+
+            return hash;
+        }
+
+        /// <summary>
+        /// Get the "generic" CLIP, removing age and species.
+        /// </summary>
+        /// <param name="text">The CLIP name from which to et the generic value.</param>
+        /// <returns>The generic CLIP name.</returns>
+        public static string GetGenericValue(string text)
+        {
             string value = text;
 
             string[] split = text.Split(new char[] { '_', }, 2);
@@ -208,10 +223,7 @@ namespace System.Security.Cryptography
                 }
             }
 
-            ulong hash = FNV64.GetHash(value);
-            hash &= 0x7FFFFFFFFFFFFFFF;
-
-            return hash;
+            return value;
         }
 
         static string[] ao = { "a", "o", };
