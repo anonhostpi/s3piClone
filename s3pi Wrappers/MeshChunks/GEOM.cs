@@ -1411,13 +1411,6 @@ namespace meshExpImp.ModelBlocks
             protected override void WriteElement(Stream s, VertexElement element) { throw new NotImplementedException(); }
 
             public override void Add() { throw new NotImplementedException(); }
-            protected override Type GetElementType(params object[] fields)
-            {
-                if (fields.Length == 1) return fields[0].GetType();
-                if (fields.Length == 3 && typeof(int).IsAssignableFrom(fields[0].GetType()) && typeof(EventHandler).IsAssignableFrom(fields[1].GetType()))
-                    return fields[2].GetType();
-                throw new ArgumentException();
-            }
 
             public VertexElement this[UsageType usage]
             {

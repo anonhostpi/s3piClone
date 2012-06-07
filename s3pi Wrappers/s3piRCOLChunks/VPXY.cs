@@ -306,18 +306,6 @@ namespace s3pi.GenericRCOLResource
             protected override void WriteElement(Stream s, Entry element) { element.UnParse(s); }
             #endregion
 
-            protected override Type GetElementType(params object[] fields)
-            {
-                if (fields.Length == 1 && typeof(Entry).IsAssignableFrom(fields[0].GetType())) return fields[0].GetType();
-
-                switch ((byte)fields[0])
-                {
-                    case 0x00: return typeof(Entry00);
-                    case 0x01: return typeof(Entry01);
-                }
-                throw new ArgumentException(String.Format("Unknown entry type 0x{0:X2}", (byte)fields[0]));
-            }
-
             public override void Add() { throw new NotImplementedException(); }
         }
         #endregion
