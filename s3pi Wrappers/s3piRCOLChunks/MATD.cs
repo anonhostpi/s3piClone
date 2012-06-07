@@ -737,7 +737,6 @@ namespace s3pi.GenericRCOLResource
 
             public string Value { get { return ValueBuilder.Replace("\n", "; "); } }
         }
-        [ConstructorParameters(new object[] { (FieldType)0, 0f, })]
         public class ElementFloat : ShaderData
         {
             const int recommendedApiVersion = 1;
@@ -748,6 +747,7 @@ namespace s3pi.GenericRCOLResource
 
             #region Constructors
             public ElementFloat(int APIversion, EventHandler handler, FieldType field, Stream s) : base(APIversion, handler, field) { Parse(s); }
+            public ElementFloat(int APIversion, EventHandler handler) : this(APIversion, handler, (FieldType)0, 0f) { }
             public ElementFloat(int APIversion, EventHandler handler, ElementFloat basis) : this(APIversion, handler, basis.field, basis.data) { }
             public ElementFloat(int APIversion, EventHandler handler, FieldType field, Single data) : base(APIversion, handler, field) { this.data = data; }
             #endregion
@@ -777,7 +777,6 @@ namespace s3pi.GenericRCOLResource
             public Single Data { get { return data; } set { if (data != value) { data = value; OnElementChanged(); } } }
             #endregion
         }
-        [ConstructorParameters(new object[] { (FieldType)0, 0f, 0f, })]
         public class ElementFloat2 : ShaderData
         {
             const int recommendedApiVersion = 1;
@@ -789,6 +788,7 @@ namespace s3pi.GenericRCOLResource
 
             #region Constructors
             public ElementFloat2(int APIversion, EventHandler handler, FieldType field, Stream s) : base(APIversion, handler, field) { Parse(s); }
+            public ElementFloat2(int APIversion, EventHandler handler) : this(APIversion, handler, (FieldType)0, 0f, 0f) { }
             public ElementFloat2(int APIversion, EventHandler handler, ElementFloat2 basis) : this(APIversion, handler, basis.field, basis.data0, basis.data1) { }
             public ElementFloat2(int APIversion, EventHandler handler, FieldType field, Single data0, Single data1) : base(APIversion, handler, field) { this.data0 = data0; this.data1 = data1; }
             #endregion
@@ -823,7 +823,6 @@ namespace s3pi.GenericRCOLResource
             public Single Data1 { get { return data1; } set { if (data1 != value) { data1 = value; OnElementChanged(); } } }
             #endregion
         }
-        [ConstructorParameters(new object[] { (FieldType)0, 0f, 0f, 0f, })]
         public class ElementFloat3 : ShaderData
         {
             const int recommendedApiVersion = 1;
@@ -836,6 +835,7 @@ namespace s3pi.GenericRCOLResource
 
             #region Constructors
             public ElementFloat3(int APIversion, EventHandler handler, FieldType field, Stream s) : base(APIversion, handler, field) { Parse(s); }
+            public ElementFloat3(int APIversion, EventHandler handler) : this(APIversion, handler, (FieldType)0, 0f, 0f, 0f) { }
             public ElementFloat3(int APIversion, EventHandler handler, ElementFloat3 basis) : this(APIversion, handler, basis.field, basis.data0, basis.data1, basis.data2) { }
             public ElementFloat3(int APIversion, EventHandler handler, FieldType field, Single data0, Single data1, Single data2) : base(APIversion, handler, field) { this.data0 = data0; this.data1 = data1; this.data2 = data2; }
             #endregion
@@ -873,7 +873,6 @@ namespace s3pi.GenericRCOLResource
             public Single Data2 { get { return data2; } set { if (data2 != value) { data2 = value; OnElementChanged(); } } }
             #endregion
         }
-        [ConstructorParameters(new object[] { (FieldType)0, 0f, 0f, 0f, 0f, })]
         public class ElementFloat4 : ShaderData
         {
             const int recommendedApiVersion = 1;
@@ -887,6 +886,7 @@ namespace s3pi.GenericRCOLResource
 
             #region Constructors
             public ElementFloat4(int APIversion, EventHandler handler, FieldType field, Stream s) : base(APIversion, handler, field) { Parse(s); }
+            public ElementFloat4(int APIversion, EventHandler handler) : this(APIversion, handler, (FieldType)0, 0f, 0f, 0f, 0f) { }
             public ElementFloat4(int APIversion, EventHandler handler, ElementFloat4 basis) : this(APIversion, handler, basis.field, basis.data0, basis.data1, basis.data2, basis.data3) { }
             public ElementFloat4(int APIversion, EventHandler handler, FieldType field, Single data0, Single data1, Single data2, Single data3) : base(APIversion, handler, field) { this.data0 = data0; this.data1 = data1; this.data2 = data2; this.data3 = data3; }
             #endregion
@@ -927,7 +927,6 @@ namespace s3pi.GenericRCOLResource
             public Single Data3 { get { return data3; } set { if (data3 != value) { data3 = value; OnElementChanged(); } } }
             #endregion
         }
-        [ConstructorParameters(new object[] { (FieldType)0, (int)0, })]
         public class ElementInt : ShaderData
         {
             const int recommendedApiVersion = 1;
@@ -938,6 +937,7 @@ namespace s3pi.GenericRCOLResource
 
             #region Constructors
             public ElementInt(int APIversion, EventHandler handler, FieldType field, Stream s) : base(APIversion, handler, field) { Parse(s); }
+            public ElementInt(int APIversion, EventHandler handler) : this(APIversion, handler, (FieldType)0, (int)0) { }
             public ElementInt(int APIversion, EventHandler handler, ElementInt basis) : this(APIversion, handler, basis.field, basis.data) { }
             public ElementInt(int APIversion, EventHandler handler, FieldType field, Int32 data) : base(APIversion, handler, field) { this.data = data; }
             #endregion
@@ -967,7 +967,6 @@ namespace s3pi.GenericRCOLResource
             public Int32 Data { get { return data; } set { if (data != value) { data = value; OnElementChanged(); } } }
             #endregion
         }
-        [ConstructorParameters(new object[] { (FieldType)0, (uint)0, })]
         public class ElementTextureRef : ShaderData
         {
             const int recommendedApiVersion = 1;
@@ -978,6 +977,7 @@ namespace s3pi.GenericRCOLResource
 
             #region Constructors
             public ElementTextureRef(int APIversion, EventHandler handler, FieldType field, Stream s) : base(APIversion, handler, field) { Parse(s); }
+            public ElementTextureRef(int APIversion, EventHandler handler) : this(APIversion, handler, (FieldType)0, (uint)0) { }
             public ElementTextureRef(int APIversion, EventHandler handler, ElementTextureRef basis) : this(APIversion, handler, basis.field, basis.data) { }
             public ElementTextureRef(int APIversion, EventHandler handler, FieldType field, GenericRCOLResource.ChunkReference data) : base(APIversion, handler, field) { this.data = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, data); }
             public ElementTextureRef(int APIversion, EventHandler handler, FieldType field, uint chunkRef) : base(APIversion, handler, field) { this.data = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, chunkRef); }
@@ -1008,7 +1008,6 @@ namespace s3pi.GenericRCOLResource
             public GenericRCOLResource.ChunkReference Data { get { return data; } set { if (data != value) { data = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, value); OnElementChanged(); } } }
             #endregion
         }
-        [ConstructorParameters(new object[] { (FieldType)0, (uint)0, (uint)0, (ulong)0, })]
         public class ElementTextureKey : ShaderData
         {
             const int recommendedApiVersion = 1;
@@ -1019,6 +1018,7 @@ namespace s3pi.GenericRCOLResource
 
             #region Constructors
             public ElementTextureKey(int APIversion, EventHandler handler, FieldType field, Stream s) : base(APIversion, handler, field) { Parse(s); }
+            public ElementTextureKey(int APIversion, EventHandler handler) : this(APIversion, handler, (FieldType)0, (uint)0, (uint)0, (ulong)0) { }
             public ElementTextureKey(int APIversion, EventHandler handler, ElementTextureKey basis) : this(APIversion, handler, basis.field, basis.data) { }
             public ElementTextureKey(int APIversion, EventHandler handler, FieldType field, IResourceKey data) : base(APIversion, handler, field) { this.data = new TGIBlock(requestedApiVersion, handler, data); }
             public ElementTextureKey(int APIversion, EventHandler handler, FieldType field, uint resourceType, uint resourceGroup, ulong instance) : base(APIversion, handler, field) { this.data = new TGIBlock(requestedApiVersion, handler, resourceType, resourceGroup, instance); }
@@ -1091,23 +1091,6 @@ namespace s3pi.GenericRCOLResource
             #endregion
 
             public override void Add() { throw new NotSupportedException(); }
-            protected override Type GetElementType(params object[] fields)
-            {
-                if (fields.Length == 1 && typeof(ShaderData).IsAssignableFrom(fields[0].GetType())) return fields[0].GetType();
-
-                List<Type> types = new List<Type>(new Type[] { typeof(int), typeof(EventHandler), });
-                for (int i = 0; i < fields.Length; i++) types.Add(fields[i].GetType());
-
-                return ShaderDataNestedTypes.Find(type =>
-                {
-                    if (!type.IsSubclassOf(typeof(ShaderData))) return false;
-                    System.Reflection.ConstructorInfo ci = type.GetConstructor(types.ToArray());
-                    if (ci == null) return false;
-                    System.Reflection.ParameterInfo[] api = ci.GetParameters();
-                    for (int i = 0; i < types.Count; i++) if (types[i] != api[i].ParameterType) return false;
-                    return true;
-                });
-            }
         }
         #endregion
 

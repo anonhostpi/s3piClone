@@ -453,7 +453,6 @@ namespace CatalogResource
             #endregion
         }
 
-        [ConstructorParameters(new object[] { (byte)0x01, "StringVariable", "Value", })]
         public class TC01_String : ComplateElement
         {
             #region Attributes
@@ -462,6 +461,7 @@ namespace CatalogResource
 
             #region Constructors
             internal TC01_String(int APIversion, EventHandler handler, string variableName, Stream s) : base(APIversion, handler, variableName, s) { }
+            public TC01_String(int APIversion, EventHandler handler) : this(APIversion, handler, 0, "StringVariable", "Value") { }
             public TC01_String(int APIversion, EventHandler handler, TC01_String basis) : this(APIversion, handler, 0, basis.variableName, basis.stringValue) { }
             public TC01_String(int APIversion, EventHandler handler, byte unused, string variableName, string stringValue) : base(APIversion, handler, variableName)
             {
@@ -493,7 +493,6 @@ namespace CatalogResource
             public string Data { get { return stringValue; } set { if (stringValue != value) stringValue = value; OnElementChanged(); } }
         }
 
-        [ConstructorParameters(new object[] { (byte)0x02, "ARGBVariable", (UInt32)0xFFAA8866, })]
         public class TC02_ARGB : ComplateElement
         {
             #region Attributes
@@ -502,6 +501,7 @@ namespace CatalogResource
 
             #region Constructors
             internal TC02_ARGB(int APIversion, EventHandler handler, string variableName, Stream s) : base(APIversion, handler, variableName, s) { }
+            public TC02_ARGB(int APIversion, EventHandler handler) : this(APIversion, handler, 0, "ARGBVariable", (UInt32)0xFFAA8866) { }
             public TC02_ARGB(int APIversion, EventHandler handler, TC02_ARGB basis) : this(APIversion, handler, 0, basis.variableName, basis.argb) { }
             public TC02_ARGB(int APIversion, EventHandler handler, byte unused, string variableName, UInt32 argb) : base(APIversion, handler, variableName)
             {
@@ -534,7 +534,6 @@ namespace CatalogResource
             public UInt32 ARGB { get { return argb; } set { if (argb != value) { argb = value; OnElementChanged(); } } }
         }
 
-        [ConstructorParameters(new object[] { (byte)0x03, "TGIIndexVariable", (byte)0x00, })]
         public class TC03_TGIIndex : ComplateElement
         {
             public DependentList<TGIBlock> ParentTGIBlocks { get; set; }
@@ -546,6 +545,7 @@ namespace CatalogResource
 
             #region Constructors
             internal TC03_TGIIndex(int APIversion, EventHandler handler, string variableName, Stream s) : base(APIversion, handler, variableName, s) { }
+            public TC03_TGIIndex(int APIversion, EventHandler handler) : this(APIversion, handler, 0, "TGIIndexVariable", (byte)0x00) { }
             public TC03_TGIIndex(int APIversion, EventHandler handler, TC03_TGIIndex basis) : this(APIversion, handler, 0, basis.variableName, basis.tgiIndex) { }
             public TC03_TGIIndex(int APIversion, EventHandler handler, byte unused, string variableName, byte tgiIndex) : base(APIversion, handler, variableName)
             {
@@ -578,7 +578,6 @@ namespace CatalogResource
             public byte TGIIndex { get { return tgiIndex; } set { if (tgiIndex != value) { tgiIndex = value; OnElementChanged(); } } }
         }
 
-        [ConstructorParameters(new object[] { (byte)0x04, "FloatVariable", 0f, })]
         public class TC04_Single : ComplateElement
         {
             #region Attributes
@@ -587,6 +586,7 @@ namespace CatalogResource
 
             #region Constructors
             internal TC04_Single(int APIversion, EventHandler handler, string variableName, Stream s) : base(APIversion, handler, variableName, s) { }
+            public TC04_Single(int APIversion, EventHandler handler) : this(APIversion, handler, 0, "FloatVariable", 0f) { }
             public TC04_Single(int APIversion, EventHandler handler, TC04_Single basis) : this(APIversion, handler, 0, basis.variableName, basis.unknown1) { }
             public TC04_Single(int APIversion, EventHandler handler, byte unused, string variableName, float unknown1) : base(APIversion, handler, variableName)
             {
@@ -618,7 +618,6 @@ namespace CatalogResource
             public float Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnElementChanged(); } } }
         }
 
-        [ConstructorParameters(new object[] { (byte)0x05, "XYVariable", 0f, 0f, })]
         public class TC05_XY : ComplateElement
         {
             #region Attributes
@@ -628,6 +627,7 @@ namespace CatalogResource
 
             #region Constructors
             internal TC05_XY(int APIversion, EventHandler handler, string variableName, Stream s) : base(APIversion, handler, variableName, s) { }
+            public TC05_XY(int APIversion, EventHandler handler) : this(APIversion, handler, 0, "XYVariable", 0f, 0f) { }
             public TC05_XY(int APIversion, EventHandler handler, TC05_XY basis) : this(APIversion, handler, 0, basis.variableName, basis.unknown1, basis.unknown2) { }
             public TC05_XY(int APIversion, EventHandler handler, byte unused, string variableName, float unknown1, float unknown2) : base(APIversion, handler, variableName)
             {
@@ -674,7 +674,6 @@ namespace CatalogResource
             public float Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnElementChanged(); } } }
         }
 
-        [ConstructorParameters(new object[] { (byte)0x06, "XYZVariable", 0f, 0f, 0f, })]
         public class TC06_XYZ : ComplateElement
         {
             #region Attributes
@@ -685,6 +684,7 @@ namespace CatalogResource
 
             #region Constructors
             internal TC06_XYZ(int APIversion, EventHandler handler, string variableName, Stream s) : base(APIversion, handler, variableName, s) { }
+            public TC06_XYZ(int APIversion, EventHandler handler) : this(APIversion, handler, 0, "XYZVariable", 0f, 0f, 0f) { }
             public TC06_XYZ(int APIversion, EventHandler handler, TC06_XYZ basis) : this(APIversion, handler, 0, basis.variableName, basis.unknown1, basis.unknown2, basis.unknown3) { }
             public TC06_XYZ(int APIversion, EventHandler handler, byte unused, string variableName, float unknown1, float unknown2, float unknown3) : base(APIversion, handler, variableName)
             {
@@ -736,7 +736,6 @@ namespace CatalogResource
             public float Unknown3 { get { return unknown3; } set { if (unknown3 != value) { unknown3 = value; OnElementChanged(); } } }
         }
 
-        [ConstructorParameters(new object[] { (byte)0x07, "TFVariable", false })]
         public class TC07_Boolean : ComplateElement
         {
             #region Attributes
@@ -745,6 +744,7 @@ namespace CatalogResource
 
             #region Constructors
             internal TC07_Boolean(int APIversion, EventHandler handler, string variableName, Stream s) : base(APIversion, handler, variableName, s) { }
+            public TC07_Boolean(int APIversion, EventHandler handler) : this(APIversion, handler, 0, "TFVariable", false) { }
             public TC07_Boolean(int APIversion, EventHandler handler, TC07_Boolean basis) : this(APIversion, handler, 0, basis.variableName, basis.unknown1 != 0) { }
             public TC07_Boolean(int APIversion, EventHandler handler, byte unused, string variableName, bool value) : base(APIversion, handler, variableName)
             {
@@ -807,37 +807,6 @@ namespace CatalogResource
             #endregion
 
             public override void Add() { throw new NotImplementedException(); }
-
-            protected override Type GetElementType(params object[] fields)
-            {
-                if (fields.Length == 1)
-                {
-                    // ComplateElement
-                    if (typeof(ComplateElement).IsAssignableFrom(fields[0].GetType()))
-                        return fields[0].GetType();
-                }
-
-                // byte, string, ...
-                if (fields.Length > 2
-                    && fields[0].GetType().Equals(typeof(byte))
-                    && fields[1].GetType().Equals(typeof(string))
-                    )
-                {
-                    switch ((byte)fields[0])
-                    {
-                        case 0x01: return typeof(TC01_String);
-                        case 0x02: return typeof(TC02_ARGB);
-                        case 0x03: return typeof(TC03_TGIIndex);
-                        case 0x04: return typeof(TC04_Single);
-                        case 0x05: return typeof(TC05_XY);
-                        case 0x06: return typeof(TC06_XYZ);
-                        case 0x07: return typeof(TC07_Boolean);
-                    }
-                    throw new InvalidDataException(String.Format("Unknown TypeCode 0x{0:X2}", (byte)fields[0]));
-                }
-
-                throw new ArgumentException();
-            }
         }
         #endregion
 

@@ -290,7 +290,6 @@ namespace ObjKeyResource
             public virtual string Value { get { return this.GetType().Name + " -- Key: \"" + key + "\"; Control code: 0x" + controlCode.ToString("X2"); } }
             #endregion
         }
-        [ConstructorParameters(new object[] { "", (byte)0x00, "", })]
         public class CDTString : ComponentDataType
         {
             #region Attributes
@@ -298,10 +297,9 @@ namespace ObjKeyResource
             #endregion
 
             #region Constructors
-            public CDTString(int APIversion, EventHandler handler, CDTString basis)
-                : this(APIversion, handler, basis.key, basis.controlCode, basis.data) { }
-            public CDTString(int APIversion, EventHandler handler, string key, byte controlCode, string data)
-                : base(APIversion, handler, key, controlCode) { this.data = data; }
+            public CDTString(int APIversion, EventHandler handler) : this(APIversion, handler, "CDTString-Key", (byte)0x00, "Value") { }
+            public CDTString(int APIversion, EventHandler handler, CDTString basis) : this(APIversion, handler, basis.key, basis.controlCode, basis.data) { }
+            public CDTString(int APIversion, EventHandler handler, string key, byte controlCode, string data) : base(APIversion, handler, key, controlCode) { this.data = data; }
             #endregion
 
             #region Data I/O
@@ -332,7 +330,6 @@ namespace ObjKeyResource
 
             public override string Value { get { return base.Value + "; Data: " + "\"" + data + "\""; } }
         }
-        [ConstructorParameters(new object[] { "", (byte)0x01, (Int32)0, })]
         public class CDTResourceKey : ComponentDataType
         {
             public DependentList<TGIBlock> ParentTGIBlocks { get; set; }
@@ -343,10 +340,9 @@ namespace ObjKeyResource
             #endregion
 
             #region Constructors
-            public CDTResourceKey(int APIversion, EventHandler handler, CDTResourceKey basis)
-                : this(APIversion, handler, basis.key, basis.controlCode, basis.data) { }
-            public CDTResourceKey(int APIversion, EventHandler handler, string key, byte controlCode, int data)
-                : base(APIversion, handler, key, controlCode) { this.data = data; }
+            public CDTResourceKey(int APIversion, EventHandler handler) : this(APIversion, handler, "CDTResourceKey-Key", (byte)0x01, (Int32)0) { }
+            public CDTResourceKey(int APIversion, EventHandler handler, CDTResourceKey basis) : this(APIversion, handler, basis.key, basis.controlCode, basis.data) { }
+            public CDTResourceKey(int APIversion, EventHandler handler, string key, byte controlCode, int data) : base(APIversion, handler, key, controlCode) { this.data = data; }
             #endregion
 
             #region Data I/O
@@ -376,29 +372,24 @@ namespace ObjKeyResource
 
             public override string Value { get { return base.Value + "; Data: " + "0x" + data.ToString("X8") + " (" + (ParentTGIBlocks == null ? "unknown" : ParentTGIBlocks[data]) + ")"; } }
         }
-        [ConstructorParameters(new object[] { "", (byte)0x02, (Int32)0, })]
         public class CDTAssetResourceName : CDTResourceKey
         {
-            public CDTAssetResourceName(int APIversion, EventHandler handler, CDTAssetResourceName basis)
-                : base(APIversion, handler, basis) { }
-            public CDTAssetResourceName(int APIversion, EventHandler handler, string key, byte controlCode, int data)
-                : base(APIversion, handler, key, controlCode, data) { }
+            public CDTAssetResourceName(int APIversion, EventHandler handler) : base(APIversion, handler, "CDTAssetResourceName-Key", (byte)0x02, (Int32)0) { }
+            public CDTAssetResourceName(int APIversion, EventHandler handler, CDTAssetResourceName basis) : base(APIversion, handler, basis) { }
+            public CDTAssetResourceName(int APIversion, EventHandler handler, string key, byte controlCode, int data) : base(APIversion, handler, key, controlCode, data) { }
 
             public override AHandlerElement Clone(EventHandler handler) { return new CDTAssetResourceName(requestedApiVersion, handler, this); }
         }
-        [ConstructorParameters(new object[] { "", (byte)0x03, "", })]
         public class CDTSteeringInstance : CDTString
         {
             #region Constructors
-            public CDTSteeringInstance(int APIversion, EventHandler handler, CDTSteeringInstance basis)
-                : base(APIversion, handler, basis) { }
-            public CDTSteeringInstance(int APIversion, EventHandler handler, string key, byte controlCode, string data)
-                : base(APIversion, handler, key, controlCode, data) { }
+            public CDTSteeringInstance(int APIversion, EventHandler handler) : base(APIversion, handler, "CDTSteeringInstance-Key", (byte)0x03, "Value") { }
+            public CDTSteeringInstance(int APIversion, EventHandler handler, CDTSteeringInstance basis) : base(APIversion, handler, basis) { }
+            public CDTSteeringInstance(int APIversion, EventHandler handler, string key, byte controlCode, string data) : base(APIversion, handler, key, controlCode, data) { }
             #endregion
 
             public override AHandlerElement Clone(EventHandler handler) { return new CDTSteeringInstance(requestedApiVersion, handler, this); }
         }
-        [ConstructorParameters(new object[] { "", (byte)0x04, (UInt32)0, })]
         public class CDTUInt32 : ComponentDataType
         {
             #region Attributes
@@ -406,10 +397,9 @@ namespace ObjKeyResource
             #endregion
 
             #region Constructors
-            public CDTUInt32(int APIversion, EventHandler handler, CDTUInt32 basis)
-                : this(APIversion, handler, basis.key, basis.controlCode, basis.data) { }
-            public CDTUInt32(int APIversion, EventHandler handler, string key, byte controlCode, uint data)
-                : base(APIversion, handler, key, controlCode) { this.data = data; }
+            public CDTUInt32(int APIversion, EventHandler handler) : this(APIversion, handler, "CDTUInt32-Key", (byte)0x04, (UInt32)0) { }
+            public CDTUInt32(int APIversion, EventHandler handler, CDTUInt32 basis) : this(APIversion, handler, basis.key, basis.controlCode, basis.data) { }
+            public CDTUInt32(int APIversion, EventHandler handler, string key, byte controlCode, uint data) : base(APIversion, handler, key, controlCode) { this.data = data; }
             #endregion
 
             #region Data I/O
@@ -461,23 +451,6 @@ namespace ObjKeyResource
             protected override void WriteCount(Stream s, int count) { (new BinaryWriter(s)).Write((byte)count); }
             protected override void WriteElement(Stream s, ComponentDataType element) { element.UnParse(s); }
             #endregion
-
-            protected override Type GetElementType(params object[] fields)
-            {
-                if (fields.Length == 1 && typeof(ComponentDataType).IsAssignableFrom(fields[0].GetType())) return fields[0].GetType();
-
-                if (fields.Length != 3) throw new ArgumentException();
-
-                switch ((byte)fields[1])
-                {
-                    case 0x00: return typeof(CDTString);
-                    case 0x01: return typeof(CDTResourceKey);
-                    case 0x02: return typeof(CDTAssetResourceName);
-                    case 0x03: return typeof(CDTSteeringInstance);
-                    case 0x04: return typeof(CDTUInt32);
-                }
-                throw new ArgumentException(String.Format("Unknown control code 0x{0:X2}", (byte)fields[1]));
-            }
 
             public bool ContainsKey(string key) { return Find(x => x.Key.Equals(key)) != null; }
 
