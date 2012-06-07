@@ -119,8 +119,6 @@ namespace s3pi.GenericRCOLResource
     }
 
     #region Definition Chunks
-    [ConstructorParameters(new object[] { (uint)0x0202, (uint)0, (ChunkReferenceList)null, (ChunkReferenceList)null, (ChunkReferenceList)null, (AnimationList)null,
-        (uint)0, (uint)0, (uint)0, (uint)0, (uint)0, (uint)0, (uint)0 })]
     public class JazzStateMachine : JazzChunk
     {
         const string TAG = "S_SM";
@@ -363,7 +361,6 @@ namespace s3pi.GenericRCOLResource
         #endregion
     }
 
-    [ConstructorParameters(new object[] { (uint)0x0101, (uint)0, (uint)0, (GenericRCOLResource.ChunkReference)null, (ChunkReferenceList)null, (uint)0, })]
     public class JazzState : JazzChunk
     {
         const string TAG = "S_St";
@@ -467,7 +464,6 @@ namespace s3pi.GenericRCOLResource
         #endregion
     }
 
-    [ConstructorParameters(new object[] { (uint)0x0101, (uint)0, (uint)0, (ChunkReferenceList)null, (ChunkReferenceList)null, })]
     public class JazzDecisionGraph : JazzChunk
     {
         const string TAG = "S_DG";
@@ -558,7 +554,6 @@ namespace s3pi.GenericRCOLResource
         #endregion
     }
 
-    [ConstructorParameters(new object[] { (uint)0x0100, (uint)0, (uint)0, })]
     public class JazzActorDefinition : JazzChunk
     {
         const string TAG = "S_AD";
@@ -636,7 +631,6 @@ namespace s3pi.GenericRCOLResource
         #endregion
     }
 
-    [ConstructorParameters(new object[] { (uint)0x0100, (uint)0, (uint)0, })]
     public class JazzParameterDefinition : JazzChunk
     {
         const string TAG = "S_PD";
@@ -716,10 +710,6 @@ namespace s3pi.GenericRCOLResource
     #endregion
 
     #region Decision Graph Node Chunks
-    [ConstructorParameters(new object[] { (uint)0x0100, (TGIBlock)null, (TGIBlock)null, (uint)0, (uint)0, (uint)0,
-        (ActorSlotList)null, (ActorSuffixList)null, (uint)0, (uint)0, (uint)0, (uint)0, "", (uint)0, (uint)0,
-        (AnimationPriority)0, (uint)0, (float)0, (float)0, (float)0, (float)0, (GenericRCOLResource.ChunkReference)null, (AnimationPriority)0,
-        (uint)0, (uint)0, (uint)0, (uint)0, (uint)0, (uint)0, (ChunkReferenceList)null, })]
     public class JazzPlayAnimationNode : JazzChunk
     {
         const string TAG = "Play";
@@ -1230,7 +1220,6 @@ namespace s3pi.GenericRCOLResource
         #endregion
     }
 
-    [ConstructorParameters(new object[] { (uint)0x0101, (OutcomeList)null, (uint)0, })]
     public class JazzRandomNode : JazzChunk
     {
         const string TAG = "Rand";
@@ -1399,7 +1388,6 @@ namespace s3pi.GenericRCOLResource
         #endregion
    }
 
-    [ConstructorParameters(new object[] { (uint)0x0101, (GenericRCOLResource.ChunkReference)null, (MatchList)null, })]
     public class JazzSelectOnParameterNode : JazzChunk
     {
         const string TAG = "SoPn";
@@ -1570,7 +1558,6 @@ namespace s3pi.GenericRCOLResource
     }
 
 #if UNDEF
-    [ConstructorParameters(new object[] { })]
     public class JazzSelectOnDestinationNode : JazzChunk
     {
         const string TAG = "S_PD";
@@ -1583,7 +1570,6 @@ namespace s3pi.GenericRCOLResource
     }
 #endif
 
-    [ConstructorParameters(new object[] { (uint)0x0101, (uint)0, })]
     public class JazzNextStateNode : JazzChunk
     {
         const string TAG = "SNSN";
@@ -1656,8 +1642,6 @@ namespace s3pi.GenericRCOLResource
         #endregion
     }
 
-    [ConstructorParameters(new object[] { (uint)0x0100, (uint)0, (GenericRCOLResource.ChunkReference)null, (uint)0, (TGIBlock)null,
-        (uint)0, (uint)0, (uint)0, (uint)0, (uint)0, (ChunkReferenceList)null, })]
     public class JazzCreatePropNode : JazzChunk
     {
         const string TAG = "Prop";
@@ -1798,7 +1782,6 @@ namespace s3pi.GenericRCOLResource
         #endregion
     }
 
-    [ConstructorParameters(new object[] { (uint)0x0100, (uint)0, (ActorOperation)0, (uint)0, (uint)0, (uint)0, (uint)0, (ChunkReferenceList)null, })]
     public class JazzActorOperationNode : JazzChunk
     {
         const string TAG = "AcOp";
@@ -1928,8 +1911,6 @@ namespace s3pi.GenericRCOLResource
         #endregion
     }
 
-    [ConstructorParameters(new object[] { (uint)0x0104, (uint)0, (AnimationPriority)0, (uint)0, (float)0, (float)0, (float)0, (float)0,
-        (GenericRCOLResource.ChunkReference)null, (AnimationPriority)0, (uint)0, (uint)0, (uint)0, (uint)0, (uint)0, (uint)0, (ChunkReferenceList)null, })]
     public class JazzStopAnimationNode : JazzChunk
     {
         const string TAG = "Stop";
