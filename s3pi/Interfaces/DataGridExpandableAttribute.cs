@@ -26,6 +26,7 @@ namespace s3pi.Interfaces
     /// Indicates that the element should be expandable rather than requiring a popup
     /// </summary>
     [AttributeUsage(AttributeTargets.All, AllowMultiple = false, Inherited = false)]
+    [Obsolete]
     public class DataGridExpandableAttribute : Attribute
     {
         bool dataGridExpandable;
