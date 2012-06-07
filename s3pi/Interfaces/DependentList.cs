@@ -179,12 +179,12 @@ namespace s3pi.Interfaces
                 {
                     elementType = fields[0] as Type;
                     ConstructorParametersAttribute[] constructorParametersArray = elementType.GetCustomAttributes(typeof(ConstructorParametersAttribute), true) as ConstructorParametersAttribute[];
-                    if (constructorParametersArray.Length == 1) // ConstructorParametersAttribute present
+                    if (constructorParametersArray.Length == 1) // ConstructorParametersAttribute present -- deprecated
                         fields = constructorParametersArray[0].parameters;
                     else // ConstructorParametersAttribute absent: this will become the only way
                         fields = new object[] { };
                 }
-                else // Add(foo, bar) -- will be deprecated
+                else // Add(foo, bar) -- deprecated
                 {
                     elementType = GetElementType(fields);
                 }
@@ -212,6 +212,7 @@ namespace s3pi.Interfaces
         /// <returns>Class on which to invoke constructor</returns>
         /// <remarks><paramref name="fields"/>[0] could be an instance of the abstract class: it should provide a constructor that accepts a "template"
         /// object and creates a new instance on that basis.</remarks>
+        [Obsolete]
         protected virtual Type GetElementType(params object[] fields) { throw new NotImplementedException(); }
         #endregion
     }
