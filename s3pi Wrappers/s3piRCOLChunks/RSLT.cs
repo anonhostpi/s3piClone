@@ -778,23 +778,23 @@ namespace s3pi.GenericRCOLResource
         public uint Version { get { return version; } set { if (version != value) { version = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(12)]
         public PartList Routes { get { return routes; } set { if (routes != value) { routes = new PartList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
-        [ElementPriority(13), DataGridExpandable]
+        [ElementPriority(13)]
         public SlotOffsetList RouteOffsets { get { return routeOffsets; } set { if (routeOffsets != value) { routeOffsets = value == null ? null : new SlotOffsetList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(14)]
         public SlottedPartList Containers { get { return containers; } set { if (containers != value) { containers = value == null ? null : new SlottedPartList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
-        [ElementPriority(15), DataGridExpandable]
+        [ElementPriority(15)]
         public SlotOffsetList ContainerOffsets { get { return containerOffsets; } set { if (containerOffsets != value) { containerOffsets = value == null ? null : new SlotOffsetList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(16)]
         public PartList Effects { get { return effects; } set { if (effects != value) { effects = value == null ? null : new PartList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
-        [ElementPriority(17), DataGridExpandable]
+        [ElementPriority(17)]
         public SlotOffsetList EffectOffsets { get { return effectOffsets; } set { if (effectOffsets != value) { effectOffsets = value == null ? null : new SlotOffsetList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(18)]
         public PartList InverseKineticsTargets { get { return inverseKineticsTargets; } set { if (inverseKineticsTargets != value) { inverseKineticsTargets = value == null ? null : new PartList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
-        [ElementPriority(19), DataGridExpandable]
+        [ElementPriority(19)]
         public SlotOffsetList InverseKineticsTargetOffsets { get { return inverseKineticsTargetOffsets; } set { if (inverseKineticsTargetOffsets != value) { inverseKineticsTargetOffsets = value == null ? null : new SlotOffsetList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(20)]
         public ConePartList Cones { get { return cones; } set { if (cones != value) { cones = value == null ? null : new ConePartList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
-        [ElementPriority(21), DataGridExpandable]
+        [ElementPriority(21)]
         public SlotOffsetList ConeOffsets { get { return coneOffsets; } set { if (coneOffsets != value) { coneOffsets = value == null ? null : new SlotOffsetList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
 
         public string Value { get { return ValueBuilder; } }

@@ -531,19 +531,19 @@ namespace CASPartResource
         public byte BlendInfoSpecialIndex { get { return blendInfoSpecialIndex; } set { if (blendInfoSpecialIndex != value) { blendInfoSpecialIndex = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(16)]
         public uint Unknown3 { get { return unknown3; } set { if (unknown3 != value) { unknown3 = value; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(17), DataGridExpandable]
+        [ElementPriority(17)]
         public ByteIndexList VPXYIndexes { get { return vpxyIndexes; } set { if (!vpxyIndexes.Equals(value)) { vpxyIndexes = value == null ? null : new ByteIndexList(OnResourceChanged, value, ReadByte, WriteByte) { ParentTGIBlocks = tgiBlocks }; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(18)]
         public LODInfoEntryList LODInfo { get { return lodInfo; } set { if (!lodInfo.Equals(value)) { lodInfo = value == null ? null : new LODInfoEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(19), DataGridExpandable]
+        [ElementPriority(19)]
         public ByteIndexList Diffuse1Indexes { get { return diffuse1Indexes; } set { if (!diffuse1Indexes.Equals(value)) { diffuse1Indexes = value == null ? null : new ByteIndexList(OnResourceChanged, value, ReadByte, WriteByte) { ParentTGIBlocks = tgiBlocks }; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(20), DataGridExpandable]
+        [ElementPriority(20)]
         public ByteIndexList Specular1Indexes { get { return specular1Indexes; } set { if (!specular1Indexes.Equals(value)) { specular1Indexes = value == null ? null : new ByteIndexList(OnResourceChanged, value, ReadByte, WriteByte) { ParentTGIBlocks = tgiBlocks }; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(21), DataGridExpandable]
+        [ElementPriority(21)]
         public ByteIndexList Diffuse2Indexes { get { return diffuse2Indexes; } set { if (!diffuse2Indexes.Equals(value)) { diffuse2Indexes = value == null ? null : new ByteIndexList(OnResourceChanged, value, ReadByte, WriteByte) { ParentTGIBlocks = tgiBlocks }; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(22), DataGridExpandable]
+        [ElementPriority(22)]
         public ByteIndexList Specular2Indexes { get { return specular2Indexes; } set { if (!specular2Indexes.Equals(value)) { specular2Indexes = value == null ? null : new ByteIndexList(OnResourceChanged, value, ReadByte, WriteByte) { ParentTGIBlocks = tgiBlocks }; OnResourceChanged(this, new EventArgs()); } } }
-        [ElementPriority(23), DataGridExpandable]
+        [ElementPriority(23)]
         public ByteIndexList BONDIndexes { get { return bondIndexes; } set { if (!bondIndexes.Equals(value)) { bondIndexes = value == null ? null : new ByteIndexList(OnResourceChanged, value, ReadByte, WriteByte) { ParentTGIBlocks = tgiBlocks }; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(24)]
         public string Unknown4 { get { return unknown4; } set { if (unknown4 != value) { unknown4 = value; OnResourceChanged(this, new EventArgs()); } } }
