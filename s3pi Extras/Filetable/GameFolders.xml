@@ -10,20 +10,6 @@
     <Suppressed>not-allowed</Suppressed>
     <GameContent>
       <Folder path="GameData/Shared/DeltaPackages">
-        <Package isPatch="true" priority="15">p15/DeltaBuild_p15.package</Package>
-        <Package isPatch="true" priority="14">p14/DeltaBuild_p14.package</Package>
-        <Package isPatch="true" priority="13">p13/DeltaBuild_p13.package</Package>
-        <Package isPatch="true" priority="12">p12/DeltaBuild_p12.package</Package>
-        <Package isPatch="true" priority="11">p11/DeltaBuild_p11.package</Package>
-        <Package isPatch="true" priority="10">p10/DeltaBuild_p10.package</Package>
-        <Package isPatch="true" priority="9">p09/DeltaBuild_p09.package</Package>
-        <Package isPatch="true" priority="8">p08/DeltaBuild_p08.package</Package>
-        <Package isPatch="true" priority="7">p07/DeltaBuild_p07.package</Package>
-        <Package isPatch="true" priority="6">p06/DeltaBuild_p06.package</Package>
-        <Package isPatch="true" priority="5">p05/DeltaBuild_p05.package</Package>
-        <Package isPatch="true" priority="4">p04/DeltaBuild_p04.package</Package>
-        <Package isPatch="true" priority="3">p03/DeltaBuild_p03.package</Package>
-        <Package isPatch="true" priority="2">p02/DeltaBuild_p02.package</Package>
       </Folder>
       <Folder path="GameData/Shared/Packages">
         <Package isPatch="true" priority="1">Deltabuild0.package</Package>
@@ -50,19 +36,6 @@
     <Suppressed>false</Suppressed>
     <GameContent>
       <Folder path="GameData/Shared/DeltaPackages">
-        <Package isPatch="true" priority="15">p15/DeltaBuild_p15.package</Package>
-        <Package isPatch="true" priority="14">p14/DeltaBuild_p14.package</Package>
-        <Package isPatch="true" priority="13">p13/DeltaBuild_p13.package</Package>
-        <Package isPatch="true" priority="12">p12/DeltaBuild_p12.package</Package>
-        <Package isPatch="true" priority="11">p11/DeltaBuild_p11.package</Package>
-        <Package isPatch="true" priority="10">p10/DeltaBuild_p10.package</Package>
-        <Package isPatch="true" priority="9">p09/DeltaBuild_p09.package</Package>
-        <Package isPatch="true" priority="8">p08/DeltaBuild_p08.package</Package>
-        <Package isPatch="true" priority="7">p07/DeltaBuild_p07.package</Package>
-        <Package isPatch="true" priority="6">p06/DeltaBuild_p06.package</Package>
-        <Package isPatch="true" priority="5">p05/DeltaBuild_p05.package</Package>
-        <Package isPatch="true" priority="4">p04/DeltaBuild_p04.package</Package>
-        <Package isPatch="true" priority="3">p03/DeltaBuild_p03.package</Package>
         <Package isPatch="true" priority="2">p02/DeltaBuild_p02.package</Package>
       </Folder>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/Fullbuildep1.package</Package>
@@ -84,20 +57,7 @@
     <Suppressed>false</Suppressed>
     <GameContent>
       <Folder path="GameData/Shared/DeltaPackages">
-        <Package isPatch="true" priority="15">p15/DeltaBuild_p15.package</Package>
-        <Package isPatch="true" priority="14">p14/DeltaBuild_p14.package</Package>
-        <Package isPatch="true" priority="13">p13/DeltaBuild_p13.package</Package>
-        <Package isPatch="true" priority="12">p12/DeltaBuild_p12.package</Package>
-        <Package isPatch="true" priority="11">p11/DeltaBuild_p11.package</Package>
-        <Package isPatch="true" priority="10">p10/DeltaBuild_p10.package</Package>
-        <Package isPatch="true" priority="9">p09/DeltaBuild_p09.package</Package>
-        <Package isPatch="true" priority="8">p08/DeltaBuild_p08.package</Package>
-        <Package isPatch="true" priority="7">p07/DeltaBuild_p07.package</Package>
-        <Package isPatch="true" priority="6">p06/DeltaBuild_p06.package</Package>
-        <Package isPatch="true" priority="5">p05/DeltaBuild_p05.package</Package>
-        <Package isPatch="true" priority="4">p04/DeltaBuild_p04.package</Package>
         <Package isPatch="true" priority="3">p03/DeltaBuild_p03.package</Package>
-        <Package isPatch="true" priority="2">p02/DeltaBuild_p02.package</Package>
       </Folder>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p03.package</Package>
     </GameContent>
@@ -118,20 +78,7 @@
     <Suppressed>false</Suppressed>
     <GameContent>
       <Folder path="GameData/Shared/DeltaPackages">
-        <Package isPatch="true" priority="15">p15/DeltaBuild_p15.package</Package>
-        <Package isPatch="true" priority="14">p14/DeltaBuild_p14.package</Package>
-        <Package isPatch="true" priority="13">p13/DeltaBuild_p13.package</Package>
-        <Package isPatch="true" priority="12">p12/DeltaBuild_p12.package</Package>
-        <Package isPatch="true" priority="11">p11/DeltaBuild_p11.package</Package>
-        <Package isPatch="true" priority="10">p10/DeltaBuild_p10.package</Package>
-        <Package isPatch="true" priority="9">p09/DeltaBuild_p09.package</Package>
-        <Package isPatch="true" priority="8">p08/DeltaBuild_p08.package</Package>
-        <Package isPatch="true" priority="7">p07/DeltaBuild_p07.package</Package>
-        <Package isPatch="true" priority="6">p06/DeltaBuild_p06.package</Package>
-        <Package isPatch="true" priority="5">p05/DeltaBuild_p05.package</Package>
         <Package isPatch="true" priority="4">p04/DeltaBuild_p04.package</Package>
-        <Package isPatch="true" priority="3">p03/DeltaBuild_p03.package</Package>
-        <Package isPatch="true" priority="2">p02/DeltaBuild_p02.package</Package>
       </Folder>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p04.package</Package>
     </GameContent>
@@ -152,20 +99,7 @@
     <Suppressed>false</Suppressed>
     <GameContent>
       <Folder path="GameData/Shared/DeltaPackages">
-        <Package isPatch="true" priority="15">p15/DeltaBuild_p15.package</Package>
-        <Package isPatch="true" priority="14">p14/DeltaBuild_p14.package</Package>
-        <Package isPatch="true" priority="13">p13/DeltaBuild_p13.package</Package>
-        <Package isPatch="true" priority="12">p12/DeltaBuild_p12.package</Package>
-        <Package isPatch="true" priority="11">p11/DeltaBuild_p11.package</Package>
-        <Package isPatch="true" priority="10">p10/DeltaBuild_p10.package</Package>
-        <Package isPatch="true" priority="9">p09/DeltaBuild_p09.package</Package>
-        <Package isPatch="true" priority="8">p08/DeltaBuild_p08.package</Package>
-        <Package isPatch="true" priority="7">p07/DeltaBuild_p07.package</Package>
-        <Package isPatch="true" priority="6">p06/DeltaBuild_p06.package</Package>
         <Package isPatch="true" priority="5">p05/DeltaBuild_p05.package</Package>
-        <Package isPatch="true" priority="4">p04/DeltaBuild_p04.package</Package>
-        <Package isPatch="true" priority="3">p03/DeltaBuild_p03.package</Package>
-        <Package isPatch="true" priority="2">p02/DeltaBuild_p02.package</Package>
       </Folder>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p05.package</Package>
     </GameContent>
@@ -186,20 +120,7 @@
     <Suppressed>false</Suppressed>
     <GameContent>
       <Folder path="GameData/Shared/DeltaPackages">
-        <Package isPatch="true" priority="15">p15/DeltaBuild_p15.package</Package>
-        <Package isPatch="true" priority="14">p14/DeltaBuild_p14.package</Package>
-        <Package isPatch="true" priority="13">p13/DeltaBuild_p13.package</Package>
-        <Package isPatch="true" priority="12">p12/DeltaBuild_p12.package</Package>
-        <Package isPatch="true" priority="11">p11/DeltaBuild_p11.package</Package>
-        <Package isPatch="true" priority="10">p10/DeltaBuild_p10.package</Package>
-        <Package isPatch="true" priority="9">p09/DeltaBuild_p09.package</Package>
-        <Package isPatch="true" priority="8">p08/DeltaBuild_p08.package</Package>
-        <Package isPatch="true" priority="7">p07/DeltaBuild_p07.package</Package>
         <Package isPatch="true" priority="6">p06/DeltaBuild_p06.package</Package>
-        <Package isPatch="true" priority="5">p05/DeltaBuild_p05.package</Package>
-        <Package isPatch="true" priority="4">p04/DeltaBuild_p04.package</Package>
-        <Package isPatch="true" priority="3">p03/DeltaBuild_p03.package</Package>
-        <Package isPatch="true" priority="2">p02/DeltaBuild_p02.package</Package>
       </Folder>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p06.package</Package>
     </GameContent>
@@ -220,20 +141,7 @@
     <Suppressed>false</Suppressed>
     <GameContent>
       <Folder path="GameData/Shared/DeltaPackages">
-        <Package isPatch="true" priority="15">p15/DeltaBuild_p15.package</Package>
-        <Package isPatch="true" priority="14">p14/DeltaBuild_p14.package</Package>
-        <Package isPatch="true" priority="13">p13/DeltaBuild_p13.package</Package>
-        <Package isPatch="true" priority="12">p12/DeltaBuild_p12.package</Package>
-        <Package isPatch="true" priority="11">p11/DeltaBuild_p11.package</Package>
-        <Package isPatch="true" priority="10">p10/DeltaBuild_p10.package</Package>
-        <Package isPatch="true" priority="9">p09/DeltaBuild_p09.package</Package>
-        <Package isPatch="true" priority="8">p08/DeltaBuild_p08.package</Package>
         <Package isPatch="true" priority="7">p07/DeltaBuild_p07.package</Package>
-        <Package isPatch="true" priority="6">p06/DeltaBuild_p06.package</Package>
-        <Package isPatch="true" priority="5">p05/DeltaBuild_p05.package</Package>
-        <Package isPatch="true" priority="4">p04/DeltaBuild_p04.package</Package>
-        <Package isPatch="true" priority="3">p03/DeltaBuild_p03.package</Package>
-        <Package isPatch="true" priority="2">p02/DeltaBuild_p02.package</Package>
       </Folder>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p07.package</Package>
     </GameContent>
@@ -254,20 +162,7 @@
     <Suppressed>false</Suppressed>
     <GameContent>
       <Folder path="GameData/Shared/DeltaPackages">
-        <Package isPatch="true" priority="15">p15/DeltaBuild_p15.package</Package>
-        <Package isPatch="true" priority="14">p14/DeltaBuild_p14.package</Package>
-        <Package isPatch="true" priority="13">p13/DeltaBuild_p13.package</Package>
-        <Package isPatch="true" priority="12">p12/DeltaBuild_p12.package</Package>
-        <Package isPatch="true" priority="11">p11/DeltaBuild_p11.package</Package>
-        <Package isPatch="true" priority="10">p10/DeltaBuild_p10.package</Package>
-        <Package isPatch="true" priority="9">p09/DeltaBuild_p09.package</Package>
         <Package isPatch="true" priority="8">p08/DeltaBuild_p08.package</Package>
-        <Package isPatch="true" priority="7">p07/DeltaBuild_p07.package</Package>
-        <Package isPatch="true" priority="6">p06/DeltaBuild_p06.package</Package>
-        <Package isPatch="true" priority="5">p05/DeltaBuild_p05.package</Package>
-        <Package isPatch="true" priority="4">p04/DeltaBuild_p04.package</Package>
-        <Package isPatch="true" priority="3">p03/DeltaBuild_p03.package</Package>
-        <Package isPatch="true" priority="2">p02/DeltaBuild_p02.package</Package>
       </Folder>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p08.package</Package>
     </GameContent>
@@ -288,20 +183,7 @@
     <Suppressed>false</Suppressed>
     <GameContent>
       <Folder path="GameData/Shared/DeltaPackages">
-        <Package isPatch="true" priority="15">p15/DeltaBuild_p15.package</Package>
-        <Package isPatch="true" priority="14">p14/DeltaBuild_p14.package</Package>
-        <Package isPatch="true" priority="13">p13/DeltaBuild_p13.package</Package>
-        <Package isPatch="true" priority="12">p12/DeltaBuild_p12.package</Package>
-        <Package isPatch="true" priority="11">p11/DeltaBuild_p11.package</Package>
-        <Package isPatch="true" priority="10">p10/DeltaBuild_p10.package</Package>
         <Package isPatch="true" priority="9">p09/DeltaBuild_p09.package</Package>
-        <Package isPatch="true" priority="8">p08/DeltaBuild_p08.package</Package>
-        <Package isPatch="true" priority="7">p07/DeltaBuild_p07.package</Package>
-        <Package isPatch="true" priority="6">p06/DeltaBuild_p06.package</Package>
-        <Package isPatch="true" priority="5">p05/DeltaBuild_p05.package</Package>
-        <Package isPatch="true" priority="4">p04/DeltaBuild_p04.package</Package>
-        <Package isPatch="true" priority="3">p03/DeltaBuild_p03.package</Package>
-        <Package isPatch="true" priority="2">p02/DeltaBuild_p02.package</Package>
       </Folder>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p09.package</Package>
     </GameContent>
@@ -322,20 +204,7 @@
     <Suppressed>false</Suppressed>
     <GameContent>
       <Folder path="GameData/Shared/DeltaPackages">
-        <Package isPatch="true" priority="15">p15/DeltaBuild_p15.package</Package>
-        <Package isPatch="true" priority="14">p14/DeltaBuild_p14.package</Package>
-        <Package isPatch="true" priority="13">p13/DeltaBuild_p13.package</Package>
-        <Package isPatch="true" priority="12">p12/DeltaBuild_p12.package</Package>
-        <Package isPatch="true" priority="11">p11/DeltaBuild_p11.package</Package>
         <Package isPatch="true" priority="10">p10/DeltaBuild_p10.package</Package>
-        <Package isPatch="true" priority="9">p09/DeltaBuild_p09.package</Package>
-        <Package isPatch="true" priority="8">p08/DeltaBuild_p08.package</Package>
-        <Package isPatch="true" priority="7">p07/DeltaBuild_p07.package</Package>
-        <Package isPatch="true" priority="6">p06/DeltaBuild_p06.package</Package>
-        <Package isPatch="true" priority="5">p05/DeltaBuild_p05.package</Package>
-        <Package isPatch="true" priority="4">p04/DeltaBuild_p04.package</Package>
-        <Package isPatch="true" priority="3">p03/DeltaBuild_p03.package</Package>
-        <Package isPatch="true" priority="2">p02/DeltaBuild_p02.package</Package>
       </Folder>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild0_p10.package</Package>
     </GameContent>
@@ -356,20 +225,7 @@
     <Suppressed>false</Suppressed>
     <GameContent>
       <Folder path="GameData/Shared/DeltaPackages">
-        <Package isPatch="true" priority="15">p15/DeltaBuild_p15.package</Package>
-        <Package isPatch="true" priority="14">p14/DeltaBuild_p14.package</Package>
-        <Package isPatch="true" priority="13">p13/DeltaBuild_p13.package</Package>
-        <Package isPatch="true" priority="12">p12/DeltaBuild_p12.package</Package>
         <Package isPatch="true" priority="11">p11/DeltaBuild_p11.package</Package>
-        <Package isPatch="true" priority="10">p10/DeltaBuild_p10.package</Package>
-        <Package isPatch="true" priority="9">p09/DeltaBuild_p09.package</Package>
-        <Package isPatch="true" priority="8">p08/DeltaBuild_p08.package</Package>
-        <Package isPatch="true" priority="7">p07/DeltaBuild_p07.package</Package>
-        <Package isPatch="true" priority="6">p06/DeltaBuild_p06.package</Package>
-        <Package isPatch="true" priority="5">p05/DeltaBuild_p05.package</Package>
-        <Package isPatch="true" priority="4">p04/DeltaBuild_p04.package</Package>
-        <Package isPatch="true" priority="3">p03/DeltaBuild_p03.package</Package>
-        <Package isPatch="true" priority="2">p02/DeltaBuild_p02.package</Package>
       </Folder>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p11.package</Package>
     </GameContent>
@@ -390,10 +246,7 @@
     <Suppressed>false</Suppressed>
     <GameContent>
       <Folder path="GameData/Shared/DeltaPackages">
-        <Package isPatch="true" priority="5">p05/DeltaBuild_p05.package</Package>
-        <Package isPatch="true" priority="4">p04/DeltaBuild_p04.package</Package>
-        <Package isPatch="true" priority="3">p03/DeltaBuild_p03.package</Package>
-        <Package isPatch="true" priority="2">p02/DeltaBuild_p02.package</Package>
+        <Package isPatch="true" priority="12">p12/DeltaBuild_p12.package</Package>
       </Folder>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p12.package</Package>
     </GameContent>
@@ -409,30 +262,59 @@
   </game>
   <game class="SP" rgversion="12">
     <Name>sp6</Name>
-    <!--Longname>The Sims 3 Even More Stuff</Longname-->
-    <DefaultInstallDir>Electronic Arts/The Sims 3 More stuff</DefaultInstallDir>
+    <Longname>The Sims 3 Katy Perry's Sweet Treats</Longname>
+    <DefaultInstallDir>Electronic Arts/The Sims 3 Katy Perry's Sweet Treats</DefaultInstallDir>
     <Suppressed>false</Suppressed>
     <GameContent>
       <Folder path="GameData/Shared/DeltaPackages">
-        <Package isPatch="true" priority="15">p15/DeltaBuild_p15.package</Package>
-        <Package isPatch="true" priority="14">p14/DeltaBuild_p14.package</Package>
         <Package isPatch="true" priority="13">p13/DeltaBuild_p13.package</Package>
-        <Package isPatch="true" priority="12">p12/DeltaBuild_p12.package</Package>
-        <Package isPatch="true" priority="11">p11/DeltaBuild_p11.package</Package>
-        <Package isPatch="true" priority="10">p10/DeltaBuild_p10.package</Package>
-        <Package isPatch="true" priority="9">p09/DeltaBuild_p09.package</Package>
-        <Package isPatch="true" priority="8">p08/DeltaBuild_p08.package</Package>
-        <Package isPatch="true" priority="7">p07/DeltaBuild_p07.package</Package>
-        <Package isPatch="true" priority="6">p06/DeltaBuild_p06.package</Package>
-        <Package isPatch="true" priority="5">p05/DeltaBuild_p05.package</Package>
-        <Package isPatch="true" priority="4">p04/DeltaBuild_p04.package</Package>
-        <Package isPatch="true" priority="3">p03/DeltaBuild_p03.package</Package>
-        <Package isPatch="true" priority="2">p02/DeltaBuild_p02.package</Package>
       </Folder>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p13.package</Package>
     </GameContent>
     <DDSImages>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p13.package</Package>
+    </DDSImages>
+    <Thumbnails>
+      <Folder path="Thumbnails">
+        <Package isPatch="false" priority="0">AllThumbnails.package</Package>
+        <Package isPatch="false" priority="0">CasThumbnails.package</Package>
+      </Folder>
+    </Thumbnails>
+  </game>
+  <game class="EP" rgversion="13">
+    <Name>ep7</Name>
+    <Longname>The Next EP</Longname>
+    <DefaultInstallDir>Electronic Arts/The Next EP</DefaultInstallDir>
+    <Suppressed>false</Suppressed>
+    <GameContent>
+      <Folder path="GameData/Shared/DeltaPackages">
+        <Package isPatch="true" priority="14">p14/DeltaBuild_p14.package</Package>
+      </Folder>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p14.package</Package>
+    </GameContent>
+    <DDSImages>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p14.package</Package>
+    </DDSImages>
+    <Thumbnails>
+      <Folder path="Thumbnails">
+        <Package isPatch="false" priority="0">AllThumbnails.package</Package>
+        <Package isPatch="false" priority="0">CasThumbnails.package</Package>
+      </Folder>
+    </Thumbnails>
+  </game>
+  <game class="SP" rgversion="14">
+    <Name>sp7</Name>
+    <Longname>The Next SP</Longname>
+    <DefaultInstallDir>Electronic Arts/The Next SP</DefaultInstallDir>
+    <Suppressed>false</Suppressed>
+    <GameContent>
+      <Folder path="GameData/Shared/DeltaPackages">
+        <Package isPatch="true" priority="15">p15/DeltaBuild_p15.package</Package>
+      </Folder>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p15.package</Package>
+    </GameContent>
+    <DDSImages>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p15.package</Package>
     </DDSImages>
     <Thumbnails>
       <Folder path="Thumbnails">
