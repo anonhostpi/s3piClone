@@ -238,9 +238,12 @@ namespace System.Security.Cryptography
                 case "h": return 0x05;
                 case "e": return 0x06;
                 case "ad": return 0x08;
+                case "cd": return 0x09;
                 case "al": return 0x0A;
                 case "ac": return 0x0D;
+                case "cc": return 0x0E;
                 case "ah": return 0x10;
+                case "ch": return 0x11;
                 case "ab": return 0x12;
                 case "ar": return 0x13;
                 default: return 0x00;
