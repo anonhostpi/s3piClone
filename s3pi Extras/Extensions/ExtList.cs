@@ -22,6 +22,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using s3pi.Extensions.Properties;
 
 namespace s3pi.Extensions
 {
@@ -42,10 +43,7 @@ namespace s3pi.Extensions
 
         ExtList()
         {
-            string path = Path.Combine(Path.GetDirectoryName(typeof(ExtList).Assembly.Location), "Extensions.txt");
-            if (!File.Exists(path)) return;
-
-            StreamReader sr = new StreamReader(path);
+            StringReader sr = new StringReader(Resources.Extensions);
             string s;
             while ((s = sr.ReadLine()) != null)
             {
