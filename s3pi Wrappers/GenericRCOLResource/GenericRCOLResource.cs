@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.IO;
 using s3pi.Interfaces;
 using System.Reflection;
+using s3pi.GenericRCOLResource.Properties;
 
 namespace s3pi.GenericRCOLResource
 {
@@ -691,7 +692,7 @@ namespace s3pi.GenericRCOLResource
                 catch { }
             }
 
-            StreamReader sr = new StreamReader(Path.Combine(folder, "RCOLResources.txt"));
+            StringReader sr = new StringReader(Resources.RCOLResources);
             resourceTypes = new List<string>();
             string s;
             while ((s = sr.ReadLine()) != null)

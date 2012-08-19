@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 using s3pi.Interfaces;
+using s3pi.TextResource.Properties;
 
 namespace TextResource
 {
@@ -126,8 +127,7 @@ namespace TextResource
         static List<string> resourceTypes = null;
         static TextResourceHandler()
         {
-            string path = Path.GetDirectoryName(typeof(TextResource).Assembly.Location);
-            StreamReader sr = new StreamReader(Path.Combine(path, "TextResources.txt"));
+            StringReader sr = new StringReader(Resources.TextResources);
             resourceTypes = new List<string>();
             string s;
             while ((s = sr.ReadLine()) != null)

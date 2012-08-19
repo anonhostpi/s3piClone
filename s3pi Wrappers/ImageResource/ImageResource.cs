@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using s3pi.Interfaces;
+using s3pi.ImageResource.Properties;
 
 namespace ImageResource
 {
@@ -72,8 +73,7 @@ namespace ImageResource
         static List<string> resourceTypes = null;
         static ImageResourceHandler()
         {
-            string path = Path.GetDirectoryName(typeof(ImageResource).Assembly.Location);
-            StreamReader sr = new StreamReader(Path.Combine(path, "ImageResources.txt"));
+            StringReader sr = new StringReader(Resources.ImageResources);
             resourceTypes = new List<string>();
             string s;
             while ((s = sr.ReadLine()) != null)
