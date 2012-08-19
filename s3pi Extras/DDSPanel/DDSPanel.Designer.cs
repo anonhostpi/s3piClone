@@ -42,6 +42,7 @@
             this.tlpSize = new System.Windows.Forms.TableLayoutPanel();
             this.label2 = new System.Windows.Forms.Label();
             this.lbSize = new System.Windows.Forms.Label();
+            this.lbDDSFmt = new System.Windows.Forms.Label();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -65,7 +66,7 @@
             this.tableLayoutPanel1.RowCount = 2;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(594, 157);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(543, 157);
             this.tableLayoutPanel1.TabIndex = 1;
             this.tableLayoutPanel1.Click += new System.EventHandler(this.control_Click);
             // 
@@ -79,7 +80,7 @@
             this.panel1.Location = new System.Drawing.Point(0, 29);
             this.panel1.Margin = new System.Windows.Forms.Padding(0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(594, 128);
+            this.panel1.Size = new System.Drawing.Size(543, 128);
             this.panel1.TabIndex = 2;
             this.panel1.Click += new System.EventHandler(this.control_Click);
             // 
@@ -109,7 +110,7 @@
             this.flowLayoutPanel1.Location = new System.Drawing.Point(0, 3);
             this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(462, 23);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(512, 23);
             this.flowLayoutPanel1.TabIndex = 0;
             this.flowLayoutPanel1.Click += new System.EventHandler(this.control_Click);
             // 
@@ -197,17 +198,19 @@
             this.tlpSize.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.tlpSize.AutoSize = true;
             this.tlpSize.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.tlpSize.ColumnCount = 2;
+            this.tlpSize.ColumnCount = 3;
+            this.tlpSize.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tlpSize.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tlpSize.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tlpSize.Controls.Add(this.label2, 0, 0);
             this.tlpSize.Controls.Add(this.lbSize, 1, 0);
+            this.tlpSize.Controls.Add(this.lbDDSFmt, 2, 0);
             this.tlpSize.Location = new System.Drawing.Point(379, 5);
             this.tlpSize.Margin = new System.Windows.Forms.Padding(0);
             this.tlpSize.Name = "tlpSize";
             this.tlpSize.RowCount = 1;
             this.tlpSize.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tlpSize.Size = new System.Drawing.Size(83, 13);
+            this.tlpSize.Size = new System.Drawing.Size(133, 13);
             this.tlpSize.TabIndex = 6;
             this.tlpSize.Click += new System.EventHandler(this.control_Click);
             // 
@@ -231,6 +234,15 @@
             this.lbSize.Text = "XX, YY";
             this.lbSize.Click += new System.EventHandler(this.control_Click);
             // 
+            // lbDDSFmt
+            // 
+            this.lbDDSFmt.AutoSize = true;
+            this.lbDDSFmt.Location = new System.Drawing.Point(86, 0);
+            this.lbDDSFmt.Name = "lbDDSFmt";
+            this.lbDDSFmt.Size = new System.Drawing.Size(44, 13);
+            this.lbDDSFmt.TabIndex = 2;
+            this.lbDDSFmt.Text = "DDSfmt";
+            // 
             // timer1
             // 
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
@@ -241,7 +253,7 @@
             this.Controls.Add(this.tableLayoutPanel1);
             this.Margin = new System.Windows.Forms.Padding(0);
             this.Name = "DDSPanel";
-            this.Size = new System.Drawing.Size(594, 157);
+            this.Size = new System.Drawing.Size(543, 157);
             this.Resize += new System.EventHandler(this.DDSPanel_Resize);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
@@ -271,5 +283,6 @@
         private TableLayoutPanel tlpSize;
         private Label label2;
         private Label lbSize;
+        private Label lbDDSFmt;
     }
 }

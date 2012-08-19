@@ -64,7 +64,7 @@ namespace System.Windows.Forms
         /// <summary>
         /// When non-zero, indicates the maximum width and height to constrain the image size.
         /// </summary>
-        [Description("Set non-zero bounds to constrain the image size")]
+        [DefaultValue(typeof(Size), "0, 0"), Description("Set non-zero bounds to constrain the image size")]
         public Size MaxSize { get { return maxSize; } set { maxSize = value; pictureBox1.Image = doResize(); OnChanged(MaxSizeChanged); } }
 
         /// <summary>
@@ -176,14 +176,16 @@ namespace System.Windows.Forms
             set
             {
                 if (!loaded) return;
+                if (ImageSize == value) return;
 
                 try
                 {
                     this.Enabled = false;
                     Application.UseWaitCursor = true;
+                    Application.DoEvents();
                     ddsFile = ddsFile.Resize(value);
                 }
-                finally { this.Enabled = true; Application.UseWaitCursor = false; }
+                finally { this.Enabled = true; Application.UseWaitCursor = false; Application.DoEvents(); }
 
                 ckb_CheckedChanged(null, null);
             }
@@ -193,7 +195,20 @@ namespace System.Windows.Forms
         /// When true, indicates the DDS image is encoded with an alpha channel.
         /// </summary>
         [ReadOnly(true), Description("When true, indicates the DDS image is encoded with an alpha channel.")]
+        [Obsolete("Use AlphaDepth instead")]
         public bool HasAlphaChannel { get { return loaded && ddsFile.HasAlphaChannel; } }
+
+        /// <summary>
+        /// The number of alpha channel bits per pixel in the encoded DDS image.
+        /// </summary>
+        [DefaultValue(8), Description("The number of alpha channel bits per pixel in the encoded DDS image.")]
+        public int AlphaDepth { get { return loaded ? ddsFile.AlphaDepth : -1; } set { if (loaded) { ddsFile.AlphaDepth = value; pictureBox1.Image = doResize(); } } }
+
+        /// <summary>
+        /// Indicates whether the encoded DDS image uses DXT compression.
+        /// </summary>
+        [DefaultValue(true), Description("Indicates whether the encoded DDS image uses DXT compression.")]
+        public bool UseDXT { get { return loaded && ddsFile.UseDXT; } set { if (loaded) { ddsFile.UseDXT = value; pictureBox1.Image = doResize(); } } }
 
         /// <summary>
         /// Indicates that a Mask is currently loaded.
@@ -259,12 +274,28 @@ namespace System.Windows.Forms
         /// <param name="stream"><see cref="Stream"/> containing a DDS-encoded image.</param>
         /// <param name="imageSize">(out) Size of DDS image.</param>
         /// <param name="hasAlphaChannel">(out) True if DDS image has an alpha channel.</param>
+        [Obsolete("Use alternative overload for alphaDepth.")]
         public void DDSInfo(Stream stream, out Size imageSize, out bool hasAlphaChannel)
         {
             DdsFile dds = new DdsFile();
             dds.GetInfo(stream);
             imageSize = new Size(dds.Size.Width, dds.Size.Height);
             hasAlphaChannel = dds.HasAlphaChannel;
+        }
+
+        /// <summary>
+        /// Return the image size and an indication of presence of an alpha channel
+        /// for a DDS image in a stream.
+        /// </summary>
+        /// <param name="stream"><see cref="Stream"/> containing a DDS-encoded image.</param>
+        /// <param name="imageSize">(out) Size of DDS image.</param>
+        /// <param name="alphaDepth">(out) The number of alpha channel bits per pixel.</param>
+        public void DDSInfo(Stream stream, out Size imageSize, out int alphaDepth)
+        {
+            DdsFile dds = new DdsFile();
+            dds.GetInfo(stream);
+            imageSize = new Size(dds.Size.Width, dds.Size.Height);
+            alphaDepth = dds.AlphaDepth;
         }
 
         /// <summary>
@@ -296,10 +327,11 @@ namespace System.Windows.Forms
                 {
                     this.Enabled = false;
                     Application.UseWaitCursor = true;
+                    Application.DoEvents();
                     ddsFile.Load(stream, supportHSV);
                     loaded = true;
                 }
-                finally { this.Enabled = true; Application.UseWaitCursor = false; }
+                finally { this.Enabled = true; Application.UseWaitCursor = false; Application.DoEvents(); }
                 this.supportHSV = supportHSV;
                 ckb_CheckedChanged(null, null);
             }
@@ -356,11 +388,12 @@ namespace System.Windows.Forms
             {
                 this.Enabled = false;
                 Application.UseWaitCursor = true;
+                Application.DoEvents();
                 Image import = Image.FromFile(filename, true);
                 ddsFile.CreateImage(import, supportHSV);
                 loaded = true;
             }
-            finally { this.Enabled = true; Application.UseWaitCursor = false; }
+            finally { this.Enabled = true; Application.UseWaitCursor = false; Application.DoEvents(); }
             this.supportHSV = supportHSV;
             ckb_CheckedChanged(null, null);
         }
@@ -418,10 +451,11 @@ namespace System.Windows.Forms
             {
                 this.Enabled = false;
                 Application.UseWaitCursor = true;
+                Application.DoEvents();
                 ddsFile.CreateImage(colour.Value, width, height, supportHSV);
                 loaded = true;
             }
-            finally { this.Enabled = true; Application.UseWaitCursor = false; }
+            finally { this.Enabled = true; Application.UseWaitCursor = false; Application.DoEvents(); }
 
             if (!loaded) return;
             this.supportHSV = supportHSV;
@@ -495,10 +529,11 @@ namespace System.Windows.Forms
             {
                 this.Enabled = false;
                 Application.UseWaitCursor = true;
+                Application.DoEvents();
                 ddsFile.CreateImage(red, green, blue, alpha, width, height, supportHSV);
                 loaded = true;
             }
-            finally { this.Enabled = true; Application.UseWaitCursor = false; }
+            finally { this.Enabled = true; Application.UseWaitCursor = false; Application.DoEvents(); }
 
             if (!loaded) return;
             this.supportHSV = supportHSV;
@@ -539,15 +574,12 @@ namespace System.Windows.Forms
             {
                 base.Enabled = false;
                 Application.UseWaitCursor = true;
+                Application.DoEvents();
                 if (greyscale.Width != image.Width || greyscale.Height != image.Height)
                     greyscale = greyscale.GetThumbnailImage(image.Width, image.Height, () => false, System.IntPtr.Zero);
                 ddsFile.SetAlphaFromGreyscale(greyscale);
             }
-            finally
-            {
-                base.Enabled = true;
-                Application.UseWaitCursor = false;
-            }
+            finally { base.Enabled = true; Application.UseWaitCursor = false; Application.DoEvents(); }
             ckb_CheckedChanged(null, null);
         }
 
@@ -583,14 +615,11 @@ namespace System.Windows.Forms
             {
                 base.Enabled = false;
                 Application.UseWaitCursor = true;
+                Application.DoEvents();
                 this.ddsMask = new DdsFile();
                 this.ddsMask.Load(mask, false);//only want the pixmap data
             }
-            finally
-            {
-                base.Enabled = true;
-                Application.UseWaitCursor = false;
-            }
+            finally { base.Enabled = true; Application.UseWaitCursor = false; Application.DoEvents(); }
         }
 
         /// <summary>
@@ -734,13 +763,14 @@ namespace System.Windows.Forms
             {
                 this.Enabled = false;
                 Application.UseWaitCursor = true;
+                Application.DoEvents();
                 if (ch1Image != null) { ch1dds = new DdsFile(); ch1dds.Load(ch1Image, false); }
                 if (ch2Image != null) { ch2dds = new DdsFile(); ch2dds.Load(ch2Image, false); }
                 if (ch3Image != null) { ch3dds = new DdsFile(); ch3dds.Load(ch3Image, false); }
                 if (ch4Image != null) { ch4dds = new DdsFile(); ch4dds.Load(ch4Image, false); }
                 ddsFile.MaskedApplyImage(this.ddsMask, ch1dds, ch2dds, ch3dds, ch4dds);
             }
-            finally { this.Enabled = true; Application.UseWaitCursor = false; }
+            finally { this.Enabled = true; Application.UseWaitCursor = false; Application.DoEvents(); }
             this.ckb_CheckedChanged(null, null);
         }
 
@@ -848,11 +878,12 @@ namespace System.Windows.Forms
             {
                 this.Enabled = false;
                 Application.UseWaitCursor = true;
+                Application.DoEvents();
                 ddsFile.HSVShift = hsvShift;
                 image = ddsFile.GetImage(ckbR.Checked, ckbG.Checked, ckbB.Checked, ckbA.Checked, ckbI.Checked);
                 pictureBox1.Image = doResize();
             }
-            finally { this.Enabled = true; Application.UseWaitCursor = false; }
+            finally { this.Enabled = true; Application.UseWaitCursor = false; Application.DoEvents(); }
 
             if (sender != null)
             {
@@ -875,6 +906,7 @@ namespace System.Windows.Forms
             {
                 tlpSize.Visible = true;
                 lbSize.Text = image.Size.Width + ", " + image.Size.Height;
+                lbDDSFmt.Text = UseDXT ? "DXT: " + AlphaDepth : "Non-DXT";
             }
             else tlpSize.Visible = false;
 

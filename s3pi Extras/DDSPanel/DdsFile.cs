@@ -279,6 +279,16 @@ namespace System.Drawing
                         m_aBitMask = 0x00000000;
                         break;
 
+                    case DdsFileFormat.DDS_FORMAT_R8G8B8:
+                        m_flags = PixelFormatFlags.DDS_RGB;
+                        m_fourCC = 0;
+                        m_rgbBitCount = 24;
+                        m_rBitMask = 0x00ff0000;
+                        m_gBitMask = 0x0000ff00;
+                        m_bBitMask = 0x000000ff;
+                        m_aBitMask = 0x00000000;
+                        break;
+
                     case DdsFileFormat.DDS_FORMAT_A1R5G5B5:
                         m_flags = PixelFormatFlags.DDS_RGB | PixelFormatFlags.DDS_ALPHA;
                         m_fourCC = 0;
@@ -297,16 +307,6 @@ namespace System.Drawing
                         m_gBitMask = 0x000000f0;
                         m_bBitMask = 0x0000000f;
                         m_aBitMask = 0x0000f000;
-                        break;
-
-                    case DdsFileFormat.DDS_FORMAT_R8G8B8:
-                        m_flags = PixelFormatFlags.DDS_RGB;
-                        m_fourCC = 0;
-                        m_rgbBitCount = 24;
-                        m_rBitMask = 0x00ff0000;
-                        m_gBitMask = 0x0000ff00;
-                        m_bBitMask = 0x000000ff;
-                        m_aBitMask = 0x00000000;
                         break;
 
                     case DdsFileFormat.DDS_FORMAT_R5G6B5:
@@ -363,89 +363,190 @@ namespace System.Drawing
                 output.Write(this.m_aBitMask);
             }
 
+            [Obsolete]
             internal bool IsFourChannel
             {
                 get
                 {
-                    if ((m_flags & DdsPixelFormat.PixelFormatFlags.DDS_FOURCC) != 0
-                        /*&& m_fourCC != fourccDXT1/**/) return true;
+                    if ((m_flags & DdsPixelFormat.PixelFormatFlags.DDS_FOURCC) != 0) return true;
                     if ((m_flags & (DdsPixelFormat.PixelFormatFlags.DDS_RGB | DdsPixelFormat.PixelFormatFlags.DDS_ALPHAPIXELS | DdsPixelFormat.PixelFormatFlags.DDS_ALPHA)) != 0
                         && m_aBitMask != 0) return true;
                     return false;
                 }
             }
 
+            internal int AlphaDepth
+            {
+                get
+                {
+                    if ((m_flags & DdsPixelFormat.PixelFormatFlags.DDS_FOURCC) != 0) return m_fourCC == fourccDXT1 ? 1 : m_fourCC == fourccDXT3 ? 3 : 5;
+
+                    int i = 0;
+                    for (uint j = m_aBitMask; j != 0; j >>= 1) if ((j & 1) != 0) i++;
+                    return i;
+                }
+
+                set
+                {
+                    // Did anything change?
+                    if (value == AlphaDepth) return;
+
+                    // Are we DXTn format?
+                    if ((m_flags & DdsPixelFormat.PixelFormatFlags.DDS_FOURCC) != 0)
+                    {
+                        // "AlphaDepth" is abused for selecting format
+                        if (value == 1) this.m_fourCC = fourccDXT1;
+                        else if (value == 3) this.m_fourCC = fourccDXT3;
+                        else if (value == 5) this.m_fourCC = fourccDXT5;
+                        else
+                            throw new ArgumentException(String.Format("Invalid value {0} for AlphaDepth for DXTn image.  Please use '1', '3' or '5'.", value));
+                        return;
+                    }
+
+                    // Setting to zero is pretty easy...
+                    if (value == 0)
+                    {
+                        this.m_aBitMask = 0;
+                        this.m_flags &= ~PixelFormatFlags.DDS_ALPHA;
+                        this.m_flags &= ~PixelFormatFlags.DDS_ALPHAPIXELS; // we never turn it on but turn it off for safety
+                        
+                        if (this.m_rgbBitCount == 32 && this.m_bBitMask == 0x000000ff)
+                        {
+                            // We can drop 32bit to 24bit?
+                            this.m_rgbBitCount = 24;
+                        }
+                        else if (this.m_rgbBitCount == 16)
+                        {
+                            // We can expand bits per pixel
+                            this.m_rBitMask = 0x0000f800;
+                            this.m_gBitMask = 0x000007e0;
+                            this.m_bBitMask = 0x0000001f;
+                        }
+
+                        return;
+                    }
+
+                    // Select an appropriate bitmask
+                    switch (value)
+                    {
+                        case 1:
+                            this.m_rgbBitCount = 16;
+                            m_rBitMask = 0x00007c00;
+                            m_gBitMask = 0x000003e0;
+                            m_bBitMask = 0x0000001f;
+                            m_aBitMask = 0x00008000;
+                            break;
+                        case 4:
+                            this.m_rgbBitCount = 16;
+                            m_rBitMask = 0x00000f00;
+                            m_gBitMask = 0x000000f0;
+                            m_bBitMask = 0x0000000f;
+                            m_aBitMask = 0x0000f000;
+                            break;
+                        case 8:
+                            // Only change the encoding order for ex-16bpp
+                            if (m_rgbBitCount == 16)
+                            {
+                                m_rBitMask = 0x000000ff;
+                                m_gBitMask = 0x0000ff00;
+                                m_bBitMask = 0x00ff0000;
+                            }
+                            m_rgbBitCount = 32;
+                            m_aBitMask = 0xff000000;
+                            this.m_flags |= PixelFormatFlags.DDS_ALPHA;
+                            break;
+                        default:
+                            throw new ArgumentException(String.Format("Invalid value {0} for AlphaDepth.  Only 0, 1, 4 or 8 allowed.", value));
+                    }
+                }
+            }
+
             internal int PixelSize { get { return m_rgbBitCount / 8; } }
+
+            internal DdsFileFormat fileFormatFromPixelFormat
+            {
+                get
+                {
+                    //Is it DXTn?
+                    if ((m_flags & DdsPixelFormat.PixelFormatFlags.DDS_FOURCC) != 0)
+                    {
+                        switch (m_fourCC)
+                        {
+                            case fourccDXT1: return DdsFileFormat.DDS_FORMAT_DXT1;
+                            case fourccDXT3: return DdsFileFormat.DDS_FORMAT_DXT3;
+                            case fourccDXT5: return DdsFileFormat.DDS_FORMAT_DXT5;
+                            default:
+                                throw new InvalidOperationException(String.Format("Unsupported DDS FOURCC value 0x{0:X8}.", m_fourCC));
+                        }
+                    }
+
+                    // No... so use the bit depths and masks
+                    if (m_rgbBitCount == 32)
+                    {
+                        if ((m_rBitMask == 0x00ff0000) && (m_gBitMask == 0x0000ff00) && (m_bBitMask == 0x000000ff))
+                        {
+                            return m_aBitMask == 0xff000000 ? DdsFileFormat.DDS_FORMAT_A8R8G8B8 : DdsFileFormat.DDS_FORMAT_X8R8G8B8;
+                        }
+                        else if ((m_rBitMask == 0x000000ff) && (m_gBitMask == 0x0000ff00) && (m_bBitMask == 0x00ff0000))
+                        {
+                            return m_aBitMask == 0xff000000 ? DdsFileFormat.DDS_FORMAT_A8B8G8R8 : DdsFileFormat.DDS_FORMAT_X8B8G8R8;
+                        }
+                    }
+                    else if (m_rgbBitCount == 24)
+                    {
+                        if ((m_rBitMask == 0x00ff0000) && (m_gBitMask == 0x0000ff00) && (m_bBitMask == 0x000000ff) && (m_aBitMask == 0x00000000))
+                        {
+                            return DdsFileFormat.DDS_FORMAT_R8G8B8;
+                        }
+                    }
+                    if (m_rgbBitCount == 16)
+                    {
+                        if ((m_rBitMask == 0x00000f00) && (m_gBitMask == 0x000000f0) && (m_bBitMask == 0x0000000f) && (m_aBitMask == 0x0000f000))
+                        {
+                            return DdsFileFormat.DDS_FORMAT_A4R4G4B4;
+                        }
+                        else if ((m_rBitMask == 0x00007c00) && (m_gBitMask == 0x000003e0) && (m_bBitMask == 0x0000001f) && (m_aBitMask == 0x00008000))
+                        {
+                            return DdsFileFormat.DDS_FORMAT_A1R5G5B5;
+                        }
+                        else if (
+                            (m_rBitMask == 0x0000f800) && (m_gBitMask == 0x000007e0) && (m_bBitMask == 0x0000001f) && (m_aBitMask == 0x00000000))
+                        {
+                            return DdsFileFormat.DDS_FORMAT_R5G6B5;
+                        }
+                    }
+
+                    // Oh dear...
+                    throw new InvalidOperationException("Unsupported DDS format (this should never happen).");
+                }
+            }
 
             internal void codecFromPixelFormat(out ToARGB toARGB, out ToPixel toPixel)
             {
                 toARGB = null;
                 toPixel = null;
-                if (IsFourChannel)
+
+                // If we should use DXTn, throw back no codec
+                if ((m_flags & DdsPixelFormat.PixelFormatFlags.DDS_FOURCC) != 0) return;
+
+                // No support for alpha-only images
+                if ((m_flags & DdsPixelFormat.PixelFormatFlags.DDS_RGB) == 0) return;
+
+                try
                 {
-                    if (m_rgbBitCount == 32)
+                    switch (fileFormatFromPixelFormat)
                     {
-                        if ((m_rBitMask == 0x00ff0000) && (m_gBitMask == 0x0000ff00) &&
-                            (m_bBitMask == 0x000000ff) && (m_aBitMask == 0xff000000))
-                        {
-                            toARGB = fromDDS_A8R8G8B8;
-                            toPixel = toDDS_A8R8G8B8;
-                        }
-                        else if ((m_rBitMask == 0x000000ff) && (m_gBitMask == 0x0000ff00) &&
-                            (m_bBitMask == 0x00ff0000) && (m_aBitMask == 0xff000000))
-                        {
-                            toARGB = fromDDS_A8B8G8R8;
-                            toPixel = toDDS_A8B8G8R8;
-                        }
-                    }
-                    else if (m_rgbBitCount == 16)
-                    {
-                        if ((m_rBitMask == 0x00007c00) && (m_gBitMask == 0x000003e0) &&
-                            (m_bBitMask == 0x0000001f) && (m_aBitMask == 0x00008000))
-                        {
-                            toARGB = fromDDS_A1R5G5B5;
-                            toPixel = toDDS_A1R5G5B5;
-                        }
-                        else if ((m_rBitMask == 0x00000f00) && (m_gBitMask == 0x000000f0) &&
-                            (m_bBitMask == 0x0000000f) && (m_aBitMask == 0x0000f000))
-                        {
-                            toARGB = fromDDS_A4R4G4B4;
-                            toPixel = toDDS_A4R4G4B4;
-                        }
+                        case DdsFileFormat.DDS_FORMAT_A8R8G8B8: toARGB = fromDDS_A8R8G8B8; toPixel = toDDS_A8R8G8B8; break;
+                        case DdsFileFormat.DDS_FORMAT_A8B8G8R8: toARGB = fromDDS_A8B8G8R8; toPixel = toDDS_A8B8G8R8; break;
+                        case DdsFileFormat.DDS_FORMAT_A1R5G5B5: toARGB = fromDDS_A1R5G5B5; toPixel = toDDS_A1R5G5B5; break;
+                        case DdsFileFormat.DDS_FORMAT_A4R4G4B4: toARGB = fromDDS_A4R4G4B4; toPixel = toDDS_A4R4G4B4; break;
+                        case DdsFileFormat.DDS_FORMAT_X8R8G8B8: toARGB = fromDDS_X8R8G8B8; toPixel = toDDS_X8R8G8B8; break;
+                        case DdsFileFormat.DDS_FORMAT_X8B8G8R8: toARGB = fromDDS_X8B8G8R8; toPixel = toDDS_X8B8G8R8; break;
+                        case DdsFileFormat.DDS_FORMAT_R8G8B8: toARGB = fromDDS_R8G8B8; toPixel = toDDS_R8G8B8; break;
+                        case DdsFileFormat.DDS_FORMAT_R5G6B5: toARGB = fromDDS_R5G6B5; toPixel = toDDS_R5G6B5; break;
                     }
                 }
-                else if (m_flags == DdsPixelFormat.PixelFormatFlags.DDS_RGB)
-                {
-                    if (m_rgbBitCount == 32)
-                    {
-                        if ((m_rBitMask == 0x00ff0000) && (m_gBitMask == 0x0000ff00) &&
-                            (m_bBitMask == 0x000000ff) && (m_aBitMask == 0x00000000))
-                        {
-                            toARGB = fromDDS_X8R8G8B8;
-                            toPixel = toDDS_X8R8G8B8;
-                        }
-                        else if ((m_rBitMask == 0x000000ff) && (m_gBitMask == 0x0000ff00) &&
-                            (m_bBitMask == 0x00ff0000) && (m_aBitMask == 0x00000000))
-                        {
-                            toARGB = fromDDS_X8B8G8R8;
-                            toPixel = toDDS_X8B8G8R8;
-                        }
-                    }
-                    else if ((m_rgbBitCount == 24) &&
-                        (m_rBitMask == 0x00ff0000) && (m_gBitMask == 0x0000ff00) &&
-                        (m_bBitMask == 0x000000ff) && (m_aBitMask == 0x00000000))
-                    {
-                        toARGB = fromDDS_R8G8B8;
-                        toPixel = toDDS_R8G8B8;
-                    }
-                    else if ((m_rgbBitCount == 16) &&
-                        (m_rBitMask == 0x0000f800) && (m_gBitMask == 0x000007e0) &&
-                        (m_bBitMask == 0x0000001f) && (m_aBitMask == 0x00000000))
-                    {
-                        toARGB = fromDDS_R5G6B5;
-                        toPixel = toDDS_R5G6B5;
-                    }
-                }
+                catch (InvalidOperationException) { return; }// Any other unsupported types, just let the caller deal with the problem
             }
 
             #region Supported non-DXT1/3/5 conversion methods - decompress
@@ -1155,10 +1256,12 @@ namespace System.Drawing
         /// <param name="supportHSV">When true, create an HSVa-encoded version of the image.</param>
         public void CreateImage(DdsFile image, int width, int height, bool supportHSV)
         {
-            ddsHeader = new DdsHeader(image.HasAlphaChannel ? DdsFileFormat.DDS_FORMAT_DXT5 : DdsFileFormat.DDS_FORMAT_DXT1, width, height);
+            ddsHeader = new DdsHeader(image.ddsHeader.m_pixelFormat.fileFormatFromPixelFormat, width, height);
 
             // Regardless of the pixel format, using Bitmap to resize the image pre-multiplies the alpha
             // so we need this mess.
+
+            // First, get the image, strip the alpha, then resize
             using (DdsFile ddsFileBase = new DdsFile())
             {
                 ddsFileBase.CreateImage(image, false);
@@ -1166,13 +1269,14 @@ namespace System.Drawing
                 baseImage = new Bitmap(ddsFileBase.Image, width, height).ToARGBData();
             }
 
-            if (image.HasAlphaChannel)
+            currentImage = (uint[])baseImage.Clone();
+
+            // Now reapply the original alpha
+            if (image.AlphaDepth > 0)
             {
                 Bitmap alpha = new Bitmap(image.GetGreyscaleFromAlpha(), width, height);
                 SetAlphaFromGreyscale(alpha);
             }
-
-            currentImage = (uint[])baseImage.Clone();
 
             if (supportHSV) UpdateHSVData();
         }
@@ -1183,7 +1287,7 @@ namespace System.Drawing
         /// </summary>
         /// <param name="image"><see cref="T:Image"/> from which to extract image pixels.</param>
         /// <param name="supportHSV">When true, create an HSVa-encoded version of the image.</param>
-        public void CreateImage(Image image, bool supportHSV) { CreateImage(new Bitmap(image), supportHSV, image.PixelFormat); }
+        public void CreateImage(Image image, bool supportHSV) { CreateImage(new Bitmap(image), supportHSV); }
 
         /// <summary>
         /// Creates an image from a given <see cref="T:Bitmap"/>.
@@ -1191,14 +1295,9 @@ namespace System.Drawing
         /// </summary>
         /// <param name="image"><see cref="T:Bitmap"/> from which to extract image pixels.</param>
         /// <param name="supportHSV">When true, create an HSVa-encoded version of the image.</param>
-        /// <param name="fmt">(Optional) Override the <paramref name="image"/> <see cref="T:Imaging.PixelFormat"/> value.</param>
-        public void CreateImage(Bitmap image, bool supportHSV, Imaging.PixelFormat? fmt = null)
+        public void CreateImage(Bitmap image, bool supportHSV)
         {
-            if (!fmt.HasValue) fmt = image.PixelFormat;
-            ddsHeader = new DdsHeader((fmt & Imaging.PixelFormat.Alpha) == 0
-                ? DdsFileFormat.DDS_FORMAT_DXT1
-                : DdsFileFormat.DDS_FORMAT_DXT5
-                , image.Width, image.Height);
+            ddsHeader = new DdsHeader(DdsFileFormat.DDS_FORMAT_DXT5, image.Width, image.Height);
 
             baseImage = image.ToARGBData();
 
@@ -1216,25 +1315,10 @@ namespace System.Drawing
         /// <param name="supportHSV">When true, create an HSVa-encoded version of the image.</param>
         public void CreateImage(Bitmap image, int width, int height, bool supportHSV)
         {
-            // Regardless of the pixel format, using Bitmap to resize the image pre-multiplies the alpha
-            // so we need this mess.
             using (DdsFile ddsFileBase = new DdsFile())
             {
                 ddsFileBase.CreateImage(image, false);
-                Bitmap alpha = new Bitmap(ddsFileBase.GetGreyscaleFromAlpha(), width, height);
-                ddsFileBase.DeleteAlphaChannel();
-
-                ddsHeader = new DdsHeader((image.PixelFormat & Imaging.PixelFormat.Alpha) == 0
-                    ? DdsFileFormat.DDS_FORMAT_DXT1
-                    : DdsFileFormat.DDS_FORMAT_DXT5
-                    , width, height);
-
-                baseImage = new Bitmap(ddsFileBase.Image, width, height).ToARGBData();
-                currentImage = (uint[])baseImage.Clone();
-
-                SetAlphaFromGreyscale(alpha);
-
-                if (supportHSV) UpdateHSVData();
+                CreateImage(ddsFileBase.Resize(new Size(width, height)), supportHSV);
             }
         }
         #endregion
@@ -1243,25 +1327,20 @@ namespace System.Drawing
         /// <summary>
         /// Converts the R, G and B channels of the supplied <paramref name="image"/> to greyscale
         /// and loads this into the Alpha channel of the current image.
-        /// The image format will be changed to one supporting an Alpha channel, if required.
+        /// The image format will be changed to one supporting an 8-bit Alpha channel, if required.
         /// </summary>
         /// <param name="image"><see cref="DdsFile"/> to extract greyscale data from for alpha channel.</param>
         public void SetAlphaFromGreyscale(DdsFile image)
         {
-            if (!HasAlphaChannel)
-                ddsHeader.SetDdsFileFormat(DdsFileFormat.DDS_FORMAT_DXT5);
+            AlphaDepth = UseDXT ? 5 : 8;
 
             SetPixels((x, y, value) =>
             {
-                uint srcValue = image.GetPixel(x % image.ddsHeader.m_width, y % image.ddsHeader.m_height);
-                uint alpha = ((srcValue.R() + srcValue.G() + srcValue.B()) / 3) & 0xff;
-                if ((srcValue & 0x00FFFFFF) != 0)
+                uint alpha;
+                lock (image)
                 {
-                    value &= 0x00FFFFFF;
-                }
-                else
-                {
-                    value &= 0x00FFFFFF;
+                    uint srcValue = image.GetPixel(x % image.ddsHeader.m_width, y % image.ddsHeader.m_height);
+                    alpha = ((srcValue.R() + srcValue.G() + srcValue.B()) / 3) & 0xff;
                 }
 
                 return (value & 0x00FFFFFF) | (alpha << 24);
@@ -1287,12 +1366,10 @@ namespace System.Drawing
         /// <param name="image"><see cref="Bitmap"/> to extract greyscale data from for alpha channel.</param>
         public void SetAlphaFromGreyscale(Bitmap image)
         {
-            if (!HasAlphaChannel)
-                ddsHeader.SetDdsFileFormat(DdsFileFormat.DDS_FORMAT_DXT5);
+            AlphaDepth = UseDXT ? 5 : 8;
 
             SetPixels((x, y, value) =>
             {
-                int srcOffset = y * ddsHeader.m_width;
                 uint alpha;
                 lock (image)
                 {
@@ -1311,15 +1388,8 @@ namespace System.Drawing
         /// </summary>
         public void DeleteAlphaChannel()
         {
-            if (HasAlphaChannel)
-                ddsHeader.SetDdsFileFormat(DdsFileFormat.DDS_FORMAT_DXT1);
-
-            for (int y = 0; y < ddsHeader.m_height; y++)
-            {
-                int srcOffset = y * ddsHeader.m_width;
-                for (int x = 0; x < ddsHeader.m_width; x++)
-                    currentImage[srcOffset + x] |= 0xFF000000;
-            }
+            AlphaDepth = UseDXT ? 1 : 0;
+            SetPixels((x, y, value) => value |= 0xFF000000);
 
             if (SupportsHSV) UpdateHSVData();
         }
@@ -1341,7 +1411,51 @@ namespace System.Drawing
         /// <summary>
         /// When true, indicates the DDS image is encoded with an alpha channel.
         /// </summary>
+        [Obsolete("AlphaDepth should be used in preference")]
         public bool HasAlphaChannel { get { return ddsHeader.m_pixelFormat.IsFourChannel; } }
+
+        /// <summary>
+        /// When UseDXT is true, the DXT compression mode.
+        /// Otherwise the number of bits per alpha pixel.
+        /// </summary>
+        /// <exception cref="ArgumentException">
+        /// Thrown if an unsupported alpha depth is set.
+        /// </exception>
+        public int AlphaDepth
+        {
+            get { return ddsHeader.m_pixelFormat.AlphaDepth; }
+            set { ddsHeader.m_pixelFormat.AlphaDepth = value; }
+        }
+
+        /// <summary>
+        /// If true, use DXT-type image compression for storage.
+        /// The exact format will depend on the <see cref="AlphaDepth"/>.
+        /// Setting to false (from true) will default to A8B8G8R8 format.
+        /// </summary>
+        public bool UseDXT
+        {
+            get { return (ddsHeader.m_pixelFormat.m_flags & DdsPixelFormat.PixelFormatFlags.DDS_FOURCC) != 0; }
+            set
+            {
+                if (value == UseDXT) return;
+
+                if (value)
+                {
+                    int a = AlphaDepth;
+                    // Turn on DXT
+                    if (a <= 1) ddsHeader.SetDdsFileFormat(DdsFileFormat.DDS_FORMAT_DXT1);
+                    else if (a <= 4) ddsHeader.SetDdsFileFormat(DdsFileFormat.DDS_FORMAT_DXT3);
+                    else if (a <= 8) ddsHeader.SetDdsFileFormat(DdsFileFormat.DDS_FORMAT_DXT5);
+                    else
+                        throw new InvalidOperationException("Cannot set UseDXT with unsupported alpha depth.");
+                }
+                else
+                {
+                    // Turn off DXT
+                    ddsHeader.SetDdsFileFormat(DdsFileFormat.DDS_FORMAT_A8B8G8R8);
+                }
+            }
+        }
 
         /// <summary>
         /// Extract a <see cref="T:Image"/> representing the current image, subject to the filtering requested.
@@ -1432,7 +1546,7 @@ namespace System.Drawing
         public DdsFile Resize(Size size)
         {
             DdsFile ddsFile = new DdsFile();
-            ddsFile.CreateImage(Image, size.Width, size.Height, SupportsHSV);
+            ddsFile.CreateImage(this, size.Width, size.Height, SupportsHSV);
             return ddsFile;
         }
 
