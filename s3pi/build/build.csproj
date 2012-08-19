@@ -122,6 +122,10 @@
       <Project>{47693A2A-1F86-47CA-A170-CC0C195A53B7}</Project>
       <Name>GenericRCOLResource</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\s3pi Wrappers\VideoResource\VideoResource.csproj">
+      <Project>{F6B6A77D-FE64-4CC6-9DB5-AD8DDBF42AFD}</Project>
+      <Name>VideoResource</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\s3pi Wrappers\ImageResource\ImageResource.csproj">
       <Project>{AD53972B-D73E-4935-A4AD-3EBE0E3516F2}</Project>
       <Name>ImageResource</Name>
