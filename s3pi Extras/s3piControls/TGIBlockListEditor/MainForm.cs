@@ -21,9 +21,10 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Linq;
+using System.Reflection;
 using System.Windows.Forms;
 using s3pi.Interfaces;
-using System.Reflection;
 
 namespace System.Windows.Forms.TGIBlockListEditorForm
 {
@@ -118,6 +119,7 @@ namespace System.Windows.Forms.TGIBlockListEditorForm
             {
                 cbType.Value = 0;
                 tbGroup.Text = tbInstance.Text = "";
+                btnPaste.Enabled = btnCopy.Enabled = false;
             }
             else
             {
@@ -125,6 +127,7 @@ namespace System.Windows.Forms.TGIBlockListEditorForm
                 cbType.Value = item.ResourceType;
                 tbGroup.Text = "0x" + item.ResourceGroup.ToString("X8");
                 tbInstance.Text = "0x" + item.Instance.ToString("X16");
+                btnPaste.Enabled = btnCopy.Enabled = true;
             }
             cbType.Enabled = tbGroup.Enabled = tbInstance.Enabled = btnDelete.Enabled = listView1.SelectedIndices.Count > 0;
         }
@@ -202,6 +205,36 @@ namespace System.Windows.Forms.TGIBlockListEditorForm
             ListViewItem lvi = CreateListViewItem(items[listView1.SelectedIndices[0]]);
             listView1.SelectedItems[0].SubItems[3].Text = lvi.SubItems[3].Text;
         }
+
+        private void contextMenuStrip1_Opening(object sender, CancelEventArgs e)
+        {
+            TGIBlock item = new TGIBlock(0, null);
+
+            copyRKToolStripMenuItem.Enabled = (listView1.SelectedIndices.Count != 0);
+            pasteRKToolStripMenuItem.Enabled = copyRKToolStripMenuItem.Enabled && TGIBlock.TryParse(Clipboard.GetText(), item);
+        }
+
+        private void copyRKToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Clipboard.SetText(String.Join("\r\n",
+                listView1.SelectedItems.OfType<ListViewItem>().Where(i => i.Tag is TGIBlock).Select(r => (r.Tag as TGIBlock).ToString())));
+        }
+
+        private void btnCopy_Click(object sender, EventArgs e) { copyRKToolStripMenuItem_Click(sender, e); }
+
+        private void pasteRKToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (listView1.SelectedIndices.Count == 0) return;
+
+            TGIBlock item = new TGIBlock(0, null);
+            if (!TGIBlock.TryParse(Clipboard.GetText(), item)) return;
+
+            cbType.Value = item.ResourceType;
+            tbGroup.Text = "0x" + item.ResourceGroup.ToString("X8");
+            tbInstance.Text = "0x" + item.Instance.ToString("X16");
+        }
+
+        private void btnPaste_Click(object sender, EventArgs e) { pasteRKToolStripMenuItem_Click(sender, e); }
     }
 }
 
