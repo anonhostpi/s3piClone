@@ -30,7 +30,7 @@
     </Thumbnails>
   </game>
   <game class="EP" rgversion="1">
-    <Name>ep1</Name>
+    <Name>WA</Name>
     <Longname>The Sims 3 World Adventures</Longname>
     <DefaultInstallDir>Electronic Arts/The Sims 3 World Adventures</DefaultInstallDir>
     <Suppressed>false</Suppressed>
@@ -51,7 +51,7 @@
     </Thumbnails>
   </game>
   <game class="SP" rgversion="2">
-    <Name>sp1</Name>
+    <Name>HEL</Name>
     <Longname>The Sims 3 High-End Loft Stuff</Longname>
     <DefaultInstallDir>Electronic Arts/The Sims 3 High-End Loft Stuff</DefaultInstallDir>
     <Suppressed>false</Suppressed>
@@ -72,7 +72,7 @@
     </Thumbnails>
   </game>
   <game class="EP" rgversion="3">
-    <Name>ep2</Name>
+    <Name>AMB</Name>
     <Longname>The Sims 3 Ambitions</Longname>
     <DefaultInstallDir>Electronic Arts/The Sims 3 Ambitions</DefaultInstallDir>
     <Suppressed>false</Suppressed>
@@ -93,7 +93,7 @@
     </Thumbnails>
   </game>
   <game class="SP" rgversion="4">
-    <Name>sp2</Name>
+    <Name>FLS</Name>
     <Longname>The Sims 3 Fast Lane Stuff</Longname>
     <DefaultInstallDir>Electronic Arts/The Sims 3 Fast Lane Stuff</DefaultInstallDir>
     <Suppressed>false</Suppressed>
@@ -114,7 +114,7 @@
     </Thumbnails>
   </game>
   <game class="EP" rgversion="5">
-    <Name>ep3</Name>
+    <Name>LN</Name>
     <Longname>The Sims 3 Late Night</Longname>
     <DefaultInstallDir>Electronic Arts/The Sims 3 Late Night</DefaultInstallDir>
     <Suppressed>false</Suppressed>
@@ -135,7 +135,7 @@
     </Thumbnails>
   </game>
   <game class="SP" rgversion="6">
-    <Name>sp3</Name>
+    <Name>OLS</Name>
     <Longname>The Sims 3 Outdoor Living Stuff</Longname>
     <DefaultInstallDir>Electronic Arts/The Sims 3 Outdoor Living Stuff</DefaultInstallDir>
     <Suppressed>false</Suppressed>
@@ -156,7 +156,7 @@
     </Thumbnails>
   </game>
   <game class="EP" rgversion="7">
-    <Name>ep4</Name>
+    <Name>GEN</Name>
     <Longname>The Sims 3 Generations</Longname>
     <DefaultInstallDir>Electronic Arts/The Sims 3 Generations</DefaultInstallDir>
     <Suppressed>false</Suppressed>
@@ -177,7 +177,7 @@
     </Thumbnails>
   </game>
   <game class="SP" rgversion="8">
-    <Name>sp4</Name>
+    <Name>TLS</Name>
     <Longname>The Sims 3 Town Life Stuff</Longname>
     <DefaultInstallDir>Electronic Arts/The Sims 3 Town Life Stuff</DefaultInstallDir>
     <Suppressed>false</Suppressed>
@@ -198,7 +198,7 @@
     </Thumbnails>
   </game>
   <game class="EP" rgversion="9">
-    <Name>ep5</Name>
+    <Name>PETS</Name>
     <Longname>The Sims 3 Pets</Longname>
     <DefaultInstallDir>Electronic Arts/The Sims 3 Pets</DefaultInstallDir>
     <Suppressed>false</Suppressed>
@@ -219,7 +219,7 @@
     </Thumbnails>
   </game>
   <game class="SP" rgversion="10">
-    <Name>sp5</Name>
+    <Name>MSS</Name>
     <Longname>The Sims 3 Master Suite Stuff</Longname>
     <DefaultInstallDir>Electronic Arts/The Sims 3 Master Suite Stuff</DefaultInstallDir>
     <Suppressed>false</Suppressed>
@@ -240,7 +240,7 @@
     </Thumbnails>
   </game>
   <game class="EP" rgversion="11">
-    <Name>ep6</Name>
+    <Name>SHT</Name>
     <Longname>The Sims 3 Showtime</Longname>
     <DefaultInstallDir>Electronic Arts/The Sims 3 Showtime</DefaultInstallDir>
     <Suppressed>false</Suppressed>
@@ -261,7 +261,7 @@
     </Thumbnails>
   </game>
   <game class="SP" rgversion="12">
-    <Name>sp6</Name>
+    <Name>KPST</Name>
     <Longname>The Sims 3 Katy Perry's Sweet Treats</Longname>
     <DefaultInstallDir>Electronic Arts/The Sims 3 Katy Perry's Sweet Treats</DefaultInstallDir>
     <Suppressed>false</Suppressed>
@@ -281,10 +281,10 @@
       </Folder>
     </Thumbnails>
   </game>
-  <game class="EP" rgversion="13">
-    <Name>ep7</Name>
-    <Longname>The Next EP</Longname>
-    <DefaultInstallDir>Electronic Arts/The Next EP</DefaultInstallDir>
+  <game class="SP" rgversion="13">
+    <Name>DS</Name>
+    <Longname>The Sims 3 Diesel Stuff</Longname>
+    <DefaultInstallDir>Electronic Arts/The Sims 3 Diesel Stuff</DefaultInstallDir>
     <Suppressed>false</Suppressed>
     <GameContent>
       <Folder path="GameData/Shared/DeltaPackages">
@@ -302,9 +302,9 @@
       </Folder>
     </Thumbnails>
   </game>
-  <game class="SP" rgversion="14">
-    <Name>sp7</Name>
-    <Longname>The Next SP</Longname>
+  <game class="EP" rgversion="14">
+    <Name>SN</Name>
+    <Longname>The Sims 3 Supernatural</Longname>
     <DefaultInstallDir>Electronic Arts/The Next SP</DefaultInstallDir>
     <Suppressed>false</Suppressed>
     <GameContent>
@@ -315,6 +315,48 @@
     </GameContent>
     <DDSImages>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p15.package</Package>
+    </DDSImages>
+    <Thumbnails>
+      <Folder path="Thumbnails">
+        <Package isPatch="false" priority="0">AllThumbnails.package</Package>
+        <Package isPatch="false" priority="0">CasThumbnails.package</Package>
+      </Folder>
+    </Thumbnails>
+  </game>
+  <game class="EP" rgversion="15">
+    <Name>SEAS</Name>
+    <Longname>The Sims 3 Seasons</Longname>
+    <DefaultInstallDir>Electronic Arts/The Sims 3 Seasons</DefaultInstallDir>
+    <Suppressed>false</Suppressed>
+    <GameContent>
+      <Folder path="GameData/Shared/DeltaPackages">
+        <Package isPatch="true" priority="15">p16/DeltaBuild_p16.package</Package>
+      </Folder>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p16.package</Package>
+    </GameContent>
+    <DDSImages>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p16.package</Package>
+    </DDSImages>
+    <Thumbnails>
+      <Folder path="Thumbnails">
+        <Package isPatch="false" priority="0">AllThumbnails.package</Package>
+        <Package isPatch="false" priority="0">CasThumbnails.package</Package>
+      </Folder>
+    </Thumbnails>
+  </game>
+  <game class="SP" rgversion="16">
+    <Name>NEXT</Name>
+    <Longname>The Sims 3 Next Pack</Longname>
+    <DefaultInstallDir>Electronic Arts/The Sims 3 Whatever Is Next</DefaultInstallDir>
+    <Suppressed>false</Suppressed>
+    <GameContent>
+      <Folder path="GameData/Shared/DeltaPackages">
+        <Package isPatch="true" priority="15">p17/DeltaBuild_p17.package</Package>
+      </Folder>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p17.package</Package>
+    </GameContent>
+    <DDSImages>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p17.package</Package>
     </DDSImages>
     <Thumbnails>
       <Folder path="Thumbnails">
