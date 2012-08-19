@@ -271,14 +271,13 @@ namespace meshExpImp.ModelBlocks
             }
             public Mesh(int APIversion, EventHandler handler, Mesh basis)
                 : this(APIversion, handler, basis.mOwner,
-                basis.Name,
-                basis.MaterialIndex, basis.VertexFormatIndex,
-                basis.VertexBufferIndex, basis.IndexBufferIndex,
-                basis.PrimitiveType, basis.Flags,
-                basis.StreamOffset, basis.StartVertex, basis.StartIndex, basis.MinVertexIndex, basis.VertexCount, basis.PrimitiveCount,
-                basis.Bounds, basis.SkinControllerIndex,
-                basis.JointReferences, basis.GeometryStates, basis.ScaleOffsetIndex,
-                basis.ParentName, basis.MirrorPlane
+                basis.mName,
+                basis.mMaterialIndex, basis.mVertexFormatIndex, basis.mVertexBufferIndex, basis.mIndexBufferIndex,
+                basis.mPrimitiveType, basis.mFlags,
+                basis.mStreamOffset, basis.mStartVertex, basis.mStartIndex, basis.mMinVertexIndex, basis.mVertexCount, basis.mPrimitiveCount,
+                basis.mBounds, basis.mSkinControllerIndex,
+                basis.mJointReferences, basis.mGeometryStates, basis.mScaleOffsetIndex,
+                basis.mParentName, basis.mMirrorPlane
                 ) { }
             public Mesh(int APIversion, EventHandler handler, MLOD owner,
                 uint name,
@@ -312,8 +311,11 @@ namespace meshExpImp.ModelBlocks
                 mJointReferences = jointReferences == null ? null : new UIntList(handler, jointReferences);
                 mGeometryStates = geometryStates == null ? null : new GeometryStateList(handler, geometryStates);
                 mScaleOffsetIndex = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, scaleOffsetIndex);
-                mParentName = parentName;//mOwner.Version > 0x00000201
-                mMirrorPlane = new Vector4(requestedApiVersion, handler, mirrorPlane);//mOwner.Version > 0x00000201
+                if (mOwner.Version > 0x00000201)
+                {
+                    mParentName = parentName;
+                    mMirrorPlane = new Vector4(requestedApiVersion, handler, mirrorPlane);
+                }
             }
             public Mesh(int APIversion, EventHandler handler, MLOD owner, Stream s) : base(APIversion, handler) { mOwner = owner; Parse(s); }
             #endregion
