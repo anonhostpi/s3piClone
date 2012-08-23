@@ -6,6 +6,7 @@
   <game class="baseGame" rgversion="0" priority="99">
     <Name>base</Name>
     <Longname>The Sims 3</Longname>
+    <GUID>{C05D8CDB-417D-4335-A38C-A0659EDFD6B8}</GUID>
     <DefaultInstallDir>Electronic Arts/The Sims 3</DefaultInstallDir>
     <Suppressed>not-allowed</Suppressed>
     <GameContent>
@@ -32,6 +33,7 @@
   <game class="EP" rgversion="1">
     <Name>WA</Name>
     <Longname>The Sims 3 World Adventures</Longname>
+    <GUID>{BA26FFA5-6D47-47DB-BE56-34C357B5F8CC}</GUID>
     <DefaultInstallDir>Electronic Arts/The Sims 3 World Adventures</DefaultInstallDir>
     <Suppressed>false</Suppressed>
     <GameContent>
@@ -53,6 +55,7 @@
   <game class="SP" rgversion="2">
     <Name>HEL</Name>
     <Longname>The Sims 3 High-End Loft Stuff</Longname>
+    <GUID>{71828142-5A24-4BD0-97E7-976DA08CE6CF}</GUID>
     <DefaultInstallDir>Electronic Arts/The Sims 3 High-End Loft Stuff</DefaultInstallDir>
     <Suppressed>false</Suppressed>
     <GameContent>
@@ -74,6 +77,7 @@
   <game class="EP" rgversion="3">
     <Name>AMB</Name>
     <Longname>The Sims 3 Ambitions</Longname>
+    <GUID>{910F4A29-1134-49E0-AD8B-56E4A3152BD1}</GUID>
     <DefaultInstallDir>Electronic Arts/The Sims 3 Ambitions</DefaultInstallDir>
     <Suppressed>false</Suppressed>
     <GameContent>
@@ -95,6 +99,7 @@
   <game class="SP" rgversion="4">
     <Name>FLS</Name>
     <Longname>The Sims 3 Fast Lane Stuff</Longname>
+    <GUID>{ED436EA8-4145-4703-AE5D-4D09DD24AF5A}</GUID>
     <DefaultInstallDir>Electronic Arts/The Sims 3 Fast Lane Stuff</DefaultInstallDir>
     <Suppressed>false</Suppressed>
     <GameContent>
@@ -116,6 +121,7 @@
   <game class="EP" rgversion="5">
     <Name>LN</Name>
     <Longname>The Sims 3 Late Night</Longname>
+    <GUID>{45057FCE-5784-48BE-8176-D9D00AF56C3C}</GUID>
     <DefaultInstallDir>Electronic Arts/The Sims 3 Late Night</DefaultInstallDir>
     <Suppressed>false</Suppressed>
     <GameContent>
@@ -137,6 +143,7 @@
   <game class="SP" rgversion="6">
     <Name>OLS</Name>
     <Longname>The Sims 3 Outdoor Living Stuff</Longname>
+    <GUID>{117B6BF6-82C3-420C-B284-9247C8568E53}</GUID>
     <DefaultInstallDir>Electronic Arts/The Sims 3 Outdoor Living Stuff</DefaultInstallDir>
     <Suppressed>false</Suppressed>
     <GameContent>
@@ -158,6 +165,7 @@
   <game class="EP" rgversion="7">
     <Name>GEN</Name>
     <Longname>The Sims 3 Generations</Longname>
+    <GUID>{E6B88BD6-E4B2-4701-A648-B6DAC6E491CC}</GUID>
     <DefaultInstallDir>Electronic Arts/The Sims 3 Generations</DefaultInstallDir>
     <Suppressed>false</Suppressed>
     <GameContent>
@@ -179,6 +187,7 @@
   <game class="SP" rgversion="8">
     <Name>TLS</Name>
     <Longname>The Sims 3 Town Life Stuff</Longname>
+    <GUID>{7B11296A-F894-449C-8DF6-6AAAA7D4D118}</GUID>
     <DefaultInstallDir>Electronic Arts/The Sims 3 Town Life Stuff</DefaultInstallDir>
     <Suppressed>false</Suppressed>
     <GameContent>
@@ -200,6 +209,7 @@
   <game class="EP" rgversion="9">
     <Name>PETS</Name>
     <Longname>The Sims 3 Pets</Longname>
+    <GUID>{C12631C6-804D-4B32-B0DD-8A496462F106}</GUID>
     <DefaultInstallDir>Electronic Arts/The Sims 3 Pets</DefaultInstallDir>
     <Suppressed>false</Suppressed>
     <GameContent>
@@ -221,6 +231,7 @@
   <game class="SP" rgversion="10">
     <Name>MSS</Name>
     <Longname>The Sims 3 Master Suite Stuff</Longname>
+    <GUID>{08A25478-C5DD-4EA7-B168-3D687CA987FF}</GUID>
     <DefaultInstallDir>Electronic Arts/The Sims 3 Master Suite Stuff</DefaultInstallDir>
     <Suppressed>false</Suppressed>
     <GameContent>
@@ -242,6 +253,7 @@
   <game class="EP" rgversion="11">
     <Name>SHT</Name>
     <Longname>The Sims 3 Showtime</Longname>
+    <GUID>{3BBFD444-5FAB-49F6-98B1-A1954E831399}</GUID>
     <DefaultInstallDir>Electronic Arts/The Sims 3 Showtime</DefaultInstallDir>
     <Suppressed>false</Suppressed>
     <GameContent>
@@ -263,6 +275,7 @@
   <game class="SP" rgversion="12">
     <Name>KPST</Name>
     <Longname>The Sims 3 Katy Perry's Sweet Treats</Longname>
+    <GUID>{9B2506E3-9A3F-45B5-96BF-509CAD584650}</GUID>
     <DefaultInstallDir>Electronic Arts/The Sims 3 Katy Perry's Sweet Treats</DefaultInstallDir>
     <Suppressed>false</Suppressed>
     <GameContent>
@@ -284,6 +297,7 @@
   <game class="SP" rgversion="13">
     <Name>DS</Name>
     <Longname>The Sims 3 Diesel Stuff</Longname>
+    <GUID />
     <DefaultInstallDir>Electronic Arts/The Sims 3 Diesel Stuff</DefaultInstallDir>
     <Suppressed>false</Suppressed>
     <GameContent>
@@ -305,6 +319,7 @@
   <game class="EP" rgversion="14">
     <Name>SN</Name>
     <Longname>The Sims 3 Supernatural</Longname>
+    <GUID />
     <DefaultInstallDir>Electronic Arts/The Next SP</DefaultInstallDir>
     <Suppressed>false</Suppressed>
     <GameContent>
@@ -326,6 +341,7 @@
   <game class="EP" rgversion="15">
     <Name>SEAS</Name>
     <Longname>The Sims 3 Seasons</Longname>
+    <GUID />
     <DefaultInstallDir>Electronic Arts/The Sims 3 Seasons</DefaultInstallDir>
     <Suppressed>false</Suppressed>
     <GameContent>
@@ -347,6 +363,7 @@
   <game class="SP" rgversion="16">
     <Name>NEXT</Name>
     <Longname>The Sims 3 Next Pack</Longname>
+    <GUID />
     <DefaultInstallDir>Electronic Arts/The Sims 3 Whatever Is Next</DefaultInstallDir>
     <Suppressed>false</Suppressed>
     <GameContent>

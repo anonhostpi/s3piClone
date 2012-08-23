@@ -130,7 +130,7 @@ namespace s3pi.Filetable
         static XElement XElementGameFolders { get { return GameFoldersXML.Element(docXName); } }
 
         static string _rootFolder = null;
-        static string RootFolder
+        internal static string RootFolder
         {
             get
             {
@@ -209,7 +209,7 @@ namespace s3pi.Filetable
                         xy.Length == 2 &&
                         GameFolders.byName(xy[0]) != null &&
                         Directory.Exists(xy[1]) &&
-                        Path.GetFullPath(xy[1]) != Path.GetFullPath(Path.Combine(RootFolder, GameFolders.byName(xy[0]).DefaultInstallDir))
+                        Path.GetFullPath(xy[1]) != GameFolders.byName(xy[0]).InstallDir
                         )
                     .ToDictionary(xy => GameFolders.byName(xy[0]), xy => xy[1]);
             }
@@ -226,7 +226,7 @@ namespace s3pi.Filetable
         /// </remarks>
         public static string InstallDir(Game game)
         {
-            return installDirs.ContainsKey(game) && Directory.Exists(installDirs[game]) ? installDirs[game] : Path.Combine(RootFolder, game.DefaultInstallDir);
+            return installDirs.ContainsKey(game) && Directory.Exists(installDirs[game]) ? installDirs[game] : game.InstallDir;
         }
 
         static List<Game> gamesEnabled = null;
@@ -385,6 +385,39 @@ namespace s3pi.Filetable
             }
         }
 
+        string _guid = null;
+        /// <summary>
+        /// Where known, the GUID for an EP/SP, used in the Windows Registry.
+        /// </summary>
+        /// <example>
+        /// The following registry key is The Sims™ 3 High-End Loft Stuff:
+        /// <c>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\GameUX\Games\{71828142-5A24-4BD0-97E7-976DA08CE6CF}</c>
+        /// </example>
+        public string GUID
+        {
+            get
+            {
+                if (_guid == null) _guid = getElement("GUID", "");
+                return _guid;
+            }
+        }
+
+        /// <summary>
+        /// Returns the ConfigApplicationPath Windows registry value for this EP/SP (or null).
+        /// </summary>
+        public string ConfigApplicationPath
+        {
+            get
+            {
+                if (GUID == "") return null;
+                using (var rkGame = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\GameUX\Games\" + GUID))
+                {
+                    if (rkGame == null) return null;
+                    return rkGame.GetValue("ConfigApplicationPath") as string;
+                }
+            }
+        }
+
         string _defaultInstallDir = null;
         /// <summary>
         /// The default installation location, relative to the determined root folder.
@@ -396,6 +429,27 @@ namespace s3pi.Filetable
             {
                 if (_defaultInstallDir == null) _defaultInstallDir = getElement("DefaultInstallDir", "/");
                 return _defaultInstallDir;
+            }
+        }
+
+        string _installDir = null;
+        /// <summary>
+        /// The full path to where we think the EP/SP is installed unless overriden.
+        /// </summary>
+        public string InstallDir
+        {
+            get
+            {
+                if (_installDir == null)
+                {
+                    _installDir = ConfigApplicationPath;
+                    if (_installDir == null)
+                    {
+                        _installDir = Path.Combine(GameFolders.RootFolder, DefaultInstallDir);
+                    }
+                    _installDir = Path.GetFullPath(_installDir);
+                }
+                return _installDir;
             }
         }
 
