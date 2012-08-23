@@ -76,6 +76,7 @@ namespace NGMPHashMapResource
             MemoryStream ms = new MemoryStream();
             BinaryWriter w = new BinaryWriter(ms);
             w.Write(version);
+            if (data == null) data = new NGMPPairList(OnResourceChanged);
             data.UnParse(ms);
             w.Flush();
             return ms;
