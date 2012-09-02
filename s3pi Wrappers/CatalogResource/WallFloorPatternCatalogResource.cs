@@ -194,6 +194,16 @@ namespace CatalogResource
             public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
             #endregion
 
+            #region ICloneable Members
+
+            public object Clone() { return new WallFloorPatternMaterial(requestedApiVersion, handler, this); }
+
+            #endregion
+
+            #region AHandlerElement
+            public override AHandlerElement Clone(EventHandler handler) { return new WallFloorPatternMaterial(requestedApiVersion, handler, this); }
+            #endregion
+
             #region Content Fields
             public uint Unknown4 { get { return unknown4; } set { if (unknown4 != value) { unknown4 = value; OnElementChanged(); } } }
             public uint Unknown5 { get { return unknown5; } set { if (unknown5 != value) { unknown5 = value; OnElementChanged(); } } }
