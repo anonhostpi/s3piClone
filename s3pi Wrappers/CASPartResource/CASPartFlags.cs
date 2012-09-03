@@ -28,8 +28,8 @@ namespace CASPartResource
     public enum AgeFlags : byte
     {
         Baby = 0x01,
-        Toddler = 0x02,
-        Child = 004,
+        Toddler = 0x02,//"Pre-schooler"?
+        Child = 0x04,
         Teen = 0x08,
 
         YoungAdult = 0x10,
