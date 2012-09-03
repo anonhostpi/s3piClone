@@ -55,16 +55,20 @@ namespace System.Windows.Forms
             this.SuspendLayout();
 
             // Calculate our maximum work area
-            // Start off with the owning form size or, failing that being available, the primary screen size
-            Size winSize = CopyableMessageBox.OwningForm != null ? CopyableMessageBox.OwningForm.Size : Screen.PrimaryScreen.WorkingArea.Size;
+            Size winSize = Screen.PrimaryScreen.WorkingArea.Size;
 
-            // Next, if we got less than 1/4 of the screen width or height above, use the primary screen width or height
-            if (winSize.Width < Screen.PrimaryScreen.WorkingArea.Size.Width / 4) winSize.Width = Screen.PrimaryScreen.WorkingArea.Size.Width;
-            if (winSize.Height < Screen.PrimaryScreen.WorkingArea.Size.Height / 4) winSize.Height = Screen.PrimaryScreen.WorkingArea.Size.Height;
-
-            // Finally, reduce to 80% of width and height
+            // Reduce to 80% of width and height
             winSize.Width = winSize.Width * 4 / 5;
             winSize.Height = winSize.Height * 4 / 5;
+
+            // Now see how big the owning form is, if there is one - avoid its size by +/-10%
+            if (CopyableMessageBox.OwningForm != null)
+            {
+                if (winSize.Width > CopyableMessageBox.OwningForm.Width * 0.9f && winSize.Width < CopyableMessageBox.OwningForm.Width * 1.1f)
+                    winSize.Width = winSize.Width * 4 / 5;
+                if (winSize.Height > CopyableMessageBox.OwningForm.Height * 0.9f && winSize.Height < CopyableMessageBox.OwningForm.Height * 1.1f)
+                    winSize.Height = winSize.Height * 4 / 5;
+            }
 
             // Now determine how much estate is lost to the form border
             int formWidth = Bounds.Width - ClientSize.Width;
@@ -85,16 +89,16 @@ namespace System.Windows.Forms
             TextBox tb = new TextBox
             {
                 AutoSize = true,
-                Font = new Label().Font,
-                Margin = new Padding(12),
+                Font = tbMessage.Font,
+                Margin = new Padding(0),
                 MaximumSize = new Size(maxWidth, maxHeight),
                 Multiline = true,
-                Text = this.tbMessage.Text,
+                Lines = this.tbMessage.Lines,
             };
             tb.PerformLayout();
 
-            tbMessage.Font = tb.Font;
-            tbMessage.ClientSize = tb.PreferredSize;
+            tbMessage.ClientSize = new Size(tb.PreferredSize.Width > maxWidth ? maxWidth : tb.PreferredSize.Width,
+                tb.PreferredSize.Height > maxHeight ? maxHeight : tb.PreferredSize.Height);
             tbMessage.PerformLayout();
 
             int minWidth = Math.Max(btnSize.Width, iconSize.Width) + formWidth;

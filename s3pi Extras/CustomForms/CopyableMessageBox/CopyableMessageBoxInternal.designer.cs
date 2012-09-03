@@ -42,14 +42,14 @@
             this.flpButtons.Controls.Add(this.button1);
             this.flpButtons.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.flpButtons.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft;
-            this.flpButtons.Location = new System.Drawing.Point(0, 72);
+            this.flpButtons.Location = new System.Drawing.Point(0, 91);
             this.flpButtons.Name = "flpButtons";
-            this.flpButtons.Size = new System.Drawing.Size(158, 42);
+            this.flpButtons.Size = new System.Drawing.Size(174, 42);
             this.flpButtons.TabIndex = 0;
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(74, 9);
+            this.button1.Location = new System.Drawing.Point(90, 9);
             this.button1.Margin = new System.Windows.Forms.Padding(9);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
@@ -70,7 +70,7 @@
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 1;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(158, 72);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(174, 91);
             this.tableLayoutPanel1.TabIndex = 1;
             // 
             // tbMessage
@@ -82,7 +82,8 @@
             this.tbMessage.Multiline = true;
             this.tbMessage.Name = "tbMessage";
             this.tbMessage.ReadOnly = true;
-            this.tbMessage.Size = new System.Drawing.Size(54, 48);
+            this.tbMessage.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.tbMessage.Size = new System.Drawing.Size(70, 67);
             this.tbMessage.TabIndex = 0;
             this.tbMessage.Text = "Text here\r\nmore text\r\nmo\r\nre\r\ntext";
             this.tbMessage.SizeChanged += new System.EventHandler(this.ctl_SizeChanged);
@@ -97,7 +98,7 @@
             this.lbIcon.Location = new System.Drawing.Point(16, 16);
             this.lbIcon.Margin = new System.Windows.Forms.Padding(16);
             this.lbIcon.Name = "lbIcon";
-            this.lbIcon.Size = new System.Drawing.Size(48, 40);
+            this.lbIcon.Size = new System.Drawing.Size(48, 45);
             this.lbIcon.TabIndex = 1;
             this.lbIcon.Text = "X";
             this.lbIcon.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
@@ -106,7 +107,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(158, 114);
+            this.ClientSize = new System.Drawing.Size(174, 133);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Controls.Add(this.flpButtons);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
