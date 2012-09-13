@@ -164,7 +164,7 @@ namespace System.Drawing
                 /// </summary>
                 DDS_ALPHA = 0x00000002,
                 /// <summary>
-                /// Format supports four channels
+                /// Format supports FOURCC DXT identifier
                 /// </summary>
                 DDS_FOURCC = 0x00000004,
                 /// <summary>
@@ -1218,13 +1218,7 @@ namespace System.Drawing
             ddsHeader = new DdsHeader(DdsFileFormat.DDS_FORMAT_DXT5, width, height);
 
             baseImage = new uint[width * height];
-
-            for (int y = 0; y < height; y++)
-            {
-                int offset = y * width;
-                for (int x = 0; x < width; x++)
-                    baseImage[offset + x] = argb;
-            }
+            DoAction((x, y, unused) => baseImage[y * width + x] = argb);
 
             currentImage = (uint[])baseImage.Clone();
             if (supportHSV) UpdateHSVData();
@@ -1393,7 +1387,6 @@ namespace System.Drawing
 
             if (SupportsHSV) UpdateHSVData();
         }
-        #endregion
 
         /// <summary>
         /// Get a greyscale image representing the alpha channel of the current image.
@@ -1426,6 +1419,7 @@ namespace System.Drawing
             get { return ddsHeader.m_pixelFormat.AlphaDepth; }
             set { ddsHeader.m_pixelFormat.AlphaDepth = value; }
         }
+        #endregion
 
         /// <summary>
         /// If true, use DXT-type image compression for storage.
