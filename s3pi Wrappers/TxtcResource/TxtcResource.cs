@@ -558,6 +558,7 @@ namespace TxtcResource
             public enum BooleanProperties : uint
             {
                 //EntryBoolean
+                Unknown0x655FD973 = 0x655FD973,
                 Unknown0xD49E8879 = 0xD49E8879,
                 UIVisible = 0xD92A4C8B,
                 EnableFiltering = 0xE27FE962,
