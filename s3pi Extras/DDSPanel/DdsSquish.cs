@@ -354,6 +354,13 @@ namespace System.Drawing
 
         private static bool Is64Bit() { return (Marshal.SizeOf(IntPtr.Zero) == 8); }
 
+#if NOTIMPLEMENTED
+		[DllImport("kernel32.dll")]
+		static extern bool IsProcessorFeaturePresent(uint ProcessorFeature);
+		private const int PF_MMX_INSTRUCTIONS_AVAILABLE = 3;
+		private static unsafe bool IsSSE2Present() { return IsProcessorFeaturePresent(PF_MMX_INSTRUCTIONS_AVAILABLE); }
+#endif
+
         private sealed class SquishInterface_32
         {
 #if NOTIMPLEMENTED
