@@ -1130,7 +1130,7 @@ namespace CatalogResource
 
             #region ICloneable Members
 
-            public object Clone() { return new Material(requestedApiVersion, handler, this); }
+            public virtual object Clone() { return new Material(requestedApiVersion, handler, this); }
 
             #endregion
 

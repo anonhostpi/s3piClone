@@ -196,7 +196,7 @@ namespace CatalogResource
 
             #region ICloneable Members
 
-            public object Clone() { return new WallFloorPatternMaterial(requestedApiVersion, handler, this); }
+            public override object Clone() { return new WallFloorPatternMaterial(requestedApiVersion, handler, this); }
 
             #endregion
 
