@@ -68,7 +68,7 @@ namespace s3pi.GenericRCOLResource
             RCOLIndexEntry[] index = new RCOLIndexEntry[countChunks];
             for (int i = 0; i < countChunks; i++) { index[i].Position = r.ReadUInt32(); index[i].Length = r.ReadInt32(); }
 
-            blockList = new ChunkEntryList(requestedApiVersion, OnResourceChanged, s, chunks, index);
+            blockList = new ChunkEntryList(requestedApiVersion, OnResourceChanged, s, chunks, index) { ParentTGIBlocks = resources, };
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace s3pi.GenericRCOLResource
             w.Write(unused);
             if (resources == null) resources = new CountedTGIBlockList(OnResourceChanged, "ITG");
             w.Write(resources.Count);
-            if (blockList == null) blockList = new ChunkEntryList(OnResourceChanged);
+            if (blockList == null) blockList = new ChunkEntryList(OnResourceChanged) { ParentTGIBlocks = resources, };
             w.Write(blockList.Count);
             foreach (ChunkEntry ce in blockList) ce.TGIBlock.UnParse(ms);
             resources.UnParse(ms);
@@ -137,6 +137,12 @@ namespace s3pi.GenericRCOLResource
         {
             const Int32 recommendedApiVersion = 1;
 
+            DependentList<TGIBlock> _ParentTGIBlocks;
+            /// <summary>
+            /// Used internally to pass on the list of resource keys.
+            /// </summary>
+            public DependentList<TGIBlock> ParentTGIBlocks { get { return _ParentTGIBlocks; } set { if (_ParentTGIBlocks != value) { _ParentTGIBlocks = value; rcolBlock.ParentTGIBlocks = _ParentTGIBlocks; } } }
+
             #region Attributes
             TGIBlock tgiBlock;
             ARCOLBlock rcolBlock;
@@ -181,7 +187,15 @@ namespace s3pi.GenericRCOLResource
             /// <summary>
             /// The visible-to-API list of fields in this class.
             /// </summary>
-            public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
+            public override List<string> ContentFields
+            {
+                get
+                {
+                    List<string> res = GetContentFields(requestedApiVersion, this.GetType());
+                    res.Remove("ParentTGIBlocks");
+                    return res;
+                }
+            }
             #endregion
 
             #region IEquatable<ChunkEntry> Members
@@ -249,6 +263,16 @@ namespace s3pi.GenericRCOLResource
         /// </summary>
         public class ChunkEntryList : DependentList<ChunkEntry>
         {
+            private DependentList<TGIBlock> _ParentTGIBlocks;
+            /// <summary>
+            /// Used to pass down the resource key list.
+            /// </summary>
+            public DependentList<TGIBlock> ParentTGIBlocks
+            {
+                get { return _ParentTGIBlocks; }
+                set { if (_ParentTGIBlocks != value) { _ParentTGIBlocks = value; foreach (var i in this) i.ParentTGIBlocks = _ParentTGIBlocks; } }
+            }
+
             internal ChunkEntryList(int requestedApiVersion, EventHandler handler, Stream s, TGIBlock[] chunks, RCOLIndexEntry[] index)
                 : base(null, -1)
             {
@@ -626,16 +650,41 @@ namespace s3pi.GenericRCOLResource
         /// </summary>
         [ElementPriority(3)]
         public uint Unused { get { return unused; } set { if (unused != value) { unused = value; OnResourceChanged(this, EventArgs.Empty); } } }
+
         /// <summary>
         /// The list of <see cref="TGIBlock"/>s referenced for resources external to this resource.
         /// </summary>
         [ElementPriority(4)]
-        public CountedTGIBlockList Resources { get { return resources; } set { if (resources != value) { resources = value == null ? null : new CountedTGIBlockList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
+        public CountedTGIBlockList Resources
+        {
+            get { return resources; }
+            set
+            {
+                if (resources != value)
+                {
+                    resources = value == null ? null : new CountedTGIBlockList(OnResourceChanged, value);
+                    blockList.ParentTGIBlocks = resources;
+                    OnResourceChanged(this, EventArgs.Empty);
+                }
+            }
+        }
+
         /// <summary>
         /// The list of <see cref="ChunkEntry"/> values for RCOL blocks within this resource.
         /// </summary>
         [ElementPriority(5)]
-        public ChunkEntryList ChunkEntries { get { return blockList; } set { if (blockList != value) { blockList = value == null ? null : new ChunkEntryList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
+        public ChunkEntryList ChunkEntries
+        {
+            get { return blockList; }
+            set
+            {
+                if (blockList != value)
+                {
+                    blockList = value == null ? null : new ChunkEntryList(OnResourceChanged, value) { ParentTGIBlocks = resources, };
+                    OnResourceChanged(this, EventArgs.Empty);
+                }
+            }
+        }
 
         /// <summary>
         /// A displayable string representing the content of this resource.
