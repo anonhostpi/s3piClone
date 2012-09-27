@@ -320,7 +320,7 @@
     <Name>SN</Name>
     <Longname>The Sims 3 Supernatural</Longname>
     <GUID>{B37DAFA5-717D-41F8-BDFB-3A4B68C0B3A1}</GUID>
-    <DefaultInstallDir>Electronic Arts/The Next SP</DefaultInstallDir>
+    <DefaultInstallDir>Electronic Arts/The Sims 3 Supernatural</DefaultInstallDir>
     <Suppressed>false</Suppressed>
     <GameContent>
       <Folder path="GameData/Shared/DeltaPackages">
@@ -361,7 +361,7 @@
     </Thumbnails>
   </game>
   <game class="SP" rgversion="16">
-    <Name>NEXT</Name>
+    <Name>Spare</Name>
     <Longname>The Sims 3 Next Pack</Longname>
     <GUID />
     <DefaultInstallDir>Electronic Arts/The Sims 3 Whatever Is Next</DefaultInstallDir>
