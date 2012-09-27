@@ -31,6 +31,13 @@ namespace s3pi.Interfaces
         const int recommendedApiVersion = 1;
 
         /// <summary>
+        /// For ValueBuilder purposes, the list of external resource keys is passed down here.
+        /// Not all RCOLs need it, so it may end up unused.  Override this property to take
+        /// specific action (such as passing the reference further on).
+        /// </summary>
+        public virtual DependentList<TGIBlock> ParentTGIBlocks { get; set; }
+
+        /// <summary>
         /// Holds the requested API version.
         /// </summary>
         protected int requestedAPIversion;
@@ -85,7 +92,15 @@ namespace s3pi.Interfaces
         /// <summary>
         /// The list of available field names on this API object
         /// </summary>
-        public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
+        public override List<string> ContentFields
+        {
+            get
+            {
+                List<string> res = GetContentFields(requestedApiVersion, this.GetType());
+                res.Remove("ParentTGIBlocks");
+                return res;
+            }
+        }
 
         /// <summary>
         /// Unless overridden in an implementing class, returns <c>1</c>.
