@@ -26,6 +26,7 @@ namespace meshExpImp.ModelBlocks
 {
     public class GeometryResource : GenericRCOLResource
     {
+        //public BlendGeometryResource(int APIversion, Stream s) : base(APIversion, s) { if (stream == null) { stream = UnParse(); OnResourceChanged(this, new EventArgs()); } stream.Position = 0; Parse(stream); }
         public GeometryResource(int APIversion, Stream s)
             : base(APIversion, s)
         {
@@ -40,13 +41,29 @@ namespace meshExpImp.ModelBlocks
                 ms.Flush();
                 ms.Position = 0;
                 GEOM geom = new GEOM(requestedApiVersion, OnResourceChanged, ms);
-                ChunkEntries.Add(new ChunkEntry(0, null, chunk.TGIBlock, geom));
+                ChunkEntries.Add(new ChunkEntry(0, OnResourceChanged, chunk.TGIBlock, geom));
             }
+        }
+
+        protected override Stream UnParse()
+        {
+            if (version == 0 && publicChunks == 0 && unused == 0 && blockList == null && resources == null)
+            {
+                // In that case, assume we're a newly created "stream == null" situation GenericRCOLResource that needs
+                // some help to become a real life GeometryResource.
+
+                resources = new CountedTGIBlockList(OnResourceChanged, "ITG");
+                // Unfortunately, a Resource does not know its own ResourceKey.  This is the best we can manage.
+                TGIBlock rk = new TGIBlock(0, null, 0x015A1849, 0, 0);
+                GEOM geom = new GEOM(requestedApiVersion, OnResourceChanged);
+                blockList = new ChunkEntryList(OnResourceChanged, new ChunkEntry[] { new ChunkEntry(0, OnResourceChanged, rk, geom), }) { ParentTGIBlocks = Resources, };
+            }
+            return base.UnParse();
         }
     }
 
     /// <summary>
-    /// ResourceHandler for TxtcResource wrapper
+    /// ResourceHandler for GeometryResource wrapper
     /// </summary>
     public class GeometryResourceHandler : AResourceHandler
     {
