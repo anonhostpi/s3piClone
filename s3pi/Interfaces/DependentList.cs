@@ -75,8 +75,8 @@ namespace s3pi.Interfaces
         /// Read list entries from a stream
         /// </summary>
         /// <param name="s">Stream containing list entries</param>
-        /// <remarks>This method bypasses <see cref="DependentList{T}.Add(object[])"/>
-        /// because <see cref="CreateElement(Stream, out bool)"/> must take care of the same issues.</remarks>
+        //// <remarks>This method bypasses <see cref="DependentList{T}.Add(object[])"/>
+        //// because <see cref="CreateElement(Stream, out bool)"/> must take care of the same issues.</remarks>
         protected virtual void Parse(Stream s) { base.Clear(); bool inc = true; for (int i = ReadCount(s); i > 0; i = i - (inc ? 1 : 0)) base.Add(CreateElement(s, out inc)); }
         /// <summary>
         /// Return the number of elements to be created.
@@ -121,12 +121,18 @@ namespace s3pi.Interfaces
         /// <summary>
         /// Add a default element to a <see cref="DependentList{T}"/>.
         /// </summary>
-        /// <exception cref="NotImplementedException">Lists of abstract classes will fail
-        /// with a NotImplementedException.</exception>
+        /// <exception cref="NotImplementedException"><typeparamref name="T"/> is abstract.</exception>
         /// <exception cref="InvalidOperationException">Thrown when list size exceeded.</exception>
         /// <exception cref="NotSupportedException">The <see cref="DependentList{T}"/> is read-only.</exception>
-        public abstract void Add();
+        public virtual void Add()
+        {
+            if (typeof(T).IsAbstract)
+                throw new NotImplementedException();
 
+            this.Add(typeof(T));
+        }
+
+#if OLDVERSION
         /// <summary>
         /// Adds an entry to an <see cref="DependentList{T}"/>.
         /// </summary>
@@ -203,6 +209,42 @@ namespace s3pi.Interfaces
             }
             catch (MissingMethodException) { } // That's allowed... for now
             return false;
+        }
+#endif
+
+        /// <summary>
+        /// Adds an entry to a <see cref="DependentList{T}"/>, setting the element change handler.
+        /// </summary>
+        /// <param name="newElement">An instance of type <c>{T}</c> to add to the list.</param>
+        /// <exception cref="InvalidOperationException">Thrown when list size exceeded.</exception>
+        /// <exception cref="NotSupportedException">The <see cref="DependentList{T}"/> is read-only.</exception>
+        public override void Add(T newElement)
+        {
+            newElement.SetHandler(elementHandler);
+            base.Add(newElement);
+        }
+
+        /// <summary>
+        /// Add a default element to a <see cref="DependentList{T}"/> of the specified type, <paramref name="elementType"/>.
+        /// </summary>
+        /// <param name="elementType">A concrete type assignable to the list generic type, <typeparamref name="T"/>.</param>
+        /// <exception cref="ArgumentException"><paramref name="elementType"/> is abstract.</exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="elementType"/> is not an implementation of the list type, <typeparamref name="T"/>.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">Thrown when list size exceeded.</exception>
+        /// <exception cref="NotSupportedException">The <see cref="DependentList{T}"/> is read-only.</exception>
+        /// <seealso cref="Activator.CreateInstance(Type, object[])"/>
+        public virtual void Add(Type elementType)
+        {
+            if (elementType.IsAbstract)
+                throw new ArgumentException("Must pass a concrete element type.", "elementType");
+
+            if (!typeof(T).IsAssignableFrom(elementType))
+                throw new ArgumentException("The element type must belong to the generic type of the list.", "elementType");
+
+            T newElement = Activator.CreateInstance(elementType, new object[] { (int)0, elementHandler, }) as T;
+            base.Add(newElement);
         }
 
         /// <summary>
@@ -348,7 +390,7 @@ namespace s3pi.Interfaces
         /// <summary>
         /// Add a new default element to the list.
         /// </summary>
-        public override void Add() { base.Add(new TGIBlock(0, null, order)); } // Need to pass "order"
+        public override void Add() { base.Add(new TGIBlock(0, elementHandler, order)); } // Need to pass "order"
 
         /// <summary>
         /// Adds a new <see cref="TGIBlock"/> to the list using the values of the specified <see cref="TGIBlock"/>.
@@ -358,7 +400,7 @@ namespace s3pi.Interfaces
         /// <exception cref="System.NotSupportedException">The <see cref="AHandlerList{T}"/> is read-only.</exception>
         /// <remarks>A new element is created rather than using the element passed
         /// as the order (TGI/ITG/etc) may be different.</remarks>
-        public override void Add(TGIBlock item) { base.Add(new TGIBlock(0, elementHandler, order, item)); }
+        public override void Add(TGIBlock item) { base.Add(new TGIBlock(0, elementHandler, order, item)); } // Need to pass "order" and there's no property
 
         /// <summary>
         /// Adds a new TGIBlock to the list using the values of the IResourceKey.
@@ -366,7 +408,7 @@ namespace s3pi.Interfaces
         /// <param name="rk">The ResourceKey values to use for the TGIBlock.</param>
         /// <remarks>A new element is created rather than using the element passed
         /// as the order (TGI/ITG/etc) may be different.</remarks>
-        public void Add(IResourceKey rk) { base.Add(new TGIBlock(0, elementHandler, order, rk)); }
+        public void Add(IResourceKey rk) { base.Add(new TGIBlock(0, elementHandler, order, rk)); } // Need to pass "order"
 
         /// <summary>
         /// Inserts a new <see cref="TGIBlock"/> to the list at the specified index using the values of the specified <see cref="TGIBlock"/>.
@@ -379,7 +421,7 @@ namespace s3pi.Interfaces
         /// <exception cref="System.NotSupportedException">The <see cref="CountedTGIBlockList"/> is read-only.</exception>
         /// <remarks>A new element is created rather than using the element passed
         /// as the order (TGI/ITG/etc) may be different.</remarks>
-        public override void Insert(int index, TGIBlock item) { base.Insert(index, new TGIBlock(0, elementHandler, order, item)); }
+        public override void Insert(int index, TGIBlock item) { base.Insert(index, new TGIBlock(0, elementHandler, order, item)); } // Need to pass "order" and there's no property
     }
 
     /// <summary>
@@ -472,9 +514,9 @@ namespace s3pi.Interfaces
         }
         #endregion
 
-        /// <summary>
-        /// Add a new default element to the list
-        /// </summary>
-        public override void Add() { this.Add(new TGIBlock(0, null)); }
+        //// <summary>
+        //// Add a new default element to the list
+        //// </summary>
+        //public override void Add() { this.Add(new TGIBlock(0, null)); }
     }
 }
