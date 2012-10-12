@@ -35,11 +35,26 @@ namespace s3pi.GenericRCOLResource
         const Int32 recommendedApiVersion = 1;
 
         #region Attributes
-        uint version;
-        int publicChunks;
-        uint unused;
-        ChunkEntryList blockList;
-        CountedTGIBlockList resources;
+        /// <summary>
+        /// The version of this RCOL resource.
+        /// </summary>
+        protected uint version;
+        /// <summary>
+        /// The number of &quot;public&quot; RCOL blocks in the resource.
+        /// </summary>
+        protected int publicChunks;
+        /// <summary>
+        /// Unknown.
+        /// </summary>
+        protected uint unused;
+        /// <summary>
+        /// The list of <see cref="TGIBlock"/>s referenced for resources external to this resource.
+        /// </summary>
+        protected CountedTGIBlockList resources;
+        /// <summary>
+        /// The list of <see cref="ChunkEntry"/> values for RCOL blocks within this resource.
+        /// </summary>
+        protected ChunkEntryList blockList;
         #endregion
 
         #region Constructors
@@ -166,17 +181,17 @@ namespace s3pi.GenericRCOLResource
             public ChunkEntry(int APIversion, EventHandler handler, TGIBlock tgiBlock, ARCOLBlock rcolBlock)
                 : base(APIversion, handler)
             {
-                this.tgiBlock = (TGIBlock)tgiBlock.Clone(handler);
-                this.rcolBlock = (ARCOLBlock)rcolBlock.Clone(handler);
+                this.tgiBlock = tgiBlock.Clone(handler) as TGIBlock;
+                this.rcolBlock = rcolBlock.Clone(handler) as ARCOLBlock;
             }
 
             #region AHandlerElement Members
-            /// <summary>
-            /// Get a copy of the <see cref="ChunkEntry"/> but with a new change <see cref="EventHandler"/>.
-            /// </summary>
-            /// <param name="handler">The replacement <see cref="EventHandler"/> delegate.</param>
-            /// <returns>Return a copy of the <see cref="ChunkEntry"/> but with a new change <see cref="EventHandler"/>.</returns>
-            public override AHandlerElement Clone(EventHandler handler) { return new ChunkEntry(requestedApiVersion, handler, this); }
+            // /// <summary>
+            // /// Get a copy of the <see cref="ChunkEntry"/> but with a new change <see cref="EventHandler"/>.
+            // /// </summary>
+            // /// <param name="handler">The replacement <see cref="EventHandler"/> delegate.</param>
+            // /// <returns>Return a copy of the <see cref="ChunkEntry"/> but with a new change <see cref="EventHandler"/>.</returns>
+            // public override AHandlerElement Clone(EventHandler handler) { return new ChunkEntry(requestedApiVersion, handler, this); }
 
             /// <summary>
             /// Return the version number that this class prefers to be called with (the default if passed zero).
@@ -238,7 +253,7 @@ namespace s3pi.GenericRCOLResource
             /// The RCOL block.
             /// </summary>
             [ElementPriority(2)]
-            public ARCOLBlock RCOLBlock { get { return rcolBlock; } set { if (rcolBlock != value) { rcolBlock = (ARCOLBlock)rcolBlock.Clone(handler); OnElementChanged(); } } }
+            public ARCOLBlock RCOLBlock { get { return rcolBlock; } set { if (rcolBlock != value) { rcolBlock = rcolBlock.Clone(handler) as ARCOLBlock; OnElementChanged(); } } }
 
             /// <summary>
             /// Returns a formatted string containing the <see cref="TGIBlock"/> and, where possible, <see cref="RCOLBlock"/> values.
@@ -287,7 +302,7 @@ namespace s3pi.GenericRCOLResource
                     ms.Write(data, 0, data.Length);
                     ms.Position = 0;
 
-                    this.Add(new ChunkEntry(0, null, chunks[i], GenericRCOLResourceHandler.RCOLDealer(requestedApiVersion, elementHandler, chunks[i].ResourceType, ms)));
+                    this.Add(new ChunkEntry(0, elementHandler, chunks[i], GenericRCOLResourceHandler.RCOLDealer(requestedApiVersion, elementHandler, chunks[i].ResourceType, ms)));
                 }
 
                 this.handler = handler;
@@ -326,6 +341,15 @@ namespace s3pi.GenericRCOLResource
             /// </summary>
             /// <exception cref="NotImplementedException">Thrown if <see cref="Add()"/> is invoked.</exception>
             public override void Add() { throw new NotImplementedException(); }
+
+            /// <summary>
+            /// Adds a ChunkEntry to a <see cref="ChunkEntryList"/>, setting the element change handler
+            /// and ParentTGIBlocks.
+            /// </summary>
+            /// <param name="item">An instance of type <c>ChunkEntry</c> to add to the list.</param>
+            /// <exception cref="InvalidOperationException">Thrown when list size exceeded.</exception>
+            /// <exception cref="NotSupportedException">The <see cref="ChunkEntryList"/> is read-only.</exception>
+            public override void Add(ChunkEntry item) { item.ParentTGIBlocks = _ParentTGIBlocks; base.Add(item); }
         }
 
         /// <summary>
@@ -375,6 +399,13 @@ namespace s3pi.GenericRCOLResource
 
             #region Constructors
             /// <summary>
+            /// Create a new instance.
+            /// </summary>
+            /// <param name="APIversion">Unused; requested API version.</param>
+            /// <param name="handler">Change <see cref="EventHandler"/> delegate.</param>
+            public ChunkReference(int APIversion, EventHandler handler)
+                : this(APIversion, handler, 0) { }
+            /// <summary>
             /// Create a new instance from data in the provided <see cref="Stream"/>.
             /// </summary>
             /// <param name="APIversion">Unused; requested API version.</param>
@@ -411,12 +442,12 @@ namespace s3pi.GenericRCOLResource
             #endregion
 
             #region AHandlerElement Members
-            /// <summary>
-            /// Return a new instance with the same value as the current instance but with the given change <see cref="EventHandler"/>.
-            /// </summary>
-            /// <param name="handler">The change <see cref="EventHandler"/>.</param>
-            /// <returns>A new instance with the same value as the current instance but with the given change <see cref="EventHandler"/>.</returns>
-            public override AHandlerElement Clone(EventHandler handler) { return new ChunkReference(requestedApiVersion, handler, this); }
+            // /// <summary>
+            // /// Return a new instance with the same value as the current instance but with the given change <see cref="EventHandler"/>.
+            // /// </summary>
+            // /// <param name="handler">The change <see cref="EventHandler"/>.</param>
+            // /// <returns>A new instance with the same value as the current instance but with the given change <see cref="EventHandler"/>.</returns>
+            // public override AHandlerElement Clone(EventHandler handler) { return new ChunkReference(requestedApiVersion, handler, this); }
 
             /// <summary>
             /// Return the version number that this wrapper prefers to be called with (the default if passed zero).
