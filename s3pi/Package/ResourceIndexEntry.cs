@@ -50,8 +50,8 @@ namespace s3pi.Package
         [MaximumVersion(recommendedApiVersion)]
         public override UInt32 ResourceType
         {
-            get { ms.Position = 4; return indexReader.ReadUInt32(); }
-            set { ms.Position = 4; indexWriter.Write(value); OnElementChanged(); }
+            get { return BitConverter.ToUInt32(indexEntry, 4); }
+            set { byte[] src = BitConverter.GetBytes(value); Array.Copy(src, 0, indexEntry, 4, src.Length); OnElementChanged(); }
         }
         /// <summary>
         /// The "group" the resource is part of
@@ -60,8 +60,8 @@ namespace s3pi.Package
         [MaximumVersion(recommendedApiVersion)]
         public override UInt32 ResourceGroup
         {
-            get { ms.Position = 8; return indexReader.ReadUInt32(); }
-            set { ms.Position = 8; indexWriter.Write(value); OnElementChanged(); }
+            get { return BitConverter.ToUInt32(indexEntry, 8); }
+            set { byte[] src = BitConverter.GetBytes(value); Array.Copy(src, 0, indexEntry, 8, src.Length); OnElementChanged(); }
         }
         /// <summary>
         /// The "instance" number of the resource
@@ -70,8 +70,13 @@ namespace s3pi.Package
         [MaximumVersion(recommendedApiVersion)]
         public override UInt64 Instance
         {
-            get { ms.Position = 12; return ((ulong)indexReader.ReadUInt32() << 32) | (ulong)indexReader.ReadUInt32(); }
-            set { ms.Position = 12; indexWriter.Write((uint)(value >> 32)); indexWriter.Write((uint)(value & 0xffffffff)); OnElementChanged(); }
+            get { return ((ulong)BitConverter.ToUInt32(indexEntry, 12) << 32) | (ulong)BitConverter.ToUInt32(indexEntry, 16); }
+            set
+            {
+                byte[] src = BitConverter.GetBytes((uint)(value >> 32)); Array.Copy(src, 0, indexEntry, 12, src.Length);
+                src = BitConverter.GetBytes((uint)(value & 0xffffffff)); Array.Copy(src, 0, indexEntry, 16, src.Length);
+                OnElementChanged();
+            }
         }
         /// <summary>
         /// If the resource was read from a package, the location in the package the resource was read from
@@ -80,8 +85,8 @@ namespace s3pi.Package
         [MaximumVersion(recommendedApiVersion)]
         public override UInt32 Chunkoffset
         {
-            get { ms.Position = 20; return indexReader.ReadUInt32(); }
-            set { ms.Position = 20; indexWriter.Write(value); OnElementChanged(); }
+            get { return BitConverter.ToUInt32(indexEntry, 20); }
+            set { byte[] src = BitConverter.GetBytes(value); Array.Copy(src, 0, indexEntry, 20, src.Length); OnElementChanged(); }
         }
         /// <summary>
         /// The number of bytes the resource uses within the package
@@ -90,8 +95,8 @@ namespace s3pi.Package
         [MaximumVersion(recommendedApiVersion)]
         public override UInt32 Filesize
         {
-            get { ms.Position = 24; return indexReader.ReadUInt32() & 0x7fffffff; }
-            set { ms.Position = 24; indexWriter.Write(value | 0x80000000); OnElementChanged(); }
+            get { return BitConverter.ToUInt32(indexEntry, 24) & 0x7fffffff; }
+            set { byte[] src = BitConverter.GetBytes(value | 0x80000000); Array.Copy(src, 0, indexEntry, 24, src.Length); OnElementChanged(); OnElementChanged(); }
         }
         /// <summary>
         /// The number of bytes the resource uses in memory
@@ -100,8 +105,8 @@ namespace s3pi.Package
         [MaximumVersion(recommendedApiVersion)]
         public override UInt32 Memsize
         {
-            get { ms.Position = 28; return indexReader.ReadUInt32(); }
-            set { ms.Position = 28; indexWriter.Write(value); OnElementChanged(); }
+            get { return BitConverter.ToUInt32(indexEntry, 28); }
+            set { byte[] src = BitConverter.GetBytes(value); Array.Copy(src, 0, indexEntry, 28, src.Length); OnElementChanged(); }
         }
         /// <summary>
         /// 0xFFFF if Filesize != Memsize, else 0x0000
@@ -110,8 +115,8 @@ namespace s3pi.Package
         [MaximumVersion(recommendedApiVersion)]
         public override UInt16 Compressed
         {
-            get { ms.Position = 32; return indexReader.ReadUInt16(); }
-            set { ms.Position = 32; indexWriter.Write(value); OnElementChanged(); }
+            get { return BitConverter.ToUInt16(indexEntry, 32); }
+            set { byte[] src = BitConverter.GetBytes(value); Array.Copy(src, 0, indexEntry, 32, src.Length); OnElementChanged(); }
         }
         /// <summary>
         /// Always 0x0001
@@ -120,8 +125,8 @@ namespace s3pi.Package
         [MaximumVersion(recommendedApiVersion)]
         public override UInt16 Unknown2
         {
-            get { ms.Position = 34; return indexReader.ReadUInt16(); }
-            set { ms.Position = 34; indexWriter.Write(value); OnElementChanged(); }
+            get { return BitConverter.ToUInt16(indexEntry, 34); }
+            set { byte[] src = BitConverter.GetBytes(value); Array.Copy(src, 0, indexEntry, 34, src.Length); OnElementChanged(); }
         }
 
         /// <summary>
@@ -129,7 +134,7 @@ namespace s3pi.Package
         /// </summary>
         [MinimumVersion(1)]
         [MaximumVersion(recommendedApiVersion)]
-        public override Stream Stream { get { return ms; } }
+        public override Stream Stream { get { return new MemoryStream(indexEntry); } }
 
         /// <summary>
         /// True if the index entry has been deleted from the package index
@@ -174,18 +179,6 @@ namespace s3pi.Package
         /// The index entry data
         /// </summary>
         byte[] indexEntry = null;
-        /// <summary>
-        /// indexEntry as a (fixed size) memory stream
-        /// </summary>
-        MemoryStream ms = null;
-        /// <summary>
-        /// Used to read from the indexEntry
-        /// </summary>
-        BinaryReader indexReader = null;
-        /// <summary>
-        /// Used to write to the indexEntry
-        /// </summary>
-        BinaryWriter indexWriter = null;
 
         /// <summary>
         /// True if the index entry should be treated as deleted
@@ -202,13 +195,7 @@ namespace s3pi.Package
         /// Create a new index entry as a byte-for-byte copy of <paramref name="indexEntry"/>
         /// </summary>
         /// <param name="indexEntry">The source index entry</param>
-        private ResourceIndexEntry(byte[] indexEntry)
-        {
-            this.indexEntry = (byte[])indexEntry.Clone();
-            ms = new MemoryStream(this.indexEntry);
-            indexReader = new BinaryReader(ms);
-            indexWriter = new BinaryWriter(ms);
-        }
+        private ResourceIndexEntry(byte[] indexEntry) { this.indexEntry = (byte[])indexEntry.Clone(); }
 
         /// <summary>
         /// Create a new expanded index entry from the header and entry data passed
@@ -218,7 +205,7 @@ namespace s3pi.Package
         internal ResourceIndexEntry(Int32[] header, Int32[] entry)
         {
             indexEntry = new byte[(header.Length + entry.Length) * 4];
-            ms = new MemoryStream(indexEntry);
+            MemoryStream ms = new MemoryStream(indexEntry);
             BinaryWriter w = new BinaryWriter(ms);
 
             w.Write(header[0]);
@@ -235,9 +222,6 @@ namespace s3pi.Package
 
             for (; ec < entry.Length; ec++)
                 w.Write(entry[ec]);
-
-            indexReader = new BinaryReader(ms);
-            indexWriter = new BinaryWriter(ms);
         }
 
         /// <summary>

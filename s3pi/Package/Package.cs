@@ -79,7 +79,6 @@ namespace s3pi.Package
 
             packageStream.Position = 0;
             header = (new BinaryReader(packageStream)).ReadBytes(header.Length);
-            headerReader = new BinaryReader(new MemoryStream(header));
             if (checking) CheckHeader();
 
             bool wasnull = index == null;
@@ -236,7 +235,6 @@ namespace s3pi.Package
             if (p == null) return;
             if (p.packageStream != null) { try { p.packageStream.Close(); } catch { } p.packageStream = null; }
             p.header = null;
-            p.headerReader = null;
             p.index = null;
         }
         #endregion
@@ -246,63 +244,63 @@ namespace s3pi.Package
         /// Package header: "DBPF" bytes
         /// </summary>
         [ElementPriority(1)]
-        public override byte[] Magic { get { headerReader.BaseStream.Position = 0; return headerReader.ReadBytes(4); } }
+        public override byte[] Magic { get { byte[] res = new byte[4]; Array.Copy(header, 0, res, 0, res.Length); return res; } }
         /// <summary>
         /// Package header: 0x00000002
         /// </summary>
         [ElementPriority(2)]
-        public override int Major { get { headerReader.BaseStream.Position = 4; return headerReader.ReadInt32(); } }
+        public override int Major { get { return BitConverter.ToInt32(header, 4); } }
         /// <summary>
         /// Package header: 0x00000000
         /// </summary>
         [ElementPriority(3)]
-        public override int Minor { get { headerReader.BaseStream.Position = 8; return headerReader.ReadInt32(); } }
+        public override int Minor { get { return BitConverter.ToInt32(header, 8); } }
         /// <summary>
         /// Package header: unused
         /// </summary>
         [ElementPriority(4)]
-        public override byte[] Unknown1 { get { headerReader.BaseStream.Position = 12; return headerReader.ReadBytes(24); } }
+        public override byte[] Unknown1 { get { byte[] res = new byte[24]; Array.Copy(header, 12, res, 0, res.Length); return res; } }
         /// <summary>
         /// Package header: number of entries in the package index
         /// </summary>
         [ElementPriority(5)]
-        public override int Indexcount { get { headerReader.BaseStream.Position = 36; return headerReader.ReadInt32(); } }
+        public override int Indexcount { get { return BitConverter.ToInt32(header, 36); } }
         /// <summary>
         /// Package header: unused
         /// </summary>
         [ElementPriority(6)]
-        public override byte[] Unknown2 { get { headerReader.BaseStream.Position = 40; return headerReader.ReadBytes(4); } }
+        public override byte[] Unknown2 { get { byte[] res = new byte[4]; Array.Copy(header, 40, res, 0, res.Length); return res; } }
         /// <summary>
         /// Package header: index size on disk in bytes
         /// </summary>
         [ElementPriority(7)]
-        public override int Indexsize { get { headerReader.BaseStream.Position = 44; return headerReader.ReadInt32(); } }
+        public override int Indexsize { get { return BitConverter.ToInt32(header, 44); } }
         /// <summary>
         /// Package header: unused
         /// </summary>
         [ElementPriority(8)]
-        public override byte[] Unknown3 { get { headerReader.BaseStream.Position = 48; return headerReader.ReadBytes(12); } }
+        public override byte[] Unknown3 { get { byte[] res = new byte[12]; Array.Copy(header, 48, res, 0, res.Length); return res; } }
         /// <summary>
         /// Package header: always 3?
         /// </summary>
         [ElementPriority(9)]
-        public override int Indexversion { get { headerReader.BaseStream.Position = 60; return headerReader.ReadInt32(); } }
+        public override int Indexversion { get { return BitConverter.ToInt32(header, 60); } }
         /// <summary>
         /// Package header: index position in file
         /// </summary>
         [ElementPriority(10)]
-        public override int Indexposition { get { headerReader.BaseStream.Position = 64; int i = headerReader.ReadInt32(); return i != 0 ? i : BitConverter.ToInt32(Unknown2, 0); } }
+        public override int Indexposition { get { int i = BitConverter.ToInt32(header, 64); return i != 0 ? i : BitConverter.ToInt32(header, 40); } }
         /// <summary>
         /// Package header: unused
         /// </summary>
         [ElementPriority(11)]
-        public override byte[] Unknown4 { get { headerReader.BaseStream.Position = 68; return headerReader.ReadBytes(28); } }
+        public override byte[] Unknown4 { get { byte[] res = new byte[28]; Array.Copy(header, 68, res, 0, res.Length); return res; } }
 
         /// <summary>
         /// A MemoryStream covering the package header bytes
         /// </summary>
         [ElementPriority(12)]
-        public override Stream HeaderStream { get { return headerReader.BaseStream; } }
+        public override Stream HeaderStream { get { throw new NotImplementedException(); } }
         #endregion
 
         #region Package index
@@ -457,7 +455,6 @@ namespace s3pi.Package
         {
             this.requestedApiVersion = requestedVersion;
             header = new byte[96];
-            headerReader = new BinaryReader(new MemoryStream(header));
 
             BinaryWriter bw = new BinaryWriter(new MemoryStream(header));
             bw.Write(stringToBytes(magic));
@@ -474,7 +471,6 @@ namespace s3pi.Package
             packageStream = s;
             s.Position = 0;
             header = (new BinaryReader(s)).ReadBytes(header.Length);
-            headerReader = new BinaryReader(new MemoryStream(header));
             if (checking) CheckHeader();
         }
 
@@ -520,7 +516,6 @@ namespace s3pi.Package
         const int minor = 0;
 
         byte[] header = new byte[96];
-        BinaryReader headerReader = null;
 
         void setIndexcount(BinaryWriter w, int c) { w.BaseStream.Position = 36; w.Write(c); }
         void setIndexsize(BinaryWriter w, int c) { w.BaseStream.Position = 44; w.Write(c); }
@@ -529,8 +524,8 @@ namespace s3pi.Package
 
         void CheckHeader()
         {
-            if (headerReader.BaseStream.Length != 96)
-                throw new InvalidDataException("Hit unexpected end of file at " + headerReader.BaseStream.Position);
+            if (header.Length != 96)
+                throw new InvalidDataException("Hit unexpected end of file.");
 
             if (bytesToString(Magic) != magic)
                 throw new InvalidDataException("Expected magic tag '" + magic + "'.  Found '" + bytesToString(Magic) + "'.");
