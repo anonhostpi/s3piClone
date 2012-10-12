@@ -237,7 +237,7 @@ namespace s3pi.GenericRCOLResource
         public DependentList<TGIBlock> ParentTGIBlocks { get { return _ParentTGIBlocks; } set { _ParentTGIBlocks = value; } }
 
         protected string _RCOLTag;
-        public string RCOLTag { get { return _RCOLTag; } set { _RCOLTag = value; } }
+        public virtual string RCOLTag { get { return _RCOLTag; } set { _RCOLTag = value; } }
 
         protected FieldType field;
         long offsetPos = -1;
@@ -246,7 +246,7 @@ namespace s3pi.GenericRCOLResource
         protected ShaderData(int APIversion, EventHandler handler, FieldType field) : base(APIversion, handler) { this.field = field; }
         #endregion
 
-        public static ShaderData CreateEntry(int APIversion, EventHandler handler, Stream s, long start)
+        public static ShaderData CreateEntry(int APIversion, EventHandler handler, Stream s, long start, DependentList<TGIBlock> _ParentTGIBlocks = null, string _RCOLTag = "MATD")
         {
             BinaryReader r = new BinaryReader(s);
             FieldType field = (FieldType)r.ReadUInt32();
@@ -278,7 +278,7 @@ namespace s3pi.GenericRCOLResource
                     case DataType.dtTexture:
                         switch (count)
                         {
-                            case 4: return new ElementTextureRef(APIversion, handler, field, s);
+                            case 4: return new ElementTextureRef(APIversion, handler, field, s, _ParentTGIBlocks, _RCOLTag);
                             case 5: return new ElementTextureKey(APIversion, handler, field, s);
                         }
                         throw new InvalidDataException(String.Format("Invalid count #{0}' for DataType 0x{1:X8} at 0x{2:X8}", count, sdType, s.Position));
@@ -287,11 +287,6 @@ namespace s3pi.GenericRCOLResource
                 #endregion
             }
             finally { s.Position = pos; }
-        }
-        public static ShaderData CreateEntry(int APIversion, EventHandler handler, ShaderData basis)
-        {
-            return (ShaderData)basis.GetType().GetConstructor(new Type[] { typeof(int), typeof(EventHandler), basis.GetType(), })
-                .Invoke(new object[] { APIversion, handler, basis, });
         }
 
         internal int ByteCount() { return CountFromType; }
@@ -383,7 +378,7 @@ namespace s3pi.GenericRCOLResource
         protected override int CountFromType { get { return 1; } }
         #endregion
 
-        public override AHandlerElement Clone(EventHandler handler) { return new ElementFloat(requestedApiVersion, handler, this); }
+        //public override AHandlerElement Clone(EventHandler handler) { return new ElementFloat(requestedApiVersion, handler, this); }
 
         #region IEquatable<Entry> Members
 
@@ -421,7 +416,7 @@ namespace s3pi.GenericRCOLResource
         protected override int CountFromType { get { return 2; } }
         #endregion
 
-        public override AHandlerElement Clone(EventHandler handler) { return new ElementFloat2(requestedApiVersion, handler, this); }
+        //public override AHandlerElement Clone(EventHandler handler) { return new ElementFloat2(requestedApiVersion, handler, this); }
 
         #region IEquatable<Entry> Members
 
@@ -471,7 +466,7 @@ namespace s3pi.GenericRCOLResource
         protected override int CountFromType { get { return 3; } }
         #endregion
 
-        public override AHandlerElement Clone(EventHandler handler) { return new ElementFloat3(requestedApiVersion, handler, this); }
+        //public override AHandlerElement Clone(EventHandler handler) { return new ElementFloat3(requestedApiVersion, handler, this); }
 
         #region IEquatable<Entry> Members
 
@@ -525,7 +520,7 @@ namespace s3pi.GenericRCOLResource
         protected override int CountFromType { get { return 4; } }
         #endregion
 
-        public override AHandlerElement Clone(EventHandler handler) { return new ElementFloat4(requestedApiVersion, handler, this); }
+        //public override AHandlerElement Clone(EventHandler handler) { return new ElementFloat4(requestedApiVersion, handler, this); }
 
         #region IEquatable<Entry> Members
 
@@ -579,7 +574,7 @@ namespace s3pi.GenericRCOLResource
         protected override int CountFromType { get { return 1; } }
         #endregion
 
-        public override AHandlerElement Clone(EventHandler handler) { return new ElementInt(requestedApiVersion, handler, this); }
+        //public override AHandlerElement Clone(EventHandler handler) { return new ElementInt(requestedApiVersion, handler, this); }
 
         #region IEquatable<Entry> Members
 
@@ -596,35 +591,70 @@ namespace s3pi.GenericRCOLResource
     public class ElementTextureRef : ShaderData
     {
         const int recommendedApiVersion = 1;
+        public override string RCOLTag
+        {
+            get { return _RCOLTag; }
+            set
+            {
+                if (_RCOLTag != value)
+                {
+                    _RCOLTag = value;
+                    if (value == "GEOM")
+                        using (MemoryStream ms = new MemoryStream())
+                        {
+                            data.UnParse(ms);
+                            ms.Position = 0;
+                            index = new BinaryReader(ms).ReadInt32();
+                        }
+                    else
+                        data = new GenericRCOLResource.ChunkReference(0, handler, (uint)index);
+                }
+            }
+        }
 
         #region Attributes
-        uint value;
+        int index; //GEOM
+        GenericRCOLResource.ChunkReference data; //!GEOM
         #endregion
 
         #region Constructors
-        public ElementTextureRef(int APIversion, EventHandler handler, FieldType field, Stream s) : base(APIversion, handler, field) { Parse(s); }
-        public ElementTextureRef(int APIversion, EventHandler handler) : this(APIversion, handler, (FieldType)0, 0) { }
-        public ElementTextureRef(int APIversion, EventHandler handler, ElementTextureRef basis) : base(APIversion, handler, basis.field) { this.value = basis.value; _ParentTGIBlocks = basis._ParentTGIBlocks; _RCOLTag = base._RCOLTag; }
-        public ElementTextureRef(int APIversion, EventHandler handler, FieldType field, GenericRCOLResource.ChunkReference data) : base(APIversion, null, field) { Data = data; this.handler = handler; }
-        public ElementTextureRef(int APIversion, EventHandler handler, FieldType field, Int32 index) : base(APIversion, null, field) { Index = index; this.handler = handler; }
+
+        private ElementTextureRef(int APIversion, EventHandler handler, FieldType field, DependentList<TGIBlock> ParentTGIBlocks = null, string RCOLTag = "MATD")
+            : base(APIversion, handler, field) { _ParentTGIBlocks = ParentTGIBlocks; _RCOLTag = RCOLTag; }
+        public ElementTextureRef(int APIversion, EventHandler handler, DependentList<TGIBlock> ParentTGIBlocks = null, string RCOLTag = "MATD")
+            : this(APIversion, handler, (FieldType)0, ParentTGIBlocks, RCOLTag) { if (_RCOLTag == "GEOM") index = 0; else data = new GenericRCOLResource.ChunkReference(0, handler); }
+        public ElementTextureRef(int APIversion, EventHandler handler, ElementTextureRef basis, DependentList<TGIBlock> ParentTGIBlocks = null, string RCOLTag = "MATD")
+            : this(APIversion, handler, basis.field, ParentTGIBlocks ?? basis._ParentTGIBlocks, RCOLTag ?? basis._RCOLTag) { if (_RCOLTag == "GEOM") index = basis.index; else data = new GenericRCOLResource.ChunkReference(0, handler, basis.data); }
+        public ElementTextureRef(int APIversion, EventHandler handler, FieldType field, Stream s, DependentList<TGIBlock> ParentTGIBlocks = null, string RCOLTag = "MATD")
+            : this(APIversion, handler, field, ParentTGIBlocks, RCOLTag) { Parse(s); }
+        public ElementTextureRef(int APIversion, EventHandler handler, FieldType field, Int32 index, DependentList<TGIBlock> ParentTGIBlocks = null, string RCOLTag = "GEOM")
+            : this(APIversion, handler, field, ParentTGIBlocks, RCOLTag) { this.index = index; }
+        public ElementTextureRef(int APIversion, EventHandler handler, FieldType field, GenericRCOLResource.ChunkReference data, DependentList<TGIBlock> ParentTGIBlocks = null, string RCOLTag = "MATD")
+            : this(APIversion, handler, field, ParentTGIBlocks, RCOLTag) { this.data = new GenericRCOLResource.ChunkReference(0, handler, data); }
         #endregion
 
         #region Data I/O
         void Parse(Stream s)
         {
-            value = new BinaryReader(s).ReadUInt32();
+            if (_RCOLTag == "GEOM")
+                index = new BinaryReader(s).ReadInt32();
+            else
+                data = new GenericRCOLResource.ChunkReference(0, handler, s);
             ReadZeros(s, 12);
         }
         protected override void UnParse(Stream s)
         {
-            new BinaryWriter(s).Write(value);
+            if (_RCOLTag == "GEOM")
+                new BinaryWriter(s).Write(index);
+            else
+                data.UnParse(s);
             WriteZeros(s, 12);
         }
         protected override DataType DataTypeFromType { get { return DataType.dtTexture; } }
         protected override int CountFromType { get { return 4; } }
         #endregion
 
-        public override AHandlerElement Clone(EventHandler handler) { return new ElementTextureRef(requestedApiVersion, handler, this); }
+        //public override AHandlerElement Clone(EventHandler handler) { return new ElementTextureRef(requestedApiVersion, handler, this); }
         public override List<string> ContentFields
         {
             get
@@ -638,8 +668,27 @@ namespace s3pi.GenericRCOLResource
 
         #region IEquatable<Entry> Members
 
-        public override bool Equals(ShaderData other) { return base.Equals(other) && this.value == ((ElementTextureRef)other).value; }
-        public override int GetHashCode() { return base.GetHashCode() ^ value.GetHashCode(); }
+        public override bool Equals(ShaderData other)
+        {
+            if (!base.Equals(other))
+                return false;
+
+            ElementTextureRef _other = (ElementTextureRef)other;
+            if (_RCOLTag != _other._RCOLTag)
+                return false;
+
+            if (_RCOLTag == "GEOM")
+                return index.Equals(_other.index);
+            else
+                return data.Equals(_other.data);
+        }
+        public override int GetHashCode()
+        {
+            if (_RCOLTag == "GEOM")
+                return base.GetHashCode() ^ index.GetHashCode();
+            else
+                return base.GetHashCode() ^ data.GetHashCode();
+        }
 
         #endregion
 
@@ -647,24 +696,14 @@ namespace s3pi.GenericRCOLResource
         [ElementPriority(11)]
         public GenericRCOLResource.ChunkReference Data
         {
-            get { if (_RCOLTag == "GEOM") throw new InvalidOperationException("Use Index not Data for GEOM"); return new GenericRCOLResource.ChunkReference(0, handler, value); }
-            set
-            {
-                if (_RCOLTag == "GEOM") throw new InvalidOperationException("Use Index not Data for GEOM");
-                if (Data != value)
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        value.UnParse(ms);
-                        ms.Position = 0;
-                        this.value = new BinaryReader(ms).ReadUInt32();
-                    }
-            }
+            get { if (_RCOLTag == "GEOM") throw new InvalidOperationException("Use Index not Data for GEOM"); return data; }
+            set { if (_RCOLTag == "GEOM") throw new InvalidOperationException("Use Index not Data for GEOM"); if (data != value) { data = new GenericRCOLResource.ChunkReference(0, handler, value); OnElementChanged(); } }
         }
         [ElementPriority(11), TGIBlockListContentField("ParentTGIBlocks")]
         public Int32 Index
         {
-            get { if (_RCOLTag != "GEOM") throw new InvalidOperationException("Use Data not Index except for GEOM"); return (int)value; }
-            set { if (_RCOLTag != "GEOM") throw new InvalidOperationException("Use Data not Index except for GEOM"); if (this.value != (uint)value) { this.value = (uint)value; OnElementChanged(); } }
+            get { if (_RCOLTag != "GEOM") throw new InvalidOperationException("Use Data not Index except for GEOM"); return index; }
+            set { if (_RCOLTag != "GEOM") throw new InvalidOperationException("Use Data not Index except for GEOM"); if (index != value) { index = value; OnElementChanged(); } }
         }
         #endregion
     }
@@ -692,7 +731,7 @@ namespace s3pi.GenericRCOLResource
         protected override int CountFromType { get { return 5; } }
         #endregion
 
-        public override AHandlerElement Clone(EventHandler handler) { return new ElementTextureKey(requestedApiVersion, handler, this); }
+        //public override AHandlerElement Clone(EventHandler handler) { return new ElementTextureKey(requestedApiVersion, handler, this); }
 
         #region IEquatable<Entry> Members
 
@@ -728,17 +767,26 @@ namespace s3pi.GenericRCOLResource
         internal long dataPos = -1;
 
         #region Constructors
-        public ShaderDataList(EventHandler handler) : base(handler) { }
-        public ShaderDataList(EventHandler handler, Stream s, long start, Nullable<int> expectedDataLen, DependentList<TGIBlock> _ParentTGIBlocks = null, string _RCOLTag = "MATD")
+        public ShaderDataList(EventHandler handler, DependentList<TGIBlock> ParentTGIBlocks = null, string RCOLTag = "MATD")
+            : base(handler) { _ParentTGIBlocks = ParentTGIBlocks; _RCOLTag = RCOLTag; }
+        public ShaderDataList(EventHandler handler, Stream s, long start, Nullable<int> expectedDataLen, DependentList<TGIBlock> ParentTGIBlocks = null, string RCOLTag = "MATD")
             : base(null)
         {
             elementHandler = handler;
-            this._ParentTGIBlocks = _ParentTGIBlocks;
-            this._RCOLTag = _RCOLTag;
+            this._ParentTGIBlocks = ParentTGIBlocks;
+            this._RCOLTag = RCOLTag;
             Parse(s, start, expectedDataLen);
             this.handler = handler;
         }
-        public ShaderDataList(EventHandler handler, IEnumerable<ShaderData> lsd) : base(handler, lsd) { }
+        public ShaderDataList(EventHandler handler, IEnumerable<ShaderData> ilt, DependentList<TGIBlock> ParentTGIBlocks = null, string RCOLTag = "MATD")
+            : base(handler)
+        {
+            elementHandler = handler;
+            this._ParentTGIBlocks = ParentTGIBlocks;
+            this._RCOLTag = RCOLTag;
+            foreach (var t in ilt) this.Add(t);
+            this.handler = handler;
+        }
         #endregion
 
         #region Data I/O
@@ -748,8 +796,7 @@ namespace s3pi.GenericRCOLResource
             int dataLen = 0;
             for (int i = ReadCount(s); i > 0; i--)
             {
-                ShaderData entry = ShaderData.CreateEntry(0, elementHandler, s, start);
-                if (entry is ElementTextureRef) entry.ParentTGIBlocks = _ParentTGIBlocks;
+                ShaderData entry = ShaderData.CreateEntry(0, elementHandler, s, start, _ParentTGIBlocks, _RCOLTag);
                 this.Add(entry);
                 dataLen += this[Count - 1].ByteCount() * 4;
             }
@@ -770,6 +817,26 @@ namespace s3pi.GenericRCOLResource
         protected override void WriteElement(Stream s, ShaderData element) { throw new NotImplementedException(); }
         #endregion
 
-        public override void Add() { throw new NotSupportedException(); }
+        //public override void Add() { throw new NotSupportedException(); }
+        public override void Add(ShaderData item)
+        {
+            if (item is ElementTextureRef) { var element = item as ElementTextureRef; element.ParentTGIBlocks = _ParentTGIBlocks; element.RCOLTag = _RCOLTag; }
+            base.Add(item);
+        }
+        public override void Add(Type elementType)
+        {
+            if (elementType.IsAbstract)
+                throw new ArgumentException("Must pass a concrete element type.", "elementType");
+
+            if (!typeof(ShaderData).IsAssignableFrom(elementType))
+                throw new ArgumentException("The element type must belong to the generic type of the list.", "elementType");
+
+            ShaderData newElement;
+            if (typeof(ElementTextureRef).IsAssignableFrom(elementType))
+                newElement = Activator.CreateInstance(elementType, new object[] { (int)0, elementHandler, _ParentTGIBlocks, _RCOLTag, }) as ElementTextureRef;
+            else
+                newElement = Activator.CreateInstance(elementType, new object[] { (int)0, elementHandler, }) as ShaderData;
+            base.Add(newElement);
+        }
     }
 }
