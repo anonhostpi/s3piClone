@@ -113,12 +113,12 @@ namespace s3pi.Interfaces
         /// </summary>
         public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
 
-        /// <summary>
-        /// Get a copy of the <see cref="Quaternion"/> but with a new change <see cref="EventHandler"/>.
-        /// </summary>
-        /// <param name="handler">The replacement <see cref="EventHandler"/> delegate.</param>
-        /// <returns>Return a copy of the <see cref="Quaternion"/> but with a new change <see cref="EventHandler"/>.</returns>
-        public override AHandlerElement Clone(EventHandler handler) { return new Quaternion(requestedApiVersion, handler, this); }
+        // /// <summary>
+        // /// Get a copy of the <see cref="Quaternion"/> but with a new change <see cref="EventHandler"/>.
+        // /// </summary>
+        // /// <param name="handler">The replacement <see cref="EventHandler"/> delegate.</param>
+        // /// <returns>Return a copy of the <see cref="Quaternion"/> but with a new change <see cref="EventHandler"/>.</returns>
+        // public override AHandlerElement Clone(EventHandler handler) { return new Quaternion(requestedApiVersion, handler, this); }
         #endregion
 
         #region IEquatable<Quaternion> Members

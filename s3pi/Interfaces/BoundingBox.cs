@@ -108,12 +108,12 @@ namespace s3pi.Interfaces
         /// </summary>
         public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
 
-        /// <summary>
-        /// Get a copy of the <see cref="Vertex"/> but with a new change <see cref="EventHandler"/>.
-        /// </summary>
-        /// <param name="handler">The replacement <see cref="EventHandler"/> delegate.</param>
-        /// <returns>Return a copy of the <see cref="Vertex"/> but with a new change <see cref="EventHandler"/>.</returns>
-        public override AHandlerElement Clone(EventHandler handler) { return new Vertex(requestedApiVersion, handler, this); }
+        // /// <summary>
+        // /// Get a copy of the <see cref="Vertex"/> but with a new change <see cref="EventHandler"/>.
+        // /// </summary>
+        // /// <param name="handler">The replacement <see cref="EventHandler"/> delegate.</param>
+        // /// <returns>Return a copy of the <see cref="Vertex"/> but with a new change <see cref="EventHandler"/>.</returns>
+        // public override AHandlerElement Clone(EventHandler handler) { return new Vertex(requestedApiVersion, handler, this); }
         #endregion
 
         #region IEquatable<BoxPoint> Members
@@ -259,12 +259,12 @@ namespace s3pi.Interfaces
         /// </summary>
         public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
 
-        /// <summary>
-        /// Get a copy of the <see cref="BoundingBox"/> but with a new change <see cref="EventHandler"/>.
-        /// </summary>
-        /// <param name="handler">The replacement <see cref="EventHandler"/> delegate.</param>
-        /// <returns>Return a copy of the <see cref="BoundingBox"/> but with a new change <see cref="EventHandler"/>.</returns>
-        public override AHandlerElement Clone(EventHandler handler) { return new BoundingBox(requestedApiVersion, handler, this); }
+        // /// <summary>
+        // /// Get a copy of the <see cref="BoundingBox"/> but with a new change <see cref="EventHandler"/>.
+        // /// </summary>
+        // /// <param name="handler">The replacement <see cref="EventHandler"/> delegate.</param>
+        // /// <returns>Return a copy of the <see cref="BoundingBox"/> but with a new change <see cref="EventHandler"/>.</returns>
+        // public override AHandlerElement Clone(EventHandler handler) { return new BoundingBox(requestedApiVersion, handler, this); }
         #endregion
 
         #region IEquatable<BoundingBox> Members

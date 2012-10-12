@@ -237,12 +237,12 @@ namespace s3pi.Interfaces
         /// The best supported version of the API available
         /// </summary>
         public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
-        /// <summary>
-        /// Get a copy of the <see cref="TGIBlock"/> but with a new change <see cref="EventHandler"/>.
-        /// </summary>
-        /// <param name="handler">The replacement <see cref="EventHandler"/> delegate.</param>
-        /// <returns>Return a copy of the <see cref="TGIBlock"/> but with a new change <see cref="EventHandler"/>.</returns>
-        public override AHandlerElement Clone(EventHandler handler) { return new TGIBlock(requestedApiVersion, handler, this); }
+        // /// <summary>
+        // /// Get a copy of the <see cref="TGIBlock"/> but with a new change <see cref="EventHandler"/>.
+        // /// </summary>
+        // /// <param name="handler">The replacement <see cref="EventHandler"/> delegate.</param>
+        // /// <returns>Return a copy of the <see cref="TGIBlock"/> but with a new change <see cref="EventHandler"/>.</returns>
+        // public override AHandlerElement Clone(EventHandler handler) { return new TGIBlock(requestedApiVersion, handler, this); }
         #endregion
 
         #region IEquatable<TGIBlock> Members
