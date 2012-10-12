@@ -99,7 +99,7 @@ namespace s3pi.Interfaces
 
         #region Constructors
         /// <summary>
-        /// Initializes a new instance of the <see cref="SimpleList{T}"/> class
+        /// Initializes a new instance of the <see cref="IndexList{T}"/> class
         /// that is empty.
         /// </summary>
         /// <param name="handler">The <see cref="EventHandler"/> to call on changes to the list or its elements.</param>
@@ -108,9 +108,11 @@ namespace s3pi.Interfaces
         /// <param name="size">Optional maximum number of elements in the list.</param>
         /// <param name="readCount">Optional; default is to read a <see cref="Int32"/> from the <see cref="Stream"/>.</param>
         /// <param name="writeCount">Optional; default is to write a <see cref="Int32"/> to the <see cref="Stream"/>.</param>
-        public IndexList(EventHandler handler, CreateElementMethod createElement = null, WriteElementMethod writeElement = null, long size = -1, ReadCountMethod readCount = null, WriteCountMethod writeCount = null) : base(handler, size) { this.createElement = createElement; this.writeElement = writeElement; this.readCount = readCount; this.writeCount = writeCount; }
+        /// <param name="ParentTGIBlocks">Optional; default parent <see cref="DependentList{TGIBlock}"/> into which elements of this list index.</param>
+        public IndexList(EventHandler handler, CreateElementMethod createElement = null, WriteElementMethod writeElement = null, long size = -1, ReadCountMethod readCount = null, WriteCountMethod writeCount = null, DependentList<TGIBlock> ParentTGIBlocks = null)
+            : base(handler, size) { _ParentTGIBlocks = ParentTGIBlocks; this.createElement = createElement; this.writeElement = writeElement; this.readCount = readCount; this.writeCount = writeCount; }
         /// <summary>
-        /// Initializes a new instance of the <see cref="SimpleList{T}"/> class
+        /// Initializes a new instance of the <see cref="IndexList{T}"/> class
         /// from <paramref name="s"/>.
         /// </summary>
         /// <param name="handler">The <see cref="EventHandler"/> to call on changes to the list or its elements.</param>
@@ -120,9 +122,11 @@ namespace s3pi.Interfaces
         /// <param name="size">Optional maximum number of elements in the list.</param>
         /// <param name="readCount">Optional; default is to read a <see cref="Int32"/> from the <see cref="Stream"/>.</param>
         /// <param name="writeCount">Optional; default is to write a <see cref="Int32"/> to the <see cref="Stream"/>.</param>
-        public IndexList(EventHandler handler, Stream s, CreateElementMethod createElement, WriteElementMethod writeElement, long size = -1, ReadCountMethod readCount = null, WriteCountMethod writeCount = null) : this(null, createElement, writeElement, size, readCount, writeCount) { elementHandler = handler; Parse(s); this.handler = handler; }
+        /// <param name="ParentTGIBlocks">Optional; default parent <see cref="DependentList{TGIBlock}"/> into which elements of this list index.</param>
+        public IndexList(EventHandler handler, Stream s, CreateElementMethod createElement, WriteElementMethod writeElement, long size = -1, ReadCountMethod readCount = null, WriteCountMethod writeCount = null, DependentList<TGIBlock> ParentTGIBlocks = null)
+            : this(null, createElement, writeElement, size, readCount, writeCount, ParentTGIBlocks) { elementHandler = handler; Parse(s); this.handler = handler; }
         /// <summary>
-        /// Initializes a new instance of the <see cref="SimpleList{T}"/> class
+        /// Initializes a new instance of the <see cref="IndexList{T}"/> class
         /// from <paramref name="collection"/>, wrapping each entry in a <see cref="TGIBlockListIndex{T}"/> instance.
         /// </summary>
         /// <param name="handler">The <see cref="EventHandler"/> to call on changes to the list or its elements.</param>
@@ -132,9 +136,11 @@ namespace s3pi.Interfaces
         /// <param name="size">Optional maximum number of elements in the list.</param>
         /// <param name="readCount">Optional; default is to read a <see cref="Int32"/> from the <see cref="Stream"/>.</param>
         /// <param name="writeCount">Optional; default is to write a <see cref="Int32"/> to the <see cref="Stream"/>.</param>
-        public IndexList(EventHandler handler, IEnumerable<T> collection, CreateElementMethod createElement = null, WriteElementMethod writeElement = null, long size = -1, ReadCountMethod readCount = null, WriteCountMethod writeCount = null) : this(null, createElement, writeElement, size, readCount, writeCount) { elementHandler = handler; this.AddRange(collection); this.handler = handler; }
+        /// <param name="ParentTGIBlocks">Optional; default parent <see cref="DependentList{TGIBlock}"/> into which elements of this list index.</param>
+        public IndexList(EventHandler handler, IEnumerable<T> collection, CreateElementMethod createElement = null, WriteElementMethod writeElement = null, long size = -1, ReadCountMethod readCount = null, WriteCountMethod writeCount = null, DependentList<TGIBlock> ParentTGIBlocks = null)
+            : this(null, createElement, writeElement, size, readCount, writeCount, ParentTGIBlocks) { elementHandler = handler; this.AddRange(collection); this.handler = handler; }
         /// <summary>
-        /// Initializes a new instance of the <see cref="SimpleList{T}"/> class from the existing <paramref name="collection"/>.
+        /// Initializes a new instance of the <see cref="IndexList{T}"/> class from the existing <paramref name="collection"/>.
         /// </summary>
         /// <param name="handler">The <see cref="EventHandler"/> to call on changes to the list or its elements.</param>
         /// <param name="collection">The source to use as the initial content of the list.</param>
@@ -143,7 +149,9 @@ namespace s3pi.Interfaces
         /// <param name="size">Optional maximum number of elements in the list.</param>
         /// <param name="readCount">Optional; default is to read a <see cref="Int32"/> from the <see cref="Stream"/>.</param>
         /// <param name="writeCount">Optional; default is to write a <see cref="Int32"/> to the <see cref="Stream"/>.</param>
-        private IndexList(EventHandler handler, IEnumerable<TGIBlockListIndex<T>> collection, CreateElementMethod createElement = null, WriteElementMethod writeElement = null, long size = -1, ReadCountMethod readCount = null, WriteCountMethod writeCount = null) : this(null, createElement, writeElement, size, readCount, writeCount) { elementHandler = handler; base.AddRange(collection); this.handler = handler; }
+        /// <param name="ParentTGIBlocks">Optional; default parent <see cref="DependentList{TGIBlock}"/> into which elements of this list index.</param>
+        private IndexList(EventHandler handler, IEnumerable<TGIBlockListIndex<T>> collection, CreateElementMethod createElement = null, WriteElementMethod writeElement = null, long size = -1, ReadCountMethod readCount = null, WriteCountMethod writeCount = null, DependentList<TGIBlock> ParentTGIBlocks = null)
+            : this(null, createElement, writeElement, size, readCount, writeCount, ParentTGIBlocks) { elementHandler = handler; base.AddRange(collection); this.handler = handler; }
         #endregion
 
         #region Data I/O
@@ -165,7 +173,7 @@ namespace s3pi.Interfaces
         /// </summary>
         /// <param name="s"><see cref="Stream"/> containing data.</param>
         /// <returns>New list element.</returns>
-        protected override TGIBlockListIndex<T> CreateElement(Stream s) { return new TGIBlockListIndex<T>(0, elementHandler, createElement == null ? default(T) : createElement(s)); }
+        protected override TGIBlockListIndex<T> CreateElement(Stream s) { return new TGIBlockListIndex<T>(0, elementHandler, createElement == null ? default(T) : createElement(s), _ParentTGIBlocks); }
         /// <summary>
         /// Writes the value of a list element to <paramref name="s"/>.
         /// </summary>
@@ -203,33 +211,33 @@ namespace s3pi.Interfaces
 
         #region DependentList<TGIBlockListIndex<T>>
         /// <summary>
-        /// Add a default element to a <see cref="SimpleList{T}"/>.
+        /// Add a default element to a <see cref="IndexList{T}"/>.
         /// </summary>
         /// <exception cref="NotImplementedException">Lists of abstract classes will fail
         /// with a NotImplementedException.</exception>
         /// <exception cref="InvalidOperationException">Thrown when list size exceeded.</exception>
-        /// <exception cref="NotSupportedException">The <see cref="SimpleList{T}"/> is read-only.</exception>
-        public override void Add() { this.Add(new TGIBlockListIndex<T>(0, elementHandler, default(T)) { ParentTGIBlocks = ParentTGIBlocks }); }
+        /// <exception cref="NotSupportedException">The <see cref="IndexList{T}"/> is read-only.</exception>
+        public override void Add() { this.Add(new TGIBlockListIndex<T>(0, elementHandler, default(T), _ParentTGIBlocks)); }
         #endregion
 
         #region List<T>
         /// <summary>
-        /// Adds an entry to a <see cref="SimpleList{T}"/>.
+        /// Adds an entry to a <see cref="IndexList{T}"/>.
         /// </summary>
         /// <param name="item">The object to add.</param>
         /// <returns>True on success</returns>
         /// <exception cref="InvalidOperationException">Thrown when list size exceeded.</exception>
-        /// <exception cref="NotSupportedException">The <see cref="SimpleList{T}"/> is read-only.</exception>
-        public virtual void Add(T item) { base.Add(new TGIBlockListIndex<T>(0, elementHandler, item) { ParentTGIBlocks = ParentTGIBlocks }); }
+        /// <exception cref="NotSupportedException">The <see cref="IndexList{T}"/> is read-only.</exception>
+        public virtual void Add(T item) { base.Add(new TGIBlockListIndex<T>(0, elementHandler, item, _ParentTGIBlocks)); }
 
         /// <summary>
-        /// Adds the elements of the specified collection to the end of the <see cref="SimpleList{T}"/>.
+        /// Adds the elements of the specified collection to the end of the <see cref="IndexList{T}"/>.
         /// </summary>
-        /// <param name="collection">The collection whose elements should be added to the end of the <see cref="SimpleList{T}"/>.
+        /// <param name="collection">The collection whose elements should be added to the end of the <see cref="IndexList{T}"/>.
         /// The collection itself cannot be null, but it can contain elements that are null, if type <typeparamref name="T"/> is a reference type.</param>
         /// <exception cref="System.ArgumentNullException"><paramref name="collection"/> is null.</exception>
         /// <exception cref="System.InvalidOperationException">Thrown when list size would be exceeded.</exception>
-        /// <exception cref="System.NotSupportedException">The <see cref="SimpleList{T}"/> is read-only.</exception>
+        /// <exception cref="System.NotSupportedException">The <see cref="IndexList{T}"/> is read-only.</exception>
         /// <remarks>Calls <see cref="Add(T)"/> for each item in <paramref name="collection"/>.</remarks>
         public virtual void AddRange(IEnumerable<T> collection)
         {
@@ -246,7 +254,7 @@ namespace s3pi.Interfaces
         }
 
         /// <summary>
-        ///     Searches a the entire sorted <see cref="SimpleList{T}"/>
+        ///     Searches a the entire sorted <see cref="IndexList{T}"/>
         ///     for an element using the default comparer and returns the zero-based index
         ///     of the element.
         /// </summary>
@@ -254,10 +262,10 @@ namespace s3pi.Interfaces
         ///     The object to locate.
         /// </param>
         /// <returns>
-        ///     The zero-based index of item in the sorted <see cref="SimpleList{T}"/>,
+        ///     The zero-based index of item in the sorted <see cref="IndexList{T}"/>,
         ///     if item is found; otherwise, a negative number that is the bitwise complement
         ///     of the index of the next element that is larger than item or, if there is
-        ///     no larger element, the bitwise complement of <see cref="SimpleList{T}"/>.Count.
+        ///     no larger element, the bitwise complement of <see cref="IndexList{T}"/>.Count.
         /// </returns>
         /// <exception cref="System.InvalidOperationException">
         ///     The default comparer <see cref="Comparer{T}.Default"/>
@@ -266,7 +274,7 @@ namespace s3pi.Interfaces
         /// </exception>
         public int BinarySearch(T item) { return this.BinarySearch(item, null); }
         /// <summary>
-        ///     Searches a the entire sorted <see cref="SimpleList{T}"/>
+        ///     Searches a the entire sorted <see cref="IndexList{T}"/>
         ///     for an element using the specified comparer and returns the zero-based index
         ///     of the element.
         /// </summary>
@@ -280,10 +288,10 @@ namespace s3pi.Interfaces
         ///     null to use the default comparer <see cref="Comparer{T}.Default"/>.
         /// </param>
         /// <returns>
-        ///     The zero-based index of item in the sorted <see cref="SimpleList{T}"/>,
+        ///     The zero-based index of item in the sorted <see cref="IndexList{T}"/>,
         ///     if item is found; otherwise, a negative number that is the bitwise complement
         ///     of the index of the next element that is larger than item or, if there is
-        ///     no larger element, the bitwise complement of <see cref="SimpleList{T}"/>.Count.
+        ///     no larger element, the bitwise complement of <see cref="IndexList{T}"/>.Count.
         /// </returns>
         /// <exception cref="System.InvalidOperationException">
         ///     <paramref name="comparer"/> is null, and the default comparer <see cref="Comparer{T}.Default"/>
@@ -292,7 +300,7 @@ namespace s3pi.Interfaces
         /// </exception>
         public int BinarySearch(T item, IComparer<T> comparer) { return this.BinarySearch(0, this.Count, item, comparer); }
         /// <summary>
-        ///     Searches a range of elements in the sorted <see cref="SimpleList{T}"/>
+        ///     Searches a range of elements in the sorted <see cref="IndexList{T}"/>
         ///     for an element using the specified comparer and returns the zero-based index
         ///     of the element.
         /// </summary>
@@ -310,10 +318,10 @@ namespace s3pi.Interfaces
         ///     elements, or null to use the default comparer <see cref="Comparer{T}.Default"/>.
         /// </param>
         /// <returns>
-        ///     The zero-based index of item in the sorted <see cref="SimpleList{T}"/>,
+        ///     The zero-based index of item in the sorted <see cref="IndexList{T}"/>,
         ///     if item is found; otherwise, a negative number that is the bitwise complement
         ///     of the index of the next element that is larger than item or, if there is
-        ///     no larger element, the bitwise complement of <see cref="SimpleList{T}"/>.Count.
+        ///     no larger element, the bitwise complement of <see cref="IndexList{T}"/>.Count.
         /// </returns>
         /// <exception cref="System.ArgumentOutOfRangeException">
         ///     <paramref name="index"/> is less than 0.
@@ -321,7 +329,7 @@ namespace s3pi.Interfaces
         ///     <paramref name="count"/> is less than 0.
         /// </exception>
         /// <exception cref="System.ArgumentException">
-        ///     <paramref name="index"/> and <paramref name="count"/> do not denote a valid range in the <see cref="SimpleList{T}"/>.
+        ///     <paramref name="index"/> and <paramref name="count"/> do not denote a valid range in the <see cref="IndexList{T}"/>.
         /// </exception>
         /// <exception cref="System.InvalidOperationException">
         ///     <paramref name="comparer"/> is null, and the default comparer <see cref="Comparer{T}.Default"/>
@@ -331,7 +339,7 @@ namespace s3pi.Interfaces
         public int BinarySearch(int index, int count, T item, IComparer<T> comparer) { return base.BinarySearch(index, count, new TGIBlockListIndex<T>(0, null, item), new SimpleComparer(comparer)); }
 
         /// <summary>
-        ///     Converts the elements in the current <see cref="SimpleList{T}"/> to
+        ///     Converts the elements in the current <see cref="IndexList{T}"/> to
         ///     another type, and returns a list containing the converted elements.
         /// </summary>
         /// <typeparam name="TOutput">
@@ -343,7 +351,7 @@ namespace s3pi.Interfaces
         /// </param>
         /// <returns>
         ///     A <see cref="System.Collections.Generic.List{TOutput}"/> of the target type containing the converted
-        ///     elements from the current <see cref="SimpleList{T}"/>.
+        ///     elements from the current <see cref="IndexList{T}"/>.
         /// </returns>
         /// <exception cref="System.ArgumentNullException">
         ///     <paramref name="converter"/> is null.
@@ -351,29 +359,29 @@ namespace s3pi.Interfaces
         public List<TOutput> ConvertAll<TOutput>(Converter<T, TOutput> converter) { return base.ConvertAll<TOutput>(x => converter(x.Data)); }
 
         /// <summary>
-        ///     Copies the entire <see cref="SimpleList{T}"/> to
+        ///     Copies the entire <see cref="IndexList{T}"/> to
         ///     a compatible one-dimensional array, starting at the beginning of the target array.
         /// </summary>
         /// <param name="array">
         ///     The one-dimensional System.Array that is the destination of the elements
-        ///     copied from <see cref="SimpleList{T}"/>. The <see cref="System.Array"/> must have
+        ///     copied from <see cref="IndexList{T}"/>. The <see cref="System.Array"/> must have
         ///     zero-based indexing.
         /// </param>
         /// <exception cref="System.ArgumentNullException">
         ///     <paramref name="array"/> is null.
         /// </exception>
         /// <exception cref="System.ArgumentException">
-        ///     The number of elements in the source <see cref="SimpleList{T}"/> is
+        ///     The number of elements in the source <see cref="IndexList{T}"/> is
         ///     greater than the number of elements that the destination <paramref name="array"/> can contain.
         /// </exception>
         public void CopyTo(T[] array) { this.CopyTo(0, array, 0, this.Count); }
         /// <summary>
-        ///     Copies the entire <see cref="SimpleList{T}"/> to
+        ///     Copies the entire <see cref="IndexList{T}"/> to
         ///     a compatible one-dimensional array.
         /// </summary>
         /// <param name="array">
         ///     The one-dimensional System.Array that is the destination of the elements
-        ///     copied from <see cref="SimpleList{T}"/>. The <see cref="System.Array"/> must have
+        ///     copied from <see cref="IndexList{T}"/>. The <see cref="System.Array"/> must have
         ///     zero-based indexing.
         /// </param>
         /// <param name="arrayIndex">
@@ -388,22 +396,22 @@ namespace s3pi.Interfaces
         /// <exception cref="System.ArgumentException">
         ///     <paramref name="arrayIndex"/> is equal to or greater than the length of array.
         /// <br/>-or-<br/>
-        ///     The number of elements in the source <see cref="SimpleList{T}"/> is greater
+        ///     The number of elements in the source <see cref="IndexList{T}"/> is greater
         ///     than the available space from <paramref name="arrayIndex"/> to the end of the destination <paramref name="array"/>.
         /// </exception>
         public void CopyTo(T[] array, int arrayIndex) { this.CopyTo(0, array, arrayIndex, this.Count); }
         /// <summary>
-        ///     Copies a range of elements from the <see cref="SimpleList{T}"/> to
+        ///     Copies a range of elements from the <see cref="IndexList{T}"/> to
         ///     a compatible one-dimensional array, starting at the specified <paramref name="index"/> of the
         ///     target <paramref name="array"/>.
         /// </summary>
         /// <param name="index">
-        ///     The zero-based index in the source <see cref="SimpleList{T}"/> at
+        ///     The zero-based index in the source <see cref="IndexList{T}"/> at
         ///     which copying begins.
         /// </param>
         /// <param name="array">
         ///     The one-dimensional System.Array that is the destination of the elements
-        ///     copied from <see cref="SimpleList{T}"/>. The <see cref="System.Array"/> must have
+        ///     copied from <see cref="IndexList{T}"/>. The <see cref="System.Array"/> must have
         ///     zero-based indexing.
         /// </param>
         /// <param name="arrayIndex">
@@ -423,26 +431,26 @@ namespace s3pi.Interfaces
         ///     <paramref name="count"/> is less than 0.
         /// </exception>
         /// <exception cref="System.ArgumentException">
-        ///     <paramref name="index"/> is equal to or greater than the <see cref="SimpleList{T}"/>.Count
-        ///     of the source <see cref="SimpleList{T}"/>.
+        ///     <paramref name="index"/> is equal to or greater than the <see cref="IndexList{T}"/>.Count
+        ///     of the source <see cref="IndexList{T}"/>.
         /// <br/>-or-<br/>
         ///     <paramref name="arrayIndex"/> is equal to or greater than the length of array.
         /// <br/>-or-<br/>
         ///     The number of elements from
-        ///     <paramref name="index"/> to the end of the source <see cref="SimpleList{T}"/> is greater
+        ///     <paramref name="index"/> to the end of the source <see cref="IndexList{T}"/> is greater
         ///     than the available space from <paramref name="arrayIndex"/> to the end of the destination <paramref name="array"/>.
         /// </exception>
         public void CopyTo(int index, T[] array, int arrayIndex, int count) { base.ConvertAll<T>(e => e.Data).CopyTo(index, array, arrayIndex, count); }
 
 
         /// <summary>
-        /// Determines whether an element is in the <see cref="SimpleList{T}"/>.
+        /// Determines whether an element is in the <see cref="IndexList{T}"/>.
         /// </summary>
-        /// <param name="item">The object to locate in the <see cref="SimpleList{T}"/>.</param>
-        /// <returns>true if item is found in the <see cref="SimpleList{T}"/>; otherwise, false.</returns>
+        /// <param name="item">The object to locate in the <see cref="IndexList{T}"/>.</param>
+        /// <returns>true if item is found in the <see cref="IndexList{T}"/>; otherwise, false.</returns>
         public bool Contains(T item) { return base.Exists(e => e.Data.Equals(item)); }
         /// <summary>
-        ///     Determines whether the <see cref="SimpleList{T}"/> contains elements
+        ///     Determines whether the <see cref="IndexList{T}"/> contains elements
         ///     that match the conditions defined by the specified predicate.
         /// </summary>
         /// <param name="match">
@@ -450,7 +458,7 @@ namespace s3pi.Interfaces
         ///     to search for.
         /// </param>
         /// <returns>
-        ///     true if the <see cref="SimpleList{T}"/> contains one or more elements
+        ///     true if the <see cref="IndexList{T}"/> contains one or more elements
         ///     that match the conditions defined by the specified predicate; otherwise,
         ///     false.
         /// </returns>
@@ -461,7 +469,7 @@ namespace s3pi.Interfaces
 
         /// <summary>
         ///     Searches for an element that matches the conditions defined by the specified
-        ///     predicate, and returns the first occurrence within the entire <see cref="SimpleList{T}"/>.
+        ///     predicate, and returns the first occurrence within the entire <see cref="IndexList{T}"/>.
         /// </summary>
         /// <param name="match">
         ///     The <see cref="System.Predicate{T}"/> delegate that defines the conditions of the element
@@ -495,7 +503,7 @@ namespace s3pi.Interfaces
         ///     Retrieves all the elements that match the conditions defined by the specified predicate.
         ///     Searches for an element that matches the conditions defined by the specified
         ///     predicate, and returns the zero-based index of the first occurrence within
-        ///     the entire <see cref="SimpleList{T}"/>.
+        ///     the entire <see cref="IndexList{T}"/>.
         /// </summary>
         /// <param name="match">
         ///     The <see cref="System.Predicate{T}"/> delegate that defines the conditions of the element
@@ -512,7 +520,7 @@ namespace s3pi.Interfaces
         /// <summary>
         ///     Searches for an element that matches the conditions defined by the specified
         ///     predicate, and returns the zero-based index of the first occurrence within
-        ///     the range of elements in the <see cref="SimpleList{T}"/> that extends
+        ///     the range of elements in the <see cref="IndexList{T}"/> that extends
         ///     from the specified index to the last element.
         /// </summary>
         /// <param name="startIndex">
@@ -530,13 +538,13 @@ namespace s3pi.Interfaces
         ///     <paramref name="match"/> is null.
         /// </exception>
         /// <exception cref="System.ArgumentOutOfRangeException">
-        ///     <paramref name="startIndex"/> is outside the range of valid indexes for the <see cref="SimpleList{T}"/>.
+        ///     <paramref name="startIndex"/> is outside the range of valid indexes for the <see cref="IndexList{T}"/>.
         /// </exception>
         public int FindIndex(int startIndex, Predicate<T> match) { return this.FindIndex(startIndex, this.Count - startIndex, match); }
         /// <summary>
         ///     Searches for an element that matches the conditions defined by the specified
         ///     predicate, and returns the zero-based index of the first occurrence within
-        ///     the range of elements in the <see cref="SimpleList{T}"/> that starts
+        ///     the range of elements in the <see cref="IndexList{T}"/> that starts
         ///     at the specified index and contains the specified number of elements.
         /// </summary>
         /// <param name="startIndex">
@@ -557,16 +565,16 @@ namespace s3pi.Interfaces
         ///     <paramref name="match"/> is null.
         /// </exception>
         /// <exception cref="System.ArgumentOutOfRangeException">
-        ///     <paramref name="startIndex"/> is outside the range of valid indexes for the <see cref="SimpleList{T}"/>.
+        ///     <paramref name="startIndex"/> is outside the range of valid indexes for the <see cref="IndexList{T}"/>.
         /// <br/>-or-<br/>
         ///     <paramref name="count"/> is less than 0.
         /// <br/>-or-<br/>
-        ///     <paramref name="startIndex"/> and <paramref name="count"/> do not specify a valid section in the <see cref="SimpleList{T}"/>.
+        ///     <paramref name="startIndex"/> and <paramref name="count"/> do not specify a valid section in the <see cref="IndexList{T}"/>.
         /// </exception>
         public int FindIndex(int startIndex, int count, Predicate<T> match) { return this.IndexOf(this.Find(match), startIndex, count); }
         /// <summary>
         ///     Searches for an element that matches the conditions defined by the specified
-        ///     predicate, and returns the last occurrence within the entire <see cref="SimpleList{T}"/>.
+        ///     predicate, and returns the last occurrence within the entire <see cref="IndexList{T}"/>.
         /// </summary>
         /// <param name="match">
         ///     The <see cref="System.Predicate{T}"/> delegate that defines the conditions of the element
@@ -583,7 +591,7 @@ namespace s3pi.Interfaces
         /// <summary>
         ///     Searches for an element that matches the conditions defined by the specified
         ///     predicate, and returns the zero-based index of the last occurrence within
-        ///     the entire <see cref="SimpleList{T}"/>.
+        ///     the entire <see cref="IndexList{T}"/>.
         /// </summary>
         /// <param name="match">
         ///     The <see cref="System.Predicate{T}"/> delegate that defines the conditions of the element
@@ -600,7 +608,7 @@ namespace s3pi.Interfaces
         /// <summary>
         ///     Searches for an element that matches the conditions defined by the specified
         ///     predicate, and returns the zero-based index of the last occurrence within
-        ///     the range of elements in the <see cref="SimpleList{T}"/> that
+        ///     the range of elements in the <see cref="IndexList{T}"/> that
         ///     extends from the first element to the specified index.
         /// </summary>
         /// <param name="startIndex">
@@ -618,13 +626,13 @@ namespace s3pi.Interfaces
         ///     <paramref name="match"/> is null.
         /// </exception>
         /// <exception cref="System.ArgumentOutOfRangeException">
-        ///     <paramref name="startIndex"/> is outside the range of valid indexes for the <see cref="SimpleList{T}"/>.
+        ///     <paramref name="startIndex"/> is outside the range of valid indexes for the <see cref="IndexList{T}"/>.
         /// </exception>
         public int FindLastIndex(int startIndex, Predicate<T> match) { return this.FindLastIndex(startIndex, this.Count - startIndex, match); }
         /// <summary>
         ///     Searches for an element that matches the conditions defined by the specified
         ///     predicate, and returns the zero-based index of the last occurrence within
-        ///     the range of elements in the <see cref="SimpleList{T}"/> that
+        ///     the range of elements in the <see cref="IndexList{T}"/> that
         ///     contains the specified number of elements and ends at the specified index.
         /// </summary>
         /// <param name="startIndex">
@@ -645,19 +653,19 @@ namespace s3pi.Interfaces
         ///     <paramref name="match"/> is null.
         /// </exception>
         /// <exception cref="System.ArgumentOutOfRangeException">
-        ///     <paramref name="startIndex"/> is outside the range of valid indexes for the <see cref="SimpleList{T}"/>.
+        ///     <paramref name="startIndex"/> is outside the range of valid indexes for the <see cref="IndexList{T}"/>.
         /// <br/>-or-<br/>
         ///     <paramref name="count"/> is less than 0.
         /// <br/>-or-<br/>
-        ///     <paramref name="startIndex"/> and <paramref name="count"/> do not specify a valid section in the <see cref="SimpleList{T}"/>.
+        ///     <paramref name="startIndex"/> and <paramref name="count"/> do not specify a valid section in the <see cref="IndexList{T}"/>.
         /// </exception>
         public int FindLastIndex(int startIndex, int count, Predicate<T> match) { return this.LastIndexOf(this.FindLast(match), startIndex, count); }
 
         /// <summary>
-        /// Performs the specified action on each element of the <see cref="SimpleList{T}"/>.
+        /// Performs the specified action on each element of the <see cref="IndexList{T}"/>.
         /// </summary>
         /// <param name="action">
-        /// The <see cref="System.Action{T}"/> delegate to perform on each element of the <see cref="SimpleList{T}"/>.
+        /// The <see cref="System.Action{T}"/> delegate to perform on each element of the <see cref="IndexList{T}"/>.
         /// </param>
         /// <exception cref="System.ArgumentNullException">
         ///     <paramref name="action"/> is null.
@@ -665,19 +673,19 @@ namespace s3pi.Interfaces
         public void ForEach(Action<T> action) { base.ForEach(e => action(e.Data)); }
 
         /// <summary>
-        /// Inserts the elements of a collection into the <see cref="SimpleList{T}"/> at the specified index.
+        /// Inserts the elements of a collection into the <see cref="IndexList{T}"/> at the specified index.
         /// </summary>
         /// <param name="index">The zero-based index at which the new elements should be inserted.</param>
-        /// <param name="collection">The collection whose elements should be inserted into the <see cref="SimpleList{T}"/>.
+        /// <param name="collection">The collection whose elements should be inserted into the <see cref="IndexList{T}"/>.
         /// The collection itself cannot be null, but it can contain elements that are null, if type <typeparamref name="T"/> is a reference type.</param>
         /// <exception cref="System.ArgumentNullException"><paramref name="collection"/> is null.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">
         /// <paramref name="index"/> is less than 0.
         /// <br/>-or-<br/>
-        /// <paramref name="index"/> is greater than <see cref="SimpleList{T}"/>.Count.
+        /// <paramref name="index"/> is greater than <see cref="IndexList{T}"/>.Count.
         /// </exception>
         /// <exception cref="System.InvalidOperationException">Thrown when list size would be exceeded.</exception>
-        /// <exception cref="System.NotSupportedException">The <see cref="SimpleList{T}"/> is read-only.</exception>
+        /// <exception cref="System.NotSupportedException">The <see cref="IndexList{T}"/> is read-only.</exception>
         /// <remarks>Calls <see cref="Insert(int, T)"/> for each item in <paramref name="collection"/>.</remarks>
         public virtual void InsertRange(int index, IEnumerable<T> collection)
         {
@@ -695,31 +703,31 @@ namespace s3pi.Interfaces
 
         /// <summary>
         ///     Searches for the specified object and returns the zero-based index of the
-        ///     first occurrence within the range of elements in the <see cref="SimpleList{T}"/>
+        ///     first occurrence within the range of elements in the <see cref="IndexList{T}"/>
         ///     that extends from the specified index to the last element.
         /// </summary>
         /// <param name="item">
-        ///     The object to locate in the <see cref="SimpleList{T}"/>.
+        ///     The object to locate in the <see cref="IndexList{T}"/>.
         /// </param>
         /// <param name="index">
         ///     The zero-based starting index of the search.
         /// </param>
         /// <returns>
         ///     The zero-based index of the first occurrence of item within the range of
-        ///     elements in the <see cref="SimpleList{T}"/> that extends from index
+        ///     elements in the <see cref="IndexList{T}"/> that extends from index
         ///     to the last element, if found; otherwise, –1.
         /// </returns>
         /// <exception cref="System.ArgumentOutOfRangeException">
-        ///     index is outside the range of valid indexes for the <see cref="SimpleList{T}"/>.
+        ///     index is outside the range of valid indexes for the <see cref="IndexList{T}"/>.
         /// </exception>
         public int IndexOf(T item, int index) { return this.IndexOf(item, index, this.Count - index); }
         /// <summary>
         ///     Searches for the specified object and returns the zero-based index of the
-        ///     first occurrence within the range of elements in the <see cref="SimpleList{T}"/>
+        ///     first occurrence within the range of elements in the <see cref="IndexList{T}"/>
         ///     that starts at the specified index and contains the specified number of elements.
         /// </summary>
         /// <param name="item">
-        ///     The object to locate in the <see cref="SimpleList{T}"/>.
+        ///     The object to locate in the <see cref="IndexList{T}"/>.
         /// </param>
         /// <param name="index">
         ///     The zero-based starting index of the search.
@@ -729,58 +737,58 @@ namespace s3pi.Interfaces
         /// </param>
         /// <returns>
         ///     The zero-based index of the first occurrence of item within the range of
-        ///     elements in the <see cref="SimpleList{T}"/> that
+        ///     elements in the <see cref="IndexList{T}"/> that
         ///     starts at <paramref name="index"/> and contains <paramref name="count"/> number of elements,
         ///     if found; otherwise, –1.
         /// </returns>
         /// <exception cref="System.ArgumentOutOfRangeException">
-        ///     index is outside the range of valid indexes for the <see cref="SimpleList{T}"/>.
+        ///     index is outside the range of valid indexes for the <see cref="IndexList{T}"/>.
         ///     <br/>-or-<br/>
         ///     count is less than 0.
         ///     <br/>-or-<br/>
-        ///     index and count do not specify a valid section in the <see cref="SimpleList{T}"/>.
+        ///     index and count do not specify a valid section in the <see cref="IndexList{T}"/>.
         /// </exception>
         public int IndexOf(T item, int index, int count) { return base.IndexOf(base.Find(e => e.Data.Equals(item)), index, count); }
         /// <summary>
         ///     Searches for the specified object and returns the zero-based index of the
-        ///     last occurrence within the entire <see cref="SimpleList{T}"/>.
+        ///     last occurrence within the entire <see cref="IndexList{T}"/>.
         /// </summary>
         /// <param name="item">
-        ///     The object to locate in the <see cref="SimpleList{T}"/>.
+        ///     The object to locate in the <see cref="IndexList{T}"/>.
         /// </param>
         /// <returns>
-        ///     The zero-based index of the last occurrence of item within the entire <see cref="SimpleList{T}"/>,
+        ///     The zero-based index of the last occurrence of item within the entire <see cref="IndexList{T}"/>,
         ///     if found; otherwise, –1.
         /// </returns>
         public int LastIndexOf(T item) { return this.LastIndexOf(item, this.Count - 1, this.Count); }
         /// <summary>
         ///     Searches for the specified object and returns the zero-based index of the
-        ///     last occurrence within the range of elements in the <see cref="SimpleList{T}"/>
+        ///     last occurrence within the range of elements in the <see cref="IndexList{T}"/>
         ///     that extends from the first element to the specified index.
         /// </summary>
         /// <param name="item">
-        ///     The object to locate in the <see cref="SimpleList{T}"/>.
+        ///     The object to locate in the <see cref="IndexList{T}"/>.
         /// </param>
         /// <param name="index">
         ///     The zero-based starting index of the backward search.
         /// </param>
         /// <returns>
         ///     The zero-based index of the last occurrence of item within the range of
-        ///     elements in the <see cref="SimpleList{T}"/> that
+        ///     elements in the <see cref="IndexList{T}"/> that
         ///     extends from the first element and ends at <paramref name="index"/>,
         ///     if found; otherwise, –1.
         /// </returns>
         /// <exception cref="System.ArgumentOutOfRangeException">
-        ///     index is outside the range of valid indexes for the <see cref="SimpleList{T}"/>.
+        ///     index is outside the range of valid indexes for the <see cref="IndexList{T}"/>.
         /// </exception>
         public int LastIndexOf(T item, int index) { return this.LastIndexOf(item, index, index + 1); }
         /// <summary>
         ///     Searches for the specified object and returns the zero-based index of the
-        ///     last occurrence within the range of elements in the <see cref="SimpleList{T}"/>
+        ///     last occurrence within the range of elements in the <see cref="IndexList{T}"/>
         ///     that contains the specified number of elements and ends at the specified index.
         /// </summary>
         /// <param name="item">
-        ///     The object to locate in the <see cref="SimpleList{T}"/>.
+        ///     The object to locate in the <see cref="IndexList{T}"/>.
         /// </param>
         /// <param name="index">
         ///     The zero-based starting index of the backward search.
@@ -790,27 +798,27 @@ namespace s3pi.Interfaces
         /// </param>
         /// <returns>
         ///     The zero-based index of the last occurrence of item within the range of
-        ///     elements in the <see cref="SimpleList{T}"/> that
+        ///     elements in the <see cref="IndexList{T}"/> that
         ///     contains <paramref name="count"/> number of elements and ends at <paramref name="index"/>,
         ///     if found; otherwise, –1.
         /// </returns>
         /// <exception cref="System.ArgumentOutOfRangeException">
-        ///     index is outside the range of valid indexes for the <see cref="SimpleList{T}"/>.
+        ///     index is outside the range of valid indexes for the <see cref="IndexList{T}"/>.
         ///     <br/>-or-<br/>
         ///     count is less than 0.
         ///     <br/>-or-<br/>
-        ///     index and count do not specify a valid section in the <see cref="SimpleList{T}"/>.
+        ///     index and count do not specify a valid section in the <see cref="IndexList{T}"/>.
         /// </exception>
         public int LastIndexOf(T item, int index, int count) { return base.LastIndexOf(base.FindLast(e => e.Data.Equals(item)), index, count); }
 
         /// <summary>
-        /// Removes the first occurrence of an entry from the <see cref="SimpleList{T}"/> with the value given.
+        /// Removes the first occurrence of an entry from the <see cref="IndexList{T}"/> with the value given.
         /// </summary>
-        /// <param name="item">The value to remove from the <see cref="SimpleList{T}"/>.</param>
+        /// <param name="item">The value to remove from the <see cref="IndexList{T}"/>.</param>
         /// <returns>
-        /// true if item was successfully removed from the <see cref="SimpleList{T}"/>
+        /// true if item was successfully removed from the <see cref="IndexList{T}"/>
         /// otherwise, false. This method also returns false if item is not found in
-        /// the original <see cref="SimpleList{T}"/>.
+        /// the original <see cref="IndexList{T}"/>.
         /// </returns>
         /// <exception cref="System.NotSupportedException">The <see cref="AHandlerList{T}"/> is read-only.</exception>
         public virtual bool Remove(T item) { int index = this.IndexOf(item); if (index < 0) return false; this.RemoveAt(index); return true; }
@@ -818,22 +826,22 @@ namespace s3pi.Interfaces
         /// Removes the all the elements that match the conditions defined by the specified predicate.
         /// </summary>
         /// <param name="match">The <see cref="System.Predicate{T}"/> delegate that defines the conditions of the elements to remove.</param>
-        /// <returns>The number of elements removed from the <see cref="SimpleList{T}"/>.</returns>
+        /// <returns>The number of elements removed from the <see cref="IndexList{T}"/>.</returns>
         /// <exception cref="System.ArgumentNullException"><paramref name="match"/> is null.</exception>
-        /// <exception cref="System.NotSupportedException">The <see cref="SimpleList{T}"/> is read-only.</exception>
+        /// <exception cref="System.NotSupportedException">The <see cref="IndexList{T}"/> is read-only.</exception>
         public virtual int RemoveAll(Predicate<T> match) { return base.RemoveAll(e => match(e.Data)); }
 
         /// <summary>
-        /// Sorts the elements in the entire <see cref="SimpleList{T}"/> using the specified <see cref="Comparison{T}"/>.
+        /// Sorts the elements in the entire <see cref="IndexList{T}"/> using the specified <see cref="Comparison{T}"/>.
         /// </summary>
         /// <param name="comparison">The <see cref="Comparison{T}"/> to use when comparing elements.</param>
         /// <exception cref="System.ArgumentException">The implementation of <paramref name="comparison"/> caused an error during the sort.
         /// For example, <paramref name="comparison"/> might not return 0 when comparing an item with itself.</exception>
         /// <exception cref="System.ArgumentNullException"><paramref name="comparison"/> is null.</exception>
-        /// <exception cref="System.NotSupportedException">The <see cref="SimpleList{T}"/> is read-only.</exception>
+        /// <exception cref="System.NotSupportedException">The <see cref="IndexList{T}"/> is read-only.</exception>
         public virtual void Sort(Comparison<T> comparison) { base.Sort((x, y) => comparison(x.Data, y.Data)); }
         /// <summary>
-        /// Sorts the elements in the entire <see cref="SimpleList{T}"/> using the specified comparer.
+        /// Sorts the elements in the entire <see cref="IndexList{T}"/> using the specified comparer.
         /// </summary>
         /// <param name="comparer">The <see cref="IComparer{T}"/> implementation to use when comparing elements,
         /// or null to use the default comparer <see cref="Comparer{T}.Default"/>.</param>
@@ -846,17 +854,17 @@ namespace s3pi.Interfaces
         /// cannot find implementation of the <see cref="IComparable{T}"/> generic interface
         /// or the System.IComparable interface for type <typeparamref name="T"/>.
         /// </exception>
-        /// <exception cref="System.NotSupportedException">The <see cref="SimpleList{T}"/> is read-only.</exception>
+        /// <exception cref="System.NotSupportedException">The <see cref="IndexList{T}"/> is read-only.</exception>
         public virtual void Sort(IComparer<T> comparer) { if (comparer != null) this.Sort(comparer.Compare); else this.Sort(); }
         /// <summary>
-        /// Sorts the elements in a range of elements in <see cref="SimpleList{T}"/> using the specified comparer.
+        /// Sorts the elements in a range of elements in <see cref="IndexList{T}"/> using the specified comparer.
         /// </summary>
         /// <param name="index">The zero-based starting index of the range to sort.</param>
         /// <param name="count">The number of elements in the range to sort.</param>
         /// <param name="comparer">The <see cref="IComparer{T}"/> implementation to use when comparing elements,
         /// or null to use the default comparer <see cref="Comparer{T}.Default"/>.</param>
         /// <exception cref="System.ArgumentException">
-        /// <paramref name="index"/> and <paramref name="count"/> do not denote a valid range of elements in the <see cref="SimpleList{T}"/>.
+        /// <paramref name="index"/> and <paramref name="count"/> do not denote a valid range of elements in the <see cref="IndexList{T}"/>.
         /// <br/>-or-<br/>
         /// The implementation of <paramref name="comparer"/> caused an error during the sort.
         /// For example, <paramref name="comparer"/> might not return 0 when comparing an item with itself.
@@ -869,7 +877,7 @@ namespace s3pi.Interfaces
         /// <br/>-or-<br/>
         /// <paramref name="count"/> is less than 0.
         /// </exception>
-        /// <exception cref="System.NotSupportedException">The <see cref="SimpleList{T}"/> is read-only.</exception>
+        /// <exception cref="System.NotSupportedException">The <see cref="IndexList{T}"/> is read-only.</exception>
         public virtual void Sort(int index, int count, IComparer<T> comparer) { base.Sort(index, count, new SimpleComparer(comparer)); }
         #region SimpleComparer
         class SimpleComparer : IComparer<TGIBlockListIndex<T>>
@@ -880,20 +888,20 @@ namespace s3pi.Interfaces
         #endregion
 
         /// <summary>
-        ///     Copies the elements of the <see cref="SimpleList{T}"/> to a new array.
+        ///     Copies the elements of the <see cref="IndexList{T}"/> to a new array.
         /// </summary>
         /// <returns>
-        ///     An array containing copies of the elements of the <see cref="SimpleList{T}"/>.
+        ///     An array containing copies of the elements of the <see cref="IndexList{T}"/>.
         /// </returns>
         public new T[] ToArray() { return base.ConvertAll<T>(e => e.Data).ToArray(); }
 
         /// <summary>
-        ///     Determines whether every element in the <see cref="SimpleList{T}"/>
+        ///     Determines whether every element in the <see cref="IndexList{T}"/>
         ///     matches the conditions defined by the specified predicate.
         /// </summary>
         /// <param name="match">The <see cref="System.Predicate{T}"/> delegate that defines the conditions to check against the elements.</param>
         /// <returns>
-        ///     true if every element in the <see cref="SimpleList{T}"/> matches the
+        ///     true if every element in the <see cref="IndexList{T}"/> matches the
         ///     conditions defined by the specified predicate; otherwise, false. If the list
         ///     has no elements, the return value is true.
         /// </returns>
@@ -907,31 +915,31 @@ namespace s3pi.Interfaces
         /// </summary>
         /// <param name="index">The zero-based index of the element to get or set.</param>
         /// <returns>The element at the specified index.</returns>
-        /// <exception cref="System.ArgumentOutOfRangeException"><paramref name="index"/> is not a valid index in the <see cref="SimpleList{T}"/>.</exception>
-        /// <exception cref="System.NotSupportedException">The <see cref="SimpleList{T}"/> is read-only.</exception>
+        /// <exception cref="System.ArgumentOutOfRangeException"><paramref name="index"/> is not a valid index in the <see cref="IndexList{T}"/>.</exception>
+        /// <exception cref="System.NotSupportedException">The <see cref="IndexList{T}"/> is read-only.</exception>
         public new virtual T this[int index] { get { return base[index].Data; } set { if (!base[index].Data.Equals(value)) { base[index].Data = value; OnListChanged(); } } }
 
         /// <summary>
         ///     Searches for the specified object and returns the zero-based index of the
-        ///     first occurrence within the entire <see cref="SimpleList{T}"/>.
+        ///     first occurrence within the entire <see cref="IndexList{T}"/>.
         /// </summary>
         /// <param name="item">
-        ///     The object to locate in the <see cref="SimpleList{T}"/>.
+        ///     The object to locate in the <see cref="IndexList{T}"/>.
         /// </param>
         /// <returns>
-        ///     The zero-based index of the first occurrence of item within the entire <see cref="SimpleList{T}"/>,
+        ///     The zero-based index of the first occurrence of item within the entire <see cref="IndexList{T}"/>,
         ///     if found; otherwise, –1.
         /// </returns>
         public int IndexOf(T item) { return this.IndexOf(item, 0, this.Count); }
         /// <summary>
-        /// Inserts an item to the <see cref="SimpleList{T}"/> at the specified index.
+        /// Inserts an item to the <see cref="IndexList{T}"/> at the specified index.
         /// </summary>
         /// <param name="index">The zero-based index at which item should be inserted.</param>
-        /// <param name="item">The object to insert into the <see cref="SimpleList{T}"/>.</param>
-        /// <exception cref="System.ArgumentOutOfRangeException"><paramref name="index"/> is not a valid index in the <see cref="SimpleList{T}"/>.</exception>
+        /// <param name="item">The object to insert into the <see cref="IndexList{T}"/>.</param>
+        /// <exception cref="System.ArgumentOutOfRangeException"><paramref name="index"/> is not a valid index in the <see cref="IndexList{T}"/>.</exception>
         /// <exception cref="System.InvalidOperationException">Thrown when list size exceeded.</exception>
-        /// <exception cref="System.NotSupportedException">The <see cref="SimpleList{T}"/> is read-only.</exception>
-        public virtual void Insert(int index, T item) { base.Insert(index, new TGIBlockListIndex<T>(0, elementHandler, item) { ParentTGIBlocks = ParentTGIBlocks }); }
+        /// <exception cref="System.NotSupportedException">The <see cref="IndexList{T}"/> is read-only.</exception>
+        public virtual void Insert(int index, T item) { base.Insert(index, new TGIBlockListIndex<T>(0, elementHandler, item, _ParentTGIBlocks)); }
         #endregion
 
         #region IEnumerable<T>
@@ -959,7 +967,17 @@ namespace s3pi.Interfaces
         /// <param name="readCount">Optional; default is to read a <see cref="Int32"/> from the <see cref="Stream"/>.</param>
         /// <param name="writeCount">Optional; default is to write a <see cref="Int32"/> to the <see cref="Stream"/>.</param>
         /// <param name="size">Optional list size (should be <c>byte.MaxValue</c> or below).</param>
-        public ByteIndexList(EventHandler handler, ReadCountMethod readCount = null, WriteCountMethod writeCount = null, long size = byte.MaxValue) : base(handler, ReadByte, WriteByte, size, readCount, writeCount) { }
+        /// <param name="ParentTGIBlocks">Optional; default parent <see cref="DependentList{TGIBlock}"/> into which elements of this list index.</param>
+        public ByteIndexList(EventHandler handler, ReadCountMethod readCount = null, WriteCountMethod writeCount = null, long size = byte.MaxValue, DependentList<TGIBlock> ParentTGIBlocks = null)
+            : base(handler, ReadByte, WriteByte, size, readCount, writeCount, ParentTGIBlocks) { }
+        /// <summary>
+        /// Create an empty ByteIndexList, setting the <paramref name="ParentTGIBlocks"/> as passed.
+        /// Defaults will be used for list size limit and Data I/O handlers used for the count.
+        /// </summary>
+        /// <param name="handler">Event handler.</param>
+        /// <param name="ParentTGIBlocks">Default parent <see cref="DependentList{TGIBlock}"/> into which elements of this list index.</param>
+        public ByteIndexList(EventHandler handler, DependentList<TGIBlock> ParentTGIBlocks)
+            : this(handler, null, null, byte.MaxValue, ParentTGIBlocks) { }
         /// <summary>
         /// Create a UIntList populated from an existing set of values.
         /// </summary>
@@ -968,7 +986,18 @@ namespace s3pi.Interfaces
         /// <param name="readCount">Optional; default is to read a <see cref="Int32"/> from the <see cref="Stream"/>.</param>
         /// <param name="writeCount">Optional; default is to write a <see cref="Int32"/> to the <see cref="Stream"/>.</param>
         /// <param name="size">Optional list size (should be <c>byte.MaxValue</c> or below).</param>
-        public ByteIndexList(EventHandler handler, IEnumerable<Byte> basis, ReadCountMethod readCount = null, WriteCountMethod writeCount = null, long size = byte.MaxValue) : base(handler, basis, ReadByte, WriteByte, size, readCount, writeCount) { }
+        /// <param name="ParentTGIBlocks">Optional; default parent <see cref="DependentList{TGIBlock}"/> into which elements of this list index.</param>
+        public ByteIndexList(EventHandler handler, IEnumerable<Byte> basis, ReadCountMethod readCount = null, WriteCountMethod writeCount = null, long size = byte.MaxValue, DependentList<TGIBlock> ParentTGIBlocks = null)
+            : base(handler, basis, ReadByte, WriteByte, size, readCount, writeCount, ParentTGIBlocks) { }
+        /// <summary>
+        /// Create a ByteIndexList populated from an existing set of values, setting the <paramref name="ParentTGIBlocks"/> as passed.
+        /// There will be no list size limit and default Data I/O handlers will be used for the count.
+        /// </summary>
+        /// <param name="handler">Event handler.</param>
+        /// <param name="basis">Basis on which to populate the list.</param>
+        /// <param name="ParentTGIBlocks">Default parent <see cref="DependentList{TGIBlock}"/> into which elements of this list index.</param>
+        public ByteIndexList(EventHandler handler, IEnumerable<Byte> basis, DependentList<TGIBlock> ParentTGIBlocks)
+            : this(handler, basis, null, null, byte.MaxValue, ParentTGIBlocks) { }
         /// <summary>
         /// Create a UIntList populated from a <see cref="Stream"/>.
         /// </summary>
@@ -977,7 +1006,18 @@ namespace s3pi.Interfaces
         /// <param name="readCount">Optional; default is to read a <see cref="Int32"/> from the <see cref="Stream"/>.</param>
         /// <param name="writeCount">Optional; default is to write a <see cref="Int32"/> to the <see cref="Stream"/>.</param>
         /// <param name="size">Optional list size (should be <c>byte.MaxValue</c> or below).</param>
-        public ByteIndexList(EventHandler handler, Stream s, ReadCountMethod readCount = null, WriteCountMethod writeCount = null, long size = byte.MaxValue) : base(handler, s, ReadByte, WriteByte, size, readCount, writeCount) { }
+        /// <param name="ParentTGIBlocks">Optional; default parent <see cref="DependentList{TGIBlock}"/> into which elements of this list index.</param>
+        public ByteIndexList(EventHandler handler, Stream s, ReadCountMethod readCount = null, WriteCountMethod writeCount = null, long size = byte.MaxValue, DependentList<TGIBlock> ParentTGIBlocks = null)
+            : base(handler, s, ReadByte, WriteByte, size, readCount, writeCount, ParentTGIBlocks) { }
+        /// <summary>
+        /// Create a ByteIndexList populated from a <see cref="Stream"/>, setting the <paramref name="ParentTGIBlocks"/> as passed.
+        /// There will be no list size limit and default Data I/O handlers will be used for the count.
+        /// </summary>
+        /// <param name="handler">Event handler.</param>
+        /// <param name="s"><see cref="Stream"/> from which to read elements.</param>
+        /// <param name="ParentTGIBlocks">Default parent <see cref="DependentList{TGIBlock}"/> into which elements of this list index.</param>
+        public ByteIndexList(EventHandler handler, Stream s, DependentList<TGIBlock> ParentTGIBlocks)
+            : this(handler, s, null, null, byte.MaxValue, ParentTGIBlocks) { }
         #endregion
 
         #region Data I/O
@@ -999,7 +1039,17 @@ namespace s3pi.Interfaces
         /// <param name="size">Optional list size.</param>
         /// <param name="readCount">Optional; default is to read a <see cref="Int32"/> from the <see cref="Stream"/>.</param>
         /// <param name="writeCount">Optional; default is to write a <see cref="Int32"/> to the <see cref="Stream"/>.</param>
-        public Int32IndexList(EventHandler handler, long size = -1, ReadCountMethod readCount = null, WriteCountMethod writeCount = null) : base(handler, ReadInt32, WriteInt32, size, readCount, writeCount) { }
+        /// <param name="ParentTGIBlocks">Optional; default parent <see cref="DependentList{TGIBlock}"/> into which elements of this list index.</param>
+        public Int32IndexList(EventHandler handler, long size = -1, ReadCountMethod readCount = null, WriteCountMethod writeCount = null, DependentList<TGIBlock> ParentTGIBlocks = null)
+            : base(handler, ReadInt32, WriteInt32, size, readCount, writeCount, ParentTGIBlocks) { }
+        /// <summary>
+        /// Create an empty UIntList, setting the <paramref name="ParentTGIBlocks"/> as passed.
+        /// There will be no list size limit and default Data I/O handlers will be used for the count.
+        /// </summary>
+        /// <param name="handler">Event handler.</param>
+        /// <param name="ParentTGIBlocks">Default parent <see cref="DependentList{TGIBlock}"/> into which elements of this list index.</param>
+        public Int32IndexList(EventHandler handler, DependentList<TGIBlock> ParentTGIBlocks)
+            : this(handler, -1, null, null, ParentTGIBlocks) { }
         /// <summary>
         /// Create a UIntList populated from an existing set of values.
         /// </summary>
@@ -1008,7 +1058,18 @@ namespace s3pi.Interfaces
         /// <param name="size">Optional list size.</param>
         /// <param name="readCount">Optional; default is to read a <see cref="Int32"/> from the <see cref="Stream"/>.</param>
         /// <param name="writeCount">Optional; default is to write a <see cref="Int32"/> to the <see cref="Stream"/>.</param>
-        public Int32IndexList(EventHandler handler, IEnumerable<Int32> basis, long size = -1, ReadCountMethod readCount = null, WriteCountMethod writeCount = null) : base(handler, basis, ReadInt32, WriteInt32, size, readCount, writeCount) { }
+        /// <param name="ParentTGIBlocks">Optional; default parent <see cref="DependentList{TGIBlock}"/> into which elements of this list index.</param>
+        public Int32IndexList(EventHandler handler, IEnumerable<Int32> basis, long size = -1, ReadCountMethod readCount = null, WriteCountMethod writeCount = null, DependentList<TGIBlock> ParentTGIBlocks = null)
+            : base(handler, basis, ReadInt32, WriteInt32, size, readCount, writeCount, ParentTGIBlocks) { }
+        /// <summary>
+        /// Create a UIntList populated from an existing set of values, setting the <paramref name="ParentTGIBlocks"/> as passed.
+        /// There will be no list size limit and default Data I/O handlers will be used for the count.
+        /// </summary>
+        /// <param name="handler">Event handler.</param>
+        /// <param name="basis">Basis on which to populate the list.</param>
+        /// <param name="ParentTGIBlocks">Default parent <see cref="DependentList{TGIBlock}"/> into which elements of this list index.</param>
+        public Int32IndexList(EventHandler handler, IEnumerable<Int32> basis, DependentList<TGIBlock> ParentTGIBlocks)
+            : this(handler, basis, -1, null, null, ParentTGIBlocks) { }
         /// <summary>
         /// Create a UIntList populated from a <see cref="Stream"/>.
         /// </summary>
@@ -1017,7 +1078,18 @@ namespace s3pi.Interfaces
         /// <param name="size">Optional list size.</param>
         /// <param name="readCount">Optional; default is to read a <see cref="Int32"/> from the <see cref="Stream"/>.</param>
         /// <param name="writeCount">Optional; default is to write a <see cref="Int32"/> to the <see cref="Stream"/>.</param>
-        public Int32IndexList(EventHandler handler, Stream s, long size = -1, ReadCountMethod readCount = null, WriteCountMethod writeCount = null) : base(handler, s, ReadInt32, WriteInt32, size, readCount, writeCount) { }
+        /// <param name="ParentTGIBlocks">Optional; default parent <see cref="DependentList{TGIBlock}"/> into which elements of this list index.</param>
+        public Int32IndexList(EventHandler handler, Stream s, long size = -1, ReadCountMethod readCount = null, WriteCountMethod writeCount = null, DependentList<TGIBlock> ParentTGIBlocks = null)
+            : base(handler, s, ReadInt32, WriteInt32, size, readCount, writeCount, ParentTGIBlocks) { }
+        /// <summary>
+        /// Create a UIntList populated from a <see cref="Stream"/>, setting the <paramref name="ParentTGIBlocks"/> as passed.
+        /// There will be no list size limit and default Data I/O handlers will be used for the count.
+        /// </summary>
+        /// <param name="handler">Event handler.</param>
+        /// <param name="s"><see cref="Stream"/> from which to read elements.</param>
+        /// <param name="ParentTGIBlocks">Default parent <see cref="DependentList{TGIBlock}"/> into which elements of this list index.</param>
+        public Int32IndexList(EventHandler handler, Stream s, DependentList<TGIBlock> ParentTGIBlocks)
+            : this(handler, s, -1, null, null, ParentTGIBlocks) { }
         #endregion
 
         #region Data I/O
