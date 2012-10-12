@@ -74,8 +74,6 @@
     <Compile Include="Quaternion.cs" />
     <Compile Include="DependentList.cs" />
     <Compile Include="SimpleList.cs" />
-    <Compile Include="ConstructorParametersAttribute.cs" />
-    <Compile Include="DataGridExpandableAttribute.cs" />
     <Compile Include="ElementPriorityAttribute.cs" />
     <Compile Include="IGenericAdd.cs" />
     <Compile Include="IResourceKey.cs" />
