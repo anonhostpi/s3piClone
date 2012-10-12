@@ -515,7 +515,11 @@ namespace s3pi.Interfaces
         /// </summary>
         /// <param name="handler">The replacement <see cref="EventHandler"/> delegate.</param>
         /// <returns>Return a copy of the <see cref="AHandlerElement"/> but with a new change <see cref="EventHandler"/>.</returns>
-        public abstract AHandlerElement Clone(EventHandler handler);
+        //public abstract AHandlerElement Clone(EventHandler handler);
+        public virtual AHandlerElement Clone(EventHandler handler)
+        {
+            return Activator.CreateInstance(this.GetType(), new object[] { requestedApiVersion, handler, this, }) as AHandlerElement;
+        }
         /// <summary>
         /// Flag the <see cref="AHandlerElement"/> as dirty and invoke the <see cref="EventHandler"/> delegate.
         /// </summary>
@@ -525,6 +529,12 @@ namespace s3pi.Interfaces
             //Console.WriteLine(this.GetType().Name + " dirtied.");
             if (handler != null) handler(this, EventArgs.Empty);
         }
+
+        /// <summary>
+        /// Change the element change handler to <paramref name="handler"/>.
+        /// </summary>
+        /// <param name="handler">The new element change handler.</param>
+        internal void SetHandler(EventHandler handler) { if (this.handler != handler) this.handler = handler; }
     }
 
     /// <summary>
@@ -568,10 +578,7 @@ namespace s3pi.Interfaces
         /// </summary>
         /// <param name="handler">The replacement HandlerElement delegate.</param>
         /// <returns>Return a copy of the HandlerElement but with a new change <see cref="EventHandler"/>.</returns>
-        public override AHandlerElement Clone(EventHandler handler)
-        {
-            return new HandlerElement<T>(requestedApiVersion, handler, val);
-        }
+        public override AHandlerElement Clone(EventHandler handler) { return new HandlerElement<T>(requestedApiVersion, handler, val); }
 
         /// <summary>
         /// The best supported version of the API available
@@ -663,15 +670,9 @@ namespace s3pi.Interfaces
         /// </summary>
         /// <param name="APIversion">The requested API version.</param>
         /// <param name="handler">The <see cref="EventHandler"/> delegate to invoke if the <see cref="AHandlerElement"/> changes.</param>
-        public TGIBlockListIndex(int APIversion, EventHandler handler) : this(APIversion, handler, default(T)) { }
-
-        /// <summary>
-        /// Initialize a new instance with an initial value of <paramref name="basis"/>.
-        /// </summary>
-        /// <param name="APIversion">The requested API version.</param>
-        /// <param name="handler">The <see cref="EventHandler"/> delegate to invoke if the <see cref="AHandlerElement"/> changes.</param>
-        /// <param name="basis">Initial value for instance.</param>
-        public TGIBlockListIndex(int APIversion, EventHandler handler, T basis) : base(APIversion, handler) { data = basis; }
+        /// <param name="ParentTGIBlocks">Reference to list into which this is an index.</param>
+        public TGIBlockListIndex(int APIversion, EventHandler handler, DependentList<TGIBlock> ParentTGIBlocks = null)
+            : this(APIversion, handler, default(T), ParentTGIBlocks) { }
 
         /// <summary>
         /// Initialize a new instance with an initial value from <paramref name="basis"/>.
@@ -679,18 +680,27 @@ namespace s3pi.Interfaces
         /// <param name="APIversion">The requested API version.</param>
         /// <param name="handler">The <see cref="EventHandler"/> delegate to invoke if the <see cref="AHandlerElement"/> changes.</param>
         /// <param name="basis">Element containing the initial value for instance.</param>
-        public TGIBlockListIndex(int APIversion, EventHandler handler, TGIBlockListIndex<T> basis) : base(APIversion, handler) { data = basis.data; }
+        /// <param name="ParentTGIBlocks">Reference to list into which this is an index, or null to use that in <paramref name="basis"/>.</param>
+        public TGIBlockListIndex(int APIversion, EventHandler handler, TGIBlockListIndex<T> basis, DependentList<TGIBlock> ParentTGIBlocks = null)
+            : this(APIversion, handler, basis.data, ParentTGIBlocks ?? basis.ParentTGIBlocks) { }
+
+        /// <summary>
+        /// Initialize a new instance with an initial value of <paramref name="value"/>.
+        /// </summary>
+        /// <param name="APIversion">The requested API version.</param>
+        /// <param name="handler">The <see cref="EventHandler"/> delegate to invoke if the <see cref="AHandlerElement"/> changes.</param>
+        /// <param name="value">Initial value for instance.</param>
+        /// <param name="ParentTGIBlocks">Reference to list into which this is an index.</param>
+        public TGIBlockListIndex(int APIversion, EventHandler handler, T value, DependentList<TGIBlock> ParentTGIBlocks = null)
+            : base(APIversion, handler) { this.ParentTGIBlocks = ParentTGIBlocks; data = value; }
 
         #region AHandlerElement
-        /// <summary>
-        /// Get a copy of the HandlerElement but with a new change <see cref="EventHandler"/>.
-        /// </summary>
-        /// <param name="handler">The replacement HandlerElement delegate.</param>
-        /// <returns>Return a copy of the HandlerElement but with a new change <see cref="EventHandler"/>.</returns>
-        public override AHandlerElement Clone(EventHandler handler)
-        {
-            return new TGIBlockListIndex<T>(requestedApiVersion, handler, data) { ParentTGIBlocks = ParentTGIBlocks };
-        }
+        // /// <summary>
+        // /// Get a copy of the HandlerElement but with a new change <see cref="EventHandler"/>.
+        // /// </summary>
+        // /// <param name="handler">The replacement HandlerElement delegate.</param>
+        // /// <returns>Return a copy of the HandlerElement but with a new change <see cref="EventHandler"/>.</returns>
+        // public override AHandlerElement Clone(EventHandler handler) { return new TGIBlockListIndex<T>(requestedApiVersion, handler, data) { ParentTGIBlocks = ParentTGIBlocks }; }
 
         /// <summary>
         /// The best supported version of the API available
