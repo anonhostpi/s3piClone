@@ -27,7 +27,7 @@ namespace StblResource
     /// <summary>
     /// A resource wrapper that understands String Table resources
     /// </summary>
-    [ConstructorParameters(new object[] { (ulong)0, "" })]
+    //[ConstructorParameters(new object[] { (ulong)0, "" })]
     public class StblResource : AResource, IDictionary<ulong, string>, System.Collections.IDictionary
     {
         const int recommendedApiVersion = 1;
@@ -185,6 +185,12 @@ namespace StblResource
         public object SyncRoot { get { return null; } }
 
         #endregion
+
+        /// <summary>
+        /// Return the default dictionary entry for this <c>IDictionary{TKey, TValue}</c>.
+        /// </summary>
+        /// <returns>The default dictionary entry for this <c>IDictionary{TKey, TValue}</c>.</returns>
+        public static System.Collections.DictionaryEntry GetDefault() { return new System.Collections.DictionaryEntry((ulong)0, ""); }
 
         #region Content Fields
         public ushort Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnResourceChanged(this, EventArgs.Empty); } } }

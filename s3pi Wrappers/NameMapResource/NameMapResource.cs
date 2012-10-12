@@ -27,7 +27,7 @@ namespace NameMapResource
     /// <summary>
     /// A resource wrapper that understands 0x0166038C resources
     /// </summary>
-    [ConstructorParameters(new object[] { (ulong)0, "" })]
+    //[ConstructorParameters(new object[] { (ulong)0, "" })]
     public class NameMapResource : AResource, IDictionary<ulong, string>, System.Collections.IDictionary
     {
         static bool checking = s3pi.Settings.Settings.Checking;
@@ -82,6 +82,11 @@ namespace NameMapResource
         }
 
 
+        /// <summary>
+        /// Return the default dictionary entry for this <c>IDictionary{TKey, TValue}</c>.
+        /// </summary>
+        /// <returns>The default dictionary entry for this <c>IDictionary{TKey, TValue}</c>.</returns>
+        public static System.Collections.DictionaryEntry GetDefault() { return new System.Collections.DictionaryEntry((ulong)0, ""); }
 
         [MinimumVersion(1)]
         [MaximumVersion(recommendedApiVersion)]
