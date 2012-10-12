@@ -77,7 +77,7 @@ namespace meshExpImp.ModelBlocks
             return s;
         }
 
-        public override AHandlerElement Clone(EventHandler handler) { return new MLOD(requestedApiVersion, handler, this); }
+        //public override AHandlerElement Clone(EventHandler handler) { return new MLOD(requestedApiVersion, handler, this); }
         #endregion
 
         #region Sub-types
@@ -154,10 +154,7 @@ namespace meshExpImp.ModelBlocks
                 bw.Write(mPrimitiveCount);
             }
 
-            public override AHandlerElement Clone(EventHandler handler)
-            {
-                return new GeometryState(0, handler, this);
-            }
+            //public override AHandlerElement Clone(EventHandler handler) { return new GeometryState(0, handler, this); }
 
             public override List<string> ContentFields
             {
@@ -221,7 +218,7 @@ namespace meshExpImp.ModelBlocks
             protected override GeometryState CreateElement(Stream s) { return new GeometryState(0, handler, s); }
             protected override void WriteElement(Stream s, GeometryState element) { element.UnParse(s); }
 
-            public override void Add() { Add(new GeometryState(0, handler)); }
+            //public override void Add() { Add(new GeometryState(0, handler)); }
         }
 
         public class Mesh : AHandlerElement, IEquatable<Mesh>
@@ -394,7 +391,7 @@ namespace meshExpImp.ModelBlocks
             #endregion
 
             #region AHandlerElement
-            public override AHandlerElement Clone(EventHandler handler) { return new Mesh(0, handler, this); }
+            //public override AHandlerElement Clone(EventHandler handler) { return new Mesh(0, handler, this); }
 
             public override List<string> ContentFields
             {
@@ -637,12 +634,8 @@ namespace meshExpImp.ModelBlocks
             protected override Mesh CreateElement(Stream s) { return new Mesh(0, handler, mOwner, s); }
             protected override void WriteElement(Stream s, Mesh element) { element.UnParse(s); }
 
-            public override void Add() { base.Add(new Mesh(0, null, mOwner)); }
-            public override void Add(Mesh item)
-            {
-                base.Add(item);
-                item.Owner = mOwner;
-            }
+            public override void Add() { base.Add(new Mesh(0, handler, mOwner)); }
+            public override void Add(Mesh item) { item.Owner = mOwner; base.Add(item); }
             //And, of course, all the other ways of getting an element into a list... bad, bad, bad...  But this covers s3pe's usage.
         }
         #endregion

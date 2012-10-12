@@ -107,12 +107,12 @@ namespace s3pi.Interfaces
         /// </summary>
         public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
 
-        /// <summary>
-        /// Implementing classes must provide a means of creating a copy of themselves.
-        /// </summary>
-        /// <param name="handler">The <see cref="EventHandler"/> for the new instance.</param>
-        /// <returns>A new instance of the class with identical values, with the given change <see cref="EventHandler"/>.</returns>
-        public abstract override AHandlerElement Clone(EventHandler handler);
+        // /// <summary>
+        // /// Implementing classes must provide a means of creating a copy of themselves.
+        // /// </summary>
+        // /// <param name="handler">The <see cref="EventHandler"/> for the new instance.</param>
+        // /// <returns>A new instance of the class with identical values, with the given change <see cref="EventHandler"/>.</returns>
+        // public abstract override AHandlerElement Clone(EventHandler handler);
         #endregion
 
         #region IRCOLBlock Members

@@ -122,6 +122,8 @@ namespace CASPartResource
 
             byte count = r.ReadByte();
             tgiBlocks = new CountedTGIBlockList(OnResourceChanged, "IGT", count, s);
+
+            caspEntries.ParentTGIBlocks = tgiBlocks;
         }
 
         protected override Stream UnParse()
@@ -170,14 +172,14 @@ namespace CASPartResource
                 }
             }
 
-            if (caspEntries == null) caspEntries = new CASEntryList(OnResourceChanged); caspEntries.UnParse(s);
+            if (tgiBlocks == null) tgiBlocks = new CountedTGIBlockList(OnResourceChanged, "IGT");
+            if (caspEntries == null) caspEntries = new CASEntryList(OnResourceChanged, tgiBlocks); caspEntries.UnParse(s);
 
             w.Write(zero);
 
             if (faceEntries == null) faceEntries = new FaceEntryList(OnResourceChanged); faceEntries.UnParse(s);
 
             tgiPosn = s.Position;
-            if (tgiBlocks == null) tgiBlocks = new CountedTGIBlockList(OnResourceChanged, "IGT");
             w.Write((byte)tgiBlocks.Count);
             tgiBlocks.UnParse(s);
 
@@ -230,7 +232,7 @@ namespace CASPartResource
             #region AHandlerElement Members
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
             public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
-            public override AHandlerElement Clone(EventHandler handler) { return new XMLEntry(requestedApiVersion, handler, this); }
+            //public override AHandlerElement Clone(EventHandler handler) { return new XMLEntry(requestedApiVersion, handler, this); }
             #endregion
 
             #region IEquatable<XMLEntry> Members
@@ -297,7 +299,7 @@ namespace CASPartResource
             protected override void WriteElement(Stream s, XMLEntry element) { element.UnParse(s); }
             #endregion
 
-            public override void Add() { this.Add(new XMLEntry(0, null)); }
+            //public override void Add() { this.Add(new XMLEntry(0, null)); }
         }
 
         public class IndexPair : AHandlerElement, IEquatable<IndexPair>
@@ -312,10 +314,10 @@ namespace CASPartResource
             #endregion
 
             #region Constructors
-            public IndexPair(int APIversion, EventHandler handler) : base(APIversion, handler) { }
-            public IndexPair(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
-            public IndexPair(int APIversion, EventHandler handler, IndexPair basis) : this(APIversion, handler, basis.txtc1index) { }
-            public IndexPair(int APIversion, EventHandler handler, byte index) : base(APIversion, handler) { this.txtc1index = index; }
+            public IndexPair(int APIversion, EventHandler handler, DependentList<TGIBlock> ParentTGIBlocks = null) : base(APIversion, handler) { this.ParentTGIBlocks = ParentTGIBlocks; }
+            public IndexPair(int APIversion, EventHandler handler, Stream s, DependentList<TGIBlock> ParentTGIBlocks = null) : base(APIversion, handler) { this.ParentTGIBlocks = ParentTGIBlocks; Parse(s); }
+            public IndexPair(int APIversion, EventHandler handler, IndexPair basis, DependentList<TGIBlock> ParentTGIBlocks = null) : this(APIversion, handler, basis.txtc1index, ParentTGIBlocks ?? basis.ParentTGIBlocks) { }
+            public IndexPair(int APIversion, EventHandler handler, byte index, DependentList<TGIBlock> ParentTGIBlocks = null) : base(APIversion, handler) { this.ParentTGIBlocks = ParentTGIBlocks; this.txtc1index = index; }
             #endregion
 
             #region Data I/O
@@ -336,7 +338,7 @@ namespace CASPartResource
 
             #region AHandlerElement Members
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
-            public override AHandlerElement Clone(EventHandler handler) { return new IndexPair(requestedApiVersion, handler, this); }
+            //public override AHandlerElement Clone(EventHandler handler) { return new IndexPair(requestedApiVersion, handler, this); }
             #endregion
 
             #region IEquatable<IndexPair> Members
@@ -364,24 +366,42 @@ namespace CASPartResource
         }
         public class IndexPairList : DependentList<IndexPair>
         {
+            private DependentList<TGIBlock> _ParentTGIBlocks;
+            public DependentList<TGIBlock> ParentTGIBlocks
+            {
+                get { return _ParentTGIBlocks; }
+                set { if (_ParentTGIBlocks != value) { _ParentTGIBlocks = value; foreach (var i in this) i.ParentTGIBlocks = _ParentTGIBlocks; } }
+            }
+
             #region Constructors
-            public IndexPairList(EventHandler handler) : base(handler) { }
-            public IndexPairList(EventHandler handler, Stream s) : base(handler, s) { }
-            public IndexPairList(EventHandler handler, IEnumerable<IndexPair> le) : base(handler, le) { }
+            public IndexPairList(EventHandler handler, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : base(handler) { _ParentTGIBlocks = ParentTGIBlocks; }
+            public IndexPairList(EventHandler handler, Stream s, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : this(null, ParentTGIBlocks) { elementHandler = handler; Parse(s); this.handler = handler; }
+            public IndexPairList(EventHandler handler, IEnumerable<IndexPair> le, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : this(null, ParentTGIBlocks) { elementHandler = handler; foreach (var t in le) this.Add(t); this.handler = handler; }
             #endregion
 
             #region Data I/O
             protected override int ReadCount(Stream s) { return new BinaryReader(s).ReadByte(); }
             protected override void WriteCount(Stream s, int count) { new BinaryWriter(s).Write((byte)count); }
-            protected override IndexPair CreateElement(Stream s) { return new IndexPair(0, elementHandler, s); }
+            protected override IndexPair CreateElement(Stream s) { return new IndexPair(0, elementHandler, s, _ParentTGIBlocks); }
             protected override void WriteElement(Stream s, IndexPair element) { element.UnParse(s); }
             #endregion
 
-            public override void Add() { this.Add(new IndexPair(0, null)); }
+            public override void Add() { base.Add(new IndexPair(0, handler, _ParentTGIBlocks)); }
+            public override void Add(IndexPair item) { item.ParentTGIBlocks = _ParentTGIBlocks; base.Add(item); }
         }
 
         public class CASEntry  : AHandlerElement, IEquatable<CASEntry>
         {
+            private DependentList<TGIBlock> _ParentTGIBlocks;
+            public DependentList<TGIBlock> ParentTGIBlocks
+            {
+                get { return _ParentTGIBlocks; }
+                set { if (_ParentTGIBlocks != value) { _ParentTGIBlocks = value; txtcIndexes.ParentTGIBlocks = _ParentTGIBlocks; } }
+            }
+
             const int recommendedApiVersion = 1;
 
             #region Attributes
@@ -391,11 +411,11 @@ namespace CASPartResource
             #endregion
 
             #region Constructors
-            public CASEntry(int APIversion, EventHandler handler) : base(APIversion, handler) { txtcIndexes = new IndexPairList(handler); }
-            public CASEntry(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
-            public CASEntry(int APIversion, EventHandler handler, CASEntry basis) : this(APIversion, handler, basis.casPartIndex, basis.clothing, basis.txtcIndexes) { }
-            public CASEntry(int APIversion, EventHandler handler, byte casPartIndex, ClothingType clothing, IEnumerable<IndexPair> ibe)
-                : base(APIversion, handler) { this.casPartIndex = casPartIndex; this.clothing = clothing; this.txtcIndexes = ibe == null ? null : new IndexPairList(handler, ibe); }
+            public CASEntry(int APIversion, EventHandler handler, DependentList<TGIBlock> ParentTGIBlocks = null) : base(APIversion, handler) { _ParentTGIBlocks = ParentTGIBlocks; txtcIndexes = new IndexPairList(handler, _ParentTGIBlocks); }
+            public CASEntry(int APIversion, EventHandler handler, Stream s, DependentList<TGIBlock> ParentTGIBlocks = null) : base(APIversion, handler) { _ParentTGIBlocks = ParentTGIBlocks; Parse(s); }
+            public CASEntry(int APIversion, EventHandler handler, CASEntry basis, DependentList<TGIBlock> ParentTGIBlocks = null) : this(APIversion, handler, basis.casPartIndex, basis.clothing, basis.txtcIndexes, ParentTGIBlocks ?? basis.ParentTGIBlocks) { }
+            public CASEntry(int APIversion, EventHandler handler, byte casPartIndex, ClothingType clothing, IEnumerable<IndexPair> ibe, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : base(APIversion, handler) { _ParentTGIBlocks = ParentTGIBlocks; this.casPartIndex = casPartIndex; this.clothing = clothing; this.txtcIndexes = ibe == null ? null : new IndexPairList(handler, ibe, _ParentTGIBlocks); }
             #endregion
 
             #region Data I/O
@@ -404,7 +424,7 @@ namespace CASPartResource
                 BinaryReader r = new BinaryReader(s);
                 casPartIndex = r.ReadByte();
                 clothing = (ClothingType)r.ReadUInt32();
-                txtcIndexes = new IndexPairList(handler, s);
+                txtcIndexes = new IndexPairList(handler, s, _ParentTGIBlocks);
             }
 
             internal void UnParse(Stream s)
@@ -412,14 +432,15 @@ namespace CASPartResource
                 BinaryWriter w = new BinaryWriter(s);
                 w.Write(casPartIndex);
                 w.Write((uint)clothing);
+                if (txtcIndexes == null) txtcIndexes = new IndexPairList(handler, _ParentTGIBlocks);
                 txtcIndexes.UnParse(s);
             }
             #endregion
 
             #region AHandlerElement Members
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
-            public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
-            public override AHandlerElement Clone(EventHandler handler) { return new CASEntry(requestedApiVersion, handler, this); }
+            public override List<string> ContentFields { get { List<string> res = GetContentFields(requestedApiVersion, this.GetType()); res.Remove("ParentTGIBlocks"); return res; } }
+            //public override AHandlerElement Clone(EventHandler handler) { return new CASEntry(requestedApiVersion, handler, this); }
             #endregion
 
             #region IEquatable<CASEntry> Members
@@ -478,10 +499,20 @@ namespace CASPartResource
         }
         public class CASEntryList : DependentList<CASEntry>
         {
+            private DependentList<TGIBlock> _ParentTGIBlocks;
+            public DependentList<TGIBlock> ParentTGIBlocks
+            {
+                get { return _ParentTGIBlocks; }
+                set { if (_ParentTGIBlocks != value) { _ParentTGIBlocks = value; foreach (var i in this) i.ParentTGIBlocks = _ParentTGIBlocks; } }
+            }
+
             #region Constructors
-            public CASEntryList(EventHandler handler) : base(handler, Byte.MaxValue) { }
-            public CASEntryList(EventHandler handler, Stream s) : base(handler, s, Byte.MaxValue) { }
-            public CASEntryList(EventHandler handler, IEnumerable<CASEntry> le) : base(handler, le, Byte.MaxValue) { }
+            public CASEntryList(EventHandler handler, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : base(handler, Byte.MaxValue) { _ParentTGIBlocks = ParentTGIBlocks; }
+            public CASEntryList(EventHandler handler, Stream s, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : base(handler, Byte.MaxValue) { _ParentTGIBlocks = ParentTGIBlocks; elementHandler = handler; Parse(s); this.handler = handler; }
+            public CASEntryList(EventHandler handler, IEnumerable<CASEntry> le, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : base(handler, Byte.MaxValue) { _ParentTGIBlocks = ParentTGIBlocks; elementHandler = handler; foreach (var t in le) this.Add(t); this.handler = handler; }
             #endregion
 
             #region Data I/O
@@ -491,7 +522,10 @@ namespace CASPartResource
             protected override void WriteElement(Stream s, CASEntry element) { element.UnParse(s); }
             #endregion
 
-            public override void Add() { this.Add(new CASEntry(0, null)); }
+            //public override void Add() { this.Add(new CASEntry(0, null)); }
+
+            public override void Add() { base.Add(new CASEntry(0, handler, _ParentTGIBlocks)); }
+            public override void Add(CASEntry item) { item.ParentTGIBlocks = _ParentTGIBlocks; base.Add(item); }
         }
 
         public class FaceEntry : AHandlerElement, IEquatable<FaceEntry>
@@ -534,7 +568,7 @@ namespace CASPartResource
 
             #region AHandlerElement Members
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
-            public override AHandlerElement Clone(EventHandler handler) { return new FaceEntry(requestedApiVersion, handler, this); }
+            //public override AHandlerElement Clone(EventHandler handler) { return new FaceEntry(requestedApiVersion, handler, this); }
             public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
             #endregion
 
@@ -584,7 +618,7 @@ namespace CASPartResource
             protected override void WriteElement(Stream s, FaceEntry element) { element.UnParse(s); }
             #endregion
 
-            public override void Add() { this.Add(new FaceEntry(0, null)); }
+            //public override void Add() { this.Add(new FaceEntry(0, null)); }
         }
         #endregion
 
@@ -663,11 +697,11 @@ namespace CASPartResource
         [ElementPriority(22)]
         public float CurlPixelRadius { get { if (version < 0x00000013) throw new InvalidOperationException(); return curlPixelRadius; } set { if (version < 0x00000013) throw new InvalidOperationException(); if (curlPixelRadius != value) { curlPixelRadius = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(23)]
-        public CASEntryList CASPEntries { get { return caspEntries; } set { if (!caspEntries.Equals(value)) { caspEntries = value == null ? null : new CASEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public CASEntryList CASPEntries { get { return caspEntries; } set { if (!caspEntries.Equals(value)) { caspEntries = value == null ? null : new CASEntryList(OnResourceChanged, value, tgiBlocks); OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(24)]
         public FaceEntryList FACEEntries { get { return faceEntries; } set { if (!faceEntries.Equals(value)) { faceEntries = value == null ? null : new FaceEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(25)]
-        public CountedTGIBlockList TGIBlocks { get { return tgiBlocks; } set { if (!tgiBlocks.Equals(value)) { tgiBlocks = value == null ? null : new CountedTGIBlockList(OnResourceChanged, "IGT", value); OnResourceChanged(this, new EventArgs()); } } }
+        public CountedTGIBlockList TGIBlocks { get { return tgiBlocks; } set { if (!tgiBlocks.Equals(value)) { tgiBlocks = value == null ? null : new CountedTGIBlockList(OnResourceChanged, "IGT", value); caspEntries.ParentTGIBlocks = tgiBlocks; OnResourceChanged(this, new EventArgs()); } } }
 
         public string Value
         {

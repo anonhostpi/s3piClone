@@ -165,7 +165,7 @@ namespace s3pi.GenericRCOLResource
             return ms;
         }
 
-        public override AHandlerElement Clone(EventHandler handler) { return new MATD(requestedApiVersion, handler, this); }
+        //public override AHandlerElement Clone(EventHandler handler) { return new MATD(requestedApiVersion, handler, this); }
 
         public override List<string> ContentFields
         {
@@ -237,7 +237,7 @@ namespace s3pi.GenericRCOLResource
             #endregion
 
             #region AHandlerElement Members
-            public override AHandlerElement Clone(EventHandler handler) { return new MTRL(requestedApiVersion, handler, this); }
+            //public override AHandlerElement Clone(EventHandler handler) { return new MTRL(requestedApiVersion, handler, this); }
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
             public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
             #endregion

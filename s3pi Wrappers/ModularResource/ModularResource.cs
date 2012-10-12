@@ -68,9 +68,9 @@ namespace ModularResource
             w.Write((uint)0);//tgiOffset
             w.Write((uint)0);//tgiSize
             w.Write(unknown2);
-            if (tgiIndexes == null) tgiIndexes = new Int32IndexList(OnResourceChanged, Int16.MaxValue, ReadInt16, WriteInt16);
-            tgiIndexes.UnParse(ms);
             if (tgiBlocks == null) tgiBlocks = new TGIBlockList(OnResourceChanged);
+            if (tgiIndexes == null) tgiIndexes = new Int32IndexList(OnResourceChanged, Int16.MaxValue, ReadInt16, WriteInt16, tgiBlocks);
+            tgiIndexes.UnParse(ms);
             tgiBlocks.UnParse(ms, pos);
 
             tgiIndexes.ParentTGIBlocks = tgiBlocks;
@@ -87,7 +87,7 @@ namespace ModularResource
         [ElementPriority(2)]
         public ushort Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(3)]
-        public Int32IndexList TGIIndexes { get { return tgiIndexes; } set { if (tgiIndexes != value) { tgiIndexes = new Int32IndexList(OnResourceChanged, value, Int16.MaxValue, ReadInt16, WriteInt16) { ParentTGIBlocks = tgiBlocks }; OnResourceChanged(this, EventArgs.Empty); } } }
+        public Int32IndexList TGIIndexes { get { return tgiIndexes; } set { if (tgiIndexes != value) { tgiIndexes = new Int32IndexList(OnResourceChanged, value, Int16.MaxValue, ReadInt16, WriteInt16, tgiBlocks); OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(4)]
         public TGIBlockList TGIBlocks { get { return tgiBlocks; } set { if (tgiBlocks != value) { tgiBlocks = value == null ? null : new TGIBlockList(OnResourceChanged, value); tgiIndexes.ParentTGIBlocks = tgiBlocks; OnResourceChanged(this, EventArgs.Empty); } } }
 

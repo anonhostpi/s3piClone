@@ -117,10 +117,7 @@ namespace meshExpImp.ModelBlocks
             return String.Format("{0},{1},{2},{3}", Right, Up, Back, Translate);
         }
 
-        public override AHandlerElement Clone(EventHandler handler)
-        {
-            return new Matrix43(0, handler, this);
-        }
+        // public override AHandlerElement Clone(EventHandler handler) { return new Matrix43(0, handler, this); }
 
         public override List<string> ContentFields
         {

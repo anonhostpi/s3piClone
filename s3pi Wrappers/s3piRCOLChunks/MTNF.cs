@@ -53,7 +53,7 @@ namespace s3pi.GenericRCOLResource
             : base(APIversion, handler)
         {
             this.mtnfUnknown1 = basis.mtnfUnknown1;
-            this.sdList = basis.sdList == null ? null : new ShaderDataList(handler, basis.sdList) { ParentTGIBlocks = basis._ParentTGIBlocks, RCOLTag = basis._RCOLTag, };
+            this.sdList = basis.sdList == null ? null : new ShaderDataList(handler, basis.sdList, basis._ParentTGIBlocks, basis._RCOLTag);
         }
         public MTNF(int APIversion, EventHandler handler, Stream s, string _RCOLTag = "MATD") : base(APIversion, handler) { this._RCOLTag = _RCOLTag; Parse(s); }
         public MTNF(int APIversion, EventHandler handler, string _RCOLTag = "MATD") : base(APIversion, handler) { this._RCOLTag = _RCOLTag; }
@@ -67,7 +67,7 @@ namespace s3pi.GenericRCOLResource
             if (checking) if (mtnfTag != (uint)FOURCC("MTNF"))
                     throw new InvalidDataException(String.Format("Invalid mtnfTag read: '{0}'; expected: 'MTNF'; at 0x{1:X8}", FOURCC(mtnfTag), s.Position));
             mtnfUnknown1 = r.ReadUInt32();
-            this.sdList = new ShaderDataList(handler, s, start, r.ReadInt32(), _ParentTGIBlocks, _RCOLTag) { };
+            this.sdList = new ShaderDataList(handler, s, start, r.ReadInt32(), _ParentTGIBlocks, _RCOLTag);
         }
 
         internal void UnParse(Stream s)
@@ -78,7 +78,7 @@ namespace s3pi.GenericRCOLResource
             w.Write(mtnfUnknown1);
             long dlPos = s.Position;
             w.Write((uint)0);//data length
-            if (sdList == null) sdList = new ShaderDataList(handler) { ParentTGIBlocks = _ParentTGIBlocks, RCOLTag = _RCOLTag, };
+            if (sdList == null) sdList = new ShaderDataList(handler, _ParentTGIBlocks, _RCOLTag);
             sdList.UnParse(s, start);
 
             long dlEnd = s.Position;
@@ -89,7 +89,7 @@ namespace s3pi.GenericRCOLResource
         #endregion
 
         #region AHandlerElement Members
-        public override AHandlerElement Clone(EventHandler handler) { return new MTNF(requestedApiVersion, handler, this); }
+        //public override AHandlerElement Clone(EventHandler handler) { return new MTNF(requestedApiVersion, handler, this); }
         public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
         public override List<string> ContentFields
         {
@@ -155,7 +155,7 @@ namespace s3pi.GenericRCOLResource
             {
                 if (sdList != value)
                 {
-                    sdList = value == null ? value : new ShaderDataList(handler, value) { ParentTGIBlocks = _ParentTGIBlocks, };
+                    sdList = value == null ? value : new ShaderDataList(handler, value, _ParentTGIBlocks, _RCOLTag);
                     OnElementChanged();
                 }
             }

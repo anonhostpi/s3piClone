@@ -79,7 +79,7 @@ namespace CatalogResource
             this.movementFlags = basis.movementFlags;
             this.cutoutTilesPerLevel = basis.cutoutTilesPerLevel;
             this.levels = basis.levels;
-            this.mtDoorList = new MTDoorList(OnResourceChanged, basis.mtDoorList);
+            this.mtDoorList = new MTDoorList(OnResourceChanged, basis.mtDoorList, list);
             this.isScriptEnabled = basis.isScriptEnabled;
             this.diagonalIndex = basis.diagonalIndex;
             this.ambienceTypeHash = basis.ambienceTypeHash;
@@ -134,7 +134,7 @@ namespace CatalogResource
             this.movementFlags = movementFlags;
             this.cutoutTilesPerLevel = cutoutTilesPerLevel;
             this.levels = levels;
-            this.mtDoorList = mtDoorList == null ? null : new MTDoorList(OnResourceChanged, mtDoorList) { ParentTGIBlocks = list };
+            this.mtDoorList = mtDoorList == null ? null : new MTDoorList(OnResourceChanged, mtDoorList, list);
             this.isScriptEnabled = isScriptEnabled;
             this.diagonalIndex = diagonalIndex;
             this.ambienceTypeHash = ambienceTypeHash;
@@ -500,8 +500,11 @@ namespace CatalogResource
             w.Write((uint)movementFlags);
             w.Write(cutoutTilesPerLevel);
             w.Write(levels);
-            if (mtDoorList == null) mtDoorList = new MTDoorList(OnResourceChanged);
+
+            if (list == null) list = new TGIBlockList(OnResourceChanged);
+            if (mtDoorList == null) mtDoorList = new MTDoorList(OnResourceChanged, list);
             mtDoorList.UnParse(s);
+
             w.Write(isScriptEnabled);
             w.Write(diagonalIndex);
             w.Write(ambienceTypeHash);
@@ -1181,7 +1184,7 @@ namespace CatalogResource
 
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
 
-            public override AHandlerElement Clone(EventHandler handler) { return new TopicRating(requestedApiVersion, handler, this); }
+            //public override AHandlerElement Clone(EventHandler handler) { return new TopicRating(requestedApiVersion, handler, this); }
             #endregion
 
             #region Content Fields
@@ -1225,12 +1228,14 @@ namespace CatalogResource
             #endregion
 
             #region Constructors
-            public MTDoor(int APIversion, EventHandler handler) : base(APIversion, handler) { }
-            public MTDoor(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
-            public MTDoor(int APIversion, EventHandler handler, MTDoor basis)
-                : this(APIversion, handler, basis.leftX, basis.leftZ, basis.rightX, basis.rightZ, basis.levelOffset, basis.wallMaskIndex) { }
-            public MTDoor(int APIversion, EventHandler handler, float leftX, float leftZ, float rightX, float rightZ, uint levelOffset, uint wallMaskIndex)
-                : base(APIversion, handler)
+            public MTDoor(int APIversion, EventHandler handler, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : base(APIversion, handler) { this.ParentTGIBlocks = ParentTGIBlocks; }
+            public MTDoor(int APIversion, EventHandler handler, Stream s, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : this(APIversion, handler, ParentTGIBlocks) { Parse(s); }
+            public MTDoor(int APIversion, EventHandler handler, MTDoor basis, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : this(APIversion, handler, basis.leftX, basis.leftZ, basis.rightX, basis.rightZ, basis.levelOffset, basis.wallMaskIndex, ParentTGIBlocks ?? basis.ParentTGIBlocks) { }
+            public MTDoor(int APIversion, EventHandler handler, float leftX, float leftZ, float rightX, float rightZ, uint levelOffset, uint wallMaskIndex, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : this(APIversion, handler, ParentTGIBlocks)
             {
                 this.leftX = leftX;
                 this.leftZ = leftZ;
@@ -1300,7 +1305,7 @@ namespace CatalogResource
             #region AHandlerElement
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
 
-            public override AHandlerElement Clone(EventHandler handler) { return new MTDoor(requestedApiVersion, handler, this); }
+            //public override AHandlerElement Clone(EventHandler handler) { return new MTDoor(requestedApiVersion, handler, this); }
             #endregion
 
             #region Content Fields
@@ -1332,9 +1337,11 @@ namespace CatalogResource
             //public override List<string> ContentFields { get { List<string> res = GetContentFields(0, this.GetType()); res.Remove("ParentTGIBlocks"); return res; } }
 
             #region Constructors
-            public MTDoorList(EventHandler handler) : base(handler, Byte.MaxValue) { }
-            public MTDoorList(EventHandler handler, Stream s) : base(handler, s, Byte.MaxValue) { }
-            public MTDoorList(EventHandler handler, IEnumerable<MTDoor> mtDoorList) : base(handler, mtDoorList, Byte.MaxValue) { }
+            public MTDoorList(EventHandler handler, DependentList<TGIBlock> ParentTGIBlocks = null) : base(handler, Byte.MaxValue) { _ParentTGIBlocks = ParentTGIBlocks; }
+            public MTDoorList(EventHandler handler, Stream s, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : this(null, ParentTGIBlocks) { elementHandler = handler; Parse(s); this.handler = handler; }
+            public MTDoorList(EventHandler handler, IEnumerable<MTDoor> mtDoorList, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : this(null, ParentTGIBlocks) { elementHandler = handler; foreach (var t in mtDoorList) this.Add(t); this.handler = handler; }
             #endregion
 
             #region Data I/O
@@ -1344,7 +1351,8 @@ namespace CatalogResource
             protected override void WriteElement(Stream s, MTDoor element) { element.UnParse(s); }
             #endregion
 
-            public override void Add() { this.Add(new MTDoor(0, null) { ParentTGIBlocks = ParentTGIBlocks }); }
+            public override void Add() { this.Add(new MTDoor(0, handler, _ParentTGIBlocks)); }
+            public override void Add(MTDoor item) { item.ParentTGIBlocks = _ParentTGIBlocks; base.Add(item); }
         }
         #endregion
 
@@ -1378,7 +1386,7 @@ namespace CatalogResource
         [ElementPriority(27)]
         public uint Levels { get { return levels; } set { if (levels != value) { levels = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(28)]
-        public MTDoorList MTDoors { get { return mtDoorList; } set { if (!mtDoorList.Equals(value)) { mtDoorList = value == null ? null : new MTDoorList(OnResourceChanged, value) { ParentTGIBlocks = list }; OnResourceChanged(this, new EventArgs()); } } }
+        public MTDoorList MTDoors { get { return mtDoorList; } set { if (!mtDoorList.Equals(value)) { mtDoorList = value == null ? null : new MTDoorList(OnResourceChanged, value, list); OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(29)]
         public bool IsScriptEnabled { get { return isScriptEnabled != 0; } set { if (IsScriptEnabled != value) { isScriptEnabled = (byte)(value ? 1 : 0); OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(30), TGIBlockListContentField("TGIBlocks")]

@@ -145,7 +145,7 @@ namespace s3pi.GenericRCOLResource
             return ms;
         }
 
-        public override AHandlerElement Clone(EventHandler handler) { return new VPXY(requestedApiVersion, handler, this); }
+        //public override AHandlerElement Clone(EventHandler handler) { return new VPXY(requestedApiVersion, handler, this); }
         #endregion
 
         #region Sub-types
@@ -161,8 +161,8 @@ namespace s3pi.GenericRCOLResource
             {
                 BinaryReader r = new BinaryReader(s);
                 byte entryType = r.ReadByte();
-                if (entryType == 0x00) return new Entry00(APIversion, handler, 0, r.ReadByte(), s) { ParentTGIBlocks = ParentTGIBlocks };
-                if (entryType == 0x01) return new Entry01(APIversion, handler, 1, r.ReadInt32()) { ParentTGIBlocks = ParentTGIBlocks };
+                if (entryType == 0x00) return new Entry00(APIversion, handler, 0, r.ReadByte(), s, ParentTGIBlocks);
+                if (entryType == 0x01) return new Entry01(APIversion, handler, 1, r.ReadInt32(), ParentTGIBlocks);
                 throw new InvalidDataException(String.Format("Unknown EntryType 0x{0:X2} at 0x{1:X8}", entryType, s.Position));
             }
             #endregion
@@ -205,12 +205,14 @@ namespace s3pi.GenericRCOLResource
             byte entryID;
             Int32IndexList tgiIndexes;
 
-            public Entry00(int APIversion, EventHandler handler, Entry00 basis)
-                : this(APIversion, handler, 0, basis.entryID, basis.tgiIndexes) { }
-            public Entry00(int APIversion, EventHandler handler, byte entryType, byte entryID, IEnumerable<int> tgiIndexes)
-                : base(APIversion, handler) { this.entryID = entryID; this.tgiIndexes = new Int32IndexList(handler, tgiIndexes, byte.MaxValue, ReadByte, WriteByte); }
-            public Entry00(int APIversion, EventHandler handler, byte entryType, byte entryID, Stream s)
-                : base(APIversion, handler) { this.entryID = entryID; this.tgiIndexes = new Int32IndexList(handler, s, byte.MaxValue, ReadByte, WriteByte); }
+            public Entry00(int APIversion, EventHandler handler, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : this(APIversion, handler, 0, 0, new Int32IndexList(null), ParentTGIBlocks) { }
+            public Entry00(int APIversion, EventHandler handler, Entry00 basis, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : this(APIversion, handler, 0, basis.entryID, basis.tgiIndexes, ParentTGIBlocks ?? basis._ParentTGIBlocks) { }
+            public Entry00(int APIversion, EventHandler handler, byte entryType, byte entryID, Stream s, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : base(APIversion, handler) { _ParentTGIBlocks = ParentTGIBlocks; this.entryID = entryID; this.tgiIndexes = new Int32IndexList(handler, s, byte.MaxValue, ReadByte, WriteByte, _ParentTGIBlocks); }
+            public Entry00(int APIversion, EventHandler handler, byte entryType, byte entryID, IEnumerable<int> tgiIndexes, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : base(APIversion, handler) { _ParentTGIBlocks = ParentTGIBlocks; this.entryID = entryID; this.tgiIndexes = new Int32IndexList(handler, tgiIndexes, byte.MaxValue, ReadByte, WriteByte, _ParentTGIBlocks); }
 
             internal override void UnParse(Stream s)
             {
@@ -234,7 +236,7 @@ namespace s3pi.GenericRCOLResource
                 return entryID.GetHashCode() ^ tgiIndexes.GetHashCode();
             }
 
-            public override AHandlerElement Clone(EventHandler handler) { return new Entry00(requestedApiVersion, handler, this) { ParentTGIBlocks = ParentTGIBlocks }; }
+            //public override AHandlerElement Clone(EventHandler handler) { return new Entry00(requestedApiVersion, handler, this); }
 
             #region Content Fields
             public byte EntryID { get { return entryID; } set { if (entryID != value) { entryID = value; OnElementChanged(); } } }
@@ -246,8 +248,12 @@ namespace s3pi.GenericRCOLResource
             public override DependentList<TGIBlock> ParentTGIBlocks { get; set; }
 
             int tgiIndex;
-            public Entry01(int APIversion, EventHandler handler, Entry01 basis) : this(APIversion, handler, 1, basis.tgiIndex) { }
-            public Entry01(int APIversion, EventHandler handler, byte entryType, int tgiIndex) : base(APIversion, handler) { this.tgiIndex = tgiIndex; }
+            public Entry01(int APIversion, EventHandler handler, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : this(APIversion, handler, 1, 0, ParentTGIBlocks) { }
+            public Entry01(int APIversion, EventHandler handler, Entry01 basis, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : this(APIversion, handler, 1, basis.tgiIndex, ParentTGIBlocks ?? basis.ParentTGIBlocks) { }
+            public Entry01(int APIversion, EventHandler handler, byte entryType, int tgiIndex, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : base(APIversion, handler) { this.ParentTGIBlocks = ParentTGIBlocks; this.tgiIndex = tgiIndex; }
             internal override void UnParse(Stream s)
             {
                 BinaryWriter w = new BinaryWriter(s);
@@ -261,7 +267,7 @@ namespace s3pi.GenericRCOLResource
                 return tgiIndex.GetHashCode();
             }
 
-            public override AHandlerElement Clone(EventHandler handler) { return new Entry01(requestedApiVersion, handler, this); }
+            //public override AHandlerElement Clone(EventHandler handler) { return new Entry01(requestedApiVersion, handler, this); }
 
             #region Content Fields
             [TGIBlockListContentField("ParentTGIBlocks")]
@@ -293,7 +299,19 @@ namespace s3pi.GenericRCOLResource
             protected override void WriteElement(Stream s, Entry element) { element.UnParse(s); }
             #endregion
 
-            public override void Add() { throw new NotImplementedException(); }
+            //public override void Add() { throw new NotImplementedException(); }
+            public override void Add(Entry item) { item.ParentTGIBlocks = _ParentTGIBlocks; base.Add(item); }
+            public override void Add(Type elementType)
+            {
+                if (elementType.IsAbstract)
+                    throw new ArgumentException("Must pass a concrete element type.", "elementType");
+
+                if (!typeof(Entry).IsAssignableFrom(elementType))
+                    throw new ArgumentException("The element type must belong to the generic type of the list.", "elementType");
+
+                Entry newElement = Activator.CreateInstance(elementType, new object[] { (int)0, elementHandler, _ParentTGIBlocks, }) as Entry;
+                base.Add(newElement);
+            }
         }
         #endregion
 

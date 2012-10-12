@@ -282,7 +282,7 @@ namespace CatalogResource
                 }
             }
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
-            public override AHandlerElement Clone(EventHandler handler) { return new Common(requestedApiVersion, handler, this); }
+            //public override AHandlerElement Clone(EventHandler handler) { return new Common(requestedApiVersion, handler, this); }
             #endregion
 
             #region Sub-classes
@@ -376,13 +376,13 @@ namespace CatalogResource
             protected ComplateElement(int APIversion, EventHandler handler, string variableName) : base(APIversion, handler) { this.variableName = variableName; }
             protected ComplateElement(int APIversion, EventHandler handler, string variableName, Stream s) : this(APIversion, handler, variableName) { Parse(s); }
 
-            public static ComplateElement CreateTypeCode(int APIversion, EventHandler handler, string variableName, byte typeCode, Stream s)
+            public static ComplateElement CreateTypeCode(int APIversion, EventHandler handler, string variableName, byte typeCode, Stream s, DependentList<TGIBlock> ParentTGIBlocks = null)
             {
                 switch (typeCode)
                 {
                     case 0x01: return new TC01_String(APIversion, handler, variableName, s);
                     case 0x02: return new TC02_ARGB(APIversion, handler, variableName, s);
-                    case 0x03: return new TC03_TGIIndex(APIversion, handler, variableName, s);
+                    case 0x03: return new TC03_TGIIndex(APIversion, handler, variableName, s, ParentTGIBlocks);
                     case 0x04: return new TC04_Single(APIversion, handler, variableName, s);
                     case 0x05: return new TC05_XY(APIversion, handler, variableName, s);
                     case 0x06: return new TC06_XYZ(APIversion, handler, variableName, s);
@@ -488,7 +488,7 @@ namespace CatalogResource
                 return tc.variableName.GetHashCode() ^ tc.stringValue.GetHashCode();
             }
 
-            public override AHandlerElement Clone(EventHandler handler) { return new TC01_String(requestedApiVersion, handler, this); }
+            //public override AHandlerElement Clone(EventHandler handler) { return new TC01_String(requestedApiVersion, handler, this); }
 
             public string Data { get { return stringValue; } set { if (stringValue != value) stringValue = value; OnElementChanged(); } }
         }
@@ -528,7 +528,7 @@ namespace CatalogResource
                 return tc.variableName.GetHashCode() ^ tc.argb.GetHashCode();
             }
 
-            public override AHandlerElement Clone(EventHandler handler) { return new TC02_ARGB(requestedApiVersion, handler, this); }
+            //public override AHandlerElement Clone(EventHandler handler) { return new TC02_ARGB(requestedApiVersion, handler, this); }
 
             [ElementPriority(1)]
             public UInt32 ARGB { get { return argb; } set { if (argb != value) { argb = value; OnElementChanged(); } } }
@@ -544,13 +544,15 @@ namespace CatalogResource
             #endregion
 
             #region Constructors
-            internal TC03_TGIIndex(int APIversion, EventHandler handler, string variableName, Stream s) : base(APIversion, handler, variableName, s) { }
-            public TC03_TGIIndex(int APIversion, EventHandler handler) : this(APIversion, handler, 0, "TGIIndexVariable", (byte)0x00) { }
-            public TC03_TGIIndex(int APIversion, EventHandler handler, TC03_TGIIndex basis) : this(APIversion, handler, 0, basis.variableName, basis.tgiIndex) { }
-            public TC03_TGIIndex(int APIversion, EventHandler handler, byte unused, string variableName, byte tgiIndex) : base(APIversion, handler, variableName)
-            {
-                this.tgiIndex = tgiIndex;
-            }
+            internal TC03_TGIIndex(int APIversion, EventHandler handler, string variableName, Stream s, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : base(APIversion, handler, variableName, s) { this.ParentTGIBlocks = ParentTGIBlocks; }
+
+            public TC03_TGIIndex(int APIversion, EventHandler handler, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : this(APIversion, handler, 0, "TGIIndexVariable", (byte)0x00, ParentTGIBlocks) { }
+            public TC03_TGIIndex(int APIversion, EventHandler handler, TC03_TGIIndex basis, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : this(APIversion, handler, 0, basis.variableName, basis.tgiIndex, ParentTGIBlocks ?? basis.ParentTGIBlocks) { }
+            public TC03_TGIIndex(int APIversion, EventHandler handler, byte unused, string variableName, byte tgiIndex, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : base(APIversion, handler, variableName) { this.ParentTGIBlocks = ParentTGIBlocks; this.tgiIndex = tgiIndex; }
             #endregion
 
             #region Data I/O
@@ -572,7 +574,7 @@ namespace CatalogResource
                 return tc.variableName.GetHashCode() ^ tc.tgiIndex.GetHashCode();
             }
 
-            public override AHandlerElement Clone(EventHandler handler) { return new TC03_TGIIndex(requestedApiVersion, handler, this); }
+            //public override AHandlerElement Clone(EventHandler handler) { return new TC03_TGIIndex(requestedApiVersion, handler, this); }
 
             [TGIBlockListContentField("ParentTGIBlocks")]
             public byte TGIIndex { get { return tgiIndex; } set { if (tgiIndex != value) { tgiIndex = value; OnElementChanged(); } } }
@@ -613,7 +615,7 @@ namespace CatalogResource
                 return tc.variableName.GetHashCode() ^ tc.unknown1.GetHashCode();
             }
 
-            public override AHandlerElement Clone(EventHandler handler) { return new TC04_Single(requestedApiVersion, handler, this); }
+            //public override AHandlerElement Clone(EventHandler handler) { return new TC04_Single(requestedApiVersion, handler, this); }
 
             public float Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnElementChanged(); } } }
         }
@@ -668,7 +670,7 @@ namespace CatalogResource
                 return tc.variableName.GetHashCode() ^ tc.unknown1.GetHashCode() ^ tc.unknown2.GetHashCode();
             }
 
-            public override AHandlerElement Clone(EventHandler handler) { return new TC05_XY(requestedApiVersion, handler, this); }
+            //public override AHandlerElement Clone(EventHandler handler) { return new TC05_XY(requestedApiVersion, handler, this); }
 
             public float Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnElementChanged(); } } }
             public float Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnElementChanged(); } } }
@@ -729,7 +731,7 @@ namespace CatalogResource
                 return tc.variableName.GetHashCode() ^ tc.unknown1.GetHashCode() ^ tc.unknown2.GetHashCode() ^ tc.unknown3.GetHashCode();
             }
 
-            public override AHandlerElement Clone(EventHandler handler) { return new TC06_XYZ(requestedApiVersion, handler, this); }
+            //public override AHandlerElement Clone(EventHandler handler) { return new TC06_XYZ(requestedApiVersion, handler, this); }
 
             public float Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnElementChanged(); } } }
             public float Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnElementChanged(); } } }
@@ -775,7 +777,7 @@ namespace CatalogResource
                 return tc.variableName.GetHashCode() ^ tc.unknown1.GetHashCode();
             }
 
-            public override AHandlerElement Clone(EventHandler handler) { return new TC07_Boolean(requestedApiVersion, handler, this); }
+            //public override AHandlerElement Clone(EventHandler handler) { return new TC07_Boolean(requestedApiVersion, handler, this); }
 
             public bool Unknown1 { get { return unknown1 != 0; } set { if (Unknown1 != value) { unknown1 = (byte)(value ? 0x01 : 0x00); OnElementChanged(); } } }
         }
@@ -791,22 +793,45 @@ namespace CatalogResource
             //public override List<string> ContentFields { get { List<string> res = GetContentFields(0, this.GetType()); res.Remove("ParentTGIBlocks"); return res; } }
 
             #region Constructors
-            public ComplateList(EventHandler handler) : base(handler) { }
-            public ComplateList(EventHandler handler, Stream s) : base(handler, s) { }
-            public ComplateList(EventHandler handler, IEnumerable<ComplateElement> ltc) : base(handler, ltc) { }
+            public ComplateList(EventHandler handler, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : base(handler) { _ParentTGIBlocks = ParentTGIBlocks; }
+            public ComplateList(EventHandler handler, Stream s, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : this(null, ParentTGIBlocks) { elementHandler = handler; Parse(s); this.handler = handler; }
+            public ComplateList(EventHandler handler, IEnumerable<ComplateElement> ltc, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : this(null, ParentTGIBlocks) { elementHandler = handler; foreach (var t in ltc) this.Add(t); this.handler = handler; }
             #endregion
 
             #region Data I/O
             protected override ComplateElement CreateElement(Stream s)
             {
-                return ComplateElement.CreateTypeCode(0, elementHandler, ComplateString.Read(s), new BinaryReader(s).ReadByte(), s);
+                return ComplateElement.CreateTypeCode(0, elementHandler, ComplateString.Read(s), new BinaryReader(s).ReadByte(), s, _ParentTGIBlocks);
             }
 
             protected override void WriteCount(Stream s, int count) { new BinaryWriter(s).Write(count/* - this.FindAll(tc => tc is TC_Padding).Count/**/); }
             protected override void WriteElement(Stream s, ComplateElement element) { element.UnParse(s); }
             #endregion
 
-            public override void Add() { throw new NotImplementedException(); }
+            //public override void Add() { throw new NotImplementedException(); }
+            public override void Add(ComplateElement item)
+            {
+                if (item is TC03_TGIIndex) (item as TC03_TGIIndex).ParentTGIBlocks = _ParentTGIBlocks;
+                base.Add(item);
+            }
+            public override void Add(Type elementType)
+            {
+                if (elementType.IsAbstract)
+                    throw new ArgumentException("Must pass a concrete element type.", "elementType");
+
+                if (!typeof(ComplateElement).IsAssignableFrom(elementType))
+                    throw new ArgumentException("The element type must belong to the generic type of the list.", "elementType");
+
+                ComplateElement newElement;
+                if (typeof(TC03_TGIIndex).IsAssignableFrom(elementType))
+                    newElement = new TC03_TGIIndex(0, elementHandler, _ParentTGIBlocks);
+                else
+                    newElement = Activator.CreateInstance(elementType, new object[] { (int)0, elementHandler, }) as ComplateElement;
+                base.Add(newElement);
+            }
         }
         #endregion
 
@@ -838,30 +863,32 @@ namespace CatalogResource
             #endregion
 
             #region Constructors
-            public MaterialBlock(int APIversion, EventHandler handler)
+            public MaterialBlock(int APIversion, EventHandler handler, DependentList<TGIBlock> ParentTGIBlocks = null)
                 : base(APIversion, handler)
             {
+                _ParentTGIBlocks = ParentTGIBlocks;
                 name = "";
                 pattern = "";
-                complateList = new ComplateList(handler);
-                mbList = new MaterialBlockList(handler);
+                complateList = new ComplateList(handler, _ParentTGIBlocks);
+                mbList = new MaterialBlockList(handler, _ParentTGIBlocks);
             }
 
-            internal MaterialBlock(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
+            internal MaterialBlock(int APIversion, EventHandler handler, Stream s, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : base(APIversion, handler) { _ParentTGIBlocks = ParentTGIBlocks; Parse(s); }
 
-            public MaterialBlock(int APIversion, EventHandler handler, MaterialBlock basis)
-                : this(APIversion, handler, basis.complateXMLIndex, basis.name, basis.pattern, basis.complateList, basis.mbList) { }
+            public MaterialBlock(int APIversion, EventHandler handler, MaterialBlock basis, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : this(APIversion, handler, basis.complateXMLIndex, basis.name, basis.pattern, basis.complateList, basis.mbList, ParentTGIBlocks ?? basis._ParentTGIBlocks) { }
 
             public MaterialBlock(int APIversion, EventHandler handler, byte xmlindex, string unknown1, string unknown2,
-                IEnumerable<ComplateElement> ltc, IEnumerable<MaterialBlock> lmb)
+                IEnumerable<ComplateElement> ltc, IEnumerable<MaterialBlock> lmb, DependentList<TGIBlock> ParentTGIBlocks = null)
                 : base(APIversion, handler)
             {
-                this.handler = handler;
+                _ParentTGIBlocks = ParentTGIBlocks;
                 this.complateXMLIndex = xmlindex;
                 this.name = unknown1;
                 this.pattern = unknown2;
-                complateList = ltc == null ? null : new ComplateList(handler, ltc);
-                mbList = lmb == null ? null : new MaterialBlockList(handler, lmb);
+                complateList = ltc == null ? null : new ComplateList(handler, ltc, _ParentTGIBlocks);
+                mbList = lmb == null ? null : new MaterialBlockList(handler, lmb, _ParentTGIBlocks);
             }
             #endregion
 
@@ -871,8 +898,8 @@ namespace CatalogResource
                 this.complateXMLIndex = (new BinaryReader(s)).ReadByte();
                 this.name = ComplateString.Read(s);
                 this.pattern = ComplateString.Read(s);
-                this.complateList = new ComplateList(handler, s);
-                this.mbList = new MaterialBlockList(handler, s);
+                this.complateList = new ComplateList(handler, s, _ParentTGIBlocks);
+                this.mbList = new MaterialBlockList(handler, s, _ParentTGIBlocks);
             }
 
             public void UnParse(Stream s)
@@ -937,7 +964,7 @@ namespace CatalogResource
             #region AHandlerElement
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
 
-            public override AHandlerElement Clone(EventHandler handler) { return new MaterialBlock(requestedApiVersion, handler, this); }
+            //public override AHandlerElement Clone(EventHandler handler) { return new MaterialBlock(requestedApiVersion, handler, this); }
             #endregion
 
             #region Content Fields
@@ -948,9 +975,9 @@ namespace CatalogResource
             [ElementPriority(3)]
             public string Pattern { get { return pattern; } set { if (pattern != value) { pattern = value; OnElementChanged(); } } }
             [ElementPriority(4)]
-            public ComplateList ComplateOverrides { get { return complateList; } set { if (complateList != value) { complateList = value == null ? null : new ComplateList(handler, value); OnElementChanged(); } } }
+            public ComplateList ComplateOverrides { get { return complateList; } set { if (complateList != value) { complateList = value == null ? null : new ComplateList(handler, value, _ParentTGIBlocks); OnElementChanged(); } } }
             [ElementPriority(5)]
-            public MaterialBlockList MaterialBlocks { get { return mbList; } set { if (mbList != value) { mbList = value == null ? null : new MaterialBlockList(handler, value); OnElementChanged(); } } }
+            public MaterialBlockList MaterialBlocks { get { return mbList; } set { if (mbList != value) { mbList = value == null ? null : new MaterialBlockList(handler, value, _ParentTGIBlocks); OnElementChanged(); } } }
 
             public String Value
             {
@@ -987,17 +1014,21 @@ namespace CatalogResource
             //public override List<string> ContentFields { get { List<string> res = GetContentFields(0, this.GetType()); res.Remove("ParentTGIBlocks"); return res; } }
 
             #region Constructors
-            public MaterialBlockList(EventHandler handler) : base(handler) { }
-            internal MaterialBlockList(EventHandler handler, Stream s) : base(handler, s) { }
-            public MaterialBlockList(EventHandler handler, IEnumerable<MaterialBlock> lmb) : base(handler, lmb) { }
+            public MaterialBlockList(EventHandler handler, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : base(handler) { _ParentTGIBlocks = ParentTGIBlocks; }
+            internal MaterialBlockList(EventHandler handler, Stream s, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : this(null, ParentTGIBlocks) { elementHandler = handler; Parse(s); this.handler = handler; }
+            public MaterialBlockList(EventHandler handler, IEnumerable<MaterialBlock> lmb, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : this(null, ParentTGIBlocks) { elementHandler = handler; foreach (var t in lmb) this.Add(t); this.handler = handler; }
             #endregion
 
             #region Data I/O
-            protected override MaterialBlock CreateElement(Stream s) { return new MaterialBlock(0, elementHandler, s); }
+            protected override MaterialBlock CreateElement(Stream s) { return new MaterialBlock(0, elementHandler, s, _ParentTGIBlocks); }
             protected override void WriteElement(Stream s, MaterialBlock element) { element.UnParse(s); }
             #endregion
 
-            public override void Add() { this.Add(new MaterialBlock(0, null) { ParentTGIBlocks = ParentTGIBlocks }); }
+            public override void Add() { this.Add(new MaterialBlock(0, handler, _ParentTGIBlocks)); }
+            public override void Add(MaterialBlock item) { item.ParentTGIBlocks = _ParentTGIBlocks; base.Add(item); }
        }
 
         public class Material : AHandlerElement,
@@ -1016,9 +1047,8 @@ namespace CatalogResource
             public Material(int APIversion, EventHandler handler)
                 : base(APIversion, handler)
             {
-                mb = new MaterialBlock(requestedApiVersion, handler);
                 list = new TGIBlockList(handler);
-                mb.ParentTGIBlocks = list;
+                mb = new MaterialBlock(requestedApiVersion, handler, list);
             }
             internal Material(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
             public Material(int APIversion, EventHandler handler, Material basis)
@@ -1032,11 +1062,9 @@ namespace CatalogResource
                 this.materialType = materialType;
                 this.unknown1 = unknown1;
                 this.unknown2 = unknown2;
-                this.mb = (MaterialBlock)mb.Clone(handler);
                 this.list = ltgib == null ? null : new TGIBlockList(handler, ltgib);
+                this.mb = new MaterialBlock(requestedApiVersion, handler, this.list);
                 this.unknown3 = unknown3;
-
-                this.mb.ParentTGIBlocks = this.list;
             }
             #endregion
 
@@ -1052,6 +1080,7 @@ namespace CatalogResource
                 long tgiPosn = r.ReadUInt32() + s.Position;
                 long tgiSize = r.ReadUInt32();
 
+                // For once, I see why I might want to skip forward, read the TGIBlockList: then it could be passed to the MaterialBlock.
                 mb = new MaterialBlock(requestedApiVersion, handler, s);
 
                 list = new TGIBlockList(handler, s, tgiPosn, tgiSize);
@@ -1139,7 +1168,7 @@ namespace CatalogResource
 
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
 
-            public override AHandlerElement Clone(EventHandler handler) { return new Material(requestedApiVersion, handler, this); }
+            //public override AHandlerElement Clone(EventHandler handler) { return new Material(requestedApiVersion, handler, this); }
             #endregion
 
             #region Content Fields
@@ -1150,7 +1179,7 @@ namespace CatalogResource
             [ElementPriority(3)]
             public ushort Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnElementChanged(); } } }
             [ElementPriority(4)]
-            public MaterialBlock MaterialBlock { get { return mb; } set { if (mb != value) { mb = value; OnElementChanged(); } } }
+            public MaterialBlock MaterialBlock { get { return mb; } set { if (mb != value) { mb = new MaterialBlock(requestedApiVersion, handler, value, list); OnElementChanged(); } } }
             [ElementPriority(5)]
             public TGIBlockList TGIBlocks
             {
@@ -1177,7 +1206,7 @@ namespace CatalogResource
             protected override void WriteElement(Stream s, Material element) { element.UnParse(s); }
             #endregion
 
-            public override void Add() { this.Add(new Material(0, null)); }
+            //public override void Add() { this.Add(new Material(0, null)); }
         }
 
         static class ComplateString

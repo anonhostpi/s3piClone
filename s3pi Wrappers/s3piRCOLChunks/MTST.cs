@@ -90,7 +90,7 @@ namespace s3pi.GenericRCOLResource
             return ms;
         }
 
-        public override AHandlerElement Clone(EventHandler handler) { return new MTST(requestedApiVersion, handler, this); }
+        //public override AHandlerElement Clone(EventHandler handler) { return new MTST(requestedApiVersion, handler, this); }
         #endregion
 
         #region Sub-types
@@ -135,7 +135,7 @@ namespace s3pi.GenericRCOLResource
 
             public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
 
-            public override AHandlerElement Clone(EventHandler handler) { return new Entry(requestedApiVersion, handler, this); }
+            //public override AHandlerElement Clone(EventHandler handler) { return new Entry(requestedApiVersion, handler, this); }
             #endregion
 
             #region IEquatable<Entry> Members
@@ -174,7 +174,7 @@ namespace s3pi.GenericRCOLResource
             protected override void WriteElement(Stream s, Entry element) { element.UnParse(s); }
             #endregion
 
-            public override void Add() { this.Add(new Entry(0, null)); }
+            //public override void Add() { this.Add(new Entry(0, null)); }
         }
         #endregion
 

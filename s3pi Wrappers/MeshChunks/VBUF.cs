@@ -159,10 +159,7 @@ namespace meshExpImp.ModelBlocks
             return s;
 
         }
-        public override AHandlerElement Clone(EventHandler handler)
-        {
-            return new VBUF(0, handler, this);
-        }
+        //public override AHandlerElement Clone(EventHandler handler) { return new VBUF(0, handler, this); }
         public override uint ResourceType
         {
             get { return 0x01D0E6FB; }

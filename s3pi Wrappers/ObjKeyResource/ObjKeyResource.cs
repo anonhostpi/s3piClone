@@ -78,16 +78,16 @@ namespace ObjKeyResource
 
             if (components == null) components = new ComponentList(OnResourceChanged);
             components.UnParse(s);
-            if (componentData == null) componentData = new ComponentDataList(OnResourceChanged);
-            componentData.UnParse(s);
-            w.Write(unknown1);
 
             if (tgiBlocks == null) tgiBlocks = new TGIBlockList(OnResourceChanged);
+            if (componentData == null) componentData = new ComponentDataList(OnResourceChanged, tgiBlocks);
+            componentData.UnParse(s);
+
+            w.Write(unknown1);
+
             tgiBlocks.UnParse(s, posn);
 
             s.Flush();
-
-            componentData.ParentTGIBlocks = tgiBlocks;
 
             return s;
         }
@@ -136,7 +136,7 @@ namespace ObjKeyResource
             }
 
             #region AHandlerElement Members
-            public override AHandlerElement Clone(EventHandler handler) { return new ComponentElement(requestedApiVersion, handler, this); }
+            //public override AHandlerElement Clone(EventHandler handler) { return new ComponentElement(requestedApiVersion, handler, this); }
 
             public override int RecommendedApiVersion { get { return 1; } }
 
@@ -201,7 +201,7 @@ namespace ObjKeyResource
                 return null;
             }
 
-            public override void Add() { this.Add(new ComponentElement(0, null)); }
+            //public override void Add() { this.Add(new ComponentElement(0, null)); }
         }
 
         public abstract class ComponentDataType : AHandlerElement, IComparable<ComponentDataType>, IEqualityComparer<ComponentDataType>, IEquatable<ComponentDataType>
@@ -217,7 +217,7 @@ namespace ObjKeyResource
             protected ComponentDataType(int APIversion, EventHandler handler, string key, byte controlCode)
                 : base(APIversion, handler) { this.key = key; this.controlCode = controlCode; }
 
-            public static ComponentDataType CreateComponentData(int APIversion, EventHandler handler, Stream s)
+            public static ComponentDataType CreateComponentData(int APIversion, EventHandler handler, Stream s, DependentList<TGIBlock> ParentTGIBlocks)
             {
                 BinaryReader r = new BinaryReader(s);
                 string key = new string(r.ReadChars(r.ReadInt32()));
@@ -225,8 +225,8 @@ namespace ObjKeyResource
                 switch (controlCode)
                 {
                     case 0x00: return new CDTString(APIversion, handler, key, controlCode, new string(r.ReadChars(r.ReadInt32())));
-                    case 0x01: return new CDTResourceKey(APIversion, handler, key, controlCode, r.ReadInt32());
-                    case 0x02: return new CDTAssetResourceName(APIversion, handler, key, controlCode, r.ReadInt32());
+                    case 0x01: return new CDTResourceKey(APIversion, handler, key, controlCode, r.ReadInt32(), ParentTGIBlocks);
+                    case 0x02: return new CDTAssetResourceName(APIversion, handler, key, controlCode, r.ReadInt32(), ParentTGIBlocks);
                     case 0x03: return new CDTSteeringInstance(APIversion, handler, key, controlCode, new string(r.ReadChars(r.ReadInt32())));
                     case 0x04: return new CDTUInt32(APIversion, handler, key, controlCode, r.ReadUInt32());
                     default:
@@ -312,7 +312,7 @@ namespace ObjKeyResource
             }
             #endregion
 
-            public override AHandlerElement Clone(EventHandler handler) { return new CDTString(requestedApiVersion, handler, this); }
+            //public override AHandlerElement Clone(EventHandler handler) { return new CDTString(requestedApiVersion, handler, this); }
 
             public override int CompareTo(ComponentDataType other)
             {
@@ -340,9 +340,12 @@ namespace ObjKeyResource
             #endregion
 
             #region Constructors
-            public CDTResourceKey(int APIversion, EventHandler handler) : this(APIversion, handler, "CDTResourceKey-Key", (byte)0x01, (Int32)0) { }
-            public CDTResourceKey(int APIversion, EventHandler handler, CDTResourceKey basis) : this(APIversion, handler, basis.key, basis.controlCode, basis.data) { }
-            public CDTResourceKey(int APIversion, EventHandler handler, string key, byte controlCode, int data) : base(APIversion, handler, key, controlCode) { this.data = data; }
+            public CDTResourceKey(int APIversion, EventHandler handler, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : this(APIversion, handler, "CDTResourceKey-Key", (byte)0x01, (Int32)0) { this.ParentTGIBlocks = ParentTGIBlocks; }
+            public CDTResourceKey(int APIversion, EventHandler handler, CDTResourceKey basis, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : this(APIversion, handler, basis.key, basis.controlCode, basis.data, ParentTGIBlocks ?? basis.ParentTGIBlocks) { }
+            public CDTResourceKey(int APIversion, EventHandler handler, string key, byte controlCode, int data, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : base(APIversion, handler, key, controlCode) { this.ParentTGIBlocks = ParentTGIBlocks; this.data = data; }
             #endregion
 
             #region Data I/O
@@ -353,7 +356,7 @@ namespace ObjKeyResource
             }
             #endregion
 
-            public override AHandlerElement Clone(EventHandler handler) { return new CDTResourceKey(requestedApiVersion, handler, this); }
+            //public override AHandlerElement Clone(EventHandler handler) { return new CDTResourceKey(requestedApiVersion, handler, this); }
 
             public override int CompareTo(ComponentDataType other)
             {
@@ -366,19 +369,21 @@ namespace ObjKeyResource
 
             public override int GetHashCode(ComponentDataType obj) { return key.GetHashCode() ^ controlCode ^ data; }
 
-            [ElementPriority(2)]
-            [TGIBlockListContentField("ParentTGIBlocks")]
+            [ElementPriority(2), TGIBlockListContentField("ParentTGIBlocks")]
             public int Data { get { return data; } set { if (data != value) { data = value; OnElementChanged(); } } }
 
             public override string Value { get { return base.Value + "; Data: " + "0x" + data.ToString("X8") + " (" + (ParentTGIBlocks == null ? "unknown" : ParentTGIBlocks[data]) + ")"; } }
         }
         public class CDTAssetResourceName : CDTResourceKey
         {
-            public CDTAssetResourceName(int APIversion, EventHandler handler) : base(APIversion, handler, "CDTAssetResourceName-Key", (byte)0x02, (Int32)0) { }
-            public CDTAssetResourceName(int APIversion, EventHandler handler, CDTAssetResourceName basis) : base(APIversion, handler, basis) { }
-            public CDTAssetResourceName(int APIversion, EventHandler handler, string key, byte controlCode, int data) : base(APIversion, handler, key, controlCode, data) { }
+            public CDTAssetResourceName(int APIversion, EventHandler handler, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : base(APIversion, handler, "CDTAssetResourceName-Key", (byte)0x02, (Int32)0, ParentTGIBlocks) { }
+            public CDTAssetResourceName(int APIversion, EventHandler handler, CDTAssetResourceName basis, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : base(APIversion, handler, basis, ParentTGIBlocks ?? basis.ParentTGIBlocks) { }
+            public CDTAssetResourceName(int APIversion, EventHandler handler, string key, byte controlCode, int data, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : base(APIversion, handler, key, controlCode, data, ParentTGIBlocks) { }
 
-            public override AHandlerElement Clone(EventHandler handler) { return new CDTAssetResourceName(requestedApiVersion, handler, this); }
+            //public override AHandlerElement Clone(EventHandler handler) { return new CDTAssetResourceName(requestedApiVersion, handler, this); }
         }
         public class CDTSteeringInstance : CDTString
         {
@@ -388,7 +393,7 @@ namespace ObjKeyResource
             public CDTSteeringInstance(int APIversion, EventHandler handler, string key, byte controlCode, string data) : base(APIversion, handler, key, controlCode, data) { }
             #endregion
 
-            public override AHandlerElement Clone(EventHandler handler) { return new CDTSteeringInstance(requestedApiVersion, handler, this); }
+            //public override AHandlerElement Clone(EventHandler handler) { return new CDTSteeringInstance(requestedApiVersion, handler, this); }
         }
         public class CDTUInt32 : ComponentDataType
         {
@@ -410,7 +415,7 @@ namespace ObjKeyResource
             }
             #endregion
 
-            public override AHandlerElement Clone(EventHandler handler) { return new CDTUInt32(requestedApiVersion, handler, this); }
+            //public override AHandlerElement Clone(EventHandler handler) { return new CDTUInt32(requestedApiVersion, handler, this); }
 
             public override int CompareTo(ComponentDataType other)
             {
@@ -439,14 +444,17 @@ namespace ObjKeyResource
             }
 
             #region Constructors
-            public ComponentDataList(EventHandler handler) : base(handler, Byte.MaxValue) { }
-            public ComponentDataList(EventHandler handler, IEnumerable<ComponentDataType> luint) : base(handler, luint, Byte.MaxValue) { }
-            internal ComponentDataList(EventHandler handler, Stream s) : base(handler, s, Byte.MaxValue) { }
+            public ComponentDataList(EventHandler handler, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : base(handler, Byte.MaxValue) { _ParentTGIBlocks = ParentTGIBlocks; }
+            internal ComponentDataList(EventHandler handler, Stream s, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : this(null, ParentTGIBlocks) { elementHandler = handler; Parse(s); this.handler = handler; }
+            public ComponentDataList(EventHandler handler, IEnumerable<ComponentDataType> lcdt, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : this(null, ParentTGIBlocks) { elementHandler = handler; foreach (var t in lcdt) this.Add(t); this.handler = handler; }
             #endregion
 
             #region Data I/O
             protected override int ReadCount(Stream s) { return (new BinaryReader(s)).ReadByte(); }
-            protected override ComponentDataType CreateElement(Stream s) { return ComponentDataType.CreateComponentData(0, elementHandler, s); }
+            protected override ComponentDataType CreateElement(Stream s) { return ComponentDataType.CreateComponentData(0, elementHandler, s, _ParentTGIBlocks); }
 
             protected override void WriteCount(Stream s, int count) { (new BinaryWriter(s)).Write((byte)count); }
             protected override void WriteElement(Stream s, ComponentDataType element) { element.UnParse(s); }
@@ -465,7 +473,30 @@ namespace ObjKeyResource
                 set { this[IndexOf(this[key])] = value; }
             }
 
-            public override void Add() { throw new NotImplementedException(); }
+            //public override void Add() { throw new NotImplementedException(); }
+            public override void Add(ComponentDataType item)
+            {
+                if (item is CDTResourceKey) (item as CDTResourceKey).ParentTGIBlocks = _ParentTGIBlocks;
+                else if (item is CDTAssetResourceName) (item as CDTAssetResourceName).ParentTGIBlocks = _ParentTGIBlocks;
+                base.Add(item);
+            }
+            public override void Add(Type elementType)
+            {
+                if (elementType.IsAbstract)
+                    throw new ArgumentException("Must pass a concrete element type.", "elementType");
+
+                if (!typeof(ComponentDataType).IsAssignableFrom(elementType))
+                    throw new ArgumentException("The element type must belong to the generic type of the list.", "elementType");
+
+                ComponentDataType newElement;
+                if (elementType == typeof(CDTResourceKey))
+                    newElement = new CDTResourceKey(0, elementHandler, _ParentTGIBlocks);
+                else if (elementType == typeof(CDTAssetResourceName))
+                    newElement = new CDTAssetResourceName(0, elementHandler, _ParentTGIBlocks);
+                else
+                    newElement = Activator.CreateInstance(elementType, new object[] { (int)0, elementHandler, }) as ComponentDataType;
+                base.Add(newElement);
+            }
         }
 
         #endregion
@@ -476,7 +507,7 @@ namespace ObjKeyResource
         [ElementPriority(2)]
         public ComponentList Components { get { return components; } set { if (components != value) { components = value == null ? null : new ComponentList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(3)]
-        public ComponentDataList ComponentData { get { return componentData; } set { if (componentData != value) { componentData = value == null ? null : new ComponentDataList(OnResourceChanged, value) { ParentTGIBlocks = tgiBlocks }; OnResourceChanged(this, new EventArgs()); } } }
+        public ComponentDataList ComponentData { get { return componentData; } set { if (componentData != value) { componentData = value == null ? null : new ComponentDataList(OnResourceChanged, value, tgiBlocks); OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(4)]
         public byte Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(5)]

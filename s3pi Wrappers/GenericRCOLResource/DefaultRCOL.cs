@@ -60,12 +60,12 @@ namespace s3pi.GenericRCOLResource
         /// <param name="s">The <see cref="Stream"/> containing the data.</param>
         protected override void Parse(Stream s) { data = new byte[s.Length]; s.Read(data, 0, (int)s.Length); }
 
-        /// <summary>
-        /// Creating a copy of this instance with a new change <see cref="EventHandler"/>.
-        /// </summary>
-        /// <param name="handler">The <see cref="EventHandler"/> for the new instance.</param>
-        /// <returns>A new instance with a copy of the data and the given change <see cref="EventHandler"/>.</returns>
-        public override AHandlerElement Clone(EventHandler handler) { return new DefaultRCOL(requestedApiVersion, handler, this); }
+        // /// <summary>
+        // /// Creating a copy of this instance with a new change <see cref="EventHandler"/>.
+        // /// </summary>
+        // /// <param name="handler">The <see cref="EventHandler"/> for the new instance.</param>
+        // /// <returns>A new instance with a copy of the data and the given change <see cref="EventHandler"/>.</returns>
+        // public override AHandlerElement Clone(EventHandler handler) { return new DefaultRCOL(requestedApiVersion, handler, this); }
 
         /// <summary>
         /// DefaultRCOL only supplies &quot;Tag&quot; for <see cref="GenericRCOLResourceHandler"/>.

@@ -94,7 +94,7 @@ namespace s3pi.GenericRCOLResource
             #region DependentList<Animation>
             protected override GenericRCOLResource.ChunkReference CreateElement(Stream s) { return new GenericRCOLResource.ChunkReference(0, handler, s); }
             protected override void WriteElement(Stream s, GenericRCOLResource.ChunkReference element) { element.UnParse(s); }
-            public override void Add() { this.Add(new GenericRCOLResource.ChunkReference(0, null, 0)); }
+            //public override void Add() { this.Add(new GenericRCOLResource.ChunkReference(0, null, 0)); }
             #endregion
         }
 
@@ -237,7 +237,7 @@ namespace s3pi.GenericRCOLResource
             return ms;
         }
 
-        public override AHandlerElement Clone(EventHandler handler) { return new JazzStateMachine(requestedApiVersion, handler, this); }
+        // public override AHandlerElement Clone(EventHandler handler) { return new JazzStateMachine(requestedApiVersion, handler, this); }
         #endregion
 
         #region Sub-types
@@ -290,7 +290,7 @@ namespace s3pi.GenericRCOLResource
             #endregion
 
             #region AHandlerElement
-            public override AHandlerElement Clone(EventHandler handler) { return new Animation(requestedApiVersion, handler, this); }
+            // public override AHandlerElement Clone(EventHandler handler) { return new Animation(requestedApiVersion, handler, this); }
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
             public override List<string> ContentFields { get { return AApiVersionedFields.GetContentFields(requestedApiVersion, this.GetType()); } }
             #endregion
@@ -324,7 +324,7 @@ namespace s3pi.GenericRCOLResource
             #region DependentList<Animation>
             protected override Animation CreateElement(Stream s) { return new Animation(0, handler, s); }
             protected override void WriteElement(Stream s, Animation element) { element.UnParse(s); }
-            public override void Add() { this.Add(new Animation(0, null)); }
+            //public override void Add() { this.Add(new Animation(0, null)); }
             #endregion
         }
         #endregion
@@ -443,7 +443,7 @@ namespace s3pi.GenericRCOLResource
             return ms;
         }
 
-        public override AHandlerElement Clone(EventHandler handler) { return new JazzState(requestedApiVersion, handler, this); }
+        // public override AHandlerElement Clone(EventHandler handler) { return new JazzState(requestedApiVersion, handler, this); }
         #endregion
 
         #region ContentFields
@@ -537,7 +537,7 @@ namespace s3pi.GenericRCOLResource
             return ms;
         }
 
-        public override AHandlerElement Clone(EventHandler handler) { return new JazzDecisionGraph(requestedApiVersion, handler, this); }
+        // public override AHandlerElement Clone(EventHandler handler) { return new JazzDecisionGraph(requestedApiVersion, handler, this); }
         #endregion
 
         #region ContentFields
@@ -616,7 +616,7 @@ namespace s3pi.GenericRCOLResource
             return ms;
         }
 
-        public override AHandlerElement Clone(EventHandler handler) { return new JazzActorDefinition(requestedApiVersion, handler, this); }
+        // public override AHandlerElement Clone(EventHandler handler) { return new JazzActorDefinition(requestedApiVersion, handler, this); }
         #endregion
 
         #region ContentFields
@@ -693,7 +693,7 @@ namespace s3pi.GenericRCOLResource
             return ms;
         }
 
-        public override AHandlerElement Clone(EventHandler handler) { return new JazzParameterDefinition(requestedApiVersion, handler, this); }
+        // public override AHandlerElement Clone(EventHandler handler) { return new JazzParameterDefinition(requestedApiVersion, handler, this); }
         #endregion
 
         #region ContentFields
@@ -963,7 +963,7 @@ namespace s3pi.GenericRCOLResource
             return ms;
         }
 
-        public override AHandlerElement Clone(EventHandler handler) { return new JazzPlayAnimationNode(requestedApiVersion, handler, this); }
+        // public override AHandlerElement Clone(EventHandler handler) { return new JazzPlayAnimationNode(requestedApiVersion, handler, this); }
         #endregion
 
         #region Sub-types
@@ -1024,7 +1024,7 @@ namespace s3pi.GenericRCOLResource
             #endregion
 
             #region AHandlerElement
-            public override AHandlerElement Clone(EventHandler handler) { return new ActorSlot(requestedApiVersion, handler, this); }
+            // public override AHandlerElement Clone(EventHandler handler) { return new ActorSlot(requestedApiVersion, handler, this); }
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
             public override List<string> ContentFields { get { return AApiVersionedFields.GetContentFields(requestedApiVersion, this.GetType()); } }
             #endregion
@@ -1067,7 +1067,7 @@ namespace s3pi.GenericRCOLResource
 
             protected override void WriteElement(Stream s, ActorSlot element) { element.UnParse(s); }
 
-            public override void Add() { this.Add(new ActorSlot(0, null)); }
+            //public override void Add() { this.Add(new ActorSlot(0, null)); }
             #endregion
         }
         public class ActorSuffix : AHandlerElement, IEquatable<ActorSuffix>
@@ -1115,7 +1115,7 @@ namespace s3pi.GenericRCOLResource
             #endregion
 
             #region AHandlerElement
-            public override AHandlerElement Clone(EventHandler handler) { return new ActorSuffix(requestedApiVersion, handler, this); }
+            // public override AHandlerElement Clone(EventHandler handler) { return new ActorSuffix(requestedApiVersion, handler, this); }
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
             public override List<string> ContentFields { get { return AApiVersionedFields.GetContentFields(requestedApiVersion, this.GetType()); } }
             #endregion
@@ -1149,7 +1149,7 @@ namespace s3pi.GenericRCOLResource
 
             protected override void WriteElement(Stream s, ActorSuffix element) { element.UnParse(s); }
 
-            public override void Add() { this.Add(new ActorSuffix(0, null)); }
+            //public override void Add() { this.Add(new ActorSuffix(0, null)); }
             #endregion
         }
         #endregion
@@ -1289,7 +1289,7 @@ namespace s3pi.GenericRCOLResource
             return ms;
         }
 
-        public override AHandlerElement Clone(EventHandler handler) { return new JazzRandomNode(requestedApiVersion, handler, this); }
+        // public override AHandlerElement Clone(EventHandler handler) { return new JazzRandomNode(requestedApiVersion, handler, this); }
         #endregion
 
         #region Sub-types
@@ -1337,7 +1337,7 @@ namespace s3pi.GenericRCOLResource
             #endregion
 
             #region AHandlerElement
-            public override AHandlerElement Clone(EventHandler handler) { return new Outcome(requestedApiVersion, handler, this); }
+            // public override AHandlerElement Clone(EventHandler handler) { return new Outcome(requestedApiVersion, handler, this); }
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
             public override List<string> ContentFields { get { return AApiVersionedFields.GetContentFields(requestedApiVersion, this.GetType()); } }
             #endregion
@@ -1371,7 +1371,7 @@ namespace s3pi.GenericRCOLResource
 
             protected override void WriteElement(Stream s, Outcome element) { element.UnParse(s); }
 
-            public override void Add() { this.Add(new Outcome(0, null));  }
+            //public override void Add() { this.Add(new Outcome(0, null));  }
             #endregion
         }
         #endregion
@@ -1458,7 +1458,7 @@ namespace s3pi.GenericRCOLResource
             return ms;
         }
 
-        public override AHandlerElement Clone(EventHandler handler) { return new JazzSelectOnParameterNode(requestedApiVersion, handler, this); }
+        // public override AHandlerElement Clone(EventHandler handler) { return new JazzSelectOnParameterNode(requestedApiVersion, handler, this); }
         #endregion
 
         #region Sub-types
@@ -1506,7 +1506,7 @@ namespace s3pi.GenericRCOLResource
             #endregion
 
             #region AHandlerElement
-            public override AHandlerElement Clone(EventHandler handler) { return new Match(requestedApiVersion, handler, this); }
+            // public override AHandlerElement Clone(EventHandler handler) { return new Match(requestedApiVersion, handler, this); }
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
             public override List<string> ContentFields { get { return AApiVersionedFields.GetContentFields(requestedApiVersion, this.GetType()); } }
             #endregion
@@ -1540,7 +1540,7 @@ namespace s3pi.GenericRCOLResource
 
             protected override void WriteElement(Stream s, Match element) { element.UnParse(s); }
 
-            public override void Add() { this.Add(new Match(0, null)); }
+            //public override void Add() { this.Add(new Match(0, null)); }
             #endregion
         }
         #endregion
@@ -1629,7 +1629,7 @@ namespace s3pi.GenericRCOLResource
             return ms;
         }
 
-        public override AHandlerElement Clone(EventHandler handler) { return new JazzNextStateNode(requestedApiVersion, handler, this); }
+        // public override AHandlerElement Clone(EventHandler handler) { return new JazzNextStateNode(requestedApiVersion, handler, this); }
         #endregion
 
         #region ContentFields
@@ -1753,7 +1753,7 @@ namespace s3pi.GenericRCOLResource
             return ms;
         }
 
-        public override AHandlerElement Clone(EventHandler handler) { return new JazzCreatePropNode(requestedApiVersion, handler, this); }
+        // public override AHandlerElement Clone(EventHandler handler) { return new JazzCreatePropNode(requestedApiVersion, handler, this); }
         #endregion
 
         #region ContentFields
@@ -1878,7 +1878,7 @@ namespace s3pi.GenericRCOLResource
             return ms;
         }
 
-        public override AHandlerElement Clone(EventHandler handler) { return new JazzActorOperationNode(requestedApiVersion, handler, this); }
+        // public override AHandlerElement Clone(EventHandler handler) { return new JazzActorOperationNode(requestedApiVersion, handler, this); }
         #endregion
 
         #region Sub-types
@@ -2066,7 +2066,7 @@ namespace s3pi.GenericRCOLResource
             return ms;
         }
 
-        public override AHandlerElement Clone(EventHandler handler) { return new JazzStopAnimationNode(requestedApiVersion, handler, this); }
+        // public override AHandlerElement Clone(EventHandler handler) { return new JazzStopAnimationNode(requestedApiVersion, handler, this); }
         #endregion
 
         #region ContentFields

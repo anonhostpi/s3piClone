@@ -60,10 +60,7 @@ namespace meshExpImp.ModelBlocks
             return String.Format("[{0,8:0.00000},{1,8:0.00000}]", X, Y);
         }
 
-        public override AHandlerElement Clone(EventHandler handler)
-        {
-            return new Vector2(0, handler, this);
-        }
+        //public override AHandlerElement Clone(EventHandler handler) { return new Vector2(0, handler, this); }
 
         public override List<string> ContentFields
         {

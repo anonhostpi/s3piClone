@@ -91,7 +91,7 @@ namespace meshExpImp.ModelBlocks
         [ElementPriority(3)]
         public override uint ResourceType { get { return 0x015A1849; } }
 
-        public override AHandlerElement Clone(EventHandler handler) { return new GEOM(requestedApiVersion, handler, this); }
+        // public override AHandlerElement Clone(EventHandler handler) { return new GEOM(requestedApiVersion, handler, this); }
 
         public override List<string> ContentFields
         {
@@ -289,7 +289,7 @@ namespace meshExpImp.ModelBlocks
             }
 
             #region AHandlerElement
-            public override AHandlerElement Clone(EventHandler handler) { return new VertexFormat(requestedApiVersion, handler, this); }
+            // public override AHandlerElement Clone(EventHandler handler) { return new VertexFormat(requestedApiVersion, handler, this); }
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
             public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
             #endregion
@@ -321,7 +321,7 @@ namespace meshExpImp.ModelBlocks
             protected override VertexFormat CreateElement(Stream s) { return new VertexFormat(0, elementHandler, s); }
             protected override void WriteElement(Stream s, VertexFormat element) { element.UnParse(s); }
 
-            public override void Add() { this.Add(new VertexFormat(0, elementHandler)); }
+            //public override void Add() { this.Add(new VertexFormat(0, elementHandler)); }
         }
         #endregion
 
@@ -358,7 +358,7 @@ namespace meshExpImp.ModelBlocks
             protected override void Parse(Stream s) { BinaryReader r = new BinaryReader(s); x = r.ReadSingle(); y = r.ReadSingle(); z = r.ReadSingle(); }
             internal override void UnParse(Stream s) { BinaryWriter w = new BinaryWriter(s); w.Write(x); w.Write(y); w.Write(z); }
 
-            public override AHandlerElement Clone(EventHandler handler) { return new PositionElement(requestedApiVersion, handler, this); }
+            // public override AHandlerElement Clone(EventHandler handler) { return new PositionElement(requestedApiVersion, handler, this); }
             public override bool Equals(VertexElement other) { PositionElement o = other as PositionElement; return o != null && x.Equals(o.x) && y.Equals(o.y) && z.Equals(o.z); }
             public override bool Equals(object obj) { return obj is PositionElement && this.Equals(obj as PositionElement); }
             public override int GetHashCode() { return x.GetHashCode() ^ y.GetHashCode() ^ z.GetHashCode(); }
@@ -377,7 +377,7 @@ namespace meshExpImp.ModelBlocks
             public NormalElement(int APIversion, EventHandler handler, NormalElement basis) : this(APIversion, handler, basis.x, basis.y, basis.z) { }
             public NormalElement(int APIversion, EventHandler handler, float x, float y, float z) : base(APIversion, handler) { this.x = x; this.y = y; this.z = z; }
 
-            public override AHandlerElement Clone(EventHandler handler) { return new NormalElement(requestedApiVersion, handler, this); }
+            // public override AHandlerElement Clone(EventHandler handler) { return new NormalElement(requestedApiVersion, handler, this); }
             public override bool Equals(VertexElement other) { NormalElement o = other as NormalElement; return o != null && x.Equals(o.x) && y.Equals(o.y) && z.Equals(o.z); }
             public override bool Equals(object obj) { return obj is NormalElement && this.Equals(obj as NormalElement); }
             public override int GetHashCode() { return base.GetHashCode(); }
@@ -394,7 +394,7 @@ namespace meshExpImp.ModelBlocks
             protected override void Parse(Stream s) { BinaryReader r = new BinaryReader(s); u = r.ReadSingle(); v = r.ReadSingle(); }
             internal override void UnParse(Stream s) { BinaryWriter w = new BinaryWriter(s); w.Write(u); w.Write(v);  }
 
-            public override AHandlerElement Clone(EventHandler handler) { return new UVElement(requestedApiVersion, handler, this); }
+            // public override AHandlerElement Clone(EventHandler handler) { return new UVElement(requestedApiVersion, handler, this); }
             public override bool Equals(VertexElement other) { UVElement o = other as UVElement; return o != null && u.Equals(o.u) && v.Equals(o.v); }
             public override bool Equals(object obj) { return obj is UVElement && this.Equals(obj as UVElement); }
             public override int GetHashCode() { return u.GetHashCode() ^ v.GetHashCode(); }
@@ -416,7 +416,7 @@ namespace meshExpImp.ModelBlocks
             protected override void Parse(Stream s) { BinaryReader r = new BinaryReader(s); id = r.ReadUInt32(); }
             internal override void UnParse(Stream s) { BinaryWriter w = new BinaryWriter(s); w.Write(id); }
 
-            public override AHandlerElement Clone(EventHandler handler) { return new BoneAssignmentElement(requestedApiVersion, handler, this); }
+            // public override AHandlerElement Clone(EventHandler handler) { return new BoneAssignmentElement(requestedApiVersion, handler, this); }
             public override bool Equals(VertexElement other) { BoneAssignmentElement o = other as BoneAssignmentElement; return o != null && id.Equals(o.id); }
             public override bool Equals(object obj) { return obj is BoneAssignmentElement && this.Equals(obj as BoneAssignmentElement); }
             public override int GetHashCode() { return id.GetHashCode(); }
@@ -436,7 +436,7 @@ namespace meshExpImp.ModelBlocks
             protected override void Parse(Stream s) { BinaryReader r = new BinaryReader(s); w1 = r.ReadSingle(); w2 = r.ReadSingle(); w3 = r.ReadSingle(); w4 = r.ReadSingle(); }
             internal override void UnParse(Stream s) { BinaryWriter w = new BinaryWriter(s); w.Write(w1); w.Write(w2); w.Write(w3); w.Write(w4); }
 
-            public override AHandlerElement Clone(EventHandler handler) { return new WeightsElement(requestedApiVersion, handler, this); }
+            // public override AHandlerElement Clone(EventHandler handler) { return new WeightsElement(requestedApiVersion, handler, this); }
             public override bool Equals(VertexElement other) { WeightsElement o = other as WeightsElement; return o != null && w1.Equals(o.w1) && w2.Equals(o.w2) && w3.Equals(o.w3) && w3.Equals(o.w4); }
             public override bool Equals(object obj) { return obj is WeightsElement && this.Equals(obj as WeightsElement); }
             public override int GetHashCode() { return w1.GetHashCode() ^ w2.GetHashCode() ^ w3.GetHashCode() ^ w4.GetHashCode(); }
@@ -457,7 +457,7 @@ namespace meshExpImp.ModelBlocks
             public TangentNormalElement(int APIversion, EventHandler handler, TangentNormalElement basis) : this(APIversion, handler, basis.x, basis.y, basis.z) { }
             public TangentNormalElement(int APIversion, EventHandler handler, float x, float y, float z) : base(APIversion, handler) { this.x = x; this.y = y; this.z = z; }
 
-            public override AHandlerElement Clone(EventHandler handler) { return new TangentNormalElement(requestedApiVersion, handler, this); }
+            // public override AHandlerElement Clone(EventHandler handler) { return new TangentNormalElement(requestedApiVersion, handler, this); }
             public override bool Equals(VertexElement other) { TangentNormalElement o = other as TangentNormalElement; return o != null && x.Equals(o.x) && y.Equals(o.y) && z.Equals(o.z); }
             public override bool Equals(object obj) { return obj is TangentNormalElement && this.Equals(obj as TangentNormalElement); }
             public override int GetHashCode() { return base.GetHashCode(); }
@@ -474,7 +474,7 @@ namespace meshExpImp.ModelBlocks
             protected override void Parse(Stream s) { BinaryReader r = new BinaryReader(s); argb = r.ReadUInt32(); }
             internal override void UnParse(Stream s) { BinaryWriter w = new BinaryWriter(s); w.Write(argb); }
 
-            public override AHandlerElement Clone(EventHandler handler) { return new ColorElement(requestedApiVersion, handler, this); }
+            // public override AHandlerElement Clone(EventHandler handler) { return new ColorElement(requestedApiVersion, handler, this); }
             public override bool Equals(VertexElement other) { ColorElement o = other as ColorElement; return o != null && argb.Equals(o.argb); }
             public override bool Equals(object obj) { return obj is PositionElement && this.Equals(obj as PositionElement); }
             public override int GetHashCode() { return argb.GetHashCode(); }
@@ -486,7 +486,7 @@ namespace meshExpImp.ModelBlocks
             public VertexIDElement(int APIversion, EventHandler handler, VertexIDElement basis) : this(APIversion, handler, basis.id) { }
             public VertexIDElement(int APIversion, EventHandler handler, uint id) : base(APIversion, handler) { this.id = id; }
 
-            public override AHandlerElement Clone(EventHandler handler) { return new VertexIDElement(requestedApiVersion, handler, this); }
+            // public override AHandlerElement Clone(EventHandler handler) { return new VertexIDElement(requestedApiVersion, handler, this); }
             public override bool Equals(VertexElement other) { VertexIDElement o = other as VertexIDElement; return o != null && id.Equals(o.id); }
             public override bool Equals(object obj) { return obj is VertexIDElement && this.Equals(obj as VertexIDElement); }
             public override int GetHashCode() { return base.GetHashCode(); }
@@ -595,7 +595,7 @@ namespace meshExpImp.ModelBlocks
 
                     int index = this.IndexOf(vtx);
                     if (value.GetType().Equals(vtx.GetType()))
-                        this[index] = (VertexElement)vtx.Clone(handler);
+                        this[index] = vtx.Clone(handler) as VertexElement;
                     else
                         throw new ArgumentException();
                 }
@@ -606,25 +606,25 @@ namespace meshExpImp.ModelBlocks
             const int recommendedApiVersion = 1;
 
             ElementList elementList;
-            DependentList<VertexFormat> parentVertexFormats;
+            public DependentList<VertexFormat> ParentVertexFormats { get; set; }
+            public override List<string> ContentFields { get { var res = GetContentFields(requestedApiVersion, this.GetType()); res.Remove("ParentVertexFormats"); return res; } }
 
-            public VertexDataElement(int APIversion, EventHandler handler, DependentList<VertexFormat> parentVertexFormats) : base(APIversion, handler) { this.parentVertexFormats = parentVertexFormats; }
-            public VertexDataElement(int APIversion, EventHandler handler, Stream s, DependentList<VertexFormat> parentVertexFormats) : base(APIversion, handler) { this.parentVertexFormats = parentVertexFormats; Parse(s); }
-            public VertexDataElement(int APIversion, EventHandler handler, VertexDataElement basis) : this(APIversion, handler, basis.elementList, basis.parentVertexFormats) { }
+            public VertexDataElement(int APIversion, EventHandler handler, DependentList<VertexFormat> parentVertexFormats) : base(APIversion, handler) { this.ParentVertexFormats = parentVertexFormats; }
+            public VertexDataElement(int APIversion, EventHandler handler, Stream s, DependentList<VertexFormat> parentVertexFormats) : base(APIversion, handler) { this.ParentVertexFormats = parentVertexFormats; Parse(s); }
+            public VertexDataElement(int APIversion, EventHandler handler, VertexDataElement basis) : this(APIversion, handler, basis.elementList, basis.ParentVertexFormats) { }
             public VertexDataElement(int APIversion, EventHandler handler, DependentList<VertexElement> elementList, DependentList<VertexFormat> parentVertexFormats)
                 : base(APIversion, handler)
             {
-                this.parentVertexFormats = parentVertexFormats;//reference!
-                this.elementList = new ElementList(handler, elementList, parentVertexFormats);
+                this.ParentVertexFormats = parentVertexFormats;//reference!
+                this.elementList = new ElementList(handler, elementList, ParentVertexFormats);
             }
 
-            private void Parse(Stream s) { elementList = new ElementList(handler, s, parentVertexFormats); }
+            private void Parse(Stream s) { elementList = new ElementList(handler, s, ParentVertexFormats); }
             internal void UnParse(Stream s) { elementList.UnParse(s); }
 
             #region AHandlerElement
-            public override AHandlerElement Clone(EventHandler handler) { return new VertexDataElement(requestedApiVersion, handler, this); }
+            // public override AHandlerElement Clone(EventHandler handler) { return new VertexDataElement(requestedApiVersion, handler, this); }
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
-            public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
             #endregion
 
             public bool Equals(VertexDataElement other) { return elementList.Equals(other.elementList); }
@@ -634,7 +634,7 @@ namespace meshExpImp.ModelBlocks
             public ElementList Vertex
             {
                 get { return elementList; }
-                set { if (!elementList.Equals(value)) { elementList = new ElementList(handler, value, parentVertexFormats); OnElementChanged(); } }
+                set { if (!elementList.Equals(value)) { elementList = new ElementList(handler, value, ParentVertexFormats); OnElementChanged(); } }
             }
 
             public string Value
@@ -642,7 +642,7 @@ namespace meshExpImp.ModelBlocks
                 get
                 {
                     StringBuilder sb = new StringBuilder();
-                    foreach (var fmt in parentVertexFormats)
+                    foreach (var fmt in ParentVertexFormats)
                     {
                         sb.AppendLine(fmt.Usage.ToString() + ": " + elementList[fmt.Usage].Value);
                     }
@@ -659,7 +659,15 @@ namespace meshExpImp.ModelBlocks
             #region Constructors
             public VertexDataList(EventHandler handler, DependentList<VertexFormat> parentVertexFormats) : base(handler) { this.parentVertexFormats = parentVertexFormats; }
             public VertexDataList(EventHandler handler, Stream s, int origCount, DependentList<VertexFormat> parentVertexFormats) : base(null) { this.origCount = origCount; this.parentVertexFormats = parentVertexFormats; elementHandler = handler; Parse(s); this.handler = handler; }
-            public VertexDataList(EventHandler handler, IEnumerable<VertexDataElement> ilt, DependentList<VertexFormat> parentVertexFormats) : base(null) { this.parentVertexFormats = parentVertexFormats; elementHandler = handler; foreach (var t in ilt) this.Add(t); this.handler = handler; }
+            public VertexDataList(EventHandler handler, IEnumerable<VertexDataElement> ilt, DependentList<VertexFormat> parentVertexFormats)
+                : base(null)
+            {
+                this.parentVertexFormats = parentVertexFormats;
+                elementHandler = handler;
+                foreach (var t in ilt)
+                    this.Add(t);
+                this.handler = handler;
+            }
             #endregion
 
             protected override int ReadCount(Stream s) { return origCount; }
@@ -669,6 +677,7 @@ namespace meshExpImp.ModelBlocks
             protected override void WriteElement(Stream s, VertexDataElement element) { element.UnParse(s); }
 
             public override void Add() { this.Add(new VertexDataElement(0, elementHandler, parentVertexFormats)); }
+            public override void Add(VertexDataElement item) { item.ParentVertexFormats = parentVertexFormats; base.Add(item); }
         }
         #endregion
 
@@ -710,7 +719,7 @@ namespace meshExpImp.ModelBlocks
             }
 
             #region AHandlerElement
-            public override AHandlerElement Clone(EventHandler handler) { return new Face(requestedApiVersion, handler, this); }
+            // public override AHandlerElement Clone(EventHandler handler) { return new Face(requestedApiVersion, handler, this); }
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
             public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
             #endregion
@@ -750,7 +759,7 @@ namespace meshExpImp.ModelBlocks
             protected override void WriteCount(Stream s, int count) { base.WriteCount(s, (int)(count * 3)); }
             protected override void WriteElement(Stream s, Face element) { element.UnParse(s); }
 
-            public override void Add() { this.Add(new Face(0, elementHandler)); }
+            //public override void Add() { this.Add(new Face(0, elementHandler)); }
         }
         #endregion
 

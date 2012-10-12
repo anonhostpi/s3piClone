@@ -81,7 +81,7 @@ namespace s3pi.GenericRCOLResource
             return ms;
         }
 
-        public override AHandlerElement Clone(EventHandler handler) { return new FTPT(requestedApiVersion, handler, this); }
+        //public override AHandlerElement Clone(EventHandler handler) { return new FTPT(requestedApiVersion, handler, this); }
         #endregion
 
         #region Sub-types
@@ -131,7 +131,7 @@ namespace s3pi.GenericRCOLResource
             /// </summary>
             public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
 
-            public override AHandlerElement Clone(EventHandler handler) { return new PolygonPoint(requestedApiVersion, handler, this); }
+            //public override AHandlerElement Clone(EventHandler handler) { return new PolygonPoint(requestedApiVersion, handler, this); }
             #endregion
 
             #region IEquatable<PolygonPoint> Members
@@ -177,7 +177,7 @@ namespace s3pi.GenericRCOLResource
             protected override void WriteElement(Stream s, PolygonPoint element) { element.UnParse(s); }
             #endregion
 
-            public override void Add() { this.Add(new PolygonPoint(0, null)); }
+            //public override void Add() { this.Add(new PolygonPoint(0, null)); }
         }
 
         [Flags]
@@ -238,7 +238,7 @@ namespace s3pi.GenericRCOLResource
         {
             const int recommendedApiVersion = 1;
 
-            uint version;//of FTPT - not a ContentFields property
+            public uint ParentVersion { get; set; }
 
             #region Attributes
             uint name;
@@ -257,15 +257,15 @@ namespace s3pi.GenericRCOLResource
             #region Constructors
             public Area(int APIversion, EventHandler handler, uint version) : base(APIversion, handler)
             {
-                this.version = version;
+                this.ParentVersion = version;
                 Stream ms = new MemoryStream();
                 UnParse(ms);
                 ms.Position = 0;
                 Parse(ms);
             }
-            public Area(int APIversion, EventHandler handler, Stream s, uint version) : base(APIversion, handler) { this.version = version; Parse(s); }
+            public Area(int APIversion, EventHandler handler, Stream s, uint version) : base(APIversion, handler) { this.ParentVersion = version; Parse(s); }
             public Area(int APIversion, EventHandler handler, Area basis)
-                : this(APIversion, handler, basis.version,
+                : this(APIversion, handler, basis.ParentVersion,
                 basis.name, basis.priority, basis.areaTypeFlags, basis.closedPolygon,
                 basis.allowIntersectionFlags, basis.surfaceTypeFlags, basis.surfaceAttributeFlags,
                 basis.levelOffset,
@@ -294,7 +294,7 @@ namespace s3pi.GenericRCOLResource
                 PolygonPoint lower, PolygonPoint upper)
                 : base(APIversion, handler)
             {
-                this.version = version;
+                this.ParentVersion = version;
 
                 this.name = name;
                 this.priority = priority;
@@ -322,7 +322,7 @@ namespace s3pi.GenericRCOLResource
                 this.surfaceTypeFlags = (SurfaceType)r.ReadUInt32();
                 this.surfaceAttributeFlags = (SurfaceAttribute)r.ReadUInt32();
                 this.levelOffset = r.ReadByte();
-                this.elevationOffset = version >= 0x00000007 ? r.ReadSingle() : 0;
+                this.elevationOffset = ParentVersion >= 0x00000007 ? r.ReadSingle() : 0;
                 this.lower = new PolygonPoint(requestedApiVersion, handler, s);
                 this.upper = new PolygonPoint(requestedApiVersion, handler, s);
             }
@@ -339,7 +339,7 @@ namespace s3pi.GenericRCOLResource
                 w.Write((uint)surfaceTypeFlags);
                 w.Write((uint)surfaceAttributeFlags);
                 w.Write(levelOffset);
-                if (version >= 0x00000007) w.Write(elevationOffset);
+                if (ParentVersion >= 0x00000007) w.Write(elevationOffset);
                 if (lower == null) lower = new PolygonPoint(requestedApiVersion, handler);
                 lower.UnParse(s);
                 if (upper == null) upper = new PolygonPoint(requestedApiVersion, handler);
@@ -358,7 +358,8 @@ namespace s3pi.GenericRCOLResource
                 get
                 {
                     List<string> res = GetContentFields(requestedApiVersion, this.GetType());
-                    if (version < 0x00000007)
+                    res.Remove("ParentVersion");
+                    if (ParentVersion < 0x00000007)
                     {
                         res.Remove("ElevationOffset");
                     }
@@ -366,7 +367,7 @@ namespace s3pi.GenericRCOLResource
                 }
             }
 
-            public override AHandlerElement Clone(EventHandler handler) { return new Area(requestedApiVersion, handler, this); }
+            //public override AHandlerElement Clone(EventHandler handler) { return new Area(requestedApiVersion, handler, this); }
             #endregion
 
             #region IEquatable<Area> Members
@@ -426,8 +427,8 @@ namespace s3pi.GenericRCOLResource
             [ElementPriority(9)]
             public float ElevationOffset
             {
-                get { if (version < 0x00000007) throw new InvalidOperationException(); return elevationOffset; }
-                set { if (version < 0x00000007) throw new InvalidOperationException(); if (elevationOffset != value) { elevationOffset = value; OnElementChanged(); } }
+                get { if (ParentVersion < 0x00000007) throw new InvalidOperationException(); return elevationOffset; }
+                set { if (ParentVersion < 0x00000007) throw new InvalidOperationException(); if (elevationOffset != value) { elevationOffset = value; OnElementChanged(); } }
             }
             [ElementPriority(10)]
             public PolygonPoint Lower { get { return lower; } set { if (lower != value) { lower = value; OnElementChanged(); } } }
@@ -462,29 +463,36 @@ namespace s3pi.GenericRCOLResource
         }
         public class AreaList : DependentList<Area>
         {
-            uint version;
+            uint _ParentVersion;
+            public uint ParentVersion
+            {
+                get { return _ParentVersion; }
+                set { if (_ParentVersion != value) { _ParentVersion = value; foreach (var i in this) i.ParentVersion = _ParentVersion; } }
+            }
+
             #region Constructors
-            public AreaList(EventHandler handler, uint version) : base(handler, 255) { this.version = version; }
-            public AreaList(EventHandler handler, Stream s, uint version) : base(null, 255) { this.version = version; elementHandler = handler; Parse(s); this.handler = handler; }
-            public AreaList(EventHandler handler, IEnumerable<Area> lfpa, uint version) : base(null, 255) { this.version = version; elementHandler = handler; this.AddRange(lfpa); this.handler = handler; }
+            public AreaList(EventHandler handler, uint version) : base(handler, 255) { this._ParentVersion = version; }
+            public AreaList(EventHandler handler, Stream s, uint version) : base(null, 255) { this._ParentVersion = version; elementHandler = handler; Parse(s); this.handler = handler; }
+            public AreaList(EventHandler handler, IEnumerable<Area> lfpa, uint version) : base(null, 255) { this._ParentVersion = version; elementHandler = handler; this.AddRange(lfpa); this.handler = handler; }
             #endregion
 
             #region Data I/O
             protected override int ReadCount(Stream s) { return (new BinaryReader(s)).ReadByte(); }
             protected override void WriteCount(Stream s, int count) { (new BinaryWriter(s)).Write((byte)count); }
 
-            protected override Area CreateElement(Stream s) { return new Area(0, elementHandler, s, version); }
+            protected override Area CreateElement(Stream s) { return new Area(0, elementHandler, s, _ParentVersion); }
 
             protected override void WriteElement(Stream s, Area element) { element.UnParse(s); }
             #endregion
 
-            public override void Add() { this.Add(new Area(0, null, version)); }
+            public override void Add() { this.Add(new Area(0, handler, _ParentVersion)); }
+            public override void Add(Area item) { item.ParentVersion = _ParentVersion; base.Add(item); }
         }
         #endregion
 
         #region Content Fields
         [ElementPriority(11)]
-        public uint Version { get { return version; } set { if (version != value) { version = value; OnRCOLChanged(this, EventArgs.Empty); } } }
+        public uint Version { get { return version; } set { if (version != value) { version = value; footprintAreas.ParentVersion = version; slotAreas.ParentVersion = version; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(12)]
         public AreaList FootprintAreas { get { return footprintAreas; } set { if (footprintAreas != value) { footprintAreas = new AreaList(OnRCOLChanged, value, version); OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(13)]

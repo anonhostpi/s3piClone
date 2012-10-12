@@ -48,7 +48,7 @@ namespace meshExpImp.ModelBlocks
             public BoundingBoxList(EventHandler handler) : base(handler) { }
             public BoundingBoxList(EventHandler handler, Stream s) : base(handler, s) { }
             public BoundingBoxList(EventHandler handler, IEnumerable<BoundingBox> ilt) : base(handler, ilt) { }
-            public override void Add() { base.Add(new BoundingBox(0, null)); }
+            //public override void Add() { base.Add(new BoundingBox(0, null)); }
             protected override BoundingBox CreateElement(Stream s) { return new BoundingBox(0, this.handler, s); }
             protected override void WriteElement(Stream s, BoundingBox element) { element.UnParse(s); }
         }
@@ -77,7 +77,7 @@ namespace meshExpImp.ModelBlocks
                     WriteElement(s, element);
                 }
             }
-            public override void Add() { base.Add(new LODEntry(0, null)); }
+            //public override void Add() { base.Add(new LODEntry(0, null)); }
 
             protected override LODEntry CreateElement(Stream s) { return new LODEntry(0, handler, s); }
 
@@ -174,10 +174,7 @@ namespace meshExpImp.ModelBlocks
                 bw.Write(mMaxZValue);
             }
 
-            public override AHandlerElement Clone(EventHandler handler)
-            {
-                return new LODEntry(0, handler, this);
-            }
+            //public override AHandlerElement Clone(EventHandler handler) { return new LODEntry(0, handler, this); }
 
             public override List<string> ContentFields
             {
@@ -272,10 +269,7 @@ namespace meshExpImp.ModelBlocks
             set { if (mEntries != value) { mEntries = value == null ? null : new LODEntryList(handler, value); OnRCOLChanged(this, new EventArgs()); } }
         }
 
-        public override AHandlerElement Clone(EventHandler handler)
-        {
-            return new MODL(0, handler, this);
-        }
+        //public override AHandlerElement Clone(EventHandler handler) { return new MODL(0, handler, this); }
 
         protected override void Parse(Stream s)
         {

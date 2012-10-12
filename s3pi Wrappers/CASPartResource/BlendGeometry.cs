@@ -173,7 +173,7 @@ namespace CASPartResource
             #region AHandlerElement Members
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
             public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
-            public override AHandlerElement Clone(EventHandler handler) { return new LODSection(requestedApiVersion, handler, this); }
+            //public override AHandlerElement Clone(EventHandler handler) { return new LODSection(requestedApiVersion, handler, this); }
             #endregion
 
             #region IEquatable<Section1Entry> Members
@@ -277,7 +277,7 @@ namespace CASPartResource
             #region AHandlerElement Members
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
             public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
-            public override AHandlerElement Clone(EventHandler handler) { return new Section1Entry(requestedApiVersion, handler, this); }
+            //public override AHandlerElement Clone(EventHandler handler) { return new Section1Entry(requestedApiVersion, handler, this); }
             #endregion
 
             #region IEquatable<Section1Entry> Members
@@ -345,7 +345,7 @@ namespace CASPartResource
             protected override void WriteElement(Stream s, Section1Entry element) { element.UnParse(s); }
             #endregion
 
-            public override void Add() { this.Add(new Section1Entry(0, null)); }
+            //public override void Add() { this.Add(new Section1Entry(0, null)); }
         }
 
         public class Section2Entry : AHandlerElement, IEquatable<Section2Entry>
@@ -380,7 +380,7 @@ namespace CASPartResource
             #region AHandlerElement Members
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
             public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
-            public override AHandlerElement Clone(EventHandler handler) { return new Section2Entry(requestedApiVersion, handler, this); }
+            //public override AHandlerElement Clone(EventHandler handler) { return new Section2Entry(requestedApiVersion, handler, this); }
             #endregion
 
             #region IEquatable<Section1Entry> Members
@@ -428,7 +428,7 @@ namespace CASPartResource
             protected override void WriteElement(Stream s, Section2Entry element) { element.UnParse(s); }
             #endregion
 
-            public override void Add() { this.Add(new Section2Entry(0, null)); }
+            //public override void Add() { this.Add(new Section2Entry(0, null)); }
         }
 
         public class Section3Entry : AHandlerElement, IEquatable<Section3Entry>
@@ -469,7 +469,7 @@ namespace CASPartResource
             #region AHandlerElement Members
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
             public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
-            public override AHandlerElement Clone(EventHandler handler) { return new Section3Entry(requestedApiVersion, handler, this); }
+            //public override AHandlerElement Clone(EventHandler handler) { return new Section3Entry(requestedApiVersion, handler, this); }
             #endregion
 
             #region IEquatable<Section1Entry> Members
@@ -523,7 +523,7 @@ namespace CASPartResource
             protected override void WriteElement(Stream s, Section3Entry element) { element.UnParse(s); }
             #endregion
 
-            public override void Add() { this.Add(new Section3Entry(0, null)); }
+            //public override void Add() { this.Add(new Section3Entry(0, null)); }
         }
         #endregion
 

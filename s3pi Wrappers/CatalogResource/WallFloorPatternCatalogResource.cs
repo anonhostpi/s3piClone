@@ -201,7 +201,7 @@ namespace CatalogResource
             #endregion
 
             #region AHandlerElement
-            public override AHandlerElement Clone(EventHandler handler) { return new WallFloorPatternMaterial(requestedApiVersion, handler, this); }
+            //public override AHandlerElement Clone(EventHandler handler) { return new WallFloorPatternMaterial(requestedApiVersion, handler, this); }
             #endregion
 
             #region Content Fields
@@ -224,7 +224,7 @@ namespace CatalogResource
             protected override void WriteElement(Stream s, WallFloorPatternMaterial element) { element.UnParse(s); }
             #endregion
 
-            public override void Add() { this.Add(new WallFloorPatternMaterial(0, null)); }
+            //public override void Add() { this.Add(new WallFloorPatternMaterial(0, null)); }
 
             #region Content Fields
             //public String Value { get { string s = ""; for (int i = 0; i < Count; i++) s += string.Format("\n--{0}--\n", i) + this[i].Value; return s; } }

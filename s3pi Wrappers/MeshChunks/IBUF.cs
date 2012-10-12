@@ -186,10 +186,7 @@ namespace meshExpImp.ModelBlocks
                 return fields;
             }
         }
-        public override AHandlerElement Clone(EventHandler handler)
-        {
-            return new IBUF(0, handler, this);
-        }
+        //public override AHandlerElement Clone(EventHandler handler) { return new IBUF(0, handler, this); }
 
         protected override void Parse(Stream s)
         {

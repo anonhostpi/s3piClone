@@ -82,7 +82,7 @@ namespace s3pi.GenericRCOLResource
             return ms;
         }
 
-        public override AHandlerElement Clone(EventHandler handler) { return new SlotAdjust(requestedApiVersion, handler, this); }
+        //public override AHandlerElement Clone(EventHandler handler) { return new SlotAdjust(requestedApiVersion, handler, this); }
         #endregion
 
         #region Sub-types
@@ -163,7 +163,7 @@ namespace s3pi.GenericRCOLResource
             #endregion
 
             #region AHandlerElement
-            public override AHandlerElement Clone(EventHandler handler) { return new Adjustment(requestedApiVersion, handler, this); }
+            //public override AHandlerElement Clone(EventHandler handler) { return new Adjustment(requestedApiVersion, handler, this); }
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
             public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
             #endregion
@@ -252,7 +252,7 @@ namespace s3pi.GenericRCOLResource
             protected override Adjustment CreateElement(Stream s) { return new Adjustment(0, elementHandler, s); }
             protected override void WriteElement(Stream s, Adjustment element) { element.UnParse(s); }
 
-            public override void Add() { this.Add(new Adjustment(0, null)); }
+            //public override void Add() { this.Add(new Adjustment(0, null)); }
         }
         #endregion
 

@@ -48,10 +48,7 @@ namespace meshExpImp.ModelBlocks
                 set { if (mCommand != value) { if(mCommand!=value){mCommand = value; OnElementChanged();} } }
             }
 
-            public override AHandlerElement Clone(EventHandler handler)
-            {
-                return new SwizzleEntry(0, handler, this);
-            }
+            //public override AHandlerElement Clone(EventHandler handler) { return new SwizzleEntry(0, handler, this); }
             private SwizzleCmd mCommand;
             private void Parse(Stream s)
             {
@@ -113,10 +110,7 @@ namespace meshExpImp.ModelBlocks
                     ((IList<SwizzleEntry>)this).Add(CreateElement(s));
                 }
             }
-            public override void Add()
-            {
-                base.Add(new SwizzleEntry(0, null));
-            }
+            //public override void Add() { base.Add(new SwizzleEntry(0, null)); }
             protected override void WriteCount(Stream s, int count) { }
             protected override SwizzleEntry CreateElement(Stream s)
             {
@@ -133,10 +127,7 @@ namespace meshExpImp.ModelBlocks
             public SegmentList(EventHandler handler) : base(handler) { }
             public SegmentList(EventHandler handler, Stream s) : base(handler, s) { }
             public SegmentList(EventHandler handler, IEnumerable<SegmentInfo> ilt) : base(handler, ilt) { }
-            public override void Add()
-            {
-                base.Add(new SegmentInfo(0, null));
-            }
+            //public override void Add() { base.Add(new SegmentInfo(0, null)); }
             protected override SegmentInfo CreateElement(Stream s)
             {
                 return new SegmentInfo(0, handler, s);
@@ -280,10 +271,7 @@ namespace meshExpImp.ModelBlocks
                 mSwizzles.UnParse(s);
 
             }
-            public override AHandlerElement Clone(EventHandler handler)
-            {
-                return new SegmentInfo(0, handler, this);
-            }
+            //public override AHandlerElement Clone(EventHandler handler) { return new SegmentInfo(0, handler, this); }
 
             public override List<string> ContentFields
             {
@@ -376,10 +364,7 @@ namespace meshExpImp.ModelBlocks
             mSegments.UnParse(s);
             return s;
         }
-        public override AHandlerElement Clone(EventHandler handler)
-        {
-            return new VBSI(0, handler, this);
-        }
+        //public override AHandlerElement Clone(EventHandler handler) { return new VBSI(0, handler, this); }
 
         public override string Tag
         {

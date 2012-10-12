@@ -88,10 +88,7 @@ namespace meshExpImp.ModelBlocks
             bw.Write(mD);
         }
 
-        public override AHandlerElement Clone(EventHandler handler)
-        {
-            return new UByte4(0, handler, this);
-        }
+        // public override AHandlerElement Clone(EventHandler handler) { return new UByte4(0, handler, this); }
 
         public override System.Collections.Generic.List<string> ContentFields
         {

@@ -32,10 +32,7 @@ namespace meshExpImp.ModelBlocks
         {
             public BoneList(EventHandler handler) : base(handler) { }
             public BoneList(EventHandler handler, IEnumerable<Bone> ilt) : base(handler, ilt) { }
-            public override void Add()
-            {
-                base.Add(new Bone(0, null));
-            }
+            //public override void Add() { base.Add(new Bone(0, null)); }
             protected override Bone CreateElement(Stream s)
             {
                 throw new NotSupportedException();
@@ -97,10 +94,7 @@ namespace meshExpImp.ModelBlocks
                 set { if(mInverseBindPose!=value){mInverseBindPose = value; OnElementChanged();} }
             }
 
-            public override AHandlerElement Clone(EventHandler handler)
-            {
-                return new Bone(0, handler, this);
-            }
+            //public override AHandlerElement Clone(EventHandler handler) { return new Bone(0, handler, this); }
 
             public override List<string> ContentFields
             {
@@ -204,10 +198,7 @@ namespace meshExpImp.ModelBlocks
             foreach (var j in mBones) j.InverseBindPose.UnParse(s);
             return s;
         }
-        public override AHandlerElement Clone(EventHandler handler)
-        {
-            return new SKIN(0, handler, this);
-        }
+        //public override AHandlerElement Clone(EventHandler handler) { return new SKIN(0, handler, this); }
 
         public override string Tag
         {

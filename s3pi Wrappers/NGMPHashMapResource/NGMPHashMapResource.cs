@@ -26,7 +26,7 @@ using s3pi.Interfaces;
 namespace NGMPHashMapResource
 {
     /// <summary>
-    /// A resource wrapper that understands 0x0166038C resources
+    /// A resource wrapper that understands 0xF3A38370 resources
     /// </summary>
     public class NGMPHashMapResource : AResource
     {
@@ -108,7 +108,7 @@ namespace NGMPHashMapResource
             }
 
             #region AHandlerElement
-            public override AHandlerElement Clone(EventHandler handler) { return new NGMPPair(requestedApiVersion, handler, this); }
+            //public override AHandlerElement Clone(EventHandler handler) { return new NGMPPair(requestedApiVersion, handler, this); }
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
             public override List<string> ContentFields { get { return GetContentFields(0, this.GetType()); } }
             #endregion
@@ -136,7 +136,7 @@ namespace NGMPHashMapResource
             #region DependentList<NGMPPair>
             protected override NGMPPair CreateElement(Stream s) { return new NGMPPair(0, elementHandler, s); }
             protected override void WriteElement(Stream s, NGMPPair element) { element.UnParse(s); }
-            public override void Add() { Add(new NGMPPair(0, elementHandler)); }
+            //public override void Add() { Add(new NGMPPair(0, elementHandler)); }
             #endregion
         }
 

@@ -104,15 +104,13 @@ namespace CASPartResource
                 blendGeometry.UnParse(s);
             }
 
-            if (casEntries == null) casEntries = new CASEntryList(OnResourceChanged);
+            if (tgiBlocks == null) tgiBlocks = new TGIBlockList(OnResourceChanged, true);
+            if (casEntries == null) casEntries = new CASEntryList(OnResourceChanged, tgiBlocks);
             casEntries.UnParse(s);
 
-            if (tgiBlocks == null) tgiBlocks = new TGIBlockList(OnResourceChanged, true);
             tgiBlocks.UnParse(s, posn);
 
             s.Flush();
-
-            casEntries.ParentTGIBlocks = tgiBlocks;
 
             return s;
         }
@@ -132,12 +130,24 @@ namespace CASPartResource
             #endregion
 
             #region Constructors
-            public Entry(int APIversion, EventHandler handler) : base(APIversion, handler) { ageGender = new AgeGenderFlags(requestedApiVersion, handler); }
-            public Entry(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
-            public Entry(int APIversion, EventHandler handler, Entry basis) : this(APIversion, handler, basis.ageGender, basis.amount, basis.index) { }
-            public Entry(int APIversion, EventHandler handler, AgeGenderFlags ageGender, float amount, int index)
+            public Entry(int APIversion, EventHandler handler, DependentList<TGIBlock> ParentTGIBlocks = null)
                 : base(APIversion, handler)
             {
+                this.ParentTGIBlocks = ParentTGIBlocks;
+                ageGender = new AgeGenderFlags(requestedApiVersion, handler);
+            }
+            public Entry(int APIversion, EventHandler handler, Stream s, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : base(APIversion, handler)
+            {
+                this.ParentTGIBlocks = ParentTGIBlocks;
+                Parse(s);
+            }
+            public Entry(int APIversion, EventHandler handler, Entry basis, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : this(APIversion, handler, basis.ageGender, basis.amount, basis.index, ParentTGIBlocks ?? basis.ParentTGIBlocks) { }
+            public Entry(int APIversion, EventHandler handler, AgeGenderFlags ageGender, float amount, int index, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : base(APIversion, handler)
+            {
+                this.ParentTGIBlocks = ParentTGIBlocks;
                 this.ageGender = new AgeGenderFlags(0, handler, ageGender);
                 this.amount = amount;
                 this.index = index;
@@ -165,7 +175,7 @@ namespace CASPartResource
 
             #region AHandlerElement Members
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
-            public override AHandlerElement Clone(EventHandler handler) { return new Entry(requestedApiVersion, handler, this); }
+            //public override AHandlerElement Clone(EventHandler handler) { return new Entry(requestedApiVersion, handler, this); }
             #endregion
 
             #region IEquatable<Entry> Members
@@ -235,19 +245,32 @@ namespace CASPartResource
             #endregion
 
             #region Constructors
-            public CASEntry(int APIversion, EventHandler handler) : base(APIversion, handler) { geom = new Entry(requestedApiVersion, handler) { ParentTGIBlocks = ParentTGIBlocks }; bone = new Entry(requestedApiVersion, handler) { ParentTGIBlocks = ParentTGIBlocks }; }
-            public CASEntry(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
-            public CASEntry(int APIversion, EventHandler handler, CASEntry basis)
-                : this(APIversion, handler, basis.facialRegion, basis.andBone, basis.useGeom, basis.geom, basis.useBone, basis.bone) { }
-            public CASEntry(int APIversion, EventHandler handler, FacialRegionFlags facialRegion, uint andBone, uint useGeom, Entry geom, uint useBone, Entry bone)
+            public CASEntry(int APIversion, EventHandler handler, DependentList<TGIBlock> ParentTGIBlocks = null)
                 : base(APIversion, handler)
             {
+                geom = new Entry(requestedApiVersion, handler, _ParentTGIBlocks);
+                bone = new Entry(requestedApiVersion, handler, _ParentTGIBlocks);
+            }
+            public CASEntry(int APIversion, EventHandler handler, Stream s, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : base(APIversion, handler)
+            {
+                this._ParentTGIBlocks = ParentTGIBlocks;
+                Parse(s);
+            }
+            public CASEntry(int APIversion, EventHandler handler, CASEntry basis, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : this(APIversion, handler, basis.facialRegion, basis.andBone, basis.useGeom, basis.geom, basis.useBone, basis.bone,
+                ParentTGIBlocks ?? basis._ParentTGIBlocks) { }
+            public CASEntry(int APIversion, EventHandler handler, FacialRegionFlags facialRegion, uint andBone, uint useGeom, Entry geom, uint useBone, Entry bone,
+                DependentList<TGIBlock> ParentTGIBlocks = null)
+                : base(APIversion, handler)
+            {
+                this._ParentTGIBlocks = ParentTGIBlocks;
                 this.facialRegion = facialRegion;
                 this.andBone = andBone;
                 this.useGeom = useGeom;
-                this.geom = new Entry(requestedApiVersion, handler, geom);
+                this.geom = new Entry(requestedApiVersion, handler, geom, _ParentTGIBlocks);
                 this.useBone = useBone;
-                this.bone = new Entry(requestedApiVersion, handler, bone);
+                this.bone = new Entry(requestedApiVersion, handler, bone, _ParentTGIBlocks);
             }
             #endregion
 
@@ -260,12 +283,12 @@ namespace CASPartResource
                 if (andBone == 0)
                     useGeom = r.ReadUInt32();
                 if (andBone != 0 || useGeom != 0)
-                    geom = new Entry(requestedApiVersion, handler, s);
+                    geom = new Entry(requestedApiVersion, handler, s, _ParentTGIBlocks);
                 if (andBone != 0)
                 {
                     useBone = r.ReadUInt32();
                     if (useBone != 0)
-                        bone = new Entry(requestedApiVersion, handler, s);
+                        bone = new Entry(requestedApiVersion, handler, s, _ParentTGIBlocks);
                 }
             }
 
@@ -278,7 +301,7 @@ namespace CASPartResource
                     w.Write(useGeom);
                 if (andBone != 0 || useGeom != 0)
                 {
-                    if (geom == null) geom = new Entry(requestedApiVersion, handler) { ParentTGIBlocks = ParentTGIBlocks };
+                    if (geom == null) geom = new Entry(requestedApiVersion, handler, _ParentTGIBlocks);
                     geom.UnParse(s);
                 }
                 if (andBone != 0)
@@ -286,7 +309,7 @@ namespace CASPartResource
                     w.Write(useBone);
                     if (useBone != 0)
                     {
-                        if (bone == null) bone = new Entry(requestedApiVersion, handler) { ParentTGIBlocks = ParentTGIBlocks };
+                        if (bone == null) bone = new Entry(requestedApiVersion, handler, _ParentTGIBlocks);
                         bone.UnParse(s);
                     }
                 }
@@ -295,7 +318,7 @@ namespace CASPartResource
 
             #region AHandlerElement Members
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
-            public override AHandlerElement Clone(EventHandler handler) { return new CASEntry(requestedApiVersion, handler, this) { ParentTGIBlocks = ParentTGIBlocks }; }
+            //public override AHandlerElement Clone(EventHandler handler) { return new CASEntry(requestedApiVersion, handler, this); }
             public override List<string> ContentFields
             {
                 get
@@ -363,11 +386,11 @@ namespace CASPartResource
             [ElementPriority(3)]
             public uint UseGeom { get { return useGeom; } set { if (useGeom != value) { useGeom = value; OnElementChanged(); } } }
             [ElementPriority(4)]
-            public Entry Geom { get { return geom; } set { if (!geom.Equals(value)) { geom = new Entry(requestedApiVersion, handler, value) { ParentTGIBlocks = ParentTGIBlocks }; OnElementChanged(); } } }
+            public Entry Geom { get { return geom; } set { if (!geom.Equals(value)) { geom = new Entry(requestedApiVersion, handler, value, _ParentTGIBlocks); OnElementChanged(); } } }
             [ElementPriority(5)]
             public uint UseBone { get { return useBone; } set { if (useBone != value) { useBone = value; OnElementChanged(); } } }
             [ElementPriority(6)]
-            public Entry Bone { get { return bone; } set { if (!bone.Equals(value)) { bone = new Entry(requestedApiVersion, handler, value) { ParentTGIBlocks = ParentTGIBlocks }; OnElementChanged(); } } }
+            public Entry Bone { get { return bone; } set { if (!bone.Equals(value)) { bone = new Entry(requestedApiVersion, handler, value, _ParentTGIBlocks); OnElementChanged(); } } }
 
             public string Value
             {
@@ -398,9 +421,12 @@ namespace CASPartResource
             }
 
             #region Constructors
-            public CASEntryList(EventHandler handler) : base(handler) { }
-            public CASEntryList(EventHandler handler, Stream s) : base(handler, s) { }
-            public CASEntryList(EventHandler handler, IEnumerable<CASEntry> le) : base(handler, le) { }
+            public CASEntryList(EventHandler handler, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : base(handler) { _ParentTGIBlocks = ParentTGIBlocks; }
+            public CASEntryList(EventHandler handler, Stream s, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : this(null, ParentTGIBlocks) { elementHandler = handler; Parse(s); this.handler = handler; }
+            public CASEntryList(EventHandler handler, IEnumerable<CASEntry> le, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : this(null, ParentTGIBlocks) { elementHandler = handler; foreach (var t in le) this.Add(t); this.handler = handler; }
             #endregion
 
             #region Data I/O
@@ -408,7 +434,8 @@ namespace CASPartResource
             protected override void WriteElement(Stream s, CASEntry element) { element.UnParse(s); }
             #endregion
 
-            public override void Add() { this.Add(new CASEntry(0, null) { ParentTGIBlocks = ParentTGIBlocks }); }
+            public override void Add() { this.Add(new CASEntry(0, handler, _ParentTGIBlocks)); }
+            public override void Add(CASEntry item) { item.ParentTGIBlocks = _ParentTGIBlocks; base.Add(item); }
         }
         #endregion
 
@@ -426,7 +453,7 @@ namespace CASPartResource
             set { if (version < 8) throw new InvalidOperationException(); if (!blendGeometry.Equals(value)) { blendGeometry = new TGIBlock(requestedApiVersion, OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } }
         }
         [ElementPriority(5)]
-        public CASEntryList CASEntries { get { return casEntries; } set { if (!casEntries.Equals(value)) { casEntries = value == null ? null : new CASEntryList(OnResourceChanged, value); casEntries.ParentTGIBlocks = tgiBlocks; OnResourceChanged(this, new EventArgs()); } } }
+        public CASEntryList CASEntries { get { return casEntries; } set { if (!casEntries.Equals(value)) { casEntries = value == null ? null : new CASEntryList(OnResourceChanged, value, tgiBlocks); OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(6)]
         public TGIBlockList TGIBlocks { get { return tgiBlocks; } set { if (!tgiBlocks.Equals(value)) { tgiBlocks = value == null ? null : new TGIBlockList(OnResourceChanged, value, true); casEntries.ParentTGIBlocks = tgiBlocks; OnResourceChanged(this, new EventArgs()); } } }
 

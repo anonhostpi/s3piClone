@@ -78,17 +78,15 @@ namespace CASPartResource
             w.Write((uint)0); // tgiSize
 
             w.Write(nameHash);
-            if (tgiIndexes == null) tgiIndexes = new Int32IndexList(OnResourceChanged) { ParentTGIBlocks = tgiBlocks };
+            if (tgiBlocks == null) tgiBlocks = new TGIBlockList(OnResourceChanged);
+            if (tgiIndexes == null) tgiIndexes = new Int32IndexList(OnResourceChanged, tgiBlocks);
             tgiIndexes.UnParse(s);
             w.Write(bidirectional);
             w.Write((uint)casPanelGroup);
             w.Write((uint)sort);
             w.Write(unknown1);
 
-            if (tgiBlocks == null) tgiBlocks = new TGIBlockList(OnResourceChanged);
             tgiBlocks.UnParse(s, pos);
-
-            tgiIndexes.ParentTGIBlocks = tgiBlocks;
 
             return s;
         }
@@ -150,7 +148,7 @@ namespace CASPartResource
         [ElementPriority(2)]
         public ulong NameHash { get { return nameHash; } set { if (nameHash != value) { nameHash = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(3)]
-        public Int32IndexList TGIIndexes { get { return tgiIndexes; } set { if (!tgiIndexes.Equals(value)) { tgiIndexes = new Int32IndexList(OnResourceChanged, value) { ParentTGIBlocks = tgiBlocks }; OnResourceChanged(this, EventArgs.Empty); } } }
+        public Int32IndexList TGIIndexes { get { return tgiIndexes; } set { if (!tgiIndexes.Equals(value)) { tgiIndexes = new Int32IndexList(OnResourceChanged, value, tgiBlocks); OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(4)]
         public byte Bidirectional { get { return bidirectional; } set { if (bidirectional != value) { bidirectional = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(5)]

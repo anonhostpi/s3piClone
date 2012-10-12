@@ -158,10 +158,7 @@ namespace meshExpImp.ModelBlocks
 
             public VertexElementLayoutList(EventHandler handler, IEnumerable<ElementLayout> ilt) : base(handler, ilt) {}
 
-            public override void Add()
-            {
-                base.Add(new ElementLayout(0, null));
-            }
+            //public override void Add() { base.Add(new ElementLayout(0, null)); }
             protected override void WriteCount(Stream s, int count){}
             private void Parse(Stream s, int count)
             {
@@ -258,10 +255,7 @@ namespace meshExpImp.ModelBlocks
                 bw.Write((byte)mFormat);
                 bw.Write((byte)mOffset);
             }
-            public override AHandlerElement Clone(EventHandler handler)
-            {
-                return new ElementLayout(0, handler, this);
-            }
+            //public override AHandlerElement Clone(EventHandler handler) { return new ElementLayout(0, handler, this); }
 
             public override List<string> ContentFields
             {
@@ -401,10 +395,7 @@ namespace meshExpImp.ModelBlocks
             return s;
         }
 
-        public override AHandlerElement Clone(EventHandler handler)
-        {
-            return new VRTF(0, handler, this);
-        }
+        //public override AHandlerElement Clone(EventHandler handler) { return new VRTF(0, handler, this); }
 
         public override string Tag
         {
