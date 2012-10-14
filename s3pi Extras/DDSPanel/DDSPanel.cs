@@ -199,16 +199,31 @@ namespace System.Windows.Forms
         public bool HasAlphaChannel { get { return loaded && ddsFile.HasAlphaChannel; } }
 
         /// <summary>
-        /// The number of alpha channel bits per pixel in the encoded DDS image.
+        /// The number of alpha channel bits per pixel in the encoded DDS image or the DXT compression mode.
         /// </summary>
-        [DefaultValue(8), Description("The number of alpha channel bits per pixel in the encoded DDS image.")]
+        [DefaultValue(8), Description("The number of alpha channel bits per pixel in the encoded DDS image or the DXT compression mode.")]
         public int AlphaDepth { get { return loaded ? ddsFile.AlphaDepth : -1; } set { if (loaded) { ddsFile.AlphaDepth = value; pictureBox1.Image = doResize(); } } }
 
         /// <summary>
-        /// Indicates whether the encoded DDS image uses DXT compression.
+        /// If true, use DXT-type image compression for storage.  The mode will depend on the <see cref="AlphaDepth"/>.
         /// </summary>
-        [DefaultValue(true), Description("Indicates whether the encoded DDS image uses DXT compression.")]
+        /// <remarks>
+        /// Setting to false (from true) will default to A8B8G8R8 format.
+        /// </remarks>
+        [DefaultValue(true), Description("If true, use DXT-type image compression for storage.  The mode will depend on the AlphaDepth.")]
         public bool UseDXT { get { return loaded && ddsFile.UseDXT; } set { if (loaded) { ddsFile.UseDXT = value; pictureBox1.Image = doResize(); } } }
+
+        /// <summary>
+        /// If true, treat the image as a luminance (plus alpha) map for storage.
+        /// </summary>
+        /// <remarks>
+        /// Currently only A8L8, 16bit coding is supported.
+        /// Setting to false (from true) will default to A8B8G8R8 (non-DXT) format.
+        /// Setting to true does not turn the image into a greyscale.
+        /// This only happens on saving the image (and will not affect the displayed values until they are read back in).
+        /// </remarks>
+        [DefaultValue(true), Description("If true, treat the image as a luminance (plus alpha) map for storage.")]
+        public bool UseLuminance { get { return loaded && ddsFile.UseLuminance; } set { if (loaded) { ddsFile.UseLuminance = value; pictureBox1.Image = doResize(); } } }
 
         /// <summary>
         /// Indicates that a Mask is currently loaded.
@@ -419,6 +434,19 @@ namespace System.Windows.Forms
             pictureBox1.Image = image = null;
             pictureBox1.Size = (this.MaxSize == Size.Empty) ? new Size(0x80, 0x80) : Min(new Size(0x80, 0x80), this.MaxSize);
             ckb_CheckedChanged(null, null);
+        }
+
+        /// <summary>
+        /// Get a copy of the current DDS image as a <see cref="DdsFile"/>.
+        /// </summary>
+        /// <returns>A new <see cref="DdsFile"/> copy of the current DDS image.</returns>
+        public DdsFile GetDdsFile()
+        {
+            if (!this.loaded || ddsFile == null) return null;
+
+            DdsFile res = new DdsFile();
+            res.CreateImage(ddsFile, false);
+            return res;
         }
 
         /// <summary>

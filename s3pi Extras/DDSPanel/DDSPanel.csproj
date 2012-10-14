@@ -79,7 +79,13 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\..\s3pi\CreateAssemblyVersion\CreateAssemblyVersion.csproj">
+      <Project>{114622fb-d6bf-4ea7-9bb9-fb06b5a01212}</Project>
+      <Name>CreateAssemblyVersion</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>$(SolutionDir)CreateAssemblyVersion\$(OutDir)CreateAssemblyVersion "$(ProjectDir)\"</PreBuildEvent>
