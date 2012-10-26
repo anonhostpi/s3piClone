@@ -618,20 +618,22 @@ namespace s3pi.GenericRCOLResource
         #endregion
 
         #region Constructors
-        public ElementTextureRef(int APIversion, EventHandler handler, FieldType field, Stream s, DependentList<TGIBlock> ParentTGIBlocks = null, string RCOLTag = "MATD")
-            : this(APIversion, handler, field, ParentTGIBlocks, RCOLTag) { Parse(s); }
-        public ElementTextureRef(int APIversion, EventHandler handler)
-            : this(APIversion, handler, (FieldType)0, null, "MATD") { data = new GenericRCOLResource.ChunkReference(0, handler); }
-        public ElementTextureRef(int APIversion, EventHandler handler, DependentList<TGIBlock> ParentTGIBlocks, string RCOLTag)
-            : this(APIversion, handler, (FieldType)0, ParentTGIBlocks, RCOLTag) { if (_RCOLTag == "GEOM") index = 0; else data = new GenericRCOLResource.ChunkReference(0, handler); }
-        public ElementTextureRef(int APIversion, EventHandler handler, ElementTextureRef basis, DependentList<TGIBlock> ParentTGIBlocks = null, string RCOLTag = "MATD")
-            : this(APIversion, handler, basis.field, ParentTGIBlocks ?? basis._ParentTGIBlocks, RCOLTag ?? basis._RCOLTag) { if (_RCOLTag == "GEOM") index = basis.index; else data = new GenericRCOLResource.ChunkReference(0, handler, basis.data); }
-        public ElementTextureRef(int APIversion, EventHandler handler, FieldType field, Int32 index, DependentList<TGIBlock> ParentTGIBlocks = null, string RCOLTag = "GEOM")
-            : this(APIversion, handler, field, ParentTGIBlocks, RCOLTag) { this.index = index; }
-        public ElementTextureRef(int APIversion, EventHandler handler, FieldType field, GenericRCOLResource.ChunkReference data, DependentList<TGIBlock> ParentTGIBlocks = null, string RCOLTag = "MATD")
-            : this(APIversion, handler, field, ParentTGIBlocks, RCOLTag) { this.data = new GenericRCOLResource.ChunkReference(0, handler, data); }
         private ElementTextureRef(int APIversion, EventHandler handler, FieldType field, DependentList<TGIBlock> ParentTGIBlocks = null, string RCOLTag = "MATD")
             : base(APIversion, handler, field) { _ParentTGIBlocks = ParentTGIBlocks; _RCOLTag = RCOLTag; }
+
+        public ElementTextureRef(int APIversion, EventHandler handler, DependentList<TGIBlock> ParentTGIBlocks = null, string RCOLTag = "MATD")
+            : this(APIversion, handler, (FieldType)0, ParentTGIBlocks, RCOLTag) { if (_RCOLTag == "GEOM") index = 0; else data = new GenericRCOLResource.ChunkReference(0, handler); }
+
+        public ElementTextureRef(int APIversion, EventHandler handler, FieldType field, Stream s, DependentList<TGIBlock> ParentTGIBlocks = null, string RCOLTag = "MATD")
+            : this(APIversion, handler, field, ParentTGIBlocks, RCOLTag) { Parse(s); }
+
+        public ElementTextureRef(int APIversion, EventHandler handler, ElementTextureRef basis, DependentList<TGIBlock> ParentTGIBlocks = null, string RCOLTag = null)
+            : this(APIversion, handler, basis.field, ParentTGIBlocks ?? basis._ParentTGIBlocks, RCOLTag ?? basis._RCOLTag) { if (_RCOLTag == "GEOM") index = basis.index; else data = new GenericRCOLResource.ChunkReference(0, handler, basis.data); }
+
+        public ElementTextureRef(int APIversion, EventHandler handler, FieldType field, Int32 index, DependentList<TGIBlock> ParentTGIBlocks)
+            : this(APIversion, handler, field, ParentTGIBlocks, "GEOM") { this.index = index; }
+        public ElementTextureRef(int APIversion, EventHandler handler, FieldType field, GenericRCOLResource.ChunkReference data)
+            : this(APIversion, handler, field, null, "MATD") { this.data = new GenericRCOLResource.ChunkReference(0, handler, data); }
         #endregion
 
         #region Data I/O
@@ -655,8 +657,8 @@ namespace s3pi.GenericRCOLResource
         protected override int CountFromType { get { return 4; } }
         #endregion
 
-        // This appears to be needed because the reflection resolver didn't find the ctor with defaults.
-        public override AHandlerElement Clone(EventHandler handler) { return new ElementTextureRef(requestedApiVersion, handler, this, _ParentTGIBlocks, _RCOLTag); }
+        //- try harder... // This appears to be needed because the reflection resolver didn't find the ctor with defaults.
+        //public override AHandlerElement Clone(EventHandler handler) { return new ElementTextureRef(requestedApiVersion, handler, this, _ParentTGIBlocks, _RCOLTag); }
         public override List<string> ContentFields
         {
             get
