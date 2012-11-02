@@ -1063,7 +1063,7 @@ namespace CatalogResource
                 this.unknown1 = unknown1;
                 this.unknown2 = unknown2;
                 this.list = ltgib == null ? null : new TGIBlockList(handler, ltgib);
-                this.mb = new MaterialBlock(requestedApiVersion, handler, this.list);
+                this.mb = mb == null ? null : new MaterialBlock(requestedApiVersion, handler, mb, this.list);
                 this.unknown3 = unknown3;
             }
             #endregion
