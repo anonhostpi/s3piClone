@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using s3pi.Interfaces;
 
 namespace ScriptResource
@@ -187,46 +188,23 @@ namespace ScriptResource
         {
             get
             {
+                List<string> fields = this.ValueBuilderFields;
                 string s = "";
-                foreach (string f in this.ContentFields)
+
+                foreach (string f in fields)
                 {
-                    if (f.Equals("Value") || f.Equals("Stream") || f.Equals("AsBytes") || f.Equals("DecryptedBytes")) continue;
                     if (f.Equals("Assembly"))
                     {
                         if (cleardata.Length > 0)
                         {
+                            AppDomain ap = AppDomain.CreateDomain("assy");
                             try
                             {
-                                System.Reflection.Assembly assy = System.Reflection.Assembly.Load(cleardata);
-                                string h = String.Format("\n---------\n---------\n{0}: {1}\n---------\n", assy.GetType().Name, f);
-                                string t = "---------\n";
-                                s += h;
-                                s += assy.ToString() + "\n";
-                                foreach (var p in typeof(System.Reflection.Assembly).GetProperties())
-                                {
-                                    if (!p.CanRead) continue;
-                                    s += string.Format("  {0}: {1}\n", p.Name, "" + p.GetValue(assy, null));
-                                }
-                                foreach (var p in assy.GetReferencedAssemblies())
-                                    s += string.Format("  Ref: {0}\n", p.ToString());
-                                try
-                                {
-                                    foreach (var p in assy.GetExportedTypes())
-                                        s += string.Format("  Type: {0}\n", p.ToString());
-                                }
-                                catch { }
-                                s += t;
+                                SafeLoader loader = (SafeLoader)ap.CreateInstanceAndUnwrap(this.GetType().Assembly.FullName, typeof(SafeLoader).FullName);
+                                s += loader.Value(cleardata);
                             }
-                            catch (Exception ex)
-                            {
-                                s += this.GetType().Assembly.FullName;
-                                for (Exception inex = ex; inex != null; inex = inex.InnerException)
-                                {
-                                    s += "\n" + inex.Message;
-                                    s += "\n" + inex.StackTrace;
-                                    s += "\n-----";
-                                }
-                            }
+                            catch (Exception ex) { s += string.Format("{0}: Error: {1}\n", f, ex.Message); }
+                            finally { AppDomain.Unload(ap); }
                         }
                         else
                         {
@@ -235,6 +213,56 @@ namespace ScriptResource
                     }
                     else
                         s += string.Format("{0}: {1}\n", f, "" + this[f]);
+                }
+
+                return s;
+            }
+        }
+
+        class SafeLoader : MarshalByRefObject
+        {
+            public string Value(byte[] rawAssembly)
+            {
+                string s = "";
+                try
+                {
+                    System.Reflection.Assembly assy = System.Reflection.Assembly.Load(rawAssembly);
+                    string h = String.Format("\n---------\n---------\n{0}: Assembly\n---------\n", assy.GetType().Name);
+                    string t = "---------\n";
+                    s += h;
+                    s += assy.ToString() + "\n";
+
+                    foreach (var p in typeof(System.Reflection.Assembly).GetProperties())
+                    {
+                        try { s += string.Format("  {0}: {1}\n", p.Name, "" + p.GetValue(assy, null)); }
+                        catch (Exception ex) { s += string.Format("  {0}: Error reading Value: {1}\n", p.Name, ex.Message); }
+                    }
+
+                    s += "\nReferences:\n";
+                    foreach (var p in assy.GetReferencedAssemblies())
+                        s += string.Format("  Ref: {0}\n", p.ToString());
+
+                    s += "\nExported Types:\n";
+                    try
+                    {
+                        Type[] exportedTypes = assy.GetExportedTypes();
+                        foreach (var p in exportedTypes)
+                            s += string.Format("  Type: {0}\n", p.ToString());
+                    }
+                    catch (Exception ex) { s += "  Cannot get Exported Types: " + ex.Message + "\n"; }
+
+                    s += t;
+                }
+                catch (Exception ex)
+                {
+                    s = "\n---------\n---------\n Assembly\n---------\n";
+                    for (Exception inex = ex; inex != null; inex = inex.InnerException)
+                    {
+                        s += "\n" + inex.Message;
+                        s += "\n" + inex.StackTrace;
+                        s += "\n-----";
+                    }
+                    s += "---------\n";
                 }
                 return s;
             }
