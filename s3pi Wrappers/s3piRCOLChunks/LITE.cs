@@ -152,14 +152,14 @@ namespace s3pi.GenericRCOLResource
 
             void PointToLightSourceData()
             {
-                lightSourceData = new GeneralLightSourceType(requestedApiVersion, OnElementChanged, lightSourceDataArray);
-                spotLightSourceData = new SpotLightSourceType(requestedApiVersion, OnElementChanged, lightSourceDataArray);
-                lampShadeLightSourceData = new LampShadeLightSourceType(requestedApiVersion, OnElementChanged, lightSourceDataArray);
-                tubeShadeLightSourceData = new TubeLightSourceType(requestedApiVersion, OnElementChanged, lightSourceDataArray);
-                squareWindowLightSourceData = new SquareWindowLightSourceType(requestedApiVersion, OnElementChanged, lightSourceDataArray);
-                circularWindowLightSourceData = new CircularWindowLightSourceType(requestedApiVersion, OnElementChanged, lightSourceDataArray);
-                squareAreaLightSourceData = new SquareWindowLightSourceType(requestedApiVersion, OnElementChanged, lightSourceDataArray);
-                discAreaLightSourceData = new CircularWindowLightSourceType(requestedApiVersion, OnElementChanged, lightSourceDataArray);
+                lightSourceData = new GeneralLightSourceType(requestedApiVersion, handler, lightSourceDataArray);
+                spotLightSourceData = new SpotLightSourceType(requestedApiVersion, handler, lightSourceDataArray);
+                lampShadeLightSourceData = new LampShadeLightSourceType(requestedApiVersion, handler, lightSourceDataArray);
+                tubeShadeLightSourceData = new TubeLightSourceType(requestedApiVersion, handler, lightSourceDataArray);
+                squareWindowLightSourceData = new SquareWindowLightSourceType(requestedApiVersion, handler, lightSourceDataArray);
+                circularWindowLightSourceData = new CircularWindowLightSourceType(requestedApiVersion, handler, lightSourceDataArray);
+                squareAreaLightSourceData = new SquareWindowLightSourceType(requestedApiVersion, handler, lightSourceDataArray);
+                discAreaLightSourceData = new CircularWindowLightSourceType(requestedApiVersion, handler, lightSourceDataArray);
             }
 
             #region Data I/O
@@ -303,21 +303,20 @@ namespace s3pi.GenericRCOLResource
                 public float B { get { return Z; } set { Z = value; } }
             }
 
-            public class GeneralLightSourceType : AApiVersionedFields
+            public class GeneralLightSourceType : AHandlerElement
             {
-                protected ElementChanged handler;
                 protected float[] lightSourceData;
 
-                public GeneralLightSourceType(int APIversion, ElementChanged handler, float[] lightSourceData) { this.handler = handler; this.lightSourceData = lightSourceData; }
+                public GeneralLightSourceType(int APIversion, EventHandler handler, float[] lightSourceData)
+                    : base(APIversion, handler)
+                { this.lightSourceData = lightSourceData; }
 
                 #region AHandlerElement
                 public override int RecommendedApiVersion { get { return 0; } }
                 public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
                 #endregion
 
-                public delegate void ElementChanged();
-
-                protected void setFloatN(int n, float value) { if (lightSourceData[n] != value) { lightSourceData[n] = value; handler(); } }
+                protected void setFloatN(int n, float value) { if (lightSourceData[n] != value) { lightSourceData[n] = value; OnElementChanged(); } }
                 protected void setFloatN(int n, Vertex value)
                 {
                     if (lightSourceData[n] != value.X || lightSourceData[n + 1] != value.Y || lightSourceData[n + 2] != value.Z)
@@ -325,7 +324,7 @@ namespace s3pi.GenericRCOLResource
                         lightSourceData[n] = value.X;
                         lightSourceData[n + 1] = value.Y;
                         lightSourceData[n + 2] = value.Z;
-                        handler();
+                        OnElementChanged();
                     }
                 }
 
@@ -359,7 +358,7 @@ namespace s3pi.GenericRCOLResource
 
             public class SpotLightSourceType : GeneralLightSourceType
             {
-                public SpotLightSourceType(int APIversion, ElementChanged handler, float[] lightSourceData) : base(APIversion, handler, lightSourceData) { }
+                public SpotLightSourceType(int APIversion, EventHandler handler, float[] lightSourceData) : base(APIversion, handler, lightSourceData) { }
 
                 #region AHandlerElement
                 public override int RecommendedApiVersion { get { return 0; } }
@@ -392,7 +391,7 @@ namespace s3pi.GenericRCOLResource
 
             public class LampShadeLightSourceType : GeneralLightSourceType
             {
-                public LampShadeLightSourceType(int APIversion, ElementChanged handler, float[] lightSourceData) : base(APIversion, handler, lightSourceData) { }
+                public LampShadeLightSourceType(int APIversion, EventHandler handler, float[] lightSourceData) : base(APIversion, handler, lightSourceData) { }
 
                 #region AHandlerElement
                 public override int RecommendedApiVersion { get { return 0; } }
@@ -437,7 +436,7 @@ namespace s3pi.GenericRCOLResource
 
             public class TubeLightSourceType : GeneralLightSourceType
             {
-                public TubeLightSourceType(int APIversion, ElementChanged handler, float[] lightSourceData) : base(APIversion, handler, lightSourceData) { }
+                public TubeLightSourceType(int APIversion, EventHandler handler, float[] lightSourceData) : base(APIversion, handler, lightSourceData) { }
 
                 #region AHandlerElement
                 public override int RecommendedApiVersion { get { return 0; } }
@@ -470,7 +469,7 @@ namespace s3pi.GenericRCOLResource
 
             public class SquareWindowLightSourceType : GeneralLightSourceType
             {
-                public SquareWindowLightSourceType(int APIversion, ElementChanged handler, float[] lightSourceData) : base(APIversion, handler, lightSourceData) { }
+                public SquareWindowLightSourceType(int APIversion, EventHandler handler, float[] lightSourceData) : base(APIversion, handler, lightSourceData) { }
 
                 #region AHandlerElement
                 public override int RecommendedApiVersion { get { return 0; } }
@@ -520,7 +519,7 @@ namespace s3pi.GenericRCOLResource
 
             public class CircularWindowLightSourceType : GeneralLightSourceType
             {
-                public CircularWindowLightSourceType(int APIversion, ElementChanged handler, float[] lightSourceData) : base(APIversion, handler, lightSourceData) { }
+                public CircularWindowLightSourceType(int APIversion, EventHandler handler, float[] lightSourceData) : base(APIversion, handler, lightSourceData) { }
 
                 #region AHandlerElement
                 public override int RecommendedApiVersion { get { return 0; } }
