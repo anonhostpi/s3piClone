@@ -65,7 +65,7 @@
             this.tlpGameFolders.Controls.Add(this.label2, 1, 0);
             this.tlpGameFolders.Controls.Add(this.label3, 2, 0);
             this.tlpGameFolders.Controls.Add(this.label4, 3, 0);
-            this.tlpGameFolders.Location = new System.Drawing.Point(12, 77);
+            this.tlpGameFolders.Location = new System.Drawing.Point(12, 65);
             this.tlpGameFolders.Name = "tlpGameFolders";
             this.tlpGameFolders.RowCount = 2;
             this.tlpGameFolders.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -121,7 +121,7 @@
             // 
             this.btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnClose.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.btnClose.Location = new System.Drawing.Point(541, 103);
+            this.btnClose.Location = new System.Drawing.Point(541, 88);
             this.btnClose.Name = "btnClose";
             this.btnClose.Size = new System.Drawing.Size(75, 23);
             this.btnClose.TabIndex = 1;
@@ -136,7 +136,7 @@
             // btnReset
             // 
             this.btnReset.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnReset.Location = new System.Drawing.Point(460, 103);
+            this.btnReset.Location = new System.Drawing.Point(460, 88);
             this.btnReset.Name = "btnReset";
             this.btnReset.Size = new System.Drawing.Size(75, 23);
             this.btnReset.TabIndex = 2;
@@ -157,9 +157,9 @@
             this.tlpCustomContent.Controls.Add(this.tbCCFolder, 2, 1);
             this.tlpCustomContent.Controls.Add(this.label6, 1, 0);
             this.tlpCustomContent.Controls.Add(this.label7, 2, 0);
-            this.tlpCustomContent.Controls.Add(this.label5, 0, 0);
             this.tlpCustomContent.Controls.Add(this.btnCCEdit, 3, 1);
             this.tlpCustomContent.Controls.Add(this.label12, 3, 0);
+            this.tlpCustomContent.Controls.Add(this.label5, 0, 1);
             this.tlpCustomContent.Location = new System.Drawing.Point(12, 12);
             this.tlpCustomContent.Name = "tlpCustomContent";
             this.tlpCustomContent.RowCount = 3;
@@ -167,14 +167,14 @@
             this.tlpCustomContent.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tlpCustomContent.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 28F));
             this.tlpCustomContent.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tlpCustomContent.Size = new System.Drawing.Size(604, 59);
+            this.tlpCustomContent.Size = new System.Drawing.Size(604, 46);
             this.tlpCustomContent.TabIndex = 3;
             // 
             // ckbCustomContent
             // 
             this.ckbCustomContent.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.ckbCustomContent.AutoSize = true;
-            this.ckbCustomContent.Location = new System.Drawing.Point(79, 33);
+            this.ckbCustomContent.Location = new System.Drawing.Point(124, 20);
             this.ckbCustomContent.Name = "ckbCustomContent";
             this.ckbCustomContent.Size = new System.Drawing.Size(15, 14);
             this.ckbCustomContent.TabIndex = 1;
@@ -184,10 +184,10 @@
             // tbCCFolder
             // 
             this.tbCCFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbCCFolder.Location = new System.Drawing.Point(119, 30);
+            this.tbCCFolder.Location = new System.Drawing.Point(164, 17);
             this.tbCCFolder.Name = "tbCCFolder";
             this.tbCCFolder.ReadOnly = true;
-            this.tbCCFolder.Size = new System.Drawing.Size(441, 20);
+            this.tbCCFolder.Size = new System.Drawing.Size(396, 20);
             this.tbCCFolder.TabIndex = 3;
             // 
             // label6
@@ -195,7 +195,7 @@
             this.label6.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.label6.AutoSize = true;
             this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label6.Location = new System.Drawing.Point(60, 13);
+            this.label6.Location = new System.Drawing.Point(105, 0);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(53, 13);
             this.label6.TabIndex = 0;
@@ -206,7 +206,7 @@
             this.label7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label7.AutoSize = true;
             this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label7.Location = new System.Drawing.Point(119, 13);
+            this.label7.Location = new System.Drawing.Point(164, 0);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(80, 13);
             this.label7.TabIndex = 0;
@@ -214,21 +214,21 @@
             // 
             // label5
             // 
-            this.label5.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.label5.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label5.Location = new System.Drawing.Point(3, 0);
+            this.label5.Location = new System.Drawing.Point(3, 21);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(51, 26);
+            this.label5.Size = new System.Drawing.Size(96, 13);
             this.label5.TabIndex = 0;
-            this.label5.Text = "Custom\r\nContent";
+            this.label5.Text = "Custom Content";
             // 
             // btnCCEdit
             // 
             this.btnCCEdit.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.btnCCEdit.AutoSize = true;
             this.btnCCEdit.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.btnCCEdit.Location = new System.Drawing.Point(566, 29);
+            this.btnCCEdit.Location = new System.Drawing.Point(566, 16);
             this.btnCCEdit.Name = "btnCCEdit";
             this.btnCCEdit.Size = new System.Drawing.Size(35, 23);
             this.btnCCEdit.TabIndex = 2;
@@ -241,7 +241,7 @@
             this.label12.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.label12.AutoSize = true;
             this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label12.Location = new System.Drawing.Point(569, 13);
+            this.label12.Location = new System.Drawing.Point(569, 0);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(29, 13);
             this.label12.TabIndex = 0;
@@ -259,7 +259,7 @@
             this.AcceptButton = this.btnClose;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(628, 138);
+            this.ClientSize = new System.Drawing.Size(628, 123);
             this.Controls.Add(this.tlpCustomContent);
             this.Controls.Add(this.btnReset);
             this.Controls.Add(this.btnClose);
