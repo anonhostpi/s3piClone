@@ -38,7 +38,7 @@
     <Suppressed>false</Suppressed>
     <GameContent>
       <Folder path="GameData/Shared/DeltaPackages">
-        <Package isPatch="true" priority="2">p02/DeltaBuild_p02.package</Package>
+        <Package isPatch="true" priority="1">p02/DeltaBuild_p02.package</Package>
       </Folder>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/Fullbuildep1.package</Package>
     </GameContent>
@@ -60,7 +60,7 @@
     <Suppressed>false</Suppressed>
     <GameContent>
       <Folder path="GameData/Shared/DeltaPackages">
-        <Package isPatch="true" priority="3">p03/DeltaBuild_p03.package</Package>
+        <Package isPatch="true" priority="1">p03/DeltaBuild_p03.package</Package>
       </Folder>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p03.package</Package>
     </GameContent>
@@ -82,7 +82,7 @@
     <Suppressed>false</Suppressed>
     <GameContent>
       <Folder path="GameData/Shared/DeltaPackages">
-        <Package isPatch="true" priority="4">p04/DeltaBuild_p04.package</Package>
+        <Package isPatch="true" priority="1">p04/DeltaBuild_p04.package</Package>
       </Folder>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p04.package</Package>
     </GameContent>
@@ -104,7 +104,7 @@
     <Suppressed>false</Suppressed>
     <GameContent>
       <Folder path="GameData/Shared/DeltaPackages">
-        <Package isPatch="true" priority="5">p05/DeltaBuild_p05.package</Package>
+        <Package isPatch="true" priority="1">p05/DeltaBuild_p05.package</Package>
       </Folder>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p05.package</Package>
     </GameContent>
@@ -126,7 +126,7 @@
     <Suppressed>false</Suppressed>
     <GameContent>
       <Folder path="GameData/Shared/DeltaPackages">
-        <Package isPatch="true" priority="6">p06/DeltaBuild_p06.package</Package>
+        <Package isPatch="true" priority="1">p06/DeltaBuild_p06.package</Package>
       </Folder>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p06.package</Package>
     </GameContent>
@@ -148,7 +148,7 @@
     <Suppressed>false</Suppressed>
     <GameContent>
       <Folder path="GameData/Shared/DeltaPackages">
-        <Package isPatch="true" priority="7">p07/DeltaBuild_p07.package</Package>
+        <Package isPatch="true" priority="1">p07/DeltaBuild_p07.package</Package>
       </Folder>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p07.package</Package>
     </GameContent>
@@ -170,7 +170,7 @@
     <Suppressed>false</Suppressed>
     <GameContent>
       <Folder path="GameData/Shared/DeltaPackages">
-        <Package isPatch="true" priority="8">p08/DeltaBuild_p08.package</Package>
+        <Package isPatch="true" priority="1">p08/DeltaBuild_p08.package</Package>
       </Folder>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p08.package</Package>
     </GameContent>
@@ -192,7 +192,7 @@
     <Suppressed>false</Suppressed>
     <GameContent>
       <Folder path="GameData/Shared/DeltaPackages">
-        <Package isPatch="true" priority="9">p09/DeltaBuild_p09.package</Package>
+        <Package isPatch="true" priority="1">p09/DeltaBuild_p09.package</Package>
       </Folder>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p09.package</Package>
     </GameContent>
@@ -214,7 +214,7 @@
     <Suppressed>false</Suppressed>
     <GameContent>
       <Folder path="GameData/Shared/DeltaPackages">
-        <Package isPatch="true" priority="10">p10/DeltaBuild_p10.package</Package>
+        <Package isPatch="true" priority="1">p10/DeltaBuild_p10.package</Package>
       </Folder>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild0_p10.package</Package>
     </GameContent>
@@ -236,7 +236,7 @@
     <Suppressed>false</Suppressed>
     <GameContent>
       <Folder path="GameData/Shared/DeltaPackages">
-        <Package isPatch="true" priority="11">p11/DeltaBuild_p11.package</Package>
+        <Package isPatch="true" priority="1">p11/DeltaBuild_p11.package</Package>
       </Folder>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p11.package</Package>
     </GameContent>
@@ -258,7 +258,7 @@
     <Suppressed>false</Suppressed>
     <GameContent>
       <Folder path="GameData/Shared/DeltaPackages">
-        <Package isPatch="true" priority="12">p12/DeltaBuild_p12.package</Package>
+        <Package isPatch="true" priority="1">p12/DeltaBuild_p12.package</Package>
       </Folder>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p12.package</Package>
     </GameContent>
@@ -280,7 +280,7 @@
     <Suppressed>false</Suppressed>
     <GameContent>
       <Folder path="GameData/Shared/DeltaPackages">
-        <Package isPatch="true" priority="13">p13/DeltaBuild_p13.package</Package>
+        <Package isPatch="true" priority="1">p13/DeltaBuild_p13.package</Package>
       </Folder>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p13.package</Package>
     </GameContent>
@@ -302,7 +302,7 @@
     <Suppressed>false</Suppressed>
     <GameContent>
       <Folder path="GameData/Shared/DeltaPackages">
-        <Package isPatch="true" priority="14">p14/DeltaBuild_p14.package</Package>
+        <Package isPatch="true" priority="1">p14/DeltaBuild_p14.package</Package>
       </Folder>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p14.package</Package>
     </GameContent>
@@ -319,12 +319,12 @@
   <game class="EP" rgversion="14">
     <Name>SN</Name>
     <Longname>The Sims 3 Supernatural</Longname>
-    <GUID>{B37DAFA5-717D-41F8-BDFB-3A4B68C0B3A1}</GUID>
+    <GUID>{94C86A30-50E7-48B6-9934-EF26A32BCFDE}</GUID>
     <DefaultInstallDir>Electronic Arts/The Sims 3 Supernatural</DefaultInstallDir>
     <Suppressed>false</Suppressed>
     <GameContent>
       <Folder path="GameData/Shared/DeltaPackages">
-        <Package isPatch="true" priority="15">p15/DeltaBuild_p15.package</Package>
+        <Package isPatch="true" priority="1">p15/DeltaBuild_p15.package</Package>
       </Folder>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p15.package</Package>
     </GameContent>
@@ -341,12 +341,12 @@
   <game class="EP" rgversion="15">
     <Name>SEAS</Name>
     <Longname>The Sims 3 Seasons</Longname>
-    <GUID />
+    <GUID>{F3D1C4E2-1CC3-43C5-9CBB-A2A6D7FEF495}</GUID>
     <DefaultInstallDir>Electronic Arts/The Sims 3 Seasons</DefaultInstallDir>
     <Suppressed>false</Suppressed>
     <GameContent>
       <Folder path="GameData/Shared/DeltaPackages">
-        <Package isPatch="true" priority="15">p16/DeltaBuild_p16.package</Package>
+        <Package isPatch="true" priority="1">p16/DeltaBuild_p16.package</Package>
       </Folder>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p16.package</Package>
     </GameContent>
@@ -368,7 +368,7 @@
     <Suppressed>false</Suppressed>
     <GameContent>
       <Folder path="GameData/Shared/DeltaPackages">
-        <Package isPatch="true" priority="15">p17/DeltaBuild_p17.package</Package>
+        <Package isPatch="true" priority="1">p17/DeltaBuild_p17.package</Package>
       </Folder>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p17.package</Package>
     </GameContent>
