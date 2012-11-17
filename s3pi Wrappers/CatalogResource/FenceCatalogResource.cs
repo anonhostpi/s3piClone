@@ -233,7 +233,8 @@ namespace CatalogResource
                     res.Remove("SnowThicknessRailScaleFactor");
                     res.Remove("SnowThicknessPostVerticalOffset");
                     res.Remove("SnowThicknessRailVerticalOffset");
-                    if (this.version < 0x00000008 || !this.hasWall)
+                    res.Remove("HasWall");
+                    if (this.version < 0x00000008)
                     {
                         res.Remove("RisesAboveWall");
                         res.Remove("WallIndex");
@@ -241,6 +242,14 @@ namespace CatalogResource
                         {
                             res.Remove("Materials");
                         }
+                    }
+                }
+                else
+                {
+                    if (!this.hasWall)
+                    {
+                        res.Remove("RisesAboveWall");
+                        res.Remove("WallIndex");
                     }
                 }
                 return res;
@@ -382,12 +391,18 @@ namespace CatalogResource
             set { if (version < 0x0000000a) throw new InvalidOperationException(); if (snowThicknessRailVerticalOffset != value) { snowThicknessRailVerticalOffset = value; OnResourceChanged(this, new EventArgs()); } }
         }
         [ElementPriority(32)]
+        public bool HasWall
+        {
+            get { if (version < 0x0000000a) throw new InvalidOperationException(); return hasWall; }
+            set { if (version < 0x0000000a) throw new InvalidOperationException(); if (hasWall != value) { hasWall = value; OnResourceChanged(this, new EventArgs()); } }
+        }
+        [ElementPriority(33)]
         public bool RisesAboveWall
         {
             get { if (version < 0x00000008 || (version >= 0x0000000a && !hasWall)) throw new InvalidOperationException(); return risesAboveWall; }
             set { if (version < 0x00000008 || (version >= 0x0000000a && !hasWall)) throw new InvalidOperationException(); if (risesAboveWall != value) { risesAboveWall = value; OnResourceChanged(this, new EventArgs()); } }
         }
-        [ElementPriority(33), TGIBlockListContentField("TGIBlocks")]
+        [ElementPriority(34), TGIBlockListContentField("TGIBlocks")]
         public uint WallIndex
         {
             get { if (version < 0x00000008 || (version >= 0x0000000a && !hasWall)) throw new InvalidOperationException(); return wallIndex; }
