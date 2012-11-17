@@ -54,6 +54,7 @@ namespace CatalogResource
         UIntList buildableShellDisplayStateHashes;//Version>=0x18
         uint levelBelowOBJDIndex;//Version>=0x19
         uint proxyOBJDIndex;//Version>=1b
+        uint blueprintIndex; //Version>=1d
         SlotPlacement slotPlacementFlags;
         string surfaceType = "";
         string sourceMaterial = "";
@@ -120,6 +121,7 @@ namespace CatalogResource
             IEnumerable<uint> buildableShellDisplayStateHashes,//Version>=0x18
             uint levelBelowOBJDIndex,//Version>=0x19
             uint proxyOBJDIndex,//Version>=1b
+            uint blueprintIndex,//Version>=1d
             SlotPlacement slotPlacementFlags, string surfaceType, string sourceMaterial, Moodlet moodletGiven, int moodletScore,
             uint unknown21, TopicRating[] topicRatings, uint fallbackIndex, TGIBlockList ltgib)
             : base(APIversion, version, common, ltgib)
@@ -163,6 +165,44 @@ namespace CatalogResource
             this.fallbackIndex = fallbackIndex;
         }
 
+        // Version <0x1d
+        public ObjectCatalogResource(int APIversion, uint version, IEnumerable<Material> materialList,
+            string instanceName,//Version>=0x16
+            Common common, uint objkIndex, ObjectType objectTypeFlags,
+            ObjectTypeExt objectTypeFlags2,//Version>=0x1a
+            WallPlacement wallPlacementFlags, Movement movementFlags, uint cutoutTilesPerLevel, uint levels, IEnumerable<MTDoor> mtDoorList,
+            byte isScriptEnabled, uint diagonalIndex, uint ambienceTypeHash, RoomCategory roomCategoryFlags,
+            FunctionCategory functionCategoryFlags, FunctionSubCategory functionSubCategoryFlags,
+            FunctionSubCategory2 functionSubCategoryFlags2,//Version>=1c
+            RoomSubCategory roomSubCategoryFlags, BuildCategory buildCategoryFlags, uint surfaceCutoutDDSIndex,
+            uint floorCutoutDDSIndex, uint floorCutoutLevelOffset, float floorCutoutBoundsLength,//Version>=0x17
+            IEnumerable<uint> buildableShellDisplayStateHashes,//Version>=0x18
+            uint levelBelowOBJDIndex,//Version>=0x19
+            uint proxyOBJDIndex,//Version>=1b
+            //uint blueprintIndex,//Version>=1d
+            SlotPlacement slotPlacementFlags, string surfaceType, string sourceMaterial, Moodlet moodletGiven, int moodletScore,
+            uint unknown21, TopicRating[] topicRatings, uint fallbackIndex, TGIBlockList ltgib)
+            : this(APIversion, version, materialList,
+            instanceName,
+            common, objkIndex, objectTypeFlags,
+            objectTypeFlags2,
+            wallPlacementFlags, movementFlags, cutoutTilesPerLevel, levels, mtDoorList,
+            isScriptEnabled, diagonalIndex, ambienceTypeHash, roomCategoryFlags,
+            functionCategoryFlags, functionSubCategoryFlags,
+            functionSubCategoryFlags2,
+            roomSubCategoryFlags, buildCategoryFlags, surfaceCutoutDDSIndex,
+            floorCutoutDDSIndex, floorCutoutLevelOffset, floorCutoutBoundsLength,
+            buildableShellDisplayStateHashes,
+            levelBelowOBJDIndex,
+            proxyOBJDIndex,
+            0,//Version>=0x1d
+            slotPlacementFlags, surfaceType, sourceMaterial, moodletGiven, moodletScore,
+            unknown21, topicRatings, fallbackIndex, ltgib)
+        {
+            if (checking) if (version >= 0x0000001d)
+                    throw new InvalidOperationException(String.Format("Constructor requires BlueprintIndex for version {0}", version));
+        }
+
         // Version <0x1c
         public ObjectCatalogResource(int APIversion, uint version, IEnumerable<Material> materialList,
             string instanceName,//Version>=0x16
@@ -192,6 +232,7 @@ namespace CatalogResource
             buildableShellDisplayStateHashes,
             levelBelowOBJDIndex,
             proxyOBJDIndex,
+            0,//Version>=0x1d
             slotPlacementFlags, surfaceType, sourceMaterial, moodletGiven, moodletScore,
             unknown21, topicRatings, fallbackIndex, ltgib)
         {
@@ -227,6 +268,7 @@ namespace CatalogResource
             buildableShellDisplayStateHashes,
             levelBelowOBJDIndex,
             0,//Version>=0x1b
+            0,//Version>=0x1d
             slotPlacementFlags, surfaceType, sourceMaterial, moodletGiven, moodletScore,
             unknown21, topicRatings, fallbackIndex, ltgib)
         {
@@ -262,6 +304,7 @@ namespace CatalogResource
             buildableShellDisplayStateHashes,
             levelBelowOBJDIndex,
             0,//Version>=0x1b
+            0,//Version>=0x1d
             slotPlacementFlags, surfaceType, sourceMaterial, moodletGiven, moodletScore,
             unknown21, topicRatings, fallbackIndex, ltgib)
         {
@@ -297,6 +340,7 @@ namespace CatalogResource
             buildableShellDisplayStateHashes,
             0,//Version>=0x19
             0,//Version>=0x1b
+            0,//Version>=0x1d
             slotPlacementFlags, surfaceType, sourceMaterial, moodletGiven, moodletScore,
             unknown21, topicRatings, fallbackIndex, ltgib)
         {
@@ -332,6 +376,7 @@ namespace CatalogResource
             new UIntList(null),//Version>=0x18
             0,//Version>=0x19
             0,//Version>=0x1b
+            0,//Version>=0x1d
             slotPlacementFlags, surfaceType, sourceMaterial, moodletGiven, moodletScore,
             unknown21, topicRatings, fallbackIndex, ltgib)
         {
@@ -367,6 +412,7 @@ namespace CatalogResource
             new UIntList(null),//Version>=0x18
             0,//Version>=0x19
             0,//Version>=0x1b
+            0,//Version>=0x1d
             slotPlacementFlags, surfaceType, sourceMaterial, moodletGiven, moodletScore,
             unknown21, topicRatings, fallbackIndex, ltgib)
         {
@@ -402,6 +448,7 @@ namespace CatalogResource
             new UIntList(null),//Version>=0x18
             0,//Version>=0x19
             0,//Version>=0x1b
+            0,//Version>=0x1d
             slotPlacementFlags, surfaceType, sourceMaterial, moodletGiven, moodletScore,
             unknown21, topicRatings, fallbackIndex, ltgib)
         {
@@ -457,6 +504,10 @@ namespace CatalogResource
                         if (this.version >= 0x0000001b)
                         {
                             proxyOBJDIndex = r.ReadUInt32();
+                            if (this.version >= 0x0000001d)
+                            {
+                                blueprintIndex = r.ReadUInt32();
+                            }
                         }
                     }
                 }
@@ -533,6 +584,10 @@ namespace CatalogResource
                         if (this.version >= 0x0000001b)
                         {
                             w.Write(proxyOBJDIndex);
+                            if (this.version >= 0x0000001d)
+                            {
+                                w.Write(this.blueprintIndex);
+                            }
                         }
                     }
                 }
@@ -567,28 +622,32 @@ namespace CatalogResource
             get
             {
                 List<string> res = base.ContentFields;
-                if (this.version < 0x0000001c)
+                if (this.version < 0x0000001d)
                 {
-                    res.Remove("FunctionSubCategoryFlags2");
-                    if (this.version < 0x0000001b)
+                    res.Remove("BlueprintIndex");
+                    if (this.version < 0x0000001c)
                     {
-                        res.Remove("ProxyOBJDIndex");
-                        if (this.version < 0x0000001a)
+                        res.Remove("FunctionSubCategoryFlags2");
+                        if (this.version < 0x0000001b)
                         {
-                            res.Remove("ObjectTypeFlags2");
-                            if (this.version < 0x00000019)
+                            res.Remove("ProxyOBJDIndex");
+                            if (this.version < 0x0000001a)
                             {
-                                res.Remove("LevelBelowOBJDIndex");
-                                if (this.version < 0x00000018)
+                                res.Remove("ObjectTypeFlags2");
+                                if (this.version < 0x00000019)
                                 {
-                                    res.Remove("BuildableShellDisplayStateHashes");
-                                    if (this.version < 0x00000017)
+                                    res.Remove("LevelBelowOBJDIndex");
+                                    if (this.version < 0x00000018)
                                     {
-                                        res.Remove("FloorCutoutDDSIndex");
-                                        res.Remove("FloorCutoutLevelOffset");
-                                        res.Remove("FloorCutoutBoundsLength");
-                                        if (this.version < 0x00000016)
-                                            res.Remove("InstanceName");
+                                        res.Remove("BuildableShellDisplayStateHashes");
+                                        if (this.version < 0x00000017)
+                                        {
+                                            res.Remove("FloorCutoutDDSIndex");
+                                            res.Remove("FloorCutoutLevelOffset");
+                                            res.Remove("FloorCutoutBoundsLength");
+                                            if (this.version < 0x00000016)
+                                                res.Remove("InstanceName");
+                                        }
                                     }
                                 }
                             }
@@ -1447,19 +1506,26 @@ namespace CatalogResource
             get { if (version < 0x0000001b) throw new InvalidOperationException(); return proxyOBJDIndex; }
             set { if (version < 0x0000001b) throw new InvalidOperationException(); if (proxyOBJDIndex != value) { proxyOBJDIndex = value; OnResourceChanged(this, new EventArgs()); } }
         }
-        [ElementPriority(45)]
-        public SlotPlacement SlotPlacementFlags { get { return slotPlacementFlags; } set { if (slotPlacementFlags != value) { slotPlacementFlags = value; OnResourceChanged(this, new EventArgs()); } } }
+        [ElementPriority(45), TGIBlockListContentField("TGIBlocks")]
+        public uint BlueprintIndex
+        {
+            get { if (version < 0x0000001d) throw new InvalidOperationException(); return blueprintIndex; }
+            set { if (version < 0x0000001d) throw new InvalidOperationException(); if (blueprintIndex != value) { blueprintIndex = value; OnResourceChanged(this, new EventArgs()); } }
+        }
+        
         [ElementPriority(46)]
-        public string SurfaceType { get { return surfaceType; } set { if (surfaceType != value) { surfaceType = value; OnResourceChanged(this, new EventArgs()); } } }
+        public SlotPlacement SlotPlacementFlags { get { return slotPlacementFlags; } set { if (slotPlacementFlags != value) { slotPlacementFlags = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(47)]
-        public string SourceMaterial { get { return sourceMaterial; } set { if (sourceMaterial != value) { sourceMaterial = value; OnResourceChanged(this, new EventArgs()); } } }
+        public string SurfaceType { get { return surfaceType; } set { if (surfaceType != value) { surfaceType = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(48)]
-        public Moodlet MoodletGiven { get { return moodletGiven; } set { if (moodletGiven != value) { moodletGiven = value; OnResourceChanged(this, new EventArgs()); } } }
+        public string SourceMaterial { get { return sourceMaterial; } set { if (sourceMaterial != value) { sourceMaterial = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(49)]
-        public int MoodletScore { get { return moodletScore; } set { if (moodletScore != value) { moodletScore = value; OnResourceChanged(this, new EventArgs()); } } }
+        public Moodlet MoodletGiven { get { return moodletGiven; } set { if (moodletGiven != value) { moodletGiven = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(50)]
-        public uint Unknown21 { get { return unknown21; } set { if (unknown21 != value) { unknown21 = value; OnResourceChanged(this, new EventArgs()); } } }
+        public int MoodletScore { get { return moodletScore; } set { if (moodletScore != value) { moodletScore = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(51)]
+        public uint Unknown21 { get { return unknown21; } set { if (unknown21 != value) { unknown21 = value; OnResourceChanged(this, new EventArgs()); } } }
+        [ElementPriority(52)]
         public TopicRating[] TopicRatings
         {
             get { return topicRatings; }
@@ -1469,7 +1535,7 @@ namespace CatalogResource
                 if (!topicRatings.Equals<TopicRating>(value)) { topicRatings = value == null ? null : (TopicRating[])value.Clone(); OnResourceChanged(this, new EventArgs()); }
             }
         }
-        [ElementPriority(52), TGIBlockListContentField("TGIBlocks")]
+        [ElementPriority(53), TGIBlockListContentField("TGIBlocks")]
         public uint FallbackIndex { get { return fallbackIndex; } set { if (fallbackIndex != value) { fallbackIndex = value; OnResourceChanged(this, new EventArgs()); } } }
 
         public override TGIBlockList TGIBlocks { get { return list; } set { if (list != value) { list = new TGIBlockList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); mtDoorList.ParentTGIBlocks = list; } } }
