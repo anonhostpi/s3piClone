@@ -41,9 +41,9 @@
             this.tbCCFolder = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
             this.btnCCEdit = new System.Windows.Forms.Button();
             this.label12 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.tlpGameFolders.SuspendLayout();
             this.tlpCustomContent.SuspendLayout();
@@ -65,13 +65,13 @@
             this.tlpGameFolders.Controls.Add(this.label2, 1, 0);
             this.tlpGameFolders.Controls.Add(this.label3, 2, 0);
             this.tlpGameFolders.Controls.Add(this.label4, 3, 0);
-            this.tlpGameFolders.Location = new System.Drawing.Point(12, 65);
+            this.tlpGameFolders.Location = new System.Drawing.Point(12, 12);
             this.tlpGameFolders.Name = "tlpGameFolders";
             this.tlpGameFolders.RowCount = 2;
             this.tlpGameFolders.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tlpGameFolders.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tlpGameFolders.Size = new System.Drawing.Size(604, 13);
-            this.tlpGameFolders.TabIndex = 0;
+            this.tlpGameFolders.TabIndex = 1;
             // 
             // label1
             // 
@@ -95,6 +95,7 @@
             this.label2.Size = new System.Drawing.Size(53, 13);
             this.label2.TabIndex = 0;
             this.label2.Text = "Enabled";
+            this.label2.LocationChanged += new System.EventHandler(this.label2_LocationChanged);
             // 
             // label3
             // 
@@ -121,10 +122,10 @@
             // 
             this.btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnClose.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.btnClose.Location = new System.Drawing.Point(541, 88);
+            this.btnClose.Location = new System.Drawing.Point(541, 89);
             this.btnClose.Name = "btnClose";
             this.btnClose.Size = new System.Drawing.Size(75, 23);
-            this.btnClose.TabIndex = 1;
+            this.btnClose.TabIndex = 0;
             this.btnClose.Text = "Close";
             this.btnClose.UseVisualStyleBackColor = true;
             // 
@@ -136,20 +137,20 @@
             // btnReset
             // 
             this.btnReset.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnReset.Location = new System.Drawing.Point(460, 88);
+            this.btnReset.Location = new System.Drawing.Point(460, 89);
             this.btnReset.Name = "btnReset";
             this.btnReset.Size = new System.Drawing.Size(75, 23);
-            this.btnReset.TabIndex = 2;
+            this.btnReset.TabIndex = 3;
             this.btnReset.Text = "Revert";
             this.btnReset.UseVisualStyleBackColor = true;
             this.btnReset.Click += new System.EventHandler(this.btnReset_Click);
             // 
             // tlpCustomContent
             // 
-            this.tlpCustomContent.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.tlpCustomContent.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tlpCustomContent.ColumnCount = 4;
-            this.tlpCustomContent.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tlpCustomContent.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 120F));
             this.tlpCustomContent.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tlpCustomContent.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tlpCustomContent.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
@@ -160,34 +161,34 @@
             this.tlpCustomContent.Controls.Add(this.btnCCEdit, 3, 1);
             this.tlpCustomContent.Controls.Add(this.label12, 3, 0);
             this.tlpCustomContent.Controls.Add(this.label5, 0, 1);
-            this.tlpCustomContent.Location = new System.Drawing.Point(12, 12);
+            this.tlpCustomContent.Location = new System.Drawing.Point(12, 37);
             this.tlpCustomContent.Name = "tlpCustomContent";
             this.tlpCustomContent.RowCount = 3;
             this.tlpCustomContent.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tlpCustomContent.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tlpCustomContent.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 28F));
-            this.tlpCustomContent.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tlpCustomContent.Size = new System.Drawing.Size(604, 46);
-            this.tlpCustomContent.TabIndex = 3;
+            this.tlpCustomContent.TabIndex = 2;
             // 
             // ckbCustomContent
             // 
             this.ckbCustomContent.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.ckbCustomContent.AutoSize = true;
-            this.ckbCustomContent.Location = new System.Drawing.Point(124, 20);
+            this.ckbCustomContent.Location = new System.Drawing.Point(135, 19);
             this.ckbCustomContent.Name = "ckbCustomContent";
-            this.ckbCustomContent.Size = new System.Drawing.Size(15, 14);
+            this.ckbCustomContent.Size = new System.Drawing.Size(29, 17);
             this.ckbCustomContent.TabIndex = 1;
+            this.ckbCustomContent.Text = " ";
             this.ckbCustomContent.UseVisualStyleBackColor = true;
             this.ckbCustomContent.CheckedChanged += new System.EventHandler(this.ckbCustomContent_CheckedChanged);
             // 
             // tbCCFolder
             // 
             this.tbCCFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbCCFolder.Location = new System.Drawing.Point(164, 17);
+            this.tbCCFolder.Location = new System.Drawing.Point(182, 17);
             this.tbCCFolder.Name = "tbCCFolder";
             this.tbCCFolder.ReadOnly = true;
-            this.tbCCFolder.Size = new System.Drawing.Size(396, 20);
+            this.tbCCFolder.Size = new System.Drawing.Size(378, 20);
             this.tbCCFolder.TabIndex = 3;
             // 
             // label6
@@ -195,7 +196,7 @@
             this.label6.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.label6.AutoSize = true;
             this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label6.Location = new System.Drawing.Point(105, 0);
+            this.label6.Location = new System.Drawing.Point(123, 0);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(53, 13);
             this.label6.TabIndex = 0;
@@ -206,22 +207,11 @@
             this.label7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label7.AutoSize = true;
             this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label7.Location = new System.Drawing.Point(164, 0);
+            this.label7.Location = new System.Drawing.Point(182, 0);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(80, 13);
             this.label7.TabIndex = 0;
             this.label7.Text = "Install Folder";
-            // 
-            // label5
-            // 
-            this.label5.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.label5.AutoSize = true;
-            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label5.Location = new System.Drawing.Point(3, 21);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(96, 13);
-            this.label5.TabIndex = 0;
-            this.label5.Text = "Custom Content";
             // 
             // btnCCEdit
             // 
@@ -247,6 +237,17 @@
             this.label12.TabIndex = 0;
             this.label12.Text = "Edit";
             // 
+            // label5
+            // 
+            this.label5.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label5.Location = new System.Drawing.Point(21, 21);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(96, 13);
+            this.label5.TabIndex = 0;
+            this.label5.Text = "Custom Content";
+            // 
             // openFileDialog1
             // 
             this.openFileDialog1.DefaultExt = "exe";
@@ -259,11 +260,11 @@
             this.AcceptButton = this.btnClose;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(628, 123);
+            this.ClientSize = new System.Drawing.Size(628, 124);
+            this.Controls.Add(this.tlpGameFolders);
             this.Controls.Add(this.tlpCustomContent);
             this.Controls.Add(this.btnReset);
             this.Controls.Add(this.btnClose);
-            this.Controls.Add(this.tlpGameFolders);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Name = "GameFoldersForm";
             this.ShowInTaskbar = false;

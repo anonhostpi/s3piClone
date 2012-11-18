@@ -111,11 +111,11 @@ namespace s3pi.Filetable
         Dictionary<int, Game> RowToGame = null;
         private void GameFoldersForm_Load(object sender, EventArgs e)
         {
+            Size size = this.Size;
+            Size sizeTLP = tlpGameFolders.Size;
+
             if (RowToGame == null)
             {
-                Size size = this.Size;
-                Size sizeTLP = tlpGameFolders.Size;
-
                 RowToGame = new Dictionary<int, Game>();
                 foreach (Game game in GameFolders.Games.OrderByDescending(x => x.RGVersion))
                 {
@@ -139,6 +139,7 @@ namespace s3pi.Filetable
                     ckbEnabled.Anchor = AnchorStyles.None;
                     ckbEnabled.AutoSize = true;
                     ckbEnabled.Visible = game.Suppressed.HasValue;
+                    ckbEnabled.Text = " ";
                     ckbEnabled.Checked = !ePsDisabled.Contains(game.Name);
                     ckbEnabled.CheckedChanged += new EventHandler(ckbEnabled_CheckedChanged);
 
@@ -156,11 +157,9 @@ namespace s3pi.Filetable
 
                     tlpGameFolders.Controls.Add(lbGameID, 0, row);
                     tlpGameFolders.Controls.Add(ckbEnabled, 1, row);
-                    tlpGameFolders.Controls.Add(tbInstFolder, 2, row);
                     tlpGameFolders.Controls.Add(btnEdit, 3, row);
+                    tlpGameFolders.Controls.Add(tbInstFolder, 2, row);
                 }
-
-                this.Size = new Size(size.Width, size.Height - sizeTLP.Height + tlpGameFolders.Size.Height);
             }
             else
             {
@@ -193,6 +192,14 @@ namespace s3pi.Filetable
                     btnEdit.Enabled = ckbEnabled == null || !ckbEnabled.Visible || ckbEnabled.Checked;
                 }
             }
+
+            this.Size = new Size(size.Width, Math.Min(Screen.GetWorkingArea(this).Height * 4 / 5, size.Height - sizeTLP.Height + tlpGameFolders.Height));
+            this.Location = new Point((Screen.GetWorkingArea(this).Width - this.Width) / 2, (Screen.GetWorkingArea(this).Height - this.Height) / 2);
+        }
+
+        private void label2_LocationChanged(object sender, EventArgs e)
+        {
+            tlpCustomContent.ColumnStyles[0].Width = label2.Location.X - label2.Margin.Left;
         }
 
         Game GameFromControl(Control c)
