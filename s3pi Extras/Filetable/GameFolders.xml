@@ -319,7 +319,7 @@
   <game class="EP" rgversion="14">
     <Name>SN</Name>
     <Longname>The Sims 3 Supernatural</Longname>
-    <GUID>{94C86A30-50E7-48B6-9934-EF26A32BCFDE}</GUID>
+    <GUID>{B37DAFA5-717D-41F8-BDFB-3A4B68C0B3A1}</GUID>
     <DefaultInstallDir>Electronic Arts/The Sims 3 Supernatural</DefaultInstallDir>
     <Suppressed>false</Suppressed>
     <GameContent>
@@ -341,7 +341,7 @@
   <game class="EP" rgversion="15">
     <Name>SEAS</Name>
     <Longname>The Sims 3 Seasons</Longname>
-    <GUID>{F3D1C4E2-1CC3-43C5-9CBB-A2A6D7FEF495}</GUID>
+    <GUID>{3DE92282-CB49-434F-81BF-94E5B380E889}</GUID>
     <DefaultInstallDir>Electronic Arts/The Sims 3 Seasons</DefaultInstallDir>
     <Suppressed>false</Suppressed>
     <GameContent>

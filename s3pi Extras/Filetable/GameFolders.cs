@@ -410,10 +410,11 @@ namespace s3pi.Filetable
             get
             {
                 if (GUID == "") return null;
-                using (var rkGame = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\GameUX\Games\" + GUID))
+                string key = "SOFTWARE" + ((System.Runtime.InteropServices.Marshal.SizeOf(typeof(IntPtr)) != 4) ? @"\Wow6432Node" : "") + @"\Microsoft\Windows\CurrentVersion\Uninstall\" + GUID;
+                using (var rkGame = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(key))
                 {
                     if (rkGame == null) return null;
-                    return rkGame.GetValue("ConfigApplicationPath") as string;
+                    return rkGame.GetValue("InstallLocation") as string;
                 }
             }
         }
