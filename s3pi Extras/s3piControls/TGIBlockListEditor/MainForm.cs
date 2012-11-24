@@ -229,9 +229,20 @@ namespace System.Windows.Forms.TGIBlockListEditorForm
             TGIBlock item = new TGIBlock(0, null);
             if (!TGIBlock.TryParse(Clipboard.GetText(), item)) return;
 
-            cbType.Value = item.ResourceType;
-            tbGroup.Text = "0x" + item.ResourceGroup.ToString("X8");
-            tbInstance.Text = "0x" + item.Instance.ToString("X16");
+            int i = listView1.SelectedIndices[0];
+            items[i].ResourceType = item.ResourceType;
+            items[i].ResourceGroup = item.ResourceGroup;
+            items[i].Instance = item.Instance;
+
+            ListViewItem lvi = CreateListViewItem(item);
+            listView1.Items[i].Text = lvi.Text;
+            listView1.Items[i].SubItems[1].Text = lvi.SubItems[1].Text;
+            listView1.Items[i].SubItems[2].Text = lvi.SubItems[2].Text;
+            listView1.Items[i].SubItems[3].Text = lvi.SubItems[3].Text;
+
+            listView1.SelectedIndices.Remove(i);
+            listView1.SelectedIndices.Add(i);
+            cbType.Focus();
         }
 
         private void btnPaste_Click(object sender, EventArgs e) { pasteRKToolStripMenuItem_Click(sender, e); }
