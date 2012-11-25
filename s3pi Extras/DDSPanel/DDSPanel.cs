@@ -962,7 +962,10 @@ namespace System.Windows.Forms
             double scaleWidth = constraint.Width <= 0 ? 1 : Math.Min(from.Width, constraint.Width) / (double)from.Width;
             double scaleHeight = constraint.Height <= 0 ? 1 : Math.Min(from.Height, constraint.Height) / (double)from.Height;
             double scale = Math.Min(scaleWidth, scaleHeight);
-            return new Size((int)Math.Round(from.Width * scale - 0.5), (int)Math.Round(from.Height * scale - 0.5));
+
+            // Prevent scaling to zero pixels, thus allowing distortion.
+            return new Size((int)Math.Max(1, Math.Round(from.Width * scale - 0.5, MidpointRounding.AwayFromZero)),
+                (int)Math.Max(1,Math.Round(from.Height * scale - 0.5, MidpointRounding.AwayFromZero)));
         }
 
         private static Size Max(Size left, Size right)
