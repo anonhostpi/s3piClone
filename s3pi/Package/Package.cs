@@ -558,10 +558,12 @@ namespace s3pi.Package
         // Required by API, not user tools
 
         /// <summary>
-        /// Used by WrapperDealer to get the data for a resource
+        /// Required internally by s3pi - <b>not</b> for use in user tools.
+        /// Please use <c>WrapperDealer.GetResource(int, IPackage, IResourceIndexEntry)</c> instead.
         /// </summary>
         /// <param name="rc">IResourceIndexEntry of resource</param>
         /// <returns>The resource data (uncompressed, if necessary)</returns>
+        /// <remarks>Used by WrapperDealer to get the data for a resource.</remarks>
         public override Stream GetResource(IResourceIndexEntry rc)
         {
             ResourceIndexEntry rie = rc as ResourceIndexEntry;
