@@ -107,7 +107,7 @@ namespace s3pi.GenericRCOLResource
             else
                 ftptIndex = 0;
 
-            tgiBlockList = new TGIBlockList(OnRCOLChanged, s, tgiPosn, tgiSize);
+            tgiBlockList = new TGIBlockList(OnRCOLChanged, s, tgiPosn, tgiSize, ignoreTgiSize: true);
 
             entryList.ParentTGIBlocks = tgiBlockList;
         }
