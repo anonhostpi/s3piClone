@@ -20,8 +20,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using s3pi.Interfaces;
+using System.Linq;
 using System.Reflection;
+using s3pi.Interfaces;
 using s3pi.GenericRCOLResource.Properties;
 
 namespace s3pi.GenericRCOLResource
@@ -82,6 +83,16 @@ namespace s3pi.GenericRCOLResource
 
             RCOLIndexEntry[] index = new RCOLIndexEntry[countChunks];
             for (int i = 0; i < countChunks; i++) { index[i].Position = r.ReadUInt32(); index[i].Length = r.ReadInt32(); }
+            if (countChunks == 1)
+            {
+                index[0].Position = 0x2c;
+                index[0].Length = (int)(s.Length - 0x2c);
+                if (chunks[0].ResourceType == 0)
+                {
+                    string tag = new string(r.ReadChars(4));
+                    chunks[0].ResourceType = GenericRCOLResourceHandler.RCOLTypesForTag(tag).FirstOrDefault();
+                }
+            }
 
             blockList = new ChunkEntryList(requestedApiVersion, OnResourceChanged, s, chunks, index) { ParentTGIBlocks = resources, };
         }
@@ -870,6 +881,21 @@ namespace s3pi.GenericRCOLResource
                 return (ARCOLBlock)t.GetConstructor(types).Invoke(args);
             }
             return null;
+        }
+
+        /// <summary>
+        /// Return the enumeration of ResourceTypes for the given tag.
+        /// </summary>
+        /// <param name="tag">An RCOL tag.</param>
+        /// <returns>An enumeration of ResourceTypes.</returns>
+        public static IEnumerable<uint> RCOLTypesForTag(string tag)
+        {
+            return tagRegistry
+                .Where(kvp => kvp.Key == tag)
+                .Select(kvp => kvp.Value)
+                .SelectMany(t => typeRegistry
+                    .Where(kvp => kvp.Value == t)
+                    .Select(kvp => kvp.Key));
         }
 
         /// <summary>
