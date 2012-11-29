@@ -39,7 +39,7 @@ namespace System.Windows.Forms
             if (buttons.Count < 1)
                 throw new ArgumentLengthException("At least one button text must be supplied");
 
-            this.tbMessage.Lines = message.Split('\n');
+            this.tbMessage.Lines = (message + "\n").Split('\n');
             this.Text = caption;
             enumToGlyph(icon, lbIcon);
             CreateButtons(buttons, defBtn, cncBtn);
@@ -79,6 +79,7 @@ namespace System.Windows.Forms
             Size iconSize = lbIcon.Visible ? lbIcon.PreferredSize : new Size(0, 0);
 
             flpButtons.PerformLayout();
+            flpButtons.ResumeLayout(true);
             Size btnSize = flpButtons.PreferredSize;
 
             // So, remaining size...
@@ -94,12 +95,15 @@ namespace System.Windows.Forms
                 MaximumSize = new Size(maxWidth, maxHeight),
                 Multiline = true,
                 Lines = this.tbMessage.Lines,
+                Location = new Point(this.Width, this.Height),
             };
-            tb.PerformLayout();
+            this.Controls.Add(tb);
+            this.ResumeLayout(true);
 
             tbMessage.ClientSize = new Size(tb.PreferredSize.Width > maxWidth ? maxWidth : tb.PreferredSize.Width,
                 tb.PreferredSize.Height > maxHeight ? maxHeight : tb.PreferredSize.Height);
             tbMessage.PerformLayout();
+            tbMessage.ResumeLayout(true);
 
             int minWidth = Math.Max(btnSize.Width, iconSize.Width) + formWidth;
             int minHeight = btnSize.Height + iconSize.Height + formHeight;
@@ -111,8 +115,7 @@ namespace System.Windows.Forms
             this.ClientSize = ctlSize;
 
             this.Location = new Point((Screen.PrimaryScreen.WorkingArea.Size.Width - Size.Width) / 2, (Screen.PrimaryScreen.WorkingArea.Size.Height - Size.Height) / 2);
-
-            this.ResumeLayout(true);
+            this.Controls.Remove(tb);
         }
 
         private void enumToGlyph(CopyableMessageBoxIcon icon, Label lb)
@@ -144,7 +147,23 @@ namespace System.Windows.Forms
                 if (i == defBtn + 1) this.AcceptButton = btn;
                 if (i == cncBtn + 1) this.CancelButton = btn;
             }
-            flpButtons.ResumeLayout();
+            flpButtons.ResumeLayout(true);
+
+            int minW = 75;
+            int minH = 23;
+            foreach (var ctrl in flpButtons.Controls)
+            {
+                Button btn = ctrl as Button;
+                if (btn == null) continue;
+                minW = Math.Max(minW, btn.Width);
+                minH = Math.Max(minH, btn.Height);
+            }
+            foreach (var ctrl in flpButtons.Controls)
+            {
+                Button btn = ctrl as Button;
+                if (btn == null) continue;
+                btn.Size = new Size(minW, minH);
+            }
         }
 
         private Button CreateButton(string Name, int TabIndex, string Text)
@@ -153,11 +172,13 @@ namespace System.Windows.Forms
             {
                 Anchor = System.Windows.Forms.AnchorStyles.None,
                 Margin = new Forms.Padding(9),
-                Size = new System.Drawing.Size(75, 23),
+                MinimumSize = new System.Drawing.Size(75, 23),
                 UseVisualStyleBackColor = true,
                 Name = Name,
                 TabIndex = TabIndex,
                 Text = Text,
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowOnly,
             };
             newButton.Click += new System.EventHandler(this.button_Click);
             return newButton;
