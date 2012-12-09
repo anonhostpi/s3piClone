@@ -723,14 +723,14 @@ namespace s3pi.GenericRCOLResource
         public ElementTextureKey(int APIversion, EventHandler handler, FieldType field, Stream s) : base(APIversion, handler, field) { Parse(s); }
         public ElementTextureKey(int APIversion, EventHandler handler) : this(APIversion, handler, (FieldType)0, (uint)0, (uint)0, (ulong)0) { }
         public ElementTextureKey(int APIversion, EventHandler handler, ElementTextureKey basis) : this(APIversion, handler, basis.field, basis.data) { }
-        public ElementTextureKey(int APIversion, EventHandler handler, FieldType field, IResourceKey data) : base(APIversion, handler, field) { this.data = new TGIBlock(requestedApiVersion, handler, data); }
-        public ElementTextureKey(int APIversion, EventHandler handler, FieldType field, uint resourceType, uint resourceGroup, ulong instance) : base(APIversion, handler, field) { this.data = new TGIBlock(requestedApiVersion, handler, resourceType, resourceGroup, instance); }
+        public ElementTextureKey(int APIversion, EventHandler handler, FieldType field, IResourceKey data) : base(APIversion, handler, field) { this.data = new TGIBlock(requestedApiVersion, handler, "ITG", data); }
+        public ElementTextureKey(int APIversion, EventHandler handler, FieldType field, uint resourceType, uint resourceGroup, ulong instance) : base(APIversion, handler, field) { this.data = new TGIBlock(requestedApiVersion, handler, "ITG", resourceType, resourceGroup, instance); }
         #endregion
 
         #region Data I/O
-        void Parse(Stream s) { data = new TGIBlock(requestedApiVersion, handler, s); ReadZeros(s, 4); }
+        void Parse(Stream s) { data = new TGIBlock(requestedApiVersion, handler, "ITG", s); ReadZeros(s, 4); }
 
-        protected override void UnParse(Stream s) { if (data == null) data = new TGIBlock(requestedApiVersion, handler, 0); data.UnParse(s); WriteZeros(s, 4); }
+        protected override void UnParse(Stream s) { if (data == null) data = new TGIBlock(requestedApiVersion, handler, "ITG"); data.UnParse(s); WriteZeros(s, 4); }
         protected override DataType DataTypeFromType { get { return DataType.dtTexture; } }
         protected override int CountFromType { get { return 5; } }
         #endregion
@@ -746,7 +746,7 @@ namespace s3pi.GenericRCOLResource
 
         #region Content Fields
         [ElementPriority(11)]
-        public IResourceKey Data { get { return data; } set { if (!data.Equals(value)) { data = new TGIBlock(requestedApiVersion, handler, value); OnElementChanged(); } } }
+        public IResourceKey Data { get { return data; } set { if (!data.Equals(value)) { data = new TGIBlock(requestedApiVersion, handler, "ITG", value); OnElementChanged(); } } }
         #endregion
     }
 
