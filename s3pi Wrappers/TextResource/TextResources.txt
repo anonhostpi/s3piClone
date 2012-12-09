@@ -13,5 +13,7 @@
 0xA8D58BE5 XML without encoding bytes -- <skills_store/>
 0xD4D9FBE5 XML without encoding bytes -- <patternlist/>
 0xDD3223A7 XML without encoding bytes -- <buff_store/>
+0xE5105066 ?
 0xE5105067 XML without encoding bytes -- <RecipeMasterList_store/>
+0xE5105068 ?
 0xF0FF5598 Shortcut definitions
