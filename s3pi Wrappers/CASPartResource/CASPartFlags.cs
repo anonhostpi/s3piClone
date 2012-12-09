@@ -237,7 +237,7 @@ namespace CASPartResource
 
         Unknown10 = 0x00010000,
         Unknown11 = 0x00020000,
-        Unknown12 = 0x00040000,
+        Outerwear = 0x00040000,
         //CategoryMask = 0x0007FFFF,
         Unknown13 = 0x00080000,
 
