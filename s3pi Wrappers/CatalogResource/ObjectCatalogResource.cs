@@ -1135,15 +1135,15 @@ namespace CatalogResource
             //
             //
 
+
             //
             //
             //
             //
 
-
-            //
-            //
-            //
+            Blueprint = 0x10000000,
+            Unknown1D = 0x20000000,
+            Unknown1E = 0x40000000,
             Default = 0x80000000,
         }
 
