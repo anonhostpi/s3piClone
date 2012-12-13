@@ -954,28 +954,28 @@ namespace CatalogResource
             Laundry = 0x0400000000000000,
             PetEssentials = 0x0800000000000000,
 
-            Unused61 = 0x1000000000000000,
-            Unused62 = 0x2000000000000000,
-            Unused63 = 0x4000000000000000,
+            //Unused61 = 0x1000000000000000,
+            //Unused62 = 0x2000000000000000,
+            //Unused63 = 0x4000000000000000,
             Default = 0x8000000000000000,
         }
 
         [Flags]
         public enum FunctionCategory : uint
         {
-            Unused1 = 0x00000001,
+            //Unused1 = 0x00000001,
             Appliances = 0x00000002,
             Electronics = 0x00000004,
             Entertainment = 0x00000008,
 
-            Unused5 = 0x00000010,
+            //Unused5 = 0x00000010,
             Lighting = 0x00000020,
             Plumbing = 0x00000040,
             Decor = 0x00000080,
 
             Kids = 0x00000100,
             Storage = 0x00000200,
-            Unused11 = 0x00000400,
+            //Unused11 = 0x00000400,
             Comfort = 0x00000800,
 
             Surfaces = 0x00001000,
@@ -998,8 +998,8 @@ namespace CatalogResource
             //
             //
 
-            Unused29 = 0x10000000,
-            Unused30 = 0x20000000,
+            //Unused29 = 0x10000000,
+            //Unused30 = 0x20000000,
             Debug = 0x40000000,
             Default = 0x80000000,
         }
@@ -1008,7 +1008,7 @@ namespace CatalogResource
         public enum FunctionSubCategory : ulong
         {
             //Low DWORD
-            Unused1 = 0x00000001,
+            //Unused1 = 0x00000001,
             AppliancesMisc = 0x00000002,
             AppliancesSmall = 0x00000004,
             AppliancesLarge = 0x00000008,
@@ -1093,7 +1093,7 @@ namespace CatalogResource
         public enum FunctionSubCategory2 : ulong
         {
             //Low DWORD
-            Unused1 = 0x00000001,
+            //Unused1 = 0x00000001,
             FXAndLights = 0x00000002,
             Props = 0x00000004,
             MiscellaneousShowStage = 0x00000008,
@@ -1104,7 +1104,7 @@ namespace CatalogResource
         [Flags]
         public enum BuildCategory : uint
         {
-            Unused1 = 0x00000001,
+            //Unused1 = 0x00000001,
             Door = 0x00000002,
             Window = 0x00000004,
             Gate = 0x00000008,
@@ -1142,8 +1142,8 @@ namespace CatalogResource
             //
 
             Blueprint = 0x10000000,
-            Unknown1D = 0x20000000,
-            Unknown1E = 0x40000000,
+            //Unknown1D = 0x20000000,
+            //Unknown1E = 0x40000000,
             Default = 0x80000000,
         }
 
@@ -1204,30 +1204,38 @@ namespace CatalogResource
             Environment,
             Hunger,
             Bladder,
+
             Energy,
             StressRelief,
             Fun,
             Hygiene,
+
             Logic,
             Charisma,
             Cooking,
             Athletic,
+
             Painting,
             Guitar,
             Handiness,
             GroupActivity,
+
+
             Upgradable,
             LearnCookingFaster,
             ChildOnly,
-            unused13,
-            Gardening,
+            //Unknown13,
+
+            Gardening = 0x00000014,
             Fishing,
             SelfCleaning,
             NeverBreaks,
+
             Portable,
             Speed,
             Inventing,
             Sculpting,
+
             PlayPiano,
             PlayBass,
             PlayDrums,
