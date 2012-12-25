@@ -491,7 +491,7 @@ namespace s3pi.Interfaces
                     throw new InvalidDataException(String.Format("Position of TGIBlock read: 0x{0:X8}, actual: 0x{1:X8}",
                         tgiPosn, s.Position));
 
-            if (ignoreTgiSize || tgiSize > 0) Parse(s);
+            if ((ignoreTgiSize && s.Position < s.Length) || tgiSize > 0) Parse(s);
 
             if (checking && !ignoreTgiSize) if (tgiSize != s.Position - tgiPosn + (addEight ? 8 : 0))
                     throw new InvalidDataException(String.Format("Size of TGIBlock read: 0x{0:X8}, actual: 0x{1:X8}; at 0x{2:X8}",
