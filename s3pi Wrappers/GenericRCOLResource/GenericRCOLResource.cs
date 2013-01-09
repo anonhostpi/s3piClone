@@ -85,8 +85,8 @@ namespace s3pi.GenericRCOLResource
             for (int i = 0; i < countChunks; i++) { index[i].Position = r.ReadUInt32(); index[i].Length = r.ReadInt32(); }
             if (countChunks == 1)
             {
-                index[0].Position = 0x2c;
-                index[0].Length = (int)(s.Length - 0x2c);
+                index[0].Position = 0x2c + (uint)countResources * 16;
+                index[0].Length = (int)(s.Length - index[0].Position);
                 if (chunks[0].ResourceType == 0)
                 {
                     string tag = new string(r.ReadChars(4));
