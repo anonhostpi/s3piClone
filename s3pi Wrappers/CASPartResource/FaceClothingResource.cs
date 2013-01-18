@@ -217,6 +217,33 @@ namespace CASPartResource
             #endregion
         }
 
+        public class EntryList : DependentList<Entry>
+        {
+            private DependentList<TGIBlock> _ParentTGIBlocks;
+            public DependentList<TGIBlock> ParentTGIBlocks
+            {
+                get { return _ParentTGIBlocks; }
+                set { if (_ParentTGIBlocks != value) { _ParentTGIBlocks = value; foreach (var i in this) i.ParentTGIBlocks = _ParentTGIBlocks; } }
+            }
+
+            #region Constructors
+            public EntryList(EventHandler handler, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : base(handler) { _ParentTGIBlocks = ParentTGIBlocks; }
+            public EntryList(EventHandler handler, Stream s, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : this(null, ParentTGIBlocks) { elementHandler = handler; Parse(s); this.handler = handler; }
+            public EntryList(EventHandler handler, IEnumerable<Entry> le, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : this(null, ParentTGIBlocks) { elementHandler = handler; foreach (var t in le) this.Add(t); this.handler = handler; }
+            #endregion
+
+            #region Data I/O
+            protected override Entry CreateElement(Stream s) { return new Entry(0, elementHandler, s) { ParentTGIBlocks = ParentTGIBlocks }; }
+            protected override void WriteElement(Stream s, Entry element) { element.UnParse(s); }
+            #endregion
+
+            public override void Add() { this.Add(new Entry(0, handler, _ParentTGIBlocks)); }
+            public override void Add(Entry item) { item.ParentTGIBlocks = _ParentTGIBlocks; base.Add(item); }
+        }
+
         public class CASEntry : AHandlerElement, IEquatable<CASEntry>
         {
             const int recommendedApiVersion = 1;
@@ -229,27 +256,24 @@ namespace CASPartResource
                     if (_ParentTGIBlocks != value)
                     {
                         _ParentTGIBlocks = value;
-                        if (geom != null) geom.ParentTGIBlocks = _ParentTGIBlocks;
-                        if (bone != null) bone.ParentTGIBlocks = _ParentTGIBlocks;
+                        if (geomEntries != null) geomEntries.ParentTGIBlocks = _ParentTGIBlocks;
+                        if (boneEntries != null) boneEntries.ParentTGIBlocks = _ParentTGIBlocks;
                     }
                 }
             }
 
             #region Attributes
             FacialRegionFlags facialRegion;
-            uint andBone;
-            uint useGeom;
-            Entry geom;
-            uint useBone;
-            Entry bone;
+            EntryList geomEntries;
+            EntryList boneEntries;
             #endregion
 
             #region Constructors
             public CASEntry(int APIversion, EventHandler handler, DependentList<TGIBlock> ParentTGIBlocks = null)
                 : base(APIversion, handler)
             {
-                geom = new Entry(requestedApiVersion, handler, _ParentTGIBlocks);
-                bone = new Entry(requestedApiVersion, handler, _ParentTGIBlocks);
+                geomEntries = new EntryList(handler, _ParentTGIBlocks);
+                geomEntries = new EntryList(handler, _ParentTGIBlocks);
             }
             public CASEntry(int APIversion, EventHandler handler, Stream s, DependentList<TGIBlock> ParentTGIBlocks = null)
                 : base(APIversion, handler)
@@ -258,61 +282,32 @@ namespace CASPartResource
                 Parse(s);
             }
             public CASEntry(int APIversion, EventHandler handler, CASEntry basis, DependentList<TGIBlock> ParentTGIBlocks = null)
-                : this(APIversion, handler, basis.facialRegion, basis.andBone, basis.useGeom, basis.geom, basis.useBone, basis.bone,
+                : this(APIversion, handler, basis.facialRegion, basis.geomEntries, basis.boneEntries,
                 ParentTGIBlocks ?? basis._ParentTGIBlocks) { }
-            public CASEntry(int APIversion, EventHandler handler, FacialRegionFlags facialRegion, uint andBone, uint useGeom, Entry geom, uint useBone, Entry bone,
+            public CASEntry(int APIversion, EventHandler handler, FacialRegionFlags facialRegion, EntryList geomEntries, EntryList boneEntries,
                 DependentList<TGIBlock> ParentTGIBlocks = null)
                 : base(APIversion, handler)
             {
                 this._ParentTGIBlocks = ParentTGIBlocks;
                 this.facialRegion = facialRegion;
-                this.andBone = andBone;
-                this.useGeom = useGeom;
-                this.geom = new Entry(requestedApiVersion, handler, geom, _ParentTGIBlocks);
-                this.useBone = useBone;
-                this.bone = new Entry(requestedApiVersion, handler, bone, _ParentTGIBlocks);
+                this.geomEntries = new EntryList(handler, geomEntries, _ParentTGIBlocks);
+                this.boneEntries = new EntryList(handler, boneEntries, _ParentTGIBlocks);
             }
             #endregion
 
             #region Data I/O
             void Parse(Stream s)
             {
-                BinaryReader r = new BinaryReader(s);
-                facialRegion = (FacialRegionFlags)r.ReadUInt32();
-                andBone = r.ReadUInt32();
-                if (andBone == 0)
-                    useGeom = r.ReadUInt32();
-                if (andBone != 0 || useGeom != 0)
-                    geom = new Entry(requestedApiVersion, handler, s, _ParentTGIBlocks);
-                if (andBone != 0)
-                {
-                    useBone = r.ReadUInt32();
-                    if (useBone != 0)
-                        bone = new Entry(requestedApiVersion, handler, s, _ParentTGIBlocks);
-                }
+                facialRegion = (FacialRegionFlags)(new BinaryReader(s).ReadUInt32());
+                geomEntries = new EntryList(handler, s, _ParentTGIBlocks);
+                boneEntries = new EntryList(handler, s, _ParentTGIBlocks);
             }
 
             internal void UnParse(Stream s)
             {
-                BinaryWriter w = new BinaryWriter(s);
-                w.Write((uint)facialRegion);
-                w.Write(andBone);
-                if (andBone == 0)
-                    w.Write(useGeom);
-                if (andBone != 0 || useGeom != 0)
-                {
-                    if (geom == null) geom = new Entry(requestedApiVersion, handler, _ParentTGIBlocks);
-                    geom.UnParse(s);
-                }
-                if (andBone != 0)
-                {
-                    w.Write(useBone);
-                    if (useBone != 0)
-                    {
-                        if (bone == null) bone = new Entry(requestedApiVersion, handler, _ParentTGIBlocks);
-                        bone.UnParse(s);
-                    }
-                }
+                new BinaryWriter(s).Write((uint)facialRegion);
+                geomEntries.UnParse(s);
+                boneEntries.UnParse(s);
             }
             #endregion
 
@@ -325,39 +320,19 @@ namespace CASPartResource
                 {
                     List<string> res = GetContentFields(requestedApiVersion, this.GetType());
                     res.Remove("ParentTGIBlocks");
-                    if (andBone != 0)
-                        res.Remove("UseGeom");
-                    else
-                        if (useGeom == 0)
-                            res.Remove("Geom");
-                    if (andBone == 0)
-                    {
-                        res.Remove("UseBone");
-                        res.Remove("Bone");
-                    }
-                    else
-                        if (useBone == 0)
-                            res.Remove("Bone");
                     return res;
                 }
             }
             #endregion
 
-            #region IEquatable<Entry> Members
+            #region IEquatable<CASEntry> Members
 
             public bool Equals(CASEntry other)
             {
                 return
                     this.facialRegion == other.facialRegion
-                    && this.andBone == other.andBone
-                    && (this.andBone == 0 &&
-                        this.useGeom == other.useGeom)
-                    && this.geom.Equals(other.geom)
-                    && (this.andBone > 0 &&
-                        this.useBone == other.useBone
-                        && this.bone.Equals(other.bone)
-                    )
-                    ;
+                    && this.geomEntries.Equals(other.geomEntries)
+                    && this.boneEntries.Equals(other.boneEntries);
             }
 
             public override bool Equals(object obj)
@@ -369,10 +344,8 @@ namespace CASPartResource
             {
                 return
                     this.facialRegion.GetHashCode()
-                    ^ this.andBone.GetHashCode()
-                    ^ (this.andBone == 0 ? this.useGeom.GetHashCode() : 0)
-                    ^ this.geom.GetHashCode()
-                    ^ (this.andBone > 0 ? this.useBone.GetHashCode() ^ this.bone.GetHashCode() : 0)
+                    ^ this.geomEntries.GetHashCode()
+                    ^ this.boneEntries.GetHashCode()
                 ;
             }
 
@@ -382,33 +355,11 @@ namespace CASPartResource
             [ElementPriority(1)]
             public FacialRegionFlags FacialRegion { get { return facialRegion; } set { if (facialRegion != value) { facialRegion = value; OnElementChanged(); } } }
             [ElementPriority(2)]
-            public uint AndBone { get { return andBone; } set { if (andBone != value) { andBone = value; OnElementChanged(); } } }
+            public EntryList Geoms { get { return geomEntries; } set { if (!geomEntries.Equals(value)) { geomEntries = new EntryList(handler, value, _ParentTGIBlocks); OnElementChanged(); } } }
             [ElementPriority(3)]
-            public uint UseGeom { get { return useGeom; } set { if (useGeom != value) { useGeom = value; OnElementChanged(); } } }
-            [ElementPriority(4)]
-            public Entry Geom { get { return geom; } set { if (!geom.Equals(value)) { geom = new Entry(requestedApiVersion, handler, value, _ParentTGIBlocks); OnElementChanged(); } } }
-            [ElementPriority(5)]
-            public uint UseBone { get { return useBone; } set { if (useBone != value) { useBone = value; OnElementChanged(); } } }
-            [ElementPriority(6)]
-            public Entry Bone { get { return bone; } set { if (!bone.Equals(value)) { bone = new Entry(requestedApiVersion, handler, value, _ParentTGIBlocks); OnElementChanged(); } } }
+            public EntryList Bones { get { return boneEntries; } set { if (!boneEntries.Equals(value)) { boneEntries = new EntryList(handler, value, _ParentTGIBlocks); OnElementChanged(); } } }
 
-            public string Value
-            {
-                get
-                {
-                    return ValueBuilder;
-                    /*
-                    string s = "";
-                    foreach (string field in ContentFields)
-                        if (field == "Value") continue;
-                        else if (field == "Geom" || field == "Bone")
-                            s += string.Format("\n{0}: {1}", field, (this[field].Value as Entry).Value);
-                        else
-                            s += string.Format("\n{0}: {1}", field, this[field]);
-                    return s;
-                    /**/
-                }
-            }
+            public string Value { get { return ValueBuilder; } }
             #endregion
         }
         public class CASEntryList : DependentList<CASEntry>
