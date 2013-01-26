@@ -361,10 +361,10 @@
     </Thumbnails>
   </game>
   <game class="SP" rgversion="16">
-    <Name>Spare</Name>
-    <Longname>The Sims 3 Next Pack</Longname>
-    <GUID />
-    <DefaultInstallDir>Electronic Arts/The Sims 3 Whatever Is Next</DefaultInstallDir>
+    <Name>DEC</Name>
+    <Longname>The Sims 3 70s 80s 90s Stuff</Longname>
+    <GUID>{E1868CAE-E3B9-4099-8C18-AA8944D336FD}</GUID>
+    <DefaultInstallDir>Electronic Arts/The Sims 3 70s 80s &amp; 90s Stuff</DefaultInstallDir>
     <Suppressed>false</Suppressed>
     <GameContent>
       <Folder path="GameData/Shared/DeltaPackages">
@@ -374,6 +374,28 @@
     </GameContent>
     <DDSImages>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p17.package</Package>
+    </DDSImages>
+    <Thumbnails>
+      <Folder path="Thumbnails">
+        <Package isPatch="false" priority="0">AllThumbnails.package</Package>
+        <Package isPatch="false" priority="0">CasThumbnails.package</Package>
+      </Folder>
+    </Thumbnails>
+  </game>
+  <game class="EP" rgversion="17">
+    <Name>Spare</Name>
+    <Longname>The Sims 3 Next Pack</Longname>
+    <GUID />
+    <DefaultInstallDir>Electronic Arts/The Sims 3 Whatever Is Next</DefaultInstallDir>
+    <Suppressed>false</Suppressed>
+    <GameContent>
+      <Folder path="GameData/Shared/DeltaPackages">
+        <Package isPatch="true" priority="1">p18/DeltaBuild_p18.package</Package>
+      </Folder>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p18.package</Package>
+    </GameContent>
+    <DDSImages>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p18.package</Package>
     </DDSImages>
     <Thumbnails>
       <Folder path="Thumbnails">
