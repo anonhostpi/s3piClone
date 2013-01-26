@@ -16,6 +16,7 @@
 0x02019972  MTST   .mtst
 0x021D7E8C  SPT2   .speedtree
 0x022B756C  WRDH   .wdescnamehash
+0x024A0E52  CNFG   .cfg
 0x025C90A6  _CSS   .css
 0x025C95B6  LAYO   .layout
 0x025ED6F4  SIMO   .outfit
@@ -37,6 +38,7 @@
 0x03B4C61D  LITE   .light
 0x03D843C2  CCHE   .cacheentry
 0x03D86EA4  DETL   .details
+0x3F8662EA  JPEG   .jpg
 0x0418FE2A  CFEN   .fence
 0x044AE110  COMP   .complate
 0x049CA4CD  CSTR   .stairs
@@ -86,6 +88,7 @@
 0x06CE4804  META   .worldmeta
 0x073FAA07  S3SA   .s3sa
 0x0A36F07A  CCFP   .fountain
+0x0A98EAF0  JSCP   .js
 0x0C07456D  COLL   .bnry
 0x0C07469F  CLDR   .bnry
 0x0C37A5B5  LOOK   .lookuptab
@@ -121,6 +124,7 @@
 0x626F60CD  THUM   .png
 0x626F60CE  THUM   .png
 0x63A33EA7  ANIM   .animimg
+0x67771F5C  JSCP   .js
 0x6B20C4F3  CLIP   .animation
 0x6B6D837D  SNAP   .png
 0x6B6D837E  SNAP   .png
@@ -153,6 +157,7 @@
 0xD84E7FC7  ICON   .png
 0xD9BD0909  WDNM   .wdescname
 0xDD3223A7  BUFF   .xml
+0xDD6233D6  HTML   .html
 0xDEA2951C  PETB   .breed
 0xE5105066  _XML   .xml
 0xE5105067  RMLS   .xml

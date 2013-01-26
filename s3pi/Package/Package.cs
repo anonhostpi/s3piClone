@@ -19,6 +19,7 @@
  ***************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.IO;
 using s3pi.Interfaces;
@@ -458,7 +459,7 @@ namespace s3pi.Package
 
             BinaryWriter bw = new BinaryWriter(new MemoryStream(header));
             bw.Write(stringToBytes(magic));
-            bw.Write(major);
+            bw.Write(Major);
             bw.Write(minor);
             setIndexsize(bw, (new PackageIndex()).Size);
             setIndexversion(bw);
@@ -512,7 +513,7 @@ namespace s3pi.Package
         static string bytesToString(byte[] bytes) { string s = ""; foreach (byte b in bytes) s += (char)b; return s; }
 
         const string magic = "DBPF";
-        const int major = 2;
+        static int[] majors = { 2, 3 };
         const int minor = 0;
 
         byte[] header = new byte[96];
@@ -530,8 +531,8 @@ namespace s3pi.Package
             if (bytesToString(Magic) != magic)
                 throw new InvalidDataException("Expected magic tag '" + magic + "'.  Found '" + bytesToString(Magic) + "'.");
 
-            if (Major != major)
-                throw new InvalidDataException("Expected major version '" + major + "'.  Found '" + Major.ToString() + "'.");
+            if (!majors.Contains(Major))
+                throw new InvalidDataException("Expected major version(s) '" + string.Join(", ", majors) + "'.  Found '" + Major.ToString() + "'.");
 
             if (Minor != minor)
                 throw new InvalidDataException("Expected minor version '" + minor + "'.  Found '" + Minor.ToString() + "'.");
