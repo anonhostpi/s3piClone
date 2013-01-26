@@ -88,7 +88,7 @@
 0x06CE4804  META   .worldmeta
 0x073FAA07  S3SA   .s3sa
 0x0A36F07A  CCFP   .fountain
-0x0A98EAF0  JSCP   .js
+0x0A98EAF0  JSON   .json
 0x0C07456D  COLL   .bnry
 0x0C07469F  CLDR   .bnry
 0x0C37A5B5  LOOK   .lookuptab
@@ -124,7 +124,7 @@
 0x626F60CD  THUM   .png
 0x626F60CE  THUM   .png
 0x63A33EA7  ANIM   .animimg
-0x67771F5C  JSCP   .js
+0x67771F5C  JSON   .json
 0x6B20C4F3  CLIP   .animation
 0x6B6D837D  SNAP   .png
 0x6B6D837E  SNAP   .png
