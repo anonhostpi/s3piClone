@@ -452,14 +452,17 @@ namespace s3pi.Package
         #region Package implementation
         Stream packageStream = null;
 
-        private Package(int requestedVersion)
+        private Package(int requestedVersion, int major = 2)
         {
+            if (!majors.Contains(major))
+                throw new InvalidDataException("Expected major version(s) '" + string.Join(", ", majors) + "'.  Found '" + major.ToString() + "'.");
+            
             this.requestedApiVersion = requestedVersion;
             header = new byte[96];
 
             BinaryWriter bw = new BinaryWriter(new MemoryStream(header));
             bw.Write(stringToBytes(magic));
-            bw.Write(Major);
+            bw.Write(major);
             bw.Write(minor);
             setIndexsize(bw, (new PackageIndex()).Size);
             setIndexversion(bw);
