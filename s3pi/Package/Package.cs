@@ -169,6 +169,17 @@ namespace s3pi.Package
         }
 
         /// <summary>
+        /// Initialise a new, empty package and return the IPackage reference
+        /// </summary>
+        /// <param name="APIversion">(unused)</param>
+        /// <param name="major">Major version for the DBPF package.</param>
+        /// <returns>IPackage reference to an empty package</returns>
+        public static new IPackage NewPackage(int APIversion, int major)
+        {
+            return new Package(APIversion, major);
+        }
+
+        /// <summary>
         /// Open an existing package by filename, read only
         /// </summary>
         /// <param name="APIversion">(unused)</param>

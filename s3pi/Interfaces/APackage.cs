@@ -235,6 +235,13 @@ namespace s3pi.Interfaces
         /// <returns>IPackage reference to an empty package</returns>
         public static IPackage NewPackage(int APIversion) { throw new NotImplementedException(); }
         /// <summary>
+        /// Initialise a new, empty package and return the IPackage reference
+        /// </summary>
+        /// <param name="APIversion">(unused)</param>
+        /// <param name="major">Major version for the DBPF package.</param>
+        /// <returns>IPackage reference to an empty package</returns>
+        public static IPackage NewPackage(int APIversion, int major) { throw new NotImplementedException(); }
+        /// <summary>
         /// Open an existing package by filename, read only
         /// </summary>
         /// <param name="APIversion">(unused)</param>
