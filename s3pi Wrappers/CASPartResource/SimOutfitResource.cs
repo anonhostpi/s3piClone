@@ -379,7 +379,7 @@ namespace CASPartResource
             public IndexPairList(EventHandler handler, Stream s, DependentList<TGIBlock> ParentTGIBlocks = null)
                 : this(null, ParentTGIBlocks) { elementHandler = handler; Parse(s); this.handler = handler; }
             public IndexPairList(EventHandler handler, IEnumerable<IndexPair> le, DependentList<TGIBlock> ParentTGIBlocks = null)
-                : this(null, ParentTGIBlocks) { elementHandler = handler; foreach (var t in le) this.Add(t); this.handler = handler; }
+                : this(null, ParentTGIBlocks) { elementHandler = handler; foreach (var t in le) this.Add((IndexPair)t.Clone(null)); this.handler = handler; }
             #endregion
 
             #region Data I/O

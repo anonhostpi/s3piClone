@@ -409,7 +409,7 @@ namespace TxtcResource
             public SuperBlockList(EventHandler handler, Stream s, DependentList<TGIBlock> ParentTGIBlocks = null)
                 : this(null, ParentTGIBlocks) { elementHandler = handler; Parse(s); this.handler = handler; }
             public SuperBlockList(EventHandler handler, IEnumerable<SuperBlock> lsb, DependentList<TGIBlock> ParentTGIBlocks = null)
-                : this(null, ParentTGIBlocks) { elementHandler = handler; foreach (var t in lsb) this.Add(t); this.handler = handler; }
+                : this(null, ParentTGIBlocks) { elementHandler = handler; foreach (var t in lsb) this.Add((SuperBlock)t.Clone(null)); this.handler = handler; }
 
             protected override int ReadCount(Stream s) { return (new BinaryReader(s)).ReadByte(); }
             protected override SuperBlock CreateElement(Stream s) { return new SuperBlock(0, elementHandler, s, _ParentTGIBlocks); }
@@ -1064,7 +1064,7 @@ namespace TxtcResource
             public EntryList(int APIversion, EventHandler handler, Stream s, DependentList<TGIBlock> ParentTGIBlocks = null)
                 : this(null, ParentTGIBlocks) { elementHandler = handler; Parse(APIversion, s); this.handler = handler; }
             public EntryList(EventHandler handler, IEnumerable<Entry> le, DependentList<TGIBlock> ParentTGIBlocks = null)
-                : this(null, ParentTGIBlocks) { elementHandler = handler; foreach (var t in le) this.Add(t); this.handler = handler; }
+                : this(null, ParentTGIBlocks) { elementHandler = handler; foreach (var t in le) this.Add((Entry)t.Clone(null)); this.handler = handler; }
 
             protected void Parse(int APIversion, Stream s)
             {
@@ -1163,7 +1163,7 @@ namespace TxtcResource
             public EntryBlockList(EventHandler handler, int blockCount, Stream s, DependentList<TGIBlock> ParentTGIBlocks = null)
                 : this(null, ParentTGIBlocks) { elementHandler = handler; this.blockCount = blockCount; Parse(s); this.handler = handler; }
             public EntryBlockList(EventHandler handler, IEnumerable<EntryBlock> leb, DependentList<TGIBlock> ParentTGIBlocks = null)
-                : this(null, ParentTGIBlocks) { elementHandler = handler; foreach (var t in leb) this.Add(t); this.handler = handler; }
+                : this(null, ParentTGIBlocks) { elementHandler = handler; foreach (var t in leb) this.Add((EntryBlock)t.Clone(null)); this.handler = handler; }
 
             protected override int ReadCount(Stream s) { return blockCount; }
             protected override EntryBlock CreateElement(Stream s) { return new EntryBlock(0, elementHandler, s, _ParentTGIBlocks); }

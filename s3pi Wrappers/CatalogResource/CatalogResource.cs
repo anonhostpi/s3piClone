@@ -798,7 +798,7 @@ namespace CatalogResource
             public ComplateList(EventHandler handler, Stream s, DependentList<TGIBlock> ParentTGIBlocks = null)
                 : this(null, ParentTGIBlocks) { elementHandler = handler; Parse(s); this.handler = handler; }
             public ComplateList(EventHandler handler, IEnumerable<ComplateElement> ltc, DependentList<TGIBlock> ParentTGIBlocks = null)
-                : this(null, ParentTGIBlocks) { elementHandler = handler; foreach (var t in ltc) this.Add(t); this.handler = handler; }
+                : this(null, ParentTGIBlocks) { elementHandler = handler; foreach (var t in ltc) this.Add((ComplateElement)t.Clone(null)); this.handler = handler; }
             #endregion
 
             #region Data I/O
@@ -1019,7 +1019,7 @@ namespace CatalogResource
             internal MaterialBlockList(EventHandler handler, Stream s, DependentList<TGIBlock> ParentTGIBlocks = null)
                 : this(null, ParentTGIBlocks) { elementHandler = handler; Parse(s); this.handler = handler; }
             public MaterialBlockList(EventHandler handler, IEnumerable<MaterialBlock> lmb, DependentList<TGIBlock> ParentTGIBlocks = null)
-                : this(null, ParentTGIBlocks) { elementHandler = handler; foreach (var t in lmb) this.Add(t); this.handler = handler; }
+                : this(null, ParentTGIBlocks) { elementHandler = handler; foreach (var t in lmb) this.Add((MaterialBlock)t.Clone(null)); this.handler = handler; }
             #endregion
 
             #region Data I/O

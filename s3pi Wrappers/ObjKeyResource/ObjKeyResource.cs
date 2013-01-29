@@ -449,7 +449,7 @@ namespace ObjKeyResource
             internal ComponentDataList(EventHandler handler, Stream s, DependentList<TGIBlock> ParentTGIBlocks = null)
                 : this(null, ParentTGIBlocks) { elementHandler = handler; Parse(s); this.handler = handler; }
             public ComponentDataList(EventHandler handler, IEnumerable<ComponentDataType> lcdt, DependentList<TGIBlock> ParentTGIBlocks = null)
-                : this(null, ParentTGIBlocks) { elementHandler = handler; foreach (var t in lcdt) this.Add(t); this.handler = handler; }
+                : this(null, ParentTGIBlocks) { elementHandler = handler; foreach (var t in lcdt) this.Add((ComponentDataType)t.Clone(null)); this.handler = handler; }
             #endregion
 
             #region Data I/O

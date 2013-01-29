@@ -57,7 +57,7 @@ namespace s3pi.Interfaces
         /// <param name="maxSize">Optional; -1 for unlimited size, otherwise the maximum number of elements in the list.</param>
         /// <exception cref="System.InvalidOperationException">Thrown when list size exceeded.</exception>
         /// <remarks>Calls <c>this.Add(...)</c> to ensure a fresh instance is created, rather than passing <paramref name="ilt"/> to the base constructor.</remarks>
-        protected DependentList(EventHandler handler, IEnumerable<T> ilt, long maxSize = -1) : base(null, maxSize) { elementHandler = handler; foreach (var t in ilt) this.Add(t); this.handler = handler; }
+        protected DependentList(EventHandler handler, IEnumerable<T> ilt, long maxSize = -1) : base(null, maxSize) { elementHandler = handler; foreach (var t in ilt) this.Add((T)t.Clone(null)); this.handler = handler; }
 
         // Add stream-based constructors and support
         /// <summary>

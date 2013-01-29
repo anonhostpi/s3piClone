@@ -52,7 +52,7 @@ namespace CASPartResource
         byte blendInfoFitIndex;
         byte blendInfoThinIndex;
         byte blendInfoSpecialIndex;
-        uint unknown3;
+        uint overlayPriority;
         ByteIndexList vpxyIndexes;
         LODInfoEntryList lodInfo;
         ByteIndexList diffuse1Indexes;
@@ -90,7 +90,7 @@ namespace CASPartResource
             blendInfoFitIndex = r.ReadByte();
             blendInfoThinIndex = r.ReadByte();
             blendInfoSpecialIndex = r.ReadByte();
-            unknown3 = r.ReadUInt32();
+            overlayPriority = r.ReadUInt32();
             vpxyIndexes = new ByteIndexList(OnResourceChanged, s, ReadByte, WriteByte);
             lodInfo = new LODInfoEntryList(OnResourceChanged, s);
             diffuse1Indexes = new ByteIndexList(OnResourceChanged, s, ReadByte, WriteByte);
@@ -138,7 +138,7 @@ namespace CASPartResource
             w.Write(blendInfoFitIndex);
             w.Write(blendInfoThinIndex);
             w.Write(blendInfoSpecialIndex);
-            w.Write(unknown3);
+            w.Write(overlayPriority);
 
             if (tgiBlocks == null) tgiBlocks = new CountedTGIBlockList(OnResourceChanged, "IGT");
             if (vpxyIndexes == null) vpxyIndexes = new ByteIndexList(OnResourceChanged, ReadByte, WriteByte, byte.MaxValue, tgiBlocks); vpxyIndexes.UnParse(s);
@@ -530,7 +530,7 @@ namespace CASPartResource
         [ElementPriority(15), TGIBlockListContentField("TGIBlocks")]
         public byte BlendInfoSpecialIndex { get { return blendInfoSpecialIndex; } set { if (blendInfoSpecialIndex != value) { blendInfoSpecialIndex = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(16)]
-        public uint Unknown3 { get { return unknown3; } set { if (unknown3 != value) { unknown3 = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint OverlayPriority { get { return overlayPriority; } set { if (overlayPriority != value) { overlayPriority = value; OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(17)]
         public ByteIndexList VPXYIndexes { get { return vpxyIndexes; } set { if (!vpxyIndexes.Equals(value)) { vpxyIndexes = value == null ? null : new ByteIndexList(OnResourceChanged, value, ReadByte, WriteByte, byte.MaxValue, tgiBlocks); OnResourceChanged(this, new EventArgs()); } } }
         [ElementPriority(18)]

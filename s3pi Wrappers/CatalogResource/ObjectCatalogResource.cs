@@ -1462,7 +1462,7 @@ namespace CatalogResource
             public WallCutoutList(EventHandler handler, Stream s, DependentList<TGIBlock> ParentTGIBlocks = null)
                 : this(null, ParentTGIBlocks) { elementHandler = handler; Parse(s); this.handler = handler; }
             public WallCutoutList(EventHandler handler, IEnumerable<WallCutout> mtDoorList, DependentList<TGIBlock> ParentTGIBlocks = null)
-                : this(null, ParentTGIBlocks) { elementHandler = handler; foreach (var t in mtDoorList) this.Add(t); this.handler = handler; }
+                : this(null, ParentTGIBlocks) { elementHandler = handler; foreach (var t in mtDoorList) this.Add((WallCutout)t.Clone(null)); this.handler = handler; }
             #endregion
 
             #region Data I/O
