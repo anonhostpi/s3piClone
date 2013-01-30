@@ -24,7 +24,7 @@ using s3pi.Interfaces;
 
 namespace CASPartResource
 {
-    class BlendGeometryResource : AResource
+    public class BlendGeometryResource : AResource
     {
         const int recommendedApiVersion = 1;
         public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
