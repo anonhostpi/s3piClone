@@ -76,7 +76,7 @@ namespace CASPartResource
 
             bw.Write(bones.Count);
             foreach (var bone in bones)
-                bone.Matrix.UnParse(s);
+                bone.InverseBindPose.UnParse(s);
 
             return s;
         }
@@ -86,33 +86,33 @@ namespace CASPartResource
         public class MatrixRow : AHandlerElement, IEquatable<MatrixRow>
         {
             #region Attributes
-            float v1;
-            float v2;
-            float v3;
+            float x;
+            float y;
+            float z;
             #endregion
 
             #region Constructors
             public MatrixRow(int APIversion, EventHandler handler) : base(APIversion, handler) { }
             public MatrixRow(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
-            public MatrixRow(int APIversion, EventHandler handler, MatrixRow basis) : this(APIversion, handler, basis.v1, basis.v2, basis.v3) { }
-            public MatrixRow(int APIversion, EventHandler handler, float v1, float v2, float v3) : base(APIversion, handler) { this.v1 = v1; this.v2 = v2; this.v3 = v3; }
+            public MatrixRow(int APIversion, EventHandler handler, MatrixRow basis) : this(APIversion, handler, basis.x, basis.y, basis.z) { }
+            public MatrixRow(int APIversion, EventHandler handler, float x, float y, float z) : base(APIversion, handler) { this.x = x; this.y = y; this.z = z; }
             #endregion
 
             #region Data I/O
             private void Parse(Stream s)
             {
                 BinaryReader br = new BinaryReader(s);
-                v1 = br.ReadSingle();
-                v2 = br.ReadSingle();
-                v3 = br.ReadSingle();
+                x = br.ReadSingle();
+                y = br.ReadSingle();
+                z = br.ReadSingle();
             }
 
             internal void UnParse(Stream s)
             {
                 BinaryWriter bw = new BinaryWriter(s);
-                bw.Write(v1);
-                bw.Write(v2);
-                bw.Write(v3);
+                bw.Write(x);
+                bw.Write(y);
+                bw.Write(z);
             }
             #endregion
 
@@ -126,9 +126,9 @@ namespace CASPartResource
             public bool Equals(MatrixRow other)
             {
                 return
-                    v1.Equals(other.v1)
-                    && v2.Equals(other.v2)
-                    && v3.Equals(other.v3)
+                    x.Equals(other.x)
+                    && y.Equals(other.y)
+                    && z.Equals(other.z)
                     ;
             }
             public override bool Equals(object obj)
@@ -138,9 +138,9 @@ namespace CASPartResource
             public override int GetHashCode()
             {
                 return
-                    v1.GetHashCode()
-                    ^ v2.GetHashCode()
-                    ^ v3.GetHashCode()
+                    x.GetHashCode()
+                    ^ y.GetHashCode()
+                    ^ z.GetHashCode()
                     ;
             }
 
@@ -148,11 +148,11 @@ namespace CASPartResource
 
             #region Content Fields
             [ElementPriority(1)]
-            public float V1 { get { return v1; } set { if (!v1.Equals(value)) { v1 = value; OnElementChanged(); } } }
+            public float X { get { return x; } set { if (!x.Equals(value)) { x = value; OnElementChanged(); } } }
             [ElementPriority(2)]
-            public float V2 { get { return v2; } set { if (!v2.Equals(value)) { v2 = value; OnElementChanged(); } } }
+            public float Y { get { return y; } set { if (!y.Equals(value)) { y = value; OnElementChanged(); } } }
             [ElementPriority(3)]
-            public float V3 { get { return v3; } set { if (!v3.Equals(value)) { v3 = value; OnElementChanged(); } } }
+            public float Z { get { return z; } set { if (!z.Equals(value)) { z = value; OnElementChanged(); } } }
 
             public string Value { get { return "{ " + ValueBuilder.Replace("\n", "; ") + " }"; } }
             #endregion
@@ -161,40 +161,40 @@ namespace CASPartResource
         public class Matrix4x3 : AHandlerElement, IEquatable<Matrix4x3>
         {
             #region Attributes
-            MatrixRow row1;
-            MatrixRow row2;
-            MatrixRow row3;
-            MatrixRow row4;
+            MatrixRow right;
+            MatrixRow up;
+            MatrixRow back;
+            MatrixRow translate;
             #endregion
 
             #region Constructors
             public Matrix4x3(int APIversion, EventHandler handler) : base(APIversion, handler) { }
             public Matrix4x3(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
-            public Matrix4x3(int APIversion, EventHandler handler, Matrix4x3 basis) : this(APIversion, handler, basis.row1, basis.row2, basis.row3, basis.row4) { }
+            public Matrix4x3(int APIversion, EventHandler handler, Matrix4x3 basis) : this(APIversion, handler, basis.right, basis.up, basis.back, basis.translate) { }
             public Matrix4x3(int APIversion, EventHandler handler, MatrixRow row1, MatrixRow row2, MatrixRow row3, MatrixRow row4) : base(APIversion, handler)
             {
-                this.row1 = new MatrixRow(requestedApiVersion, handler, row1);
-                this.row2 = new MatrixRow(requestedApiVersion, handler, row2);
-                this.row3 = new MatrixRow(requestedApiVersion, handler, row3);
-                this.row4 = new MatrixRow(requestedApiVersion, handler, row4);
+                this.right = new MatrixRow(requestedApiVersion, handler, row1);
+                this.up = new MatrixRow(requestedApiVersion, handler, row2);
+                this.back = new MatrixRow(requestedApiVersion, handler, row3);
+                this.translate = new MatrixRow(requestedApiVersion, handler, row4);
             }
             #endregion
 
             #region Data I/O
             private void Parse(Stream s)
             {
-                row1 = new MatrixRow(requestedApiVersion, handler, s);
-                row2 = new MatrixRow(requestedApiVersion, handler, s);
-                row3 = new MatrixRow(requestedApiVersion, handler, s);
-                row4 = new MatrixRow(requestedApiVersion, handler, s);
+                right = new MatrixRow(requestedApiVersion, handler, s);
+                up = new MatrixRow(requestedApiVersion, handler, s);
+                back = new MatrixRow(requestedApiVersion, handler, s);
+                translate = new MatrixRow(requestedApiVersion, handler, s);
             }
 
             internal void UnParse(Stream s)
             {
-                row1.UnParse(s);
-                row2.UnParse(s);
-                row3.UnParse(s);
-                row4.UnParse(s);
+                right.UnParse(s);
+                up.UnParse(s);
+                back.UnParse(s);
+                translate.UnParse(s);
             }
             #endregion
 
@@ -208,10 +208,10 @@ namespace CASPartResource
             public bool Equals(Matrix4x3 other)
             {
                 return
-                    row1.Equals(other.row1)
-                    && row2.Equals(other.row2)
-                    && row3.Equals(other.row3)
-                    && row4.Equals(other.row4)
+                    right.Equals(other.right)
+                    && up.Equals(other.up)
+                    && back.Equals(other.back)
+                    && translate.Equals(other.translate)
                     ;
             }
             public override bool Equals(object obj)
@@ -221,10 +221,10 @@ namespace CASPartResource
             public override int GetHashCode()
             {
                 return
-                    row1.GetHashCode()
-                    ^ row2.GetHashCode()
-                    ^ row3.GetHashCode()
-                    ^ row4.GetHashCode()
+                    right.GetHashCode()
+                    ^ up.GetHashCode()
+                    ^ back.GetHashCode()
+                    ^ translate.GetHashCode()
                     ;
             }
 
@@ -232,13 +232,13 @@ namespace CASPartResource
 
             #region Content Fields
             [ElementPriority(1)]
-            public MatrixRow Row1 { get { return row1; } set { if (!row1.Equals(value)) { row1 =new MatrixRow(requestedApiVersion, handler, value); OnElementChanged(); } } }
+            public MatrixRow Right { get { return right; } set { if (!right.Equals(value)) { right =new MatrixRow(requestedApiVersion, handler, value); OnElementChanged(); } } }
             [ElementPriority(2)]
-            public MatrixRow Row2 { get { return row2; } set { if (!row2.Equals(value)) { row2 = new MatrixRow(requestedApiVersion, handler, value); OnElementChanged(); } } }
+            public MatrixRow Up { get { return up; } set { if (!up.Equals(value)) { up = new MatrixRow(requestedApiVersion, handler, value); OnElementChanged(); } } }
             [ElementPriority(3)]
-            public MatrixRow Row3 { get { return row3; } set { if (!row3.Equals(value)) { row3 = new MatrixRow(requestedApiVersion, handler, value); OnElementChanged(); } } }
+            public MatrixRow Back { get { return back; } set { if (!back.Equals(value)) { back = new MatrixRow(requestedApiVersion, handler, value); OnElementChanged(); } } }
             [ElementPriority(4)]
-            public MatrixRow Row4 { get { return row4; } set { if (!row4.Equals(value)) { row4 = new MatrixRow(requestedApiVersion, handler, value); OnElementChanged(); } } }
+            public MatrixRow Translate { get { return translate; } set { if (!translate.Equals(value)) { translate = new MatrixRow(requestedApiVersion, handler, value); OnElementChanged(); } } }
 
             public string Value { get { return ValueBuilder; } }
             #endregion
@@ -248,13 +248,13 @@ namespace CASPartResource
         {
             #region Attributes
             string name;
-            Matrix4x3 matrix;
+            Matrix4x3 inverseBindPose;
             #endregion
 
             #region Constructors
             public Bone(int APIversion, EventHandler handler) : base(APIversion, handler) { }
-            public Bone(int APIversion, EventHandler handler, Bone basis) : this(APIversion, handler, basis.name, basis.matrix) { }
-            public Bone(int APIversion, EventHandler handler, string name, Matrix4x3 matrix) : base(APIversion, handler) { this.name = name; this.matrix = matrix; }
+            public Bone(int APIversion, EventHandler handler, Bone basis) : this(APIversion, handler, basis.name, basis.inverseBindPose) { }
+            public Bone(int APIversion, EventHandler handler, string name, Matrix4x3 inverseBindPose) : base(APIversion, handler) { this.name = name; this.inverseBindPose = new Matrix4x3(requestedApiVersion, handler, inverseBindPose); }
             #endregion
 
             #region AHandlerElement Members
@@ -268,7 +268,7 @@ namespace CASPartResource
             {
                 return
                     name.Equals(other.name)
-                    && matrix.Equals(other.matrix)
+                    && inverseBindPose.Equals(other.inverseBindPose)
                     ;
             }
             public override bool Equals(object obj)
@@ -279,7 +279,7 @@ namespace CASPartResource
             {
                 return
                     name.GetHashCode()
-                    ^ matrix.GetHashCode()
+                    ^ inverseBindPose.GetHashCode()
                     ;
             }
 
@@ -289,7 +289,7 @@ namespace CASPartResource
             [ElementPriority(1)]
             public string Name { get { return name; } set { if (!name.Equals(value)) { name = value; OnElementChanged(); } } }
             [ElementPriority(2)]
-            public Matrix4x3 Matrix { get { return matrix; } set { if (!matrix.Equals(value)) { matrix = new Matrix4x3(requestedApiVersion, handler, value); OnElementChanged(); } } }
+            public Matrix4x3 InverseBindPose { get { return inverseBindPose; } set { if (!inverseBindPose.Equals(value)) { inverseBindPose = new Matrix4x3(requestedApiVersion, handler, value); OnElementChanged(); } } }
 
             public string Value { get { return ValueBuilder; } }
             #endregion
