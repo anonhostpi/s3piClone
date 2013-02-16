@@ -63,11 +63,11 @@ namespace meshExpImp.ModelBlocks
             return GetIndices(mesh.PrimitiveType, mesh.StartIndex, mesh.PrimitiveCount);
         }
 
-        public Int32[] GetIndices(MLOD.Mesh mesh, VRTF vrtf, int geoStateIndex)
+        public Int32[] GetIndices(MLOD.Mesh mesh, int geoStateIndex)
         {
-            return GetIndices(mesh, vrtf, mesh.GeometryStates[geoStateIndex]);
+            return GetIndices(mesh, mesh.GeometryStates[geoStateIndex]);
         }
-        public Int32[] GetIndices(MLOD.Mesh mesh, VRTF vrtf, MLOD.GeometryState geometryState)
+        public Int32[] GetIndices(MLOD.Mesh mesh, MLOD.GeometryState geometryState)
         {
             return GetIndices(mesh.PrimitiveType, geometryState.StartIndex, geometryState.PrimitiveCount)
                 .Select(x => x - geometryState.MinVertexIndex).ToArray();
