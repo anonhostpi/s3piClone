@@ -101,6 +101,7 @@ namespace s3pi.GenericRCOLResource
             VeryDirty = 0x2E5DF9BB,
             Burnt = 0xC3867C32,
             Clogged = 0x257FB026,
+            carLightsOff = 0xE4AF52C1,
         }
 
         public class Entry : AHandlerElement, IEquatable<Entry>
