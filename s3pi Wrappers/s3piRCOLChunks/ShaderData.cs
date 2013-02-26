@@ -48,6 +48,7 @@ namespace s3pi.GenericRCOLResource
         SimGlass = 0x5EDA9CDE,
         Fence = 0x67107FE8,
         LotImposter = 0x68601DE3,
+        Blueprint = 0x6864A45E,
         BasinWater = 0x6AAD2AD5,
         StandingWater = 0x70FDE012,
         BuildingWindow = 0x7B036C01,
@@ -86,16 +87,20 @@ namespace s3pi.GenericRCOLResource
         AlignToDirection = 0x17B78AF6, // Float
         DropShadowStrength = 0x1B1AB4D5, // Float
         ContourSmoothing = 0x1E27DCCD, // Float
+        [Obsolete("Deprecated")]
         reflectivity = 0x29BCDD1F, // Float
         BlendOperation = 0x2D13B939, // Float
         RotationSpeed = 0x32003AD4, // Float
         DimmingRadius = 0x32DFA298, // Float
+        IsGenericBox = 0x347C9E07, // Float
         IsSolidObject = 0x3BBF99CF, // Float
         NormalMapScale = 0x3C45E334, // Float
         NoAutomaticDaylightDimming = 0x3CB5FA70, // Float
         FramesPerSecond = 0x406ADE00, // Float
         BloomFactor = 0x4168508B, // Float
         EmissiveBloomMultiplier = 0x490E6EB4, // Float
+        IsObject = 0x4C12ECE8, // Float
+        IsPartition = 0x5250023D, // Float
         RippleSpeed = 0x52DEC070, // Float
         UseLampColor = 0x56B220CD, // Float
         TextureSpeedScale = 0x583DF357, // Float
@@ -136,6 +141,8 @@ namespace s3pi.GenericRCOLResource
         AnimSpeed = 0xD600CB63, // Float
         BackFaceDiffuseContribution = 0xD641A1B1, // Float
         BounceAmountMeters = 0xD8542D8B, // Float
+        IsFloor = 0xD9C05335, // Float
+        [Obsolete("Deprecated")]
         index_of_refraction = 0xDAA9532D, // Float
         BloomScale = 0xE29BA4AC, // Float
         AlphaMaskThreshold = 0xE77A2B60, // Float
@@ -150,6 +157,7 @@ namespace s3pi.GenericRCOLResource
         CutoutValidHeights = 0x6D43D7B7, // Float2
         UVTiling = 0x773CAB85, // Float2
         SizeScaleEnd = 0x891A3133, // Float2
+        StretchRect = 0x8D38D12E, // Float2
         SizeScaleStart = 0x9A6C2EC8, // Float2
         WaterScrollSpeedLayer2 = 0xAFA11435, // Float2
         WaterScrollSpeedLayer1 = 0xAFA11436, // Float2
@@ -157,6 +165,7 @@ namespace s3pi.GenericRCOLResource
         DetailUVScale = 0xCD985A0B, // Float2
         SpecularUVScale = 0xF12E27C3, // Float2
         UVScrollSpeed = 0xF2EEA6EC, // Float2
+        [Obsolete("Deprecated")]
         Ambient = 0x04A5DAA3, // Float3
         OverrideDirection = 0x0C12DED8, // Float3
         OverrideVelocity = 0x14677578, // Float3
@@ -165,15 +174,18 @@ namespace s3pi.GenericRCOLResource
         ForceDirection = 0x29881F55, // Float3
         Specular = 0x2CE11842, // Float3
         HaloLowColor = 0x2EB8E8D4, // Float3
+        [Obsolete("Deprecated")]
         Emission = 0x3BD441A0, // Float3
         NormalMapUVSelector = 0x415368B4, // Float3
         UVScales = 0x420520E9, // Float3
         LightMapScale = 0x4F7DCB9B, // Float3
         Diffuse = 0x637DAA05, // Float3
+        [Obsolete("Deprecated")]
         Reflective = 0x73C9923E, // Float3
         AmbientUVSelector = 0x797F8E81, // Float3
         HighlightColor = 0x90F8DCF0, // Float3
         DiffuseUVSelector = 0x91EEBAFF, // Float3
+        [Obsolete("Deprecated")]
         Transparent = 0x988403F9, // Float3
         VertexColorScale = 0xA2FD73CA, // Float3
         SpecularUVSelector = 0xB63546AC, // Float3
