@@ -33,10 +33,10 @@ namespace s3pi.GenericRCOLResource
         uint version = 0x00000103;
         uint materialNameHash;
         ShaderType shader = 0;
-        MTRL mtrl = null;
-        uint unknown1;
-        uint unknown2;
-        MTNF mtnf = null;
+        MTRL mtrl = null;// < 0x00000103
+        bool isVideoSurface;// >= 0x00000103
+        bool isPaintingSurface;// >= 0x00000103
+        MTNF mtnf = null;// >= 0x00000103
         #endregion
 
         #region Constructors
@@ -56,8 +56,8 @@ namespace s3pi.GenericRCOLResource
             }
             else
             {
-                this.unknown1 = basis.unknown1;
-                this.unknown2 = basis.unknown2;
+                this.isVideoSurface = basis.isVideoSurface;
+                this.isPaintingSurface = basis.isPaintingSurface;
                 this.mtnf = basis.mtnf != null
                     ? new MTNF(requestedApiVersion, OnRCOLChanged, basis.mtnf)
                     : new MTNF(requestedApiVersion, OnRCOLChanged);
@@ -79,7 +79,7 @@ namespace s3pi.GenericRCOLResource
         }
 
         public MATD(int APIversion, EventHandler handler,
-            uint version, uint materialNameHash, ShaderType shader, uint unknown1, uint unknown2, MTNF mtnf)
+            uint version, uint materialNameHash, ShaderType shader, bool isVideoSurface, bool isPaintingSurface, MTNF mtnf)
             : base(APIversion, handler, null)
         {
             this.version = version;
@@ -87,8 +87,8 @@ namespace s3pi.GenericRCOLResource
             this.shader = shader;
             if (checking) if (version < 0x00000103)
                     throw new ArgumentException("version must be >= 0x0103 for MTNFs");
-            this.unknown1 = unknown1;
-            this.unknown2 = unknown2;
+            this.isVideoSurface = isVideoSurface;
+            this.isPaintingSurface = isPaintingSurface;
             this.mtnf = mtnf != null
                 ? new MTNF(requestedApiVersion, OnRCOLChanged, mtnf)
                 : new MTNF(requestedApiVersion, OnRCOLChanged);
@@ -120,8 +120,8 @@ namespace s3pi.GenericRCOLResource
             }
             else
             {
-                unknown1 = r.ReadUInt32();
-                unknown2 = r.ReadUInt32();
+                isVideoSurface = r.ReadInt32() != 0;
+                isPaintingSurface = r.ReadInt32() != 0;
                 start = s.Position;
                 mtnf = new MTNF(requestedApiVersion, OnRCOLChanged, s);
             }
@@ -150,8 +150,8 @@ namespace s3pi.GenericRCOLResource
             }
             else
             {
-                w.Write(unknown1);
-                w.Write(unknown2);
+                w.Write(isVideoSurface ? 1 : 0);
+                w.Write(isPaintingSurface ? 1 : 0);
                 pos = ms.Position;
                 if (mtnf == null) mtnf = new MTNF(requestedApiVersion, OnRCOLChanged);
                 mtnf.UnParse(ms);
@@ -165,8 +165,6 @@ namespace s3pi.GenericRCOLResource
             return ms;
         }
 
-        //public override AHandlerElement Clone(EventHandler handler) { return new MATD(requestedApiVersion, handler, this); }
-
         public override List<string> ContentFields
         {
             get
@@ -174,7 +172,7 @@ namespace s3pi.GenericRCOLResource
                 List<string> res = base.ContentFields;
                 if (version < 0x00000103)
                 {
-                    res.Remove("Unknown1");
+                    res.Remove("IsVideoSurface");
                     res.Remove("Unknown2");
                     res.Remove("Mtnf");
                 }
@@ -308,13 +306,29 @@ namespace s3pi.GenericRCOLResource
         [ElementPriority(13)]
         public ShaderType Shader { get { return shader; } set { if (shader != value) { shader = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(14)]
-        public MTRL Mtrl { get { return mtrl; } set { if (mtrl != value) { mtrl = new MTRL(requestedApiVersion, handler, mtrl); OnRCOLChanged(this, EventArgs.Empty); } } }
+        public MTRL Mtrl
+        {
+            get { if (version >= 0x00000103) throw new InvalidOperationException(); return mtrl; }
+            set { if (version >= 0x00000103) throw new InvalidOperationException(); if (mtrl != value) { mtrl = new MTRL(requestedApiVersion, handler, mtrl); OnRCOLChanged(this, EventArgs.Empty); } }
+        }
         [ElementPriority(15)]
-        public uint Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
+        public bool IsVideoSurface
+        {
+            get { if (version < 0x00000103) throw new InvalidOperationException(); return isVideoSurface; }
+            set { if (version < 0x00000103) throw new InvalidOperationException(); if (isVideoSurface != value) { isVideoSurface = value; OnRCOLChanged(this, EventArgs.Empty); } }
+        }
         [ElementPriority(16)]
-        public uint Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
+        public bool IsPaintingSurface
+        {
+            get { if (version < 0x00000103) throw new InvalidOperationException(); return isPaintingSurface; }
+            set { if (version < 0x00000103) throw new InvalidOperationException(); if (isPaintingSurface != value) { isPaintingSurface = value; OnRCOLChanged(this, EventArgs.Empty); } }
+        }
         [ElementPriority(17)]
-        public MTNF Mtnf { get { return mtnf; } set { if (mtnf != value) { mtnf = new MTNF(requestedApiVersion, handler, mtnf) { RCOLTag = "MATD", }; OnRCOLChanged(this, EventArgs.Empty); } } }
+        public MTNF Mtnf
+        {
+            get { if (version < 0x00000103) throw new InvalidOperationException(); return mtnf; }
+            set { if (version < 0x00000103) throw new InvalidOperationException(); if (mtnf != value) { mtnf = new MTNF(requestedApiVersion, handler, mtnf) { RCOLTag = "MATD", }; OnRCOLChanged(this, EventArgs.Empty); } }
+        }
 
         public string Value { get { return ValueBuilder; } }
         #endregion
