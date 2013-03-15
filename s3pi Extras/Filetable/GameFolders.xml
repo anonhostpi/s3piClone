@@ -383,10 +383,10 @@
     </Thumbnails>
   </game>
   <game class="EP" rgversion="17">
-    <Name>Spare</Name>
-    <Longname>The Sims 3 Next Pack</Longname>
-    <GUID />
-    <DefaultInstallDir>Electronic Arts/The Sims 3 Whatever Is Next</DefaultInstallDir>
+    <Name>UNI</Name>
+    <Longname>The Sims 3 University Life</Longname>
+    <GUID>{F26DE8EF-F2CF-40DC-8CDA-CC0D82D11B36}</GUID>
+    <DefaultInstallDir>Electronic Arts/The Sims 3 University Life</DefaultInstallDir>
     <Suppressed>false</Suppressed>
     <GameContent>
       <Folder path="GameData/Shared/DeltaPackages">
@@ -404,4 +404,27 @@
       </Folder>
     </Thumbnails>
   </game>
+    <game class="EP" rgversion="18">
+    <Name>Spare</Name>
+    <Longname>The Sims 3 Next Pack</Longname>
+    <GUID />
+    <DefaultInstallDir>Electronic Arts/The Sims 3 Whatever Next</DefaultInstallDir>
+    <Suppressed>false</Suppressed>
+    <GameContent>
+      <Folder path="GameData/Shared/DeltaPackages">
+        <Package isPatch="true" priority="1">p19/DeltaBuild_p19.package</Package>
+      </Folder>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p19.package</Package>
+    </GameContent>
+    <DDSImages>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p19.package</Package>
+    </DDSImages>
+    <Thumbnails>
+      <Folder path="Thumbnails">
+        <Package isPatch="false" priority="0">AllThumbnails.package</Package>
+        <Package isPatch="false" priority="0">CasThumbnails.package</Package>
+      </Folder>
+    </Thumbnails>
+  </game>
+
 </gamefolders>
