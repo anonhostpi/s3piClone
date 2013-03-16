@@ -64,7 +64,7 @@ namespace VideoResource
             w.Write(fourCC);
 
             if (preamble == null) preamble = new byte[0];
-            w.Write(preamble.Length);
+            w.Write(preamble.Length + (sizeof(uint) + sizeof(int)));
             w.Write(preamble);
 
             if (video == null) video = new byte[0];
@@ -129,30 +129,14 @@ namespace VideoResource
         #endregion
     }
 
+    /// <summary>
+    /// ResourceHandler for VideoResource wrapper
+    /// </summary>
     public class VideoResourceHandler : AResourceHandler
     {
-        #region Read config file
-        static List<string> resourceTypes = null;
-        static VideoResourceHandler()
-        {
-            StringReader sr = new StringReader(Resources.VideoResource);
-            resourceTypes = new List<string>();
-            string s;
-            while ((s = sr.ReadLine()) != null)
-            {
-                string[] t = s.Split(new char[] { ' ' }, 2);
-                resourceTypes.Add(t[0]);
-            }
-        }
-        #endregion
-
-        /// <summary>
-        /// Create the content of the Dictionary.
-        /// List of resource types is read once from a configuration file in the same folder as this assembly.
-        /// </summary>
         public VideoResourceHandler()
         {
-            this.Add(typeof(VideoResource), new List<string>(resourceTypes.ToArray()));
+            this.Add(typeof(VideoResource), new List<string>(new string[] { "0xB1CC1AF6", }));
         }
     }
 }

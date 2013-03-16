@@ -49,9 +49,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="VideoResource.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\s3pi\Interfaces\Interfaces.csproj">
       <Project>{51023BD2-9139-438D-B794-95E5EC023537}</Project>
       <Name>Interfaces</Name>
@@ -67,6 +64,7 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
