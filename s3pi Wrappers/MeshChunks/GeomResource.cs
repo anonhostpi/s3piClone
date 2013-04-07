@@ -26,7 +26,6 @@ namespace meshExpImp.ModelBlocks
 {
     public class GeometryResource : GenericRCOLResource
     {
-        //public BlendGeometryResource(int APIversion, Stream s) : base(APIversion, s) { if (stream == null) { stream = UnParse(); OnResourceChanged(this, new EventArgs()); } stream.Position = 0; Parse(stream); }
         public GeometryResource(int APIversion, Stream s)
             : base(APIversion, s)
         {

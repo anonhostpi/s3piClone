@@ -80,8 +80,6 @@ namespace s3pi.GenericRCOLResource
 
             return ms;
         }
-
-        //public override AHandlerElement Clone(EventHandler handler) { return new FTPT(requestedApiVersion, handler, this); }
         #endregion
 
         #region Sub-types
@@ -130,8 +128,6 @@ namespace s3pi.GenericRCOLResource
             /// The list of available field names on this API object
             /// </summary>
             public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
-
-            //public override AHandlerElement Clone(EventHandler handler) { return new PolygonPoint(requestedApiVersion, handler, this); }
             #endregion
 
             #region IEquatable<PolygonPoint> Members
@@ -176,8 +172,6 @@ namespace s3pi.GenericRCOLResource
 
             protected override void WriteElement(Stream s, PolygonPoint element) { element.UnParse(s); }
             #endregion
-
-            //public override void Add() { this.Add(new PolygonPoint(0, null)); }
         }
 
         [Flags]
@@ -366,8 +360,6 @@ namespace s3pi.GenericRCOLResource
                     return res;
                 }
             }
-
-            //public override AHandlerElement Clone(EventHandler handler) { return new Area(requestedApiVersion, handler, this); }
             #endregion
 
             #region IEquatable<Area> Members

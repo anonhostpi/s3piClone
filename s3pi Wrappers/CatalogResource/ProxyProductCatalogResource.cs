@@ -83,7 +83,7 @@ namespace CatalogResource
         //--insert Version: ElementPriority(1)
         //--insert CommonBlock: ElementPriority(11)
         [ElementPriority(21)]
-        public Tool ToolType { get { return toolType; } set { if (toolType != value) { toolType = value; OnResourceChanged(this, new EventArgs()); } } }
+        public Tool ToolType { get { return toolType; } set { if (toolType != value) { toolType = value; OnResourceChanged(this, EventArgs.Empty); } } }
         #endregion
     }
 }

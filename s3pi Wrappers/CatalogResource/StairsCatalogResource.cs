@@ -160,23 +160,23 @@ namespace CatalogResource
         public MaterialList Materials
         {
             get { if (version < 0x00000003) throw new InvalidOperationException(); return materialList; }
-            set { if (version < 0x00000003) throw new InvalidOperationException(); if (materialList != value) { materialList = value == null ? null : new MaterialList(OnResourceChanged, value); } OnResourceChanged(this, new EventArgs()); }
+            set { if (version < 0x00000003) throw new InvalidOperationException(); if (materialList != value) { materialList = value == null ? null : new MaterialList(OnResourceChanged, value); } OnResourceChanged(this, EventArgs.Empty); }
         }
         //--insert CommonBlock: ElementPriority(11)
         [ElementPriority(21), TGIBlockListContentField("TGIBlocks")]
-        public uint Steps4xModelVPXYIndex { get { return steps4xModelVPXYIndex; } set { if (steps4xModelVPXYIndex != value) { steps4xModelVPXYIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint Steps4xModelVPXYIndex { get { return steps4xModelVPXYIndex; } set { if (steps4xModelVPXYIndex != value) { steps4xModelVPXYIndex = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(22), TGIBlockListContentField("TGIBlocks")]
-        public uint Steps1xModelVPXYIndex { get { return steps1xModelVPXYIndex; } set { if (steps1xModelVPXYIndex != value) { steps1xModelVPXYIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint Steps1xModelVPXYIndex { get { return steps1xModelVPXYIndex; } set { if (steps1xModelVPXYIndex != value) { steps1xModelVPXYIndex = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(23), TGIBlockListContentField("TGIBlocks")]
-        public uint WallCapModelVPXYIndex { get { return wallCapModelVPXYIndex; } set { if (wallCapModelVPXYIndex != value) { wallCapModelVPXYIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint WallCapModelVPXYIndex { get { return wallCapModelVPXYIndex; } set { if (wallCapModelVPXYIndex != value) { wallCapModelVPXYIndex = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(34), TGIBlockListContentField("TGIBlocks")]
-        public uint CatalogRailingIndex { get { return catalogRailing; } set { if (catalogRailing != value) { catalogRailing = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint CatalogRailingIndex { get { return catalogRailing; } set { if (catalogRailing != value) { catalogRailing = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(35), TGIBlockListContentField("TGIBlocks")]
-        public uint CatalogWallIndex { get { return catalogWall; } set { if (catalogWall != value) { catalogWall = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint CatalogWallIndex { get { return catalogWall; } set { if (catalogWall != value) { catalogWall = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(36), TGIBlockListContentField("TGIBlocks")]
-        public uint CatalogWallFloorPatternIndex { get { return catalogWallFloorPattern; } set { if (catalogWallFloorPattern != value) { catalogWallFloorPattern = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint CatalogWallFloorPatternIndex { get { return catalogWallFloorPattern; } set { if (catalogWallFloorPattern != value) { catalogWallFloorPattern = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(37), TGIBlockListContentField("TGIBlocks")]
-        public uint CatalogFenceIndex { get { return catalogFence; } set { if (catalogFence != value) { catalogFence = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint CatalogFenceIndex { get { return catalogFence; } set { if (catalogFence != value) { catalogFence = value; OnResourceChanged(this, EventArgs.Empty); } } }
         //--insert TGIBlockList: no ElementPriority
         #endregion
     }

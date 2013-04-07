@@ -152,8 +152,6 @@ namespace s3pi.GenericRCOLResource
 
             return ms;
         }
-
-        //public override AHandlerElement Clone(EventHandler handler) { return new RSLT(requestedApiVersion, handler, this); }
         #endregion
 
         #region Sub-types
@@ -207,8 +205,6 @@ namespace s3pi.GenericRCOLResource
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
 
             public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
-
-            //public override AHandlerElement Clone(EventHandler handler) { return new SlotOffset(requestedApiVersion, handler, this); }
             #endregion
 
             #region IEquatable<SlotOffset>
@@ -302,8 +298,6 @@ namespace s3pi.GenericRCOLResource
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
 
             public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
-
-            //public override AHandlerElement Clone(EventHandler handler) { return new TransformElement(requestedApiVersion, handler, this); }
             #endregion
 
             #region IEquatable<TransformElement>
@@ -370,8 +364,6 @@ namespace s3pi.GenericRCOLResource
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
 
             public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
-
-            //public override AHandlerElement Clone(EventHandler handler) { return new Part(requestedApiVersion, handler, this); }
             #endregion
 
             #region IEquatable<Part>
@@ -455,8 +447,6 @@ namespace s3pi.GenericRCOLResource
             protected override Part CreateElement(Stream s) { throw new NotImplementedException(); }
             protected override void WriteElement(Stream s, Part element) { throw new NotImplementedException(); }
             #endregion
-
-            //public override void Add() { this.Add(new Part(0, null)); }
         }
 
         //SlotPlacement flags taken from ObjectCatalogResource.cs
@@ -510,8 +500,6 @@ namespace s3pi.GenericRCOLResource
             public SlottedPart(int APIversion, EventHandler handler, uint slotName, uint boneName, SlotPlacement slotPlacementFlags,
                 TransformElement tX, TransformElement tY, TransformElement tZ)
                 : base(APIversion, handler, slotName, boneName, tX, tY, tZ) { this.slotPlacementFlags = slotPlacementFlags; }
-
-            //public override AHandlerElement Clone(EventHandler handler) { return new SlottedPart(requestedApiVersion, handler, this); }
 
             public bool Equals(SlottedPart other) { return ((Part)this).Equals((Part)other) && slotPlacementFlags.Equals(other.slotPlacementFlags); }
             public override bool Equals(object obj)
@@ -567,8 +555,6 @@ namespace s3pi.GenericRCOLResource
             protected override SlottedPart CreateElement(Stream s) { throw new NotImplementedException(); }
             protected override void WriteElement(Stream s, SlottedPart element) { throw new NotImplementedException(); }
             #endregion
-
-            //public override void Add() { this.Add(new SlottedPart(0, null)); }
         }
 
         public class ConeElement : AHandlerElement, IEquatable<ConeElement>
@@ -613,8 +599,6 @@ namespace s3pi.GenericRCOLResource
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
 
             public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
-
-            //public override AHandlerElement Clone(EventHandler handler) { return new ConeElement(requestedApiVersion, handler, this); }
             #endregion
 
             #region IEquatable<Part>
@@ -664,8 +648,6 @@ namespace s3pi.GenericRCOLResource
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
 
             public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
-
-            //public override AHandlerElement Clone(EventHandler handler) { return new ConePart(requestedApiVersion, handler, this); }
             #endregion
 
             #region IEquatable<Part>
@@ -769,8 +751,6 @@ namespace s3pi.GenericRCOLResource
             protected override ConePart CreateElement(Stream s) { throw new NotImplementedException(); }
             protected override void WriteElement(Stream s, ConePart element) { throw new NotImplementedException(); }
             #endregion
-
-            //public override void Add() { this.Add(new ConePart(0, null)); }
         }
         #endregion
 

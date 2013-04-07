@@ -144,8 +144,6 @@ namespace s3pi.GenericRCOLResource
 
             return ms;
         }
-
-        //public override AHandlerElement Clone(EventHandler handler) { return new VPXY(requestedApiVersion, handler, this); }
         #endregion
 
         #region Sub-types
@@ -236,8 +234,6 @@ namespace s3pi.GenericRCOLResource
                 return entryID.GetHashCode() ^ tgiIndexes.GetHashCode();
             }
 
-            //public override AHandlerElement Clone(EventHandler handler) { return new Entry00(requestedApiVersion, handler, this); }
-
             #region Content Fields
             public byte EntryID { get { return entryID; } set { if (entryID != value) { entryID = value; OnElementChanged(); } } }
             public Int32IndexList TGIIndexes { get { return tgiIndexes; } set { if (tgiIndexes != value) { tgiIndexes = value == null ? value : new Int32IndexList(handler, value, byte.MaxValue, ReadByte, WriteByte) { ParentTGIBlocks = _ParentTGIBlocks, }; OnElementChanged(); } } }
@@ -266,8 +262,6 @@ namespace s3pi.GenericRCOLResource
             {
                 return tgiIndex.GetHashCode();
             }
-
-            //public override AHandlerElement Clone(EventHandler handler) { return new Entry01(requestedApiVersion, handler, this); }
 
             #region Content Fields
             [TGIBlockListContentField("ParentTGIBlocks")]

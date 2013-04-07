@@ -99,28 +99,14 @@ namespace meshExpImp.ModelBlocks
         }
 
         [ElementPriority(1)]
-        public UInt32 Version { get { return mVersion; } set { if (mVersion != value) { mVersion = value; OnRCOLChanged(this, new EventArgs()); } } }
+        public UInt32 Version { get { return mVersion; } set { if (mVersion != value) { mVersion = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(2)]
-        public FormatFlags Flags { get { return mFlags; } set { if (mFlags != value) { mFlags = value; OnRCOLChanged(this, new EventArgs()); } } }
+        public FormatFlags Flags { get { return mFlags; } set { if (mFlags != value) { mFlags = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(3)]
-        public GenericRCOLResource.ChunkReference SwizzleInfo { get { return mSwizzleInfo; } set { if (mSwizzleInfo != value) { mSwizzleInfo = value; OnRCOLChanged(this, new EventArgs()); } } }
+        public GenericRCOLResource.ChunkReference SwizzleInfo { get { return mSwizzleInfo; } set { if (mSwizzleInfo != value) { mSwizzleInfo = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(4)]
-        public Byte[] Buffer { get { return mBuffer; } set { if (mBuffer != value) { mBuffer = value; OnRCOLChanged(this, new EventArgs()); } } }
-        public string Value
-        {
-            get
-            {
-                return ValueBuilder;
-                /*
-                StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("Version:\t0x{0:X8}\n", mVersion);
-                sb.AppendFormat("Flags:\t{0}\n", this["Flags"]);
-                sb.AppendFormat("Swizzle Info:\t0x{0:X8}\n", mSwizzleInfo);
-                sb.AppendFormat("Buffer[{0}]\n", mBuffer.Length);
-                return sb.ToString();
-                /**/
-            }
-        }
+        public Byte[] Buffer { get { return mBuffer; } set { if (mBuffer != value) { mBuffer = value; OnRCOLChanged(this, EventArgs.Empty); } } }
+        public string Value { get { return ValueBuilder; } }
         protected override List<string> ValueBuilderFields
         {
             get
@@ -159,7 +145,6 @@ namespace meshExpImp.ModelBlocks
             return s;
 
         }
-        //public override AHandlerElement Clone(EventHandler handler) { return new VBUF(0, handler, this); }
         public override uint ResourceType
         {
             get { return 0x01D0E6FB; }
@@ -398,14 +383,6 @@ namespace meshExpImp.ModelBlocks
             }
         }
 
-        /*public void SetVertices(MLOD mlod, int meshIndex, VRTF vrtf, Vertex[] vertices)
-        {
-            SetVertices(mlod, mlod.Meshes[meshIndex], vrtf, vertices, UVCompressor.GetUVScales(vrtf));
-        }/**/
-        /*public void SetVertices(MLOD mlod, MLOD.Mesh mesh, VRTF vrtf, Vertex[] vertices)
-        {
-            SetVertices(mlod, mesh, vrtf, vertices, UVCompressor.GetUVScales(vrtf));
-        }/**/
         public bool SetVertices(MLOD mlod, int meshIndex, VRTF vrtf, Vertex[] vertices, float[] uvscales)
         {
             return SetVertices(mlod, mlod.Meshes[meshIndex], vrtf, vertices, uvscales);
@@ -417,22 +394,6 @@ namespace meshExpImp.ModelBlocks
             return okay;
         }
 
-        /*public void SetVertices(MLOD mlod, int meshIndex, int geoIndex, VRTF vrtf, Vertex[] vertices)
-        {
-            SetVertices(mlod, mlod.Meshes[meshIndex], mlod.Meshes[meshIndex].GeometryStates[geoIndex], vrtf, vertices, UVCompressor.GetUVScales(vrtf));
-        }/**/
-        /*public void SetVertices(MLOD mlod, MLOD.Mesh mesh, int geoIndex, VRTF vrtf, Vertex[] vertices)
-        {
-            SetVertices(mlod, mesh, mesh.GeometryStates[geoIndex], vrtf, vertices, UVCompressor.GetUVScales(vrtf));
-        }/**/
-        /*public void SetVertices(MLOD mlod, MLOD.Mesh mesh, MLOD.GeometryState geo, VRTF vrtf, Vertex[] vertices)
-        {
-            SetVertices(mlod, mesh, geo, vrtf, vertices, UVCompressor.GetUVScales(vrtf));
-        }/**/
-        /*public void SetVertices(MLOD mlod, int meshIndex, int geoIndex, VRTF vrtf, Vertex[] vertices, float[] uvscales)
-        {
-            SetVertices(mlod, mlod.Meshes[meshIndex], mlod.Meshes[meshIndex].GeometryStates[geoIndex], vrtf, vertices, uvscales);
-        }/**/
         public bool SetVertices(MLOD mlod, MLOD.Mesh mesh, int geoIndex, VRTF vrtf, Vertex[] vertices, float[] uvscales)
         {
             return SetVertices(mlod, mesh, mesh.GeometryStates[geoIndex], vrtf, vertices, uvscales);

@@ -42,7 +42,7 @@ namespace CASPartResource
         private TGIBlockList tgiBlocks;
         #endregion
 
-        public BlendUnitResource(int APIversion, Stream s) : base(APIversion, s) { if (stream == null) { stream = UnParse(); OnResourceChanged(this, new EventArgs()); } stream.Position = 0; Parse(stream); }
+        public BlendUnitResource(int APIversion, Stream s) : base(APIversion, s) { if (stream == null) { stream = UnParse(); OnResourceChanged(this, EventArgs.Empty); } stream.Position = 0; Parse(stream); }
 
         #region Data I/O
         private void Parse(Stream s)

@@ -250,28 +250,28 @@ namespace CatalogResource
         #region Content Fields
         //--insert Version: ElementPriority(1)
         [ElementPriority(12)]
-        public uint Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnResourceChanged(this, EventArgs.Empty); } } }
         //--insert CommonBlock: ElementPriority(11)
         [ElementPriority(21)]
-        public Wall WallType { get { return wallType; } set { if (wallType != value) { wallType = value; OnResourceChanged(this, new EventArgs()); } } }
+        public Wall WallType { get { return wallType; } set { if (wallType != value) { wallType = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(22)]
-        public Partition PartitionType { get { return partitionType; } set { if (partitionType != value) { partitionType = value; OnResourceChanged(this, new EventArgs()); } } }
+        public Partition PartitionType { get { return partitionType; } set { if (partitionType != value) { partitionType = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(23)]
-        public PartitionFlagsType PartitionFlags { get { return partitionFlags; } set { if (partitionFlags != value) { partitionFlags = value; OnResourceChanged(this, new EventArgs()); } } }
+        public PartitionFlagsType PartitionFlags { get { return partitionFlags; } set { if (partitionFlags != value) { partitionFlags = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(24)]
-        public VerticalSpan VerticalSpanType { get { return verticalSpanType; } set { if (verticalSpanType != value) { verticalSpanType = value; OnResourceChanged(this, new EventArgs()); } } }
+        public VerticalSpan VerticalSpanType { get { return verticalSpanType; } set { if (verticalSpanType != value) { verticalSpanType = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(25)]
-        public PartitionsBlockedFlagsType PartitionsBlockedFlags { get { return partitionsBlockedFlags; } set { if (partitionsBlockedFlags != value) { partitionsBlockedFlags = value; OnResourceChanged(this, new EventArgs()); } } }
+        public PartitionsBlockedFlagsType PartitionsBlockedFlags { get { return partitionsBlockedFlags; } set { if (partitionsBlockedFlags != value) { partitionsBlockedFlags = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(26)]
-        public PartitionsBlockedFlagsType AdjacentPartitionsBlockedFlags { get { return adjacentPartitionsBlockedFlags; } set { if (adjacentPartitionsBlockedFlags != value) { adjacentPartitionsBlockedFlags = value; OnResourceChanged(this, new EventArgs()); } } }
+        public PartitionsBlockedFlagsType AdjacentPartitionsBlockedFlags { get { return adjacentPartitionsBlockedFlags; } set { if (adjacentPartitionsBlockedFlags != value) { adjacentPartitionsBlockedFlags = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(27)]
-        public PartitionTool PartitionToolMode { get { return partitionToolMode; } set { if (partitionToolMode != value) { partitionToolMode = value; OnResourceChanged(this, new EventArgs()); } } }
+        public PartitionTool PartitionToolMode { get { return partitionToolMode; } set { if (partitionToolMode != value) { partitionToolMode = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(28)]
-        public ToolUsageFlagsType ToolUsageFlags { get { return toolUsageFlags; } set { if (toolUsageFlags != value) { toolUsageFlags = value; OnResourceChanged(this, new EventArgs()); } } }
+        public ToolUsageFlagsType ToolUsageFlags { get { return toolUsageFlags; } set { if (toolUsageFlags != value) { toolUsageFlags = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(29), TGIBlockListContentField("TGIBlocks")]
-        public uint DefaultPatternIndex { get { return defaultPatternIndex; } set { if (defaultPatternIndex != value) { defaultPatternIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint DefaultPatternIndex { get { return defaultPatternIndex; } set { if (defaultPatternIndex != value) { defaultPatternIndex = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(30)]
-        public WallThickness WallThicknessType { get { return wallThicknessType; } set { if (wallThicknessType != value) { wallThicknessType = value; OnResourceChanged(this, new EventArgs()); } } }
+        public WallThickness WallThicknessType { get { return wallThicknessType; } set { if (wallThicknessType != value) { wallThicknessType = value; OnResourceChanged(this, EventArgs.Empty); } } }
         //--insert TGIBlockList: no ElementPriority
         #endregion
     }

@@ -31,7 +31,6 @@ namespace meshExpImp.ModelBlocks
     {
         private static bool checking = Settings.Checking;
 
-
         #region Attributes
         private UInt32 mVersion = 0x00000202;
         private MeshList mMeshes;
@@ -76,8 +75,6 @@ namespace meshExpImp.ModelBlocks
             mMeshes.UnParse(s);
             return s;
         }
-
-        //public override AHandlerElement Clone(EventHandler handler) { return new MLOD(requestedApiVersion, handler, this); }
         #endregion
 
         #region Sub-types
@@ -153,8 +150,6 @@ namespace meshExpImp.ModelBlocks
                 bw.Write(mVertexCount);
                 bw.Write(mPrimitiveCount);
             }
-
-            //public override AHandlerElement Clone(EventHandler handler) { return new GeometryState(0, handler, this); }
 
             public override List<string> ContentFields
             {
@@ -391,8 +386,6 @@ namespace meshExpImp.ModelBlocks
             #endregion
 
             #region AHandlerElement
-            //public override AHandlerElement Clone(EventHandler handler) { return new Mesh(0, handler, this); }
-
             public override List<string> ContentFields
             {
                 get
@@ -645,14 +638,14 @@ namespace meshExpImp.ModelBlocks
         public uint Version
         {
             get { return mVersion; }
-            set { if (mVersion != value) { mVersion = value; OnRCOLChanged(this, new EventArgs()); } }
+            set { if (mVersion != value) { mVersion = value; OnRCOLChanged(this, EventArgs.Empty); } }
         }
 
         [ElementPriority(12)]
         public MeshList Meshes
         {
             get { return mMeshes; }
-            set { if (mMeshes != value) { mMeshes = value; OnRCOLChanged(this, new EventArgs()); } }
+            set { if (mMeshes != value) { mMeshes = value; OnRCOLChanged(this, EventArgs.Empty); } }
         }
 
         public string Value { get { return ValueBuilder; } }

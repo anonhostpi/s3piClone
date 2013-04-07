@@ -80,22 +80,9 @@ namespace ComplateResource
         #endregion
 
         #region Content Fields
-        public string Value
-        {
-            get
-            {
-                return ValueBuilder;
-                /*
-                string s = "";
-                s += "Unknown1: " + this["Unknown1"];
-                s += "\nUnicodeString:\n" + UnicodeString;
-                s += "\nUnknown2: " + this["Unknown2"];
-                return s;
-                /**/
-            }
-        }
+        public string Value { get { return ValueBuilder; } }
 
-        public uint Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnResourceChanged(this, EventArgs.Empty); } } }
         public string UnicodeString
         {
             get { return UnicodeData.ReadToEnd(); }
@@ -112,7 +99,7 @@ namespace ComplateResource
                     data = (new BinaryReader(ms)).ReadBytes((int)(ms.Length - 2));
                 }
                 else data = new byte[0];
-                OnResourceChanged(this, new EventArgs());
+                OnResourceChanged(this, EventArgs.Empty);
             }
         }
         public TextReader UnicodeData
@@ -120,7 +107,7 @@ namespace ComplateResource
             get { return streamReader(new MemoryStream(data)); }
             set { UnicodeString = value.ReadToEnd(); }
         }
-        public uint Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnResourceChanged(this, EventArgs.Empty); } } }
         #endregion
     }
 

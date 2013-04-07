@@ -142,7 +142,6 @@ namespace CASPartResource
         #region AHandlerElement Members
         public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
         public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
-        //public override AHandlerElement Clone(EventHandler handler) { return new AgeGenderFlags(requestedApiVersion, handler, this); }
         #endregion
 
         #region IEquatable<Preset> Members

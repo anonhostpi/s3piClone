@@ -43,7 +43,7 @@ namespace ObjKeyResource
         TGIBlockList tgiBlocks;
         #endregion
 
-        public ObjKeyResource(int APIversion, Stream s) : base(APIversion, s) { if (stream == null) { stream = UnParse(); OnResourceChanged(this, new EventArgs()); } stream.Position = 0; Parse(stream); }
+        public ObjKeyResource(int APIversion, Stream s) : base(APIversion, s) { if (stream == null) { stream = UnParse(); OnResourceChanged(this, EventArgs.Empty); } stream.Position = 0; Parse(stream); }
 
         #region Data I/O
         void Parse(Stream s)
@@ -136,8 +136,6 @@ namespace ObjKeyResource
             }
 
             #region AHandlerElement Members
-            //public override AHandlerElement Clone(EventHandler handler) { return new ComponentElement(requestedApiVersion, handler, this); }
-
             public override int RecommendedApiVersion { get { return 1; } }
 
             public override List<string> ContentFields { get { return AApiVersionedFields.GetContentFields(requestedApiVersion, this.GetType()); } }
@@ -200,8 +198,6 @@ namespace ObjKeyResource
                     if (ce.Element == component) return ce;
                 return null;
             }
-
-            //public override void Add() { this.Add(new ComponentElement(0, null)); }
         }
 
         public abstract class ComponentDataType : AHandlerElement, IComparable<ComponentDataType>, IEqualityComparer<ComponentDataType>, IEquatable<ComponentDataType>
@@ -312,8 +308,6 @@ namespace ObjKeyResource
             }
             #endregion
 
-            //public override AHandlerElement Clone(EventHandler handler) { return new CDTString(requestedApiVersion, handler, this); }
-
             public override int CompareTo(ComponentDataType other)
             {
                 if (this.GetType() != other.GetType()) return -1;
@@ -356,8 +350,6 @@ namespace ObjKeyResource
             }
             #endregion
 
-            //public override AHandlerElement Clone(EventHandler handler) { return new CDTResourceKey(requestedApiVersion, handler, this); }
-
             public override int CompareTo(ComponentDataType other)
             {
                 if (this.GetType() != other.GetType()) return -1;
@@ -382,8 +374,6 @@ namespace ObjKeyResource
                 : base(APIversion, handler, basis, ParentTGIBlocks ?? basis.ParentTGIBlocks) { }
             public CDTAssetResourceName(int APIversion, EventHandler handler, string key, byte controlCode, int data, DependentList<TGIBlock> ParentTGIBlocks = null)
                 : base(APIversion, handler, key, controlCode, data, ParentTGIBlocks) { }
-
-            //public override AHandlerElement Clone(EventHandler handler) { return new CDTAssetResourceName(requestedApiVersion, handler, this); }
         }
         public class CDTSteeringInstance : CDTString
         {
@@ -392,8 +382,6 @@ namespace ObjKeyResource
             public CDTSteeringInstance(int APIversion, EventHandler handler, CDTSteeringInstance basis) : base(APIversion, handler, basis) { }
             public CDTSteeringInstance(int APIversion, EventHandler handler, string key, byte controlCode, string data) : base(APIversion, handler, key, controlCode, data) { }
             #endregion
-
-            //public override AHandlerElement Clone(EventHandler handler) { return new CDTSteeringInstance(requestedApiVersion, handler, this); }
         }
         public class CDTUInt32 : ComponentDataType
         {
@@ -414,8 +402,6 @@ namespace ObjKeyResource
                 new BinaryWriter(s).Write(data);
             }
             #endregion
-
-            //public override AHandlerElement Clone(EventHandler handler) { return new CDTUInt32(requestedApiVersion, handler, this); }
 
             public override int CompareTo(ComponentDataType other)
             {
@@ -473,7 +459,6 @@ namespace ObjKeyResource
                 set { this[IndexOf(this[key])] = value; }
             }
 
-            //public override void Add() { throw new NotImplementedException(); }
             public override void Add(ComponentDataType item)
             {
                 if (item is CDTResourceKey) (item as CDTResourceKey).ParentTGIBlocks = _ParentTGIBlocks;
@@ -503,15 +488,15 @@ namespace ObjKeyResource
 
         #region Content Fields
         [ElementPriority(1)]
-        public uint Format { get { return format; } set { if (format != value) { format = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint Format { get { return format; } set { if (format != value) { format = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(2)]
-        public ComponentList Components { get { return components; } set { if (components != value) { components = value == null ? null : new ComponentList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public ComponentList Components { get { return components; } set { if (components != value) { components = value == null ? null : new ComponentList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(3)]
-        public ComponentDataList ComponentData { get { return componentData; } set { if (componentData != value) { componentData = value == null ? null : new ComponentDataList(OnResourceChanged, value, tgiBlocks); OnResourceChanged(this, new EventArgs()); } } }
+        public ComponentDataList ComponentData { get { return componentData; } set { if (componentData != value) { componentData = value == null ? null : new ComponentDataList(OnResourceChanged, value, tgiBlocks); OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(4)]
-        public byte Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnResourceChanged(this, new EventArgs()); } } }
+        public byte Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(5)]
-        public TGIBlockList TGIBlocks { get { return tgiBlocks; } set { if (tgiBlocks != value) { tgiBlocks = value == null ? null : new TGIBlockList(OnResourceChanged, value); componentData.ParentTGIBlocks = tgiBlocks; OnResourceChanged(this, new EventArgs()); } } }
+        public TGIBlockList TGIBlocks { get { return tgiBlocks; } set { if (tgiBlocks != value) { tgiBlocks = value == null ? null : new TGIBlockList(OnResourceChanged, value); componentData.ParentTGIBlocks = tgiBlocks; OnResourceChanged(this, EventArgs.Empty); } } }
 
         public string Value { get { return ValueBuilder; } }
         #endregion

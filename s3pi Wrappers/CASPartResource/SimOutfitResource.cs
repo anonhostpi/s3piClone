@@ -63,7 +63,7 @@ namespace CASPartResource
 
         #endregion
 
-        public SimOutfitResource(int APIversion, Stream s) : base(APIversion, s) { if (stream == null) { stream = UnParse(); OnResourceChanged(this, new EventArgs()); } stream.Position = 0; Parse(stream); }
+        public SimOutfitResource(int APIversion, Stream s) : base(APIversion, s) { if (stream == null) { stream = UnParse(); OnResourceChanged(this, EventArgs.Empty); } stream.Position = 0; Parse(stream); }
 
         #region Data I/O
         void Parse(Stream s)
@@ -232,7 +232,6 @@ namespace CASPartResource
             #region AHandlerElement Members
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
             public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
-            //public override AHandlerElement Clone(EventHandler handler) { return new XMLEntry(requestedApiVersion, handler, this); }
             #endregion
 
             #region IEquatable<XMLEntry> Members
@@ -298,8 +297,6 @@ namespace CASPartResource
             protected override XMLEntry CreateElement(Stream s) { return new XMLEntry(0, elementHandler, s); }
             protected override void WriteElement(Stream s, XMLEntry element) { element.UnParse(s); }
             #endregion
-
-            //public override void Add() { this.Add(new XMLEntry(0, null)); }
         }
 
         public class IndexPair : AHandlerElement, IEquatable<IndexPair>
@@ -338,7 +335,6 @@ namespace CASPartResource
 
             #region AHandlerElement Members
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
-            //public override AHandlerElement Clone(EventHandler handler) { return new IndexPair(requestedApiVersion, handler, this); }
             #endregion
 
             #region IEquatable<IndexPair> Members
@@ -440,7 +436,6 @@ namespace CASPartResource
             #region AHandlerElement Members
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
             public override List<string> ContentFields { get { List<string> res = GetContentFields(requestedApiVersion, this.GetType()); res.Remove("ParentTGIBlocks"); return res; } }
-            //public override AHandlerElement Clone(EventHandler handler) { return new CASEntry(requestedApiVersion, handler, this); }
             #endregion
 
             #region IEquatable<CASEntry> Members
@@ -522,8 +517,6 @@ namespace CASPartResource
             protected override void WriteElement(Stream s, CASEntry element) { element.UnParse(s); }
             #endregion
 
-            //public override void Add() { this.Add(new CASEntry(0, null)); }
-
             public override void Add() { base.Add(new CASEntry(0, handler, _ParentTGIBlocks)); }
             public override void Add(CASEntry item) { item.ParentTGIBlocks = _ParentTGIBlocks; base.Add(item); }
         }
@@ -568,7 +561,6 @@ namespace CASPartResource
 
             #region AHandlerElement Members
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
-            //public override AHandlerElement Clone(EventHandler handler) { return new FaceEntry(requestedApiVersion, handler, this); }
             public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
             #endregion
 
@@ -617,8 +609,6 @@ namespace CASPartResource
             protected override FaceEntry CreateElement(Stream s) { return new FaceEntry(0, elementHandler, s); }
             protected override void WriteElement(Stream s, FaceEntry element) { element.UnParse(s); }
             #endregion
-
-            //public override void Add() { this.Add(new FaceEntry(0, null)); }
         }
         #endregion
 
@@ -653,109 +643,57 @@ namespace CASPartResource
 
         #region Content Fields
         [ElementPriority(1)]
-        public uint Version { get { return version; } set { if (version != value) { version = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint Version { get { return version; } set { if (version != value) { version = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(2)]
-        public XMLEntryList XmlEntries { get { return xmlEntries; } set { if (!xmlEntries.Equals(value)) { xmlEntries = value == null ? null : new XMLEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public XMLEntryList XmlEntries { get { return xmlEntries; } set { if (!xmlEntries.Equals(value)) { xmlEntries = value == null ? null : new XMLEntryList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(3)]
-        public int Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnResourceChanged(this, new EventArgs()); } } }
+        public int Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(4)]
-        public int Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnResourceChanged(this, new EventArgs()); } } }
+        public int Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(5)]
-        public float HeavyWeightSlider { get { return heavyWeightSlider; } set { if (heavyWeightSlider != value) { heavyWeightSlider = value; OnResourceChanged(this, new EventArgs()); } } }
+        public float HeavyWeightSlider { get { return heavyWeightSlider; } set { if (heavyWeightSlider != value) { heavyWeightSlider = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(6)]
-        public float StrengthSlider { get { return strengthSlider; } set { if (strengthSlider != value) { strengthSlider = value; OnResourceChanged(this, new EventArgs()); } } }
+        public float StrengthSlider { get { return strengthSlider; } set { if (strengthSlider != value) { strengthSlider = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(7)]
-        public float SlimWeightSlider { get { return slimWeightSlider; } set { if (slimWeightSlider != value) { slimWeightSlider = value; OnResourceChanged(this, new EventArgs()); } } }
+        public float SlimWeightSlider { get { return slimWeightSlider; } set { if (slimWeightSlider != value) { slimWeightSlider = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(8)]
-        public uint Unknown6 { get { return unknown6; } set { if (unknown6 != value) { unknown6 = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint Unknown6 { get { return unknown6; } set { if (unknown6 != value) { unknown6 = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(9)]
-        public UnknownFlags Unknown7 { get { return unknown7; } set { if (unknown7 != value) { unknown7 = value; OnResourceChanged(this, new EventArgs()); } } }
+        public UnknownFlags Unknown7 { get { return unknown7; } set { if (unknown7 != value) { unknown7 = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(10)]
-        public UnknownFlags Unknown8 { get { return unknown8; } set { if (unknown8 != value) { unknown8 = value; OnResourceChanged(this, new EventArgs()); } } }
+        public UnknownFlags Unknown8 { get { return unknown8; } set { if (unknown8 != value) { unknown8 = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(11)]
-        public UnknownFlags Unknown9 { get { return unknown9; } set { if (unknown9 != value) { unknown9 = value; OnResourceChanged(this, new EventArgs()); } } }
+        public UnknownFlags Unknown9 { get { return unknown9; } set { if (unknown9 != value) { unknown9 = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(12)]
-        public UnknownFlags Unknown10 { get { return unknown10; } set { if (unknown10 != value) { unknown10 = value; OnResourceChanged(this, new EventArgs()); } } }
+        public UnknownFlags Unknown10 { get { return unknown10; } set { if (unknown10 != value) { unknown10 = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(13), TGIBlockListContentField("TGIBlocks")]
-        public byte SkinToneIndex { get { return skinToneIndex; } set { if (skinToneIndex != value) { skinToneIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        public byte SkinToneIndex { get { return skinToneIndex; } set { if (skinToneIndex != value) { skinToneIndex = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(14)]
-        public float EyelashSlider { get { return eyelashSlider; } set { if (eyelashSlider != value) { eyelashSlider = value; OnResourceChanged(this, new EventArgs()); } } }
+        public float EyelashSlider { get { return eyelashSlider; } set { if (eyelashSlider != value) { eyelashSlider = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(15)]
-        public float MuscleSlider { get { if (version < 0x00000011) throw new InvalidOperationException(); return muscleSlider; } set { if (version < 0x00000011) throw new InvalidOperationException(); if (muscleSlider != value) { muscleSlider = value; OnResourceChanged(this, new EventArgs()); } } }
+        public float MuscleSlider { get { if (version < 0x00000011) throw new InvalidOperationException(); return muscleSlider; } set { if (version < 0x00000011) throw new InvalidOperationException(); if (muscleSlider != value) { muscleSlider = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(16)]
-        public float BreastSlider { get { if (version < 0x00000012) throw new InvalidOperationException(); return breastSlider; } set { if (version < 0x00000012) throw new InvalidOperationException(); if (breastSlider != value) { breastSlider = value; OnResourceChanged(this, new EventArgs()); } } }
+        public float BreastSlider { get { if (version < 0x00000012) throw new InvalidOperationException(); return breastSlider; } set { if (version < 0x00000012) throw new InvalidOperationException(); if (breastSlider != value) { breastSlider = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(17)]
-        public UInt32 HairBaseColour { get { return hairBaseColour; } set { if (!hairBaseColour.Equals(value)) { hairBaseColour = value; OnResourceChanged(this, new EventArgs()); } } }
+        public UInt32 HairBaseColour { get { return hairBaseColour; } set { if (!hairBaseColour.Equals(value)) { hairBaseColour = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(18)]
-        public UInt32 HairHaloHighColour { get { return hairHaloHighColour; } set { if (!hairHaloHighColour.Equals(value)) { hairHaloHighColour = value; OnResourceChanged(this, new EventArgs()); } } }
+        public UInt32 HairHaloHighColour { get { return hairHaloHighColour; } set { if (!hairHaloHighColour.Equals(value)) { hairHaloHighColour = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(19)]
-        public UInt32 HairHaloLowColour { get { return hairHaloLowColour; } set { if (!hairHaloLowColour.Equals(value)) { hairHaloLowColour = value; OnResourceChanged(this, new EventArgs()); } } }
+        public UInt32 HairHaloLowColour { get { return hairHaloLowColour; } set { if (!hairHaloLowColour.Equals(value)) { hairHaloLowColour = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(20)]
-        public TGIBlock FurMap { get { if (version < 0x00000014) throw new InvalidOperationException(); return furMap; } set { if (version < 0x00000014) throw new InvalidOperationException(); if (!furMap.Equals(value)) { furMap = new TGIBlock(requestedApiVersion, OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public TGIBlock FurMap { get { if (version < 0x00000014) throw new InvalidOperationException(); return furMap; } set { if (version < 0x00000014) throw new InvalidOperationException(); if (!furMap.Equals(value)) { furMap = new TGIBlock(requestedApiVersion, OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(21)]
-        public float NumCurls { get { if (version < 0x00000013) throw new InvalidOperationException(); return numCurls; } set { if (version < 0x00000013) throw new InvalidOperationException(); if (numCurls != value) { numCurls = value; OnResourceChanged(this, new EventArgs()); } } }
+        public float NumCurls { get { if (version < 0x00000013) throw new InvalidOperationException(); return numCurls; } set { if (version < 0x00000013) throw new InvalidOperationException(); if (numCurls != value) { numCurls = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(22)]
-        public float CurlPixelRadius { get { if (version < 0x00000013) throw new InvalidOperationException(); return curlPixelRadius; } set { if (version < 0x00000013) throw new InvalidOperationException(); if (curlPixelRadius != value) { curlPixelRadius = value; OnResourceChanged(this, new EventArgs()); } } }
+        public float CurlPixelRadius { get { if (version < 0x00000013) throw new InvalidOperationException(); return curlPixelRadius; } set { if (version < 0x00000013) throw new InvalidOperationException(); if (curlPixelRadius != value) { curlPixelRadius = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(23)]
-        public CASEntryList CASPEntries { get { return caspEntries; } set { if (!caspEntries.Equals(value)) { caspEntries = value == null ? null : new CASEntryList(OnResourceChanged, value, tgiBlocks); OnResourceChanged(this, new EventArgs()); } } }
+        public CASEntryList CASPEntries { get { return caspEntries; } set { if (!caspEntries.Equals(value)) { caspEntries = value == null ? null : new CASEntryList(OnResourceChanged, value, tgiBlocks); OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(24)]
-        public FaceEntryList FACEEntries { get { return faceEntries; } set { if (!faceEntries.Equals(value)) { faceEntries = value == null ? null : new FaceEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public FaceEntryList FACEEntries { get { return faceEntries; } set { if (!faceEntries.Equals(value)) { faceEntries = value == null ? null : new FaceEntryList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(25)]
-        public CountedTGIBlockList TGIBlocks { get { return tgiBlocks; } set { if (!tgiBlocks.Equals(value)) { tgiBlocks = value == null ? null : new CountedTGIBlockList(OnResourceChanged, "IGT", value); caspEntries.ParentTGIBlocks = tgiBlocks; OnResourceChanged(this, new EventArgs()); } } }
+        public CountedTGIBlockList TGIBlocks { get { return tgiBlocks; } set { if (!tgiBlocks.Equals(value)) { tgiBlocks = value == null ? null : new CountedTGIBlockList(OnResourceChanged, "IGT", value); caspEntries.ParentTGIBlocks = tgiBlocks; OnResourceChanged(this, EventArgs.Empty); } } }
 
-        public string Value
-        {
-            get
-            {
-                return ValueBuilder;
-                /*
-                string s = "";
-
-                foreach (string field in ContentFields)
-                    if (field.Equals("Value") || field.Equals("AsBytes") || field.Equals("Stream")) continue;
-                    else if (field.EndsWith("Index"))
-                    {
-                        s += String.Format("\n{0}: {1} ({2})", field, this[field], tgiBlocks[Convert.ToInt32(this[field].Value)]);
-                    }
-                    else if (field.Equals("XmlEntries"))
-                    {
-                        s += "\n--\nXmlEntries:";
-                        for (int i = 0; i < xmlEntries.Count; i++)
-                            s += String.Format("\n--{0}--\n{1}", i, xmlEntries[i].Value);
-                        s += "\n----";
-                    }
-                    else if (field.Equals("CASPEntries"))
-                    {
-                        s += "\n--\nCASPEntries:";
-                        for (int i = 0; i < caspEntries.Count; i++)
-                            s += String.Format("\n--{0}--\n{1}", i, caspEntries[i].Value);
-                        s += "\n----";
-                    }
-                    else if (field.Equals("FACEEntries"))
-                    {
-                        s += "\n--\nFACEEntries:";
-                        string fmt = "\n" + "  [{0:X" + faceEntries.Count.ToString("X").Length + "}]: {1}";
-                        for (int i = 0; i < faceEntries.Count; i++)
-                            s += String.Format(fmt, i, faceEntries[i].Value);
-                        s += "\n----";
-                    }
-                    else if (field.Equals("TGIBlocks"))
-                    {
-                        s += "\n--\nTGIBlocks:";
-                        string fmt = "\n  [{0:X" + tgiBlocks.Count.ToString("X").Length + "}]: {1}";
-                        for (int i = 0; i < tgiBlocks.Count; i++)
-                            s += String.Format(fmt, i, tgiBlocks[i].Value);
-                        s += "\n----";
-                    }
-                    else
-                    {
-                        s += String.Format("\n{0}: {1}", field, this[field]);
-                    }
-
-                return s;
-                /**/
-            }
-        }
+        public string Value { get { return ValueBuilder; } }
         #endregion
     }
 

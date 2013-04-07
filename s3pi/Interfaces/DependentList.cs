@@ -518,10 +518,5 @@ namespace s3pi.Interfaces
             s.Position = pos;
         }
         #endregion
-
-        //// <summary>
-        //// Add a new default element to the list
-        //// </summary>
-        //public override void Add() { this.Add(new TGIBlock(0, null)); }
     }
 }

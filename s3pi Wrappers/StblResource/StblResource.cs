@@ -27,7 +27,6 @@ namespace StblResource
     /// <summary>
     /// A resource wrapper that understands String Table resources
     /// </summary>
-    //[ConstructorParameters(new object[] { (ulong)0, "" })]
     public class StblResource : AResource, IDictionary<ulong, string>, System.Collections.IDictionary
     {
         const int recommendedApiVersion = 1;
@@ -43,7 +42,7 @@ namespace StblResource
         Dictionary<ulong, string> entries;
         #endregion
 
-        public StblResource(int APIversion, Stream s) : base(APIversion, s) { if (stream == null) { stream = UnParse(); OnResourceChanged(this, new EventArgs()); } stream.Position = 0; Parse(stream); }
+        public StblResource(int APIversion, Stream s) : base(APIversion, s) { if (stream == null) { stream = UnParse(); OnResourceChanged(this, EventArgs.Empty); } stream.Position = 0; Parse(stream); }
 
         #region Data I/O
         void Parse(Stream s)

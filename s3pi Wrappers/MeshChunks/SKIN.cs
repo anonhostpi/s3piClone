@@ -32,7 +32,6 @@ namespace meshExpImp.ModelBlocks
         {
             public BoneList(EventHandler handler) : base(handler) { }
             public BoneList(EventHandler handler, IEnumerable<Bone> ilt) : base(handler, ilt) { }
-            //public override void Add() { base.Add(new Bone(0, null)); }
             protected override Bone CreateElement(Stream s)
             {
                 throw new NotSupportedException();
@@ -67,19 +66,7 @@ namespace meshExpImp.ModelBlocks
                 : this(APIversion, handler, j.mNameHash, j.mInverseBindPose)
             {
             }
-            public string Value
-            {
-                get
-                {
-                    return ValueBuilder;
-                    /*
-                    StringBuilder sb = new StringBuilder();
-                    sb.AppendFormat("Name:\t0x{0:X8}\r\n", mNameHash);
-                    sb.AppendFormat("InverseBindPose:\r\n{0}", mInverseBindPose.Value);
-                    return sb.ToString();
-                    /**/
-                }
-            }
+            public string Value { get { return ValueBuilder; } }
             [ElementPriority(1)]
             public uint NameHash
             {
@@ -93,8 +80,6 @@ namespace meshExpImp.ModelBlocks
                 get { return mInverseBindPose; }
                 set { if(mInverseBindPose!=value){mInverseBindPose = value; OnElementChanged();} }
             }
-
-            //public override AHandlerElement Clone(EventHandler handler) { return new Bone(0, handler, this); }
 
             public override List<string> ContentFields
             {
@@ -139,36 +124,17 @@ namespace meshExpImp.ModelBlocks
         public uint Version
         {
             get { return mVersion; }
-            set { if(mVersion!=value){mVersion = value; OnRCOLChanged(this, new EventArgs());} }
+            set { if(mVersion!=value){mVersion = value; OnRCOLChanged(this, EventArgs.Empty);} }
         }
 
         [ElementPriority(2)]
         public BoneList Bones
         {
             get { return mBones; }
-            set { if (mBones != value) { mBones = value == null ? null : new BoneList(handler, value); OnRCOLChanged(this, new EventArgs()); } }
+            set { if (mBones != value) { mBones = value == null ? null : new BoneList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } }
         }
 
-        public string Value
-        {
-            get
-            {
-                return ValueBuilder;
-                /*
-                StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("Version:\t0x{0:X8}\n", mVersion);
-                if (mBones.Count > 0)
-                {
-                    sb.AppendFormat("Bones:\n");
-                    for (int i = 0; i < mBones.Count; i++)
-                    {
-                        sb.AppendFormat("[0x{0:X8}]\n{1}\n", i, mBones[i].Value);
-                    }
-                }
-                return sb.ToString();
-                /**/
-            }
-        }
+        public string Value { get { return ValueBuilder; } }
 
         protected override void Parse(Stream s)
         {
@@ -198,7 +164,6 @@ namespace meshExpImp.ModelBlocks
             foreach (var j in mBones) j.InverseBindPose.UnParse(s);
             return s;
         }
-        //public override AHandlerElement Clone(EventHandler handler) { return new SKIN(0, handler, this); }
 
         public override string Tag
         {

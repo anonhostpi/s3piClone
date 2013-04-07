@@ -158,7 +158,6 @@ namespace meshExpImp.ModelBlocks
 
             public VertexElementLayoutList(EventHandler handler, IEnumerable<ElementLayout> ilt) : base(handler, ilt) {}
 
-            //public override void Add() { base.Add(new ElementLayout(0, null)); }
             protected override void WriteCount(Stream s, int count){}
             private void Parse(Stream s, int count)
             {
@@ -255,7 +254,6 @@ namespace meshExpImp.ModelBlocks
                 bw.Write((byte)mFormat);
                 bw.Write((byte)mOffset);
             }
-            //public override AHandlerElement Clone(EventHandler handler) { return new ElementLayout(0, handler, this); }
 
             public override List<string> ContentFields
             {
@@ -319,49 +317,28 @@ namespace meshExpImp.ModelBlocks
         public uint Version
         {
             get { return mVersion; }
-            set { if(mVersion!=value){mVersion = value; OnRCOLChanged(this, new EventArgs());} }
+            set { if(mVersion!=value){mVersion = value; OnRCOLChanged(this, EventArgs.Empty);} }
         }
         [ElementPriority(2)]
         public int Stride
         {
             get { return mStride; }
-            set { if(mStride!=value){mStride = value; OnRCOLChanged(this, new EventArgs());} }
+            set { if(mStride!=value){mStride = value; OnRCOLChanged(this, EventArgs.Empty);} }
         }
         [ElementPriority(3)]
         public bool ExtendedFormat
         {
             get { return mExtendedFormat; }
-            set { if(mExtendedFormat!=value){mExtendedFormat = value; OnRCOLChanged(this, new EventArgs());} }
+            set { if(mExtendedFormat!=value){mExtendedFormat = value; OnRCOLChanged(this, EventArgs.Empty);} }
         }
         [ElementPriority(4)]
         public VertexElementLayoutList Layouts
         {
             get { return mLayouts; }
-            set { if (mLayouts != value) { mLayouts = value == null ? null : new VertexElementLayoutList(handler, value); OnRCOLChanged(this, new EventArgs()); } }
+            set { if (mLayouts != value) { mLayouts = value == null ? null : new VertexElementLayoutList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } }
         }
 
-        public string Value
-        {
-            get
-            {
-                return ValueBuilder;
-                /*
-                StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("Version:\t0x{0:X8}\n", mVersion);
-                sb.AppendFormat("Stride:\t0x{0:X8}\n", mStride);
-                sb.AppendFormat("Extended Format:\t{0}\n", mExtendedFormat);
-                if (mLayouts.Count > 0)
-                {
-                    sb.AppendFormat("Vertex Element Layouts:\n");
-                    for (int i = 0; i < mLayouts.Count; i++)
-                    {
-                        sb.AppendFormat("==ElementLayout[{0}]==\n{1}\n", i, mLayouts[i].Value);
-                    }
-                }
-                return sb.ToString();
-                /**/
-            }
-        }
+        public string Value { get { return ValueBuilder; } }
 
         protected override void Parse(Stream s)
         {
@@ -394,8 +371,6 @@ namespace meshExpImp.ModelBlocks
             mLayouts.UnParse(s);
             return s;
         }
-
-        //public override AHandlerElement Clone(EventHandler handler) { return new VRTF(0, handler, this); }
 
         public override string Tag
         {

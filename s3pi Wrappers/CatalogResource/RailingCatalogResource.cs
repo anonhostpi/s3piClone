@@ -133,15 +133,15 @@ namespace CatalogResource
         public MaterialList Materials
         {
             get { if (version < 0x00000003) throw new InvalidOperationException(); return materialList; }
-            set { if (version < 0x00000003) throw new InvalidOperationException(); if (materialList != value) { materialList = value == null ? null : new MaterialList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } }
+            set { if (version < 0x00000003) throw new InvalidOperationException(); if (materialList != value) { materialList = value == null ? null : new MaterialList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } }
         }
         //--insert CommonBlock: ElementPriority(11)
         [ElementPriority(21), TGIBlockListContentField("TGIBlocks")]
-        public uint Railing4xModelVPXYIndex { get { return railing4xModelVPXYIndex; } set { if (railing4xModelVPXYIndex != value) { railing4xModelVPXYIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint Railing4xModelVPXYIndex { get { return railing4xModelVPXYIndex; } set { if (railing4xModelVPXYIndex != value) { railing4xModelVPXYIndex = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(22), TGIBlockListContentField("TGIBlocks")]
-        public uint Railing1xModelVPXYIndex { get { return railing1xModelVPXYIndex; } set { if (railing1xModelVPXYIndex != value) { railing1xModelVPXYIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint Railing1xModelVPXYIndex { get { return railing1xModelVPXYIndex; } set { if (railing1xModelVPXYIndex != value) { railing1xModelVPXYIndex = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(23), TGIBlockListContentField("TGIBlocks")]
-        public uint PostModelVPXYIndex { get { return postModelVPXYIndex; } set { if (postModelVPXYIndex != value) { postModelVPXYIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint PostModelVPXYIndex { get { return postModelVPXYIndex; } set { if (postModelVPXYIndex != value) { postModelVPXYIndex = value; OnResourceChanged(this, EventArgs.Empty); } } }
         //--insert TGIBlockList: no ElementPriority
         #endregion
     }

@@ -94,7 +94,6 @@ namespace s3pi.GenericRCOLResource
             #region DependentList<Animation>
             protected override GenericRCOLResource.ChunkReference CreateElement(Stream s) { return new GenericRCOLResource.ChunkReference(0, handler, s); }
             protected override void WriteElement(Stream s, GenericRCOLResource.ChunkReference element) { element.UnParse(s); }
-            //public override void Add() { this.Add(new GenericRCOLResource.ChunkReference(0, null, 0)); }
             #endregion
         }
 
@@ -324,7 +323,6 @@ namespace s3pi.GenericRCOLResource
             #region DependentList<Animation>
             protected override Animation CreateElement(Stream s) { return new Animation(0, handler, s); }
             protected override void WriteElement(Stream s, Animation element) { element.UnParse(s); }
-            //public override void Add() { this.Add(new Animation(0, null)); }
             #endregion
         }
         #endregion
@@ -1066,8 +1064,6 @@ namespace s3pi.GenericRCOLResource
             protected override ActorSlot CreateElement(Stream s) { return new ActorSlot(0, handler, s); }
 
             protected override void WriteElement(Stream s, ActorSlot element) { element.UnParse(s); }
-
-            //public override void Add() { this.Add(new ActorSlot(0, null)); }
             #endregion
         }
         public class ActorSuffix : AHandlerElement, IEquatable<ActorSuffix>
@@ -1148,8 +1144,6 @@ namespace s3pi.GenericRCOLResource
             protected override ActorSuffix CreateElement(Stream s) { return new ActorSuffix(0, handler, s); }
 
             protected override void WriteElement(Stream s, ActorSuffix element) { element.UnParse(s); }
-
-            //public override void Add() { this.Add(new ActorSuffix(0, null)); }
             #endregion
         }
         #endregion
@@ -1370,8 +1364,6 @@ namespace s3pi.GenericRCOLResource
             protected override Outcome CreateElement(Stream s) { return new Outcome(0, handler, s); }
 
             protected override void WriteElement(Stream s, Outcome element) { element.UnParse(s); }
-
-            //public override void Add() { this.Add(new Outcome(0, null));  }
             #endregion
         }
         #endregion
@@ -1539,8 +1531,6 @@ namespace s3pi.GenericRCOLResource
             protected override Match CreateElement(Stream s) { return new Match(0, handler, s); }
 
             protected override void WriteElement(Stream s, Match element) { element.UnParse(s); }
-
-            //public override void Add() { this.Add(new Match(0, null)); }
             #endregion
         }
         #endregion

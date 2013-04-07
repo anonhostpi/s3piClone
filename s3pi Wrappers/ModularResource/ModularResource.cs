@@ -39,7 +39,7 @@ namespace ModularResource
         TGIBlockList tgiBlocks;
         #endregion
 
-        public ModularResource(int APIversion, Stream s) : base(APIversion, s) { if (stream == null) { stream = UnParse(); OnResourceChanged(this, new EventArgs()); } stream.Position = 0; Parse(stream); }
+        public ModularResource(int APIversion, Stream s) : base(APIversion, s) { if (stream == null) { stream = UnParse(); OnResourceChanged(this, EventArgs.Empty); } stream.Position = 0; Parse(stream); }
 
         #region Data I/O
         void Parse(Stream s)
@@ -91,31 +91,7 @@ namespace ModularResource
         [ElementPriority(4)]
         public TGIBlockList TGIBlocks { get { return tgiBlocks; } set { if (tgiBlocks != value) { tgiBlocks = value == null ? null : new TGIBlockList(OnResourceChanged, value); tgiIndexes.ParentTGIBlocks = tgiBlocks; OnResourceChanged(this, EventArgs.Empty); } } }
 
-        public String Value
-        {
-            get
-            {
-                return ValueBuilder;
-                /*
-                string s = "";
-                string fmt;
-
-                s += "Unknown1: 0x" + unknown1.ToString("X4");
-                s += "\nUnknown2: 0x" + unknown2.ToString("X4");
-
-                s += "\nTGIIndexes:";
-                fmt = "\n  [{0:X" + tgiIndexes.Count.ToString("X").Length + "}]: {1:X8}";
-                for (int i = 0; i < tgiIndexes.Count; i++) s += string.Format(fmt, i, tgiIndexes[i]);
-                s += "\n--";
-
-                s += "\nTGIBlocks:";
-                fmt = "\n  [{0:X" + tgiBlocks.Count.ToString("X").Length + "}]: {1}";
-                for (int i = 0; i < tgiBlocks.Count; i++) s += string.Format(fmt, i, tgiBlocks[i].Value);
-                s += "\n--";
-                return s;
-                /**/
-            }
-        }
+        public String Value { get { return ValueBuilder; } }
         #endregion
     }
 

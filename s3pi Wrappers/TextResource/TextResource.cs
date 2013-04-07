@@ -65,7 +65,7 @@ namespace TextResource
                 ms.Flush();
                 ms.Position = 0;
                 stream = ms;
-                OnResourceChanged(this, new EventArgs());
+                OnResourceChanged(this, EventArgs.Empty);
             }
         }
 

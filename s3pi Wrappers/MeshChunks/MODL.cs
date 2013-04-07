@@ -48,7 +48,6 @@ namespace meshExpImp.ModelBlocks
             public BoundingBoxList(EventHandler handler) : base(handler) { }
             public BoundingBoxList(EventHandler handler, Stream s) : base(handler, s) { }
             public BoundingBoxList(EventHandler handler, IEnumerable<BoundingBox> ilt) : base(handler, ilt) { }
-            //public override void Add() { base.Add(new BoundingBox(0, null)); }
             protected override BoundingBox CreateElement(Stream s) { return new BoundingBox(0, this.handler, s); }
             protected override void WriteElement(Stream s, BoundingBox element) { element.UnParse(s); }
         }
@@ -77,7 +76,6 @@ namespace meshExpImp.ModelBlocks
                     WriteElement(s, element);
                 }
             }
-            //public override void Add() { base.Add(new LODEntry(0, null)); }
 
             protected override LODEntry CreateElement(Stream s) { return new LODEntry(0, handler, s); }
 
@@ -105,23 +103,7 @@ namespace meshExpImp.ModelBlocks
                 mMaxZValue = maxZValue;
             }
 
-            public string Value
-            {
-                get
-                {
-                    return ValueBuilder;
-                    /*
-                    StringBuilder sb = new StringBuilder();
-                    sb.AppendFormat("Index:\t0x{0:X8}\n", mModelLodIndex);
-                    sb.AppendFormat("Flags:\t{0}\n", this["Flags"]);
-                    sb.AppendFormat("Id:\t{0}\n", mId);
-                    sb.AppendFormat("MinZValue:\t{0}\n", mMinZValue);
-                    sb.AppendFormat("MaxZValue:\t{0}\n", mMaxZValue);
-
-                    return sb.ToString();
-                    /**/
-                }
-            }
+            public string Value { get { return ValueBuilder; } }
             [ElementPriority(1)]
             public GenericRCOLResource.ChunkReference ModelLodIndex
             {
@@ -173,8 +155,6 @@ namespace meshExpImp.ModelBlocks
                 bw.Write(mMinZValue);
                 bw.Write(mMaxZValue);
             }
-
-            //public override AHandlerElement Clone(EventHandler handler) { return new LODEntry(0, handler, this); }
 
             public override List<string> ContentFields
             {
@@ -236,40 +216,38 @@ namespace meshExpImp.ModelBlocks
         public uint Version
         {
             get { return mVersion; }
-            set { if (mVersion != value) { mVersion = value; OnRCOLChanged(this, new EventArgs()); } }
+            set { if (mVersion != value) { mVersion = value; OnRCOLChanged(this, EventArgs.Empty); } }
         }
         [ElementPriority(2)]
         public BoundingBox Bounds
         {
             get { return mBounds; }
-            set { if (mBounds != value) { mBounds = value; OnRCOLChanged(this, new EventArgs()); } }
+            set { if (mBounds != value) { mBounds = value; OnRCOLChanged(this, EventArgs.Empty); } }
         }
         [ElementPriority(3)]
         public BoundingBoxList ExtraBounds
         {
             get { return mExtraBounds; }
-            set { if (mExtraBounds != value) { mExtraBounds = value == null ? null : new BoundingBoxList(handler, value); OnRCOLChanged(this, new EventArgs()); } }
+            set { if (mExtraBounds != value) { mExtraBounds = value == null ? null : new BoundingBoxList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } }
         }
         [ElementPriority(4)]
         public uint FadeType
         {
             get { return mFadeType; }
-            set { if (mFadeType != value) { mFadeType = value; OnRCOLChanged(this, new EventArgs()); } }
+            set { if (mFadeType != value) { mFadeType = value; OnRCOLChanged(this, EventArgs.Empty); } }
         }
         [ElementPriority(5)]
         public float CustomFadeDistance
         {
             get { return mCustomFadeDistance; }
-            set { if (mCustomFadeDistance != value) { mCustomFadeDistance = value; OnRCOLChanged(this, new EventArgs()); } }
+            set { if (mCustomFadeDistance != value) { mCustomFadeDistance = value; OnRCOLChanged(this, EventArgs.Empty); } }
         }
         [ElementPriority(6)]
         public LODEntryList Entries
         {
             get { return mEntries; }
-            set { if (mEntries != value) { mEntries = value == null ? null : new LODEntryList(handler, value); OnRCOLChanged(this, new EventArgs()); } }
+            set { if (mEntries != value) { mEntries = value == null ? null : new LODEntryList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } }
         }
-
-        //public override AHandlerElement Clone(EventHandler handler) { return new MODL(0, handler, this); }
 
         protected override void Parse(Stream s)
         {
@@ -331,40 +309,7 @@ namespace meshExpImp.ModelBlocks
             }
         }
 
-        public string Value
-        {
-            get
-            {
-                return ValueBuilder;
-                /*
-                StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("Version:\t0x{0:X8}\n", mVersion);
-                sb.AppendFormat("Bounds:\n{0}\n", mBounds.Value);
-                if (mVersion > 258)
-                {
-                    if (mExtraBounds.Count > 0)
-                    {
-                        sb.AppendFormat("ExtraBounds:\n");
-                        for (int i = 0; i < mExtraBounds.Count; i++)
-                        {
-                            sb.AppendFormat("=={0}==\n{1}\n", i, mExtraBounds[i].Value);
-                        }
-                    }
-                    sb.AppendFormat("FadeType:\t0x{0:X8}\n", mFadeType);
-                    sb.AppendFormat("CustomFadeDistance:\t{0:0.00000}\n", mCustomFadeDistance);
-                }
-                if (mEntries.Count > 0)
-                {
-                    sb.AppendFormat("LOD Entries:\n");
-                    for (int i = 0; i < mEntries.Count; i++)
-                    {
-                        sb.AppendFormat("=={0}==\n{1}\n", i, mEntries[i].Value);
-                    }
-                }
-                return sb.ToString();
-                /**/
-            }
-        }
+        public string Value { get { return ValueBuilder; } }
         public override uint ResourceType
         {
             get { return 0x01661233; }

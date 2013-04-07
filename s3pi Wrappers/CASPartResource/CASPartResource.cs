@@ -65,7 +65,7 @@ namespace CASPartResource
 
         #endregion
 
-        public CASPartResource(int APIversion, Stream s) : base(APIversion, s) { if (stream == null) { stream = UnParse(); OnResourceChanged(this, new EventArgs()); } stream.Position = 0; Parse(stream); }
+        public CASPartResource(int APIversion, Stream s) : base(APIversion, s) { if (stream == null) { stream = UnParse(); OnResourceChanged(this, EventArgs.Empty); } stream.Position = 0; Parse(stream); }
 
         #region Data I/O
         void Parse(Stream s)
@@ -208,7 +208,6 @@ namespace CASPartResource
             #region AHandlerElement Members
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
             public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
-            //public override AHandlerElement Clone(EventHandler handler) { return new Preset(requestedApiVersion, handler, this); }
             #endregion
 
             #region IEquatable<Preset> Members
@@ -273,8 +272,6 @@ namespace CASPartResource
             protected override Preset CreateElement(Stream s) { return new Preset(0, elementHandler, s); }
             protected override void WriteElement(Stream s, Preset element) { element.UnParse(s); }
             #endregion
-
-            //public override void Add() { this.Add(new Preset(0, null)); }
         }
 
         public class LODInfoEntry : AHandlerElement, IEquatable<LODInfoEntry>
@@ -322,7 +319,6 @@ namespace CASPartResource
 
             #region AHandlerElement Members
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
-            //public override AHandlerElement Clone(EventHandler handler) { return new LODInfoEntry(requestedApiVersion, handler, this); }
             public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
             #endregion
 
@@ -361,13 +357,7 @@ namespace CASPartResource
             [ElementPriority(3)]
             public LODAssetList LODAssets { get { return lodAssets; } set { if (!lodAssets.Equals(value)) { lodAssets = new LODAssetList(handler, value); OnElementChanged(); } } }
 
-            public string Value
-            {
-                get
-                {
-                    return ValueBuilder;
-                }
-            }
+            public string Value { get { return ValueBuilder; } }
             #endregion
         }
         public class LODInfoEntryList : DependentList<LODInfoEntry>
@@ -384,8 +374,6 @@ namespace CASPartResource
             protected override LODInfoEntry CreateElement(Stream s) { return new LODInfoEntry(0, elementHandler, s); }
             protected override void WriteElement(Stream s, LODInfoEntry element) { element.UnParse(s); }
             #endregion
-
-            //public override void Add() { this.Add(new LODInfoEntry(0, null)); }
         }
 
         public class LODAsset : AHandlerElement, IEquatable<LODAsset>
@@ -427,7 +415,6 @@ namespace CASPartResource
             #region AHandlerElement Members
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
             public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
-            //public override AHandlerElement Clone(EventHandler handler) { return new LODAsset(requestedApiVersion, handler, this); }
             #endregion
 
             #region IEquatable<LODAsset> Members
@@ -466,17 +453,6 @@ namespace CASPartResource
             public CASGeomFlags CastShadow { get { return castShadow; } set { if (castShadow != value) { castShadow = value; OnElementChanged(); } } }
 
             public string Value { get { return ValueBuilder; } }
-            /*public string Value
-            {
-                get
-                {
-                    System.Text.StringBuilder sb = new StringBuilder();
-                    foreach (string field in ContentFields)
-                        if (!field.Equals("Value"))
-                            sb.Append(string.Format("{0}: {1}; ", field, this[field]));
-                    return sb.ToString().TrimEnd(';', ' ');
-                }
-            }/**/
             #endregion
         }
         public class LODAssetList : DependentList<LODAsset>
@@ -493,60 +469,58 @@ namespace CASPartResource
             protected override LODAsset CreateElement(Stream s) { return new LODAsset(0, elementHandler, s); }
             protected override void WriteElement(Stream s, LODAsset element) { element.UnParse(s); }
             #endregion
-
-            //public override void Add() { this.Add(new LODAsset(0, null)); }
         }
         #endregion
 
         #region Content Fields
         [ElementPriority(1)]
-        public uint Version { get { return version; } set { if (version != value) { version = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint Version { get { return version; } set { if (version != value) { version = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(2)]
-        public PresetList Presets { get { return presets; } set { if (!presets.Equals(value)) { presets = value == null ? null : new PresetList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public PresetList Presets { get { return presets; } set { if (!presets.Equals(value)) { presets = value == null ? null : new PresetList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(3)]
-        public string Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnResourceChanged(this, new EventArgs()); } } }
+        public string Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(4)]
-        public float SortPriority { get { return sortPriority; } set { if (sortPriority != value) { sortPriority = value; OnResourceChanged(this, new EventArgs()); } } }
+        public float SortPriority { get { return sortPriority; } set { if (sortPriority != value) { sortPriority = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(5)]
-        public byte Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnResourceChanged(this, new EventArgs()); } } }
+        public byte Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(6)]
-        public ClothingType Clothing { get { return clothing; } set { if (clothing != value) { clothing = value; OnResourceChanged(this, new EventArgs()); } } }
+        public ClothingType Clothing { get { return clothing; } set { if (clothing != value) { clothing = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(7)]
-        public DataTypeFlags DataType { get { return dataType; } set { if (dataType != value) { dataType = value; OnResourceChanged(this, new EventArgs()); } } }
+        public DataTypeFlags DataType { get { return dataType; } set { if (dataType != value) { dataType = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(8)]
-        public AgeGenderFlags AgeGender { get { return ageGender; } set { if (!ageGender.Equals(value)) { ageGender = new AgeGenderFlags(0, OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public AgeGenderFlags AgeGender { get { return ageGender; } set { if (!ageGender.Equals(value)) { ageGender = new AgeGenderFlags(0, OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(9)]
-        public ClothingCategoryFlags ClothingCategory { get { return clothingCategory; } set { if (clothingCategory != value) { clothingCategory = value; OnResourceChanged(this, new EventArgs()); } } }
+        public ClothingCategoryFlags ClothingCategory { get { return clothingCategory; } set { if (clothingCategory != value) { clothingCategory = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(10), TGIBlockListContentField("TGIBlocks")]
-        public byte CasPart1Index { get { return casPart1Index; } set { if (casPart1Index != value) { casPart1Index = value; OnResourceChanged(this, new EventArgs()); } } }
+        public byte CasPart1Index { get { return casPart1Index; } set { if (casPart1Index != value) { casPart1Index = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(11), TGIBlockListContentField("TGIBlocks")]
-        public byte CasPart2Index { get { return casPart2Index; } set { if (casPart2Index != value) { casPart2Index = value; OnResourceChanged(this, new EventArgs()); } } }
+        public byte CasPart2Index { get { return casPart2Index; } set { if (casPart2Index != value) { casPart2Index = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(12), TGIBlockListContentField("TGIBlocks")]
-        public byte BlendInfoFatIndex { get { return blendInfoFatIndex; } set { if (blendInfoFatIndex != value) { blendInfoFatIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        public byte BlendInfoFatIndex { get { return blendInfoFatIndex; } set { if (blendInfoFatIndex != value) { blendInfoFatIndex = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(13), TGIBlockListContentField("TGIBlocks")]
-        public byte BlendInfoFitIndex { get { return blendInfoFitIndex; } set { if (blendInfoFitIndex != value) { blendInfoFitIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        public byte BlendInfoFitIndex { get { return blendInfoFitIndex; } set { if (blendInfoFitIndex != value) { blendInfoFitIndex = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(14), TGIBlockListContentField("TGIBlocks")]
-        public byte BlendInfoThinIndex { get { return blendInfoThinIndex; } set { if (blendInfoThinIndex != value) { blendInfoThinIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        public byte BlendInfoThinIndex { get { return blendInfoThinIndex; } set { if (blendInfoThinIndex != value) { blendInfoThinIndex = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(15), TGIBlockListContentField("TGIBlocks")]
-        public byte BlendInfoSpecialIndex { get { return blendInfoSpecialIndex; } set { if (blendInfoSpecialIndex != value) { blendInfoSpecialIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        public byte BlendInfoSpecialIndex { get { return blendInfoSpecialIndex; } set { if (blendInfoSpecialIndex != value) { blendInfoSpecialIndex = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(16)]
-        public uint OverlayPriority { get { return overlayPriority; } set { if (overlayPriority != value) { overlayPriority = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint OverlayPriority { get { return overlayPriority; } set { if (overlayPriority != value) { overlayPriority = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(17)]
-        public ByteIndexList VPXYIndexes { get { return vpxyIndexes; } set { if (!vpxyIndexes.Equals(value)) { vpxyIndexes = value == null ? null : new ByteIndexList(OnResourceChanged, value, ReadByte, WriteByte, byte.MaxValue, tgiBlocks); OnResourceChanged(this, new EventArgs()); } } }
+        public ByteIndexList VPXYIndexes { get { return vpxyIndexes; } set { if (!vpxyIndexes.Equals(value)) { vpxyIndexes = value == null ? null : new ByteIndexList(OnResourceChanged, value, ReadByte, WriteByte, byte.MaxValue, tgiBlocks); OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(18)]
-        public LODInfoEntryList LODInfo { get { return lodInfo; } set { if (!lodInfo.Equals(value)) { lodInfo = value == null ? null : new LODInfoEntryList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public LODInfoEntryList LODInfo { get { return lodInfo; } set { if (!lodInfo.Equals(value)) { lodInfo = value == null ? null : new LODInfoEntryList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(19)]
-        public ByteIndexList Diffuse1Indexes { get { return diffuse1Indexes; } set { if (!diffuse1Indexes.Equals(value)) { diffuse1Indexes = value == null ? null : new ByteIndexList(OnResourceChanged, value, ReadByte, WriteByte, byte.MaxValue, tgiBlocks); OnResourceChanged(this, new EventArgs()); } } }
+        public ByteIndexList Diffuse1Indexes { get { return diffuse1Indexes; } set { if (!diffuse1Indexes.Equals(value)) { diffuse1Indexes = value == null ? null : new ByteIndexList(OnResourceChanged, value, ReadByte, WriteByte, byte.MaxValue, tgiBlocks); OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(20)]
-        public ByteIndexList Specular1Indexes { get { return specular1Indexes; } set { if (!specular1Indexes.Equals(value)) { specular1Indexes = value == null ? null : new ByteIndexList(OnResourceChanged, value, ReadByte, WriteByte, byte.MaxValue, tgiBlocks); OnResourceChanged(this, new EventArgs()); } } }
+        public ByteIndexList Specular1Indexes { get { return specular1Indexes; } set { if (!specular1Indexes.Equals(value)) { specular1Indexes = value == null ? null : new ByteIndexList(OnResourceChanged, value, ReadByte, WriteByte, byte.MaxValue, tgiBlocks); OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(21)]
-        public ByteIndexList Diffuse2Indexes { get { return diffuse2Indexes; } set { if (!diffuse2Indexes.Equals(value)) { diffuse2Indexes = value == null ? null : new ByteIndexList(OnResourceChanged, value, ReadByte, WriteByte, byte.MaxValue, tgiBlocks); OnResourceChanged(this, new EventArgs()); } } }
+        public ByteIndexList Diffuse2Indexes { get { return diffuse2Indexes; } set { if (!diffuse2Indexes.Equals(value)) { diffuse2Indexes = value == null ? null : new ByteIndexList(OnResourceChanged, value, ReadByte, WriteByte, byte.MaxValue, tgiBlocks); OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(22)]
-        public ByteIndexList Specular2Indexes { get { return specular2Indexes; } set { if (!specular2Indexes.Equals(value)) { specular2Indexes = value == null ? null : new ByteIndexList(OnResourceChanged, value, ReadByte, WriteByte, byte.MaxValue, tgiBlocks); OnResourceChanged(this, new EventArgs()); } } }
+        public ByteIndexList Specular2Indexes { get { return specular2Indexes; } set { if (!specular2Indexes.Equals(value)) { specular2Indexes = value == null ? null : new ByteIndexList(OnResourceChanged, value, ReadByte, WriteByte, byte.MaxValue, tgiBlocks); OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(23)]
-        public ByteIndexList BONDIndexes { get { return bondIndexes; } set { if (!bondIndexes.Equals(value)) { bondIndexes = value == null ? null : new ByteIndexList(OnResourceChanged, value, ReadByte, WriteByte, byte.MaxValue, tgiBlocks); OnResourceChanged(this, new EventArgs()); } } }
+        public ByteIndexList BONDIndexes { get { return bondIndexes; } set { if (!bondIndexes.Equals(value)) { bondIndexes = value == null ? null : new ByteIndexList(OnResourceChanged, value, ReadByte, WriteByte, byte.MaxValue, tgiBlocks); OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(24)]
-        public string Unknown4 { get { return unknown4; } set { if (unknown4 != value) { unknown4 = value; OnResourceChanged(this, new EventArgs()); } } }
+        public string Unknown4 { get { return unknown4; } set { if (unknown4 != value) { unknown4 = value; OnResourceChanged(this, EventArgs.Empty); } } }
 
         [ElementPriority(25)]
         public CountedTGIBlockList TGIBlocks
@@ -561,7 +535,7 @@ namespace CASPartResource
                     vpxyIndexes.ParentTGIBlocks = diffuse1Indexes.ParentTGIBlocks = specular1Indexes.ParentTGIBlocks =
                         diffuse2Indexes.ParentTGIBlocks = specular2Indexes.ParentTGIBlocks = bondIndexes.ParentTGIBlocks = tgiBlocks;
                     
-                    OnResourceChanged(this, new EventArgs());
+                    OnResourceChanged(this, EventArgs.Empty);
                 }
             }
         }

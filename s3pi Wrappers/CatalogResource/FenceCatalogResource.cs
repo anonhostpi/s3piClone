@@ -303,8 +303,6 @@ namespace CatalogResource
             /// The list of available field names on this API object
             /// </summary>
             public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
-
-            //public override AHandlerElement Clone(EventHandler handler) { return new PolygonPoint(requestedApiVersion, handler, this); }
             #endregion
 
             #region IEquatable<PolygonPoint> Members
@@ -341,72 +339,72 @@ namespace CatalogResource
         public MaterialList Materials
         {
             get { if (version < 0x00000007) throw new InvalidOperationException(); return materialList; }
-            set { if (version < 0x00000007) throw new InvalidOperationException(); if (materialList != value) { materialList = value == null ? null : new MaterialList(OnResourceChanged, value); } OnResourceChanged(this, new EventArgs()); }
+            set { if (version < 0x00000007) throw new InvalidOperationException(); if (materialList != value) { materialList = value == null ? null : new MaterialList(OnResourceChanged, value); } OnResourceChanged(this, EventArgs.Empty); }
         }
         //--insert CommonBlock: ElementPriority(11)
         [ElementPriority(21), TGIBlockListContentField("TGIBlocks")]
-        public uint ModelVPXYIndex { get { return modelVPXYIndex; } set { if (modelVPXYIndex != value) { modelVPXYIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint ModelVPXYIndex { get { return modelVPXYIndex; } set { if (modelVPXYIndex != value) { modelVPXYIndex = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(22), TGIBlockListContentField("TGIBlocks")]
-        public uint DiagonalVPXYIndex { get { return diagonalVPXYIndex; } set { if (diagonalVPXYIndex != value) { diagonalVPXYIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint DiagonalVPXYIndex { get { return diagonalVPXYIndex; } set { if (diagonalVPXYIndex != value) { diagonalVPXYIndex = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(23), TGIBlockListContentField("TGIBlocks")]
-        public uint PostVPXYIndex { get { return postVPXYIndex; } set { if (postVPXYIndex != value) { postVPXYIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint PostVPXYIndex { get { return postVPXYIndex; } set { if (postVPXYIndex != value) { postVPXYIndex = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(24)]
-        public uint TileSpacing { get { return tileSpacing; } set { if (tileSpacing != value) { tileSpacing = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint TileSpacing { get { return tileSpacing; } set { if (tileSpacing != value) { tileSpacing = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(25)]
-        public bool CanWalkOver { get { return canWalkOver; } set { if (canWalkOver != value) { canWalkOver = value; OnResourceChanged(this, new EventArgs()); } } }
+        public bool CanWalkOver { get { return canWalkOver; } set { if (canWalkOver != value) { canWalkOver = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(26)]
         public bool ShouldNotGetThickSnow
         {
             get { if (version < 0x0000000a) throw new InvalidOperationException(); return shouldNotGetThickSnow; }
-            set { if (version < 0x0000000a) throw new InvalidOperationException(); if (shouldNotGetThickSnow != value) { shouldNotGetThickSnow = value; OnResourceChanged(this, new EventArgs()); } }
+            set { if (version < 0x0000000a) throw new InvalidOperationException(); if (shouldNotGetThickSnow != value) { shouldNotGetThickSnow = value; OnResourceChanged(this, EventArgs.Empty); } }
         }
         [ElementPriority(27)]
         public bool SnowPostShapeIsCircle
         {
             get { if (version < 0x0000000a) throw new InvalidOperationException(); return snowPostShapeIsCircle; }
-            set { if (version < 0x0000000a) throw new InvalidOperationException(); if (snowPostShapeIsCircle != value) { snowPostShapeIsCircle = value; OnResourceChanged(this, new EventArgs()); } }
+            set { if (version < 0x0000000a) throw new InvalidOperationException(); if (snowPostShapeIsCircle != value) { snowPostShapeIsCircle = value; OnResourceChanged(this, EventArgs.Empty); } }
         }
         [ElementPriority(28)]
         public float SnowThicknessPostScaleFactor
         {
             get { if (version < 0x0000000a) throw new InvalidOperationException(); return snowThicknessPostScaleFactor; }
-            set { if (version < 0x0000000a) throw new InvalidOperationException(); if (snowThicknessPostScaleFactor != value) { snowThicknessPostScaleFactor = value; OnResourceChanged(this, new EventArgs()); } }
+            set { if (version < 0x0000000a) throw new InvalidOperationException(); if (snowThicknessPostScaleFactor != value) { snowThicknessPostScaleFactor = value; OnResourceChanged(this, EventArgs.Empty); } }
         }
         [ElementPriority(29)]
         public float SnowThicknessRailScaleFactor
         {
             get { if (version < 0x0000000a) throw new InvalidOperationException(); return snowThicknessRailScaleFactor; }
-            set { if (version < 0x0000000a) throw new InvalidOperationException(); if (snowThicknessRailScaleFactor != value) { snowThicknessRailScaleFactor = value; OnResourceChanged(this, new EventArgs()); } }
+            set { if (version < 0x0000000a) throw new InvalidOperationException(); if (snowThicknessRailScaleFactor != value) { snowThicknessRailScaleFactor = value; OnResourceChanged(this, EventArgs.Empty); } }
         }
         [ElementPriority(30)]
         public float SnowThicknessPostVerticalOffset
         {
             get { if (version < 0x0000000a) throw new InvalidOperationException(); return snowThicknessPostVerticalOffset; }
-            set { if (version < 0x0000000a) throw new InvalidOperationException(); if (snowThicknessPostVerticalOffset != value) { snowThicknessPostVerticalOffset = value; OnResourceChanged(this, new EventArgs()); } }
+            set { if (version < 0x0000000a) throw new InvalidOperationException(); if (snowThicknessPostVerticalOffset != value) { snowThicknessPostVerticalOffset = value; OnResourceChanged(this, EventArgs.Empty); } }
         }
         [ElementPriority(31)]
         public float SnowThicknessRailVerticalOffset
         {
             get { if (version < 0x0000000a) throw new InvalidOperationException(); return snowThicknessRailVerticalOffset; }
-            set { if (version < 0x0000000a) throw new InvalidOperationException(); if (snowThicknessRailVerticalOffset != value) { snowThicknessRailVerticalOffset = value; OnResourceChanged(this, new EventArgs()); } }
+            set { if (version < 0x0000000a) throw new InvalidOperationException(); if (snowThicknessRailVerticalOffset != value) { snowThicknessRailVerticalOffset = value; OnResourceChanged(this, EventArgs.Empty); } }
         }
         [ElementPriority(32)]
         public bool HasWall
         {
             get { if (version < 0x0000000a) throw new InvalidOperationException(); return hasWall; }
-            set { if (version < 0x0000000a) throw new InvalidOperationException(); if (hasWall != value) { hasWall = value; OnResourceChanged(this, new EventArgs()); } }
+            set { if (version < 0x0000000a) throw new InvalidOperationException(); if (hasWall != value) { hasWall = value; OnResourceChanged(this, EventArgs.Empty); } }
         }
         [ElementPriority(33)]
         public bool RisesAboveWall
         {
             get { if (version < 0x00000008 || (version >= 0x0000000a && !hasWall)) throw new InvalidOperationException(); return risesAboveWall; }
-            set { if (version < 0x00000008 || (version >= 0x0000000a && !hasWall)) throw new InvalidOperationException(); if (risesAboveWall != value) { risesAboveWall = value; OnResourceChanged(this, new EventArgs()); } }
+            set { if (version < 0x00000008 || (version >= 0x0000000a && !hasWall)) throw new InvalidOperationException(); if (risesAboveWall != value) { risesAboveWall = value; OnResourceChanged(this, EventArgs.Empty); } }
         }
         [ElementPriority(34), TGIBlockListContentField("TGIBlocks")]
         public uint WallIndex
         {
             get { if (version < 0x00000008 || (version >= 0x0000000a && !hasWall)) throw new InvalidOperationException(); return wallIndex; }
-            set { if (version < 0x00000008 || (version >= 0x0000000a && !hasWall)) throw new InvalidOperationException(); if (wallIndex != value) { wallIndex = value; OnResourceChanged(this, new EventArgs()); } }
+            set { if (version < 0x00000008 || (version >= 0x0000000a && !hasWall)) throw new InvalidOperationException(); if (wallIndex != value) { wallIndex = value; OnResourceChanged(this, EventArgs.Empty); } }
         }
 
         //--insert TGIBlockList: no ElementPriority

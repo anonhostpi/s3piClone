@@ -48,7 +48,6 @@ namespace meshExpImp.ModelBlocks
                 set { if (mCommand != value) { if(mCommand!=value){mCommand = value; OnElementChanged();} } }
             }
 
-            //public override AHandlerElement Clone(EventHandler handler) { return new SwizzleEntry(0, handler, this); }
             private SwizzleCmd mCommand;
             private void Parse(Stream s)
             {
@@ -110,7 +109,6 @@ namespace meshExpImp.ModelBlocks
                     ((IList<SwizzleEntry>)this).Add(CreateElement(s));
                 }
             }
-            //public override void Add() { base.Add(new SwizzleEntry(0, null)); }
             protected override void WriteCount(Stream s, int count) { }
             protected override SwizzleEntry CreateElement(Stream s)
             {
@@ -127,7 +125,6 @@ namespace meshExpImp.ModelBlocks
             public SegmentList(EventHandler handler) : base(handler) { }
             public SegmentList(EventHandler handler, Stream s) : base(handler, s) { }
             public SegmentList(EventHandler handler, IEnumerable<SegmentInfo> ilt) : base(handler, ilt) { }
-            //public override void Add() { base.Add(new SegmentInfo(0, null)); }
             protected override SegmentInfo CreateElement(Stream s)
             {
                 return new SegmentInfo(0, handler, s);
@@ -231,28 +228,7 @@ namespace meshExpImp.ModelBlocks
                 set { if (mSwizzles != value) { mSwizzles = value == null ? null : new SwizzleList(handler, value); OnElementChanged(); } }
             }
 
-            public string Value
-            {
-                get
-                {
-                    return ValueBuilder;
-                    /*
-                    var sb = new StringBuilder();
-                    sb.AppendFormat("VertexSize:\t{0}\n", mVertexSize);
-                    sb.AppendFormat("VertexCount:\t{0}\n", mVertexCount);
-                    sb.AppendFormat("ByteOffset:\t{0}\n", mByteOffset);
-                    if (mSwizzles.Count > 0)
-                    {
-                        sb.AppendLine("Swizzles:");
-                        for (int i = 0; i < mSwizzles.Count; i++)
-                        {
-                            sb.AppendFormat("[{0}]:{1}\n", i, mSwizzles[i]["Command"]);
-                        }
-                    }
-                    return sb.ToString();
-                    /**/
-                }
-            }
+            public string Value { get { return ValueBuilder; } }
             private void Parse(Stream s)
             {
                 BinaryReader br = new BinaryReader(s);
@@ -271,7 +247,6 @@ namespace meshExpImp.ModelBlocks
                 mSwizzles.UnParse(s);
 
             }
-            //public override AHandlerElement Clone(EventHandler handler) { return new SegmentInfo(0, handler, this); }
 
             public override List<string> ContentFields
             {
@@ -319,28 +294,10 @@ namespace meshExpImp.ModelBlocks
         public SegmentList Segments
         {
             get { return mSegments; }
-            set { if (mSegments != value) { mSegments = value; OnRCOLChanged(this, new EventArgs()); } }
+            set { if (mSegments != value) { mSegments = value; OnRCOLChanged(this, EventArgs.Empty); } }
         }
 
-        public string Value
-        {
-            get
-            {
-                return ValueBuilder;
-                /*
-                StringBuilder sb = new StringBuilder();
-                if (mSegments.Count > 0)
-                {
-                    sb.AppendFormat("Segments:\n");
-                    for (int i = 0; i < mSegments.Count; i++)
-                    {
-                        sb.AppendFormat("==SegmentInfo[{0}]==\n{1}\n", i, mSegments[i].Value);
-                    }
-                }
-                return sb.ToString();
-                /**/
-            }
-        }
+        public string Value { get { return ValueBuilder; } }
         public static VBSI FromMLOD(MLOD mlod, GenericRCOLResource container)
         {
             var vbsi = new VBSI(0, null);
@@ -364,7 +321,6 @@ namespace meshExpImp.ModelBlocks
             mSegments.UnParse(s);
             return s;
         }
-        //public override AHandlerElement Clone(EventHandler handler) { return new VBSI(0, handler, this); }
 
         public override string Tag
         {

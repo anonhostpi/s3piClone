@@ -56,7 +56,7 @@ namespace CASPartResource
         TGIBlockList tgiBlocks;
         #endregion
 
-        public FaceClothingResource(int APIversion, Stream s) : base(APIversion, s) { if (stream == null) { stream = UnParse(); OnResourceChanged(this, new EventArgs()); } stream.Position = 0; Parse(stream); }
+        public FaceClothingResource(int APIversion, Stream s) : base(APIversion, s) { if (stream == null) { stream = UnParse(); OnResourceChanged(this, EventArgs.Empty); } stream.Position = 0; Parse(stream); }
 
         #region Data I/O
         void Parse(Stream s)
@@ -175,7 +175,6 @@ namespace CASPartResource
 
             #region AHandlerElement Members
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
-            //public override AHandlerElement Clone(EventHandler handler) { return new Entry(requestedApiVersion, handler, this); }
             #endregion
 
             #region IEquatable<Entry> Members
@@ -313,7 +312,6 @@ namespace CASPartResource
 
             #region AHandlerElement Members
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
-            //public override AHandlerElement Clone(EventHandler handler) { return new CASEntry(requestedApiVersion, handler, this); }
             public override List<string> ContentFields
             {
                 get
@@ -392,52 +390,23 @@ namespace CASPartResource
 
         #region Content Fields
         [ElementPriority(1)]
-        public uint Version { get { return version; } set { if (version != value) { version = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint Version { get { return version; } set { if (version != value) { version = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(2)]
-        public string PartName { get { return partName; } set { if (partName != value) { partName = value; OnResourceChanged(this, new EventArgs()); } } }
+        public string PartName { get { return partName; } set { if (partName != value) { partName = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(3)]
-        public uint Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(4)]
         public TGIBlock BlendGeometry
         {
             get { if (version < 8) throw new InvalidOperationException(); return blendGeometry; }
-            set { if (version < 8) throw new InvalidOperationException(); if (!blendGeometry.Equals(value)) { blendGeometry = new TGIBlock(requestedApiVersion, OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } }
+            set { if (version < 8) throw new InvalidOperationException(); if (!blendGeometry.Equals(value)) { blendGeometry = new TGIBlock(requestedApiVersion, OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } }
         }
         [ElementPriority(5)]
-        public CASEntryList CASEntries { get { return casEntries; } set { if (!casEntries.Equals(value)) { casEntries = value == null ? null : new CASEntryList(OnResourceChanged, value, tgiBlocks); OnResourceChanged(this, new EventArgs()); } } }
+        public CASEntryList CASEntries { get { return casEntries; } set { if (!casEntries.Equals(value)) { casEntries = value == null ? null : new CASEntryList(OnResourceChanged, value, tgiBlocks); OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(6)]
-        public TGIBlockList TGIBlocks { get { return tgiBlocks; } set { if (!tgiBlocks.Equals(value)) { tgiBlocks = value == null ? null : new TGIBlockList(OnResourceChanged, value, true); casEntries.ParentTGIBlocks = tgiBlocks; OnResourceChanged(this, new EventArgs()); } } }
+        public TGIBlockList TGIBlocks { get { return tgiBlocks; } set { if (!tgiBlocks.Equals(value)) { tgiBlocks = value == null ? null : new TGIBlockList(OnResourceChanged, value, true); casEntries.ParentTGIBlocks = tgiBlocks; OnResourceChanged(this, EventArgs.Empty); } } }
 
-        public string Value
-        {
-            get
-            {
-                return ValueBuilder;
-                /*
-                string s = "";
-                string fmt = "";
-
-                s += "Version: " + this["Version"];
-                s += "\nPartName: " + this["PartName"];
-                s += "\nUnknown1: " + this["Unknown1"];
-                s += "\nBlendGeometry: " + this["BlendGeometry"];
-
-                s += "\nCAS Entries:";
-                fmt = "\n--[{0:X" + casEntries.Count.ToString("X").Length + "}]--{1}";
-                for (int i = 0; i < casEntries.Count; i++)
-                    s += String.Format(fmt, i, casEntries[i].Value);
-                s += "\n----";
-
-                s += "\n--\nTGI Blocks:";
-                fmt = "\n  [{0:X" + tgiBlocks.Count.ToString("X").Length + "}]: {1}";
-                for (int i = 0; i < tgiBlocks.Count; i++)
-                    s += String.Format(fmt, i, tgiBlocks[i]);
-                s += "\n----";
-
-                return s;
-                /**/
-            }
-        }
+        public string Value { get { return ValueBuilder; } }
         #endregion
     }
 

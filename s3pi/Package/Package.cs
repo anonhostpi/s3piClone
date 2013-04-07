@@ -84,7 +84,7 @@ namespace s3pi.Package
 
             bool wasnull = index == null;
             index = null;
-            if (!wasnull) OnResourceIndexInvalidated(this, new EventArgs());
+            if (!wasnull) OnResourceIndexInvalidated(this, EventArgs.Empty);
         }
 
         /// <summary>
@@ -562,7 +562,7 @@ namespace s3pi.Package
                 if (index == null)
                 {
                     index = new PackageIndex(packageStream, Indexposition, Indexsize, Indexcount);
-                    OnResourceIndexInvalidated(this, new EventArgs());
+                    OnResourceIndexInvalidated(this, EventArgs.Empty);
                 }
                 return index;
             }

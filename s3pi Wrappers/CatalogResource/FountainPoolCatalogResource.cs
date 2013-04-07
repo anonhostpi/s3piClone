@@ -136,21 +136,21 @@ namespace CatalogResource
         //--insert Version: ElementPriority(1)
         //--insert CommonBlock: ElementPriority(11)
         [ElementPriority(21), TGIBlockListContentField("TGIBlocks")]
-        public ShapeType Shape { get { return shape; } set { if (shape != value) { shape = value; OnResourceChanged(this, new EventArgs()); } } }
+        public ShapeType Shape { get { return shape; } set { if (shape != value) { shape = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(22), TGIBlockListContentField("TGIBlocks")]
-        public uint CWSTIndex { get { return cwstIndex; } set { if (cwstIndex != value) { cwstIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint CWSTIndex { get { return cwstIndex; } set { if (cwstIndex != value) { cwstIndex = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(23), TGIBlockListContentField("TGIBlocks")]
-        public uint CWALFloorIndex { get { return cwalFloorIndex; } set { if (cwalFloorIndex != value) { cwalFloorIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint CWALFloorIndex { get { return cwalFloorIndex; } set { if (cwalFloorIndex != value) { cwalFloorIndex = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(24), TGIBlockListContentField("TGIBlocks")]
-        public uint CWALWallIndex { get { return cwalWallIndex; } set { if (cwalWallIndex != value) { cwalWallIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint CWALWallIndex { get { return cwalWallIndex; } set { if (cwalWallIndex != value) { cwalWallIndex = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(25), TGIBlockListContentField("TGIBlocks")]
-        public uint CFNDIndex { get { return cfndIndex; } set { if (cfndIndex != value) { cfndIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint CFNDIndex { get { return cfndIndex; } set { if (cfndIndex != value) { cfndIndex = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(26), TGIBlockListContentField("TGIBlocks")]
-        public uint GroundCutoutDDSIndex { get { return groundCutoutDDSIndex; } set { if (groundCutoutDDSIndex != value) { groundCutoutDDSIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint GroundCutoutDDSIndex { get { return groundCutoutDDSIndex; } set { if (groundCutoutDDSIndex != value) { groundCutoutDDSIndex = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(27)]
-        public uint XScale { get { return xScale; } set { if (xScale != value) { xScale = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint XScale { get { return xScale; } set { if (xScale != value) { xScale = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(28)]
-        public uint YScale { get { return yScale; } set { if (yScale != value) { yScale = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint YScale { get { return yScale; } set { if (yScale != value) { yScale = value; OnResourceChanged(this, EventArgs.Empty); } } }
         //--insert TGIBlockList: no ElementPriority
         #endregion
     }

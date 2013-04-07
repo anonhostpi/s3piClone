@@ -37,7 +37,7 @@ namespace CASPartResource
         BoneList bones;
         #endregion
 
-        public BoneResource(int APIversion, Stream s) : base(APIversion, s) { if (stream == null) { stream = UnParse(); OnResourceChanged(this, new EventArgs()); } stream.Position = 0; Parse(stream); }
+        public BoneResource(int APIversion, Stream s) : base(APIversion, s) { if (stream == null) { stream = UnParse(); OnResourceChanged(this, EventArgs.Empty); } stream.Position = 0; Parse(stream); }
 
         #region Data I/O
         private void Parse(Stream s)
@@ -313,9 +313,9 @@ namespace CASPartResource
 
         #region Content Fields
         [ElementPriority(1)]
-        public uint Version { get { return version; } set { if (!version.Equals(value)) { version = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint Version { get { return version; } set { if (!version.Equals(value)) { version = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(2)]
-        public BoneList Bones { get { return bones; } set { if (!bones.Equals(value)) { bones = new BoneList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public BoneList Bones { get { return bones; } set { if (!bones.Equals(value)) { bones = new BoneList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
 
         public string Value { get { return ValueBuilder; } }
         #endregion

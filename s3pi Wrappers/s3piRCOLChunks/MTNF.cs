@@ -89,7 +89,6 @@ namespace s3pi.GenericRCOLResource
         #endregion
 
         #region AHandlerElement Members
-        //public override AHandlerElement Clone(EventHandler handler) { return new MTNF(requestedApiVersion, handler, this); }
         public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
         public override List<string> ContentFields
         {

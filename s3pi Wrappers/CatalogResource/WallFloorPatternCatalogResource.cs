@@ -200,10 +200,6 @@ namespace CatalogResource
 
             #endregion
 
-            #region AHandlerElement
-            //public override AHandlerElement Clone(EventHandler handler) { return new WallFloorPatternMaterial(requestedApiVersion, handler, this); }
-            #endregion
-
             #region Content Fields
             public uint Unknown4 { get { return unknown4; } set { if (unknown4 != value) { unknown4 = value; OnElementChanged(); } } }
             public uint Unknown5 { get { return unknown5; } set { if (unknown5 != value) { unknown5 = value; OnElementChanged(); } } }
@@ -222,12 +218,6 @@ namespace CatalogResource
             #region Data I/O
             protected override WallFloorPatternMaterial CreateElement(Stream s) { return new WallFloorPatternMaterial(0, elementHandler, s); }
             protected override void WriteElement(Stream s, WallFloorPatternMaterial element) { element.UnParse(s); }
-            #endregion
-
-            //public override void Add() { this.Add(new WallFloorPatternMaterial(0, null)); }
-
-            #region Content Fields
-            //public String Value { get { string s = ""; for (int i = 0; i < Count; i++) s += string.Format("\n--{0}--\n", i) + this[i].Value; return s; } }
             #endregion
         }
 
@@ -314,20 +304,20 @@ namespace CatalogResource
         #region Content Fields
         //--insert Version: ElementPriority(1)
         [ElementPriority(12)]
-        public WallFloorPatternMaterialList Materials { get { return materialList; } set { if (materialList != value) { materialList = value == null ? null : new WallFloorPatternMaterialList(OnResourceChanged, value); } OnResourceChanged(this, new EventArgs()); } }
+        public WallFloorPatternMaterialList Materials { get { return materialList; } set { if (materialList != value) { materialList = value == null ? null : new WallFloorPatternMaterialList(OnResourceChanged, value); } OnResourceChanged(this, EventArgs.Empty); } }
         //--insert CommonBlock: ElementPriority(11)
         [ElementPriority(21)]
-        public Pattern PatternType { get { return patternType; } set { if (patternType != value) { patternType = value; OnResourceChanged(this, new EventArgs()); } } }
+        public Pattern PatternType { get { return patternType; } set { if (patternType != value) { patternType = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(22), TGIBlockListContentField("TGIBlocks")]
-        public uint MaterialVPXYIndex { get { return materialVPXYIndex; } set { if (materialVPXYIndex != value) { materialVPXYIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint MaterialVPXYIndex { get { return materialVPXYIndex; } set { if (materialVPXYIndex != value) { materialVPXYIndex = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(23)]
-        public SortFlagsType SortFlags { get { return sortFlags; } set { if (sortFlags != value) { sortFlags = value; OnResourceChanged(this, new EventArgs()); } } }
+        public SortFlagsType SortFlags { get { return sortFlags; } set { if (sortFlags != value) { sortFlags = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(24)]
-        public string Unknown10 { get { return surfaceType; } set { if (surfaceType != value) { surfaceType = value; OnResourceChanged(this, new EventArgs()); } } }
+        public string Unknown10 { get { return surfaceType; } set { if (surfaceType != value) { surfaceType = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(25)]
-        public Terrain TerrainType { get { return terrainType; } set { if (terrainType != value) { terrainType = value; OnResourceChanged(this, new EventArgs()); } } }
+        public Terrain TerrainType { get { return terrainType; } set { if (terrainType != value) { terrainType = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(26)]
-        public uint ARGB { get { return argb; } set { if (argb != value) { argb = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint ARGB { get { return argb; } set { if (argb != value) { argb = value; OnResourceChanged(this, EventArgs.Empty); } } }
         //--insert TGIBlockList: no ElementPriority
         #endregion
     }

@@ -64,7 +64,7 @@ namespace s3pi.GenericRCOLResource
         /// </summary>
         /// <param name="APIversion">Unused; requested API version.</param>
         /// <param name="s">The <see cref="Stream"/> to read the resource in from.</param>
-        public GenericRCOLResource(int APIversion, Stream s) : base(APIversion, s) { if (stream == null) { stream = UnParse(); OnResourceChanged(this, new EventArgs()); } stream.Position = 0; Parse(stream); }
+        public GenericRCOLResource(int APIversion, Stream s) : base(APIversion, s) { if (stream == null) { stream = UnParse(); OnResourceChanged(this, EventArgs.Empty); } stream.Position = 0; Parse(stream); }
         #endregion
 
         #region Data I/O
@@ -197,13 +197,6 @@ namespace s3pi.GenericRCOLResource
             }
 
             #region AHandlerElement Members
-            // /// <summary>
-            // /// Get a copy of the <see cref="ChunkEntry"/> but with a new change <see cref="EventHandler"/>.
-            // /// </summary>
-            // /// <param name="handler">The replacement <see cref="EventHandler"/> delegate.</param>
-            // /// <returns>Return a copy of the <see cref="ChunkEntry"/> but with a new change <see cref="EventHandler"/>.</returns>
-            // public override AHandlerElement Clone(EventHandler handler) { return new ChunkEntry(requestedApiVersion, handler, this); }
-
             /// <summary>
             /// Return the version number that this class prefers to be called with (the default if passed zero).
             /// </summary>
@@ -453,13 +446,6 @@ namespace s3pi.GenericRCOLResource
             #endregion
 
             #region AHandlerElement Members
-            // /// <summary>
-            // /// Return a new instance with the same value as the current instance but with the given change <see cref="EventHandler"/>.
-            // /// </summary>
-            // /// <param name="handler">The change <see cref="EventHandler"/>.</param>
-            // /// <returns>A new instance with the same value as the current instance but with the given change <see cref="EventHandler"/>.</returns>
-            // public override AHandlerElement Clone(EventHandler handler) { return new ChunkReference(requestedApiVersion, handler, this); }
-
             /// <summary>
             /// Return the version number that this wrapper prefers to be called with (the default if passed zero).
             /// </summary>

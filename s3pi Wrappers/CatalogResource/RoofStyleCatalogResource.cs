@@ -147,15 +147,15 @@ namespace CatalogResource
         //--insert Version: ElementPriority(1)
         //--insert CommonBlock: ElementPriority(11)
         [ElementPriority(27)]
-        public Roof RoofType { get { return roofType; } set { if (roofType != value) { roofType = value; OnResourceChanged(this, new EventArgs()); } } }
+        public Roof RoofType { get { return roofType; } set { if (roofType != value) { roofType = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(28), TGIBlockListContentField("TGIBlocks")]
-        public uint CatalogRoofPattern { get { return catalogRoofPattern; } set { if (catalogRoofPattern != value) { catalogRoofPattern = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint CatalogRoofPattern { get { return catalogRoofPattern; } set { if (catalogRoofPattern != value) { catalogRoofPattern = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(29), TGIBlockListContentField("TGIBlocks")]
-        public uint CatalogWallStyle { get { return catalogWallStyle; } set { if (catalogWallStyle != value) { catalogWallStyle = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint CatalogWallStyle { get { return catalogWallStyle; } set { if (catalogWallStyle != value) { catalogWallStyle = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(30)]
-        public float DefaultSlope { get { return defaultSlope; } set { if (defaultSlope != value) { defaultSlope = value; OnResourceChanged(this, new EventArgs()); } } }
+        public float DefaultSlope { get { return defaultSlope; } set { if (defaultSlope != value) { defaultSlope = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(31)]
-        public RoofStyle RoofStyleFlags { get { return roofStyleFlags; } set { if (roofStyleFlags != value) { roofStyleFlags = value; OnResourceChanged(this, new EventArgs()); } } }
+        public RoofStyle RoofStyleFlags { get { return roofStyleFlags; } set { if (roofStyleFlags != value) { roofStyleFlags = value; OnResourceChanged(this, EventArgs.Empty); } } }
         //--insert TGIBlockList: no ElementPriority
         #endregion
     }

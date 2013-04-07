@@ -154,29 +154,15 @@ namespace meshExpImp.ModelBlocks
         }
 
         [ElementPriority(1)]
-        public UInt32 Version { get { return mVersion; } set { if (mVersion != value) { mVersion = value; OnRCOLChanged(this, new EventArgs()); } } }
+        public UInt32 Version { get { return mVersion; } set { if (mVersion != value) { mVersion = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(2)]
-        public FormatFlags Flags { get { return mFlags; } set { if (mFlags != value) { mFlags = value; OnRCOLChanged(this, new EventArgs()); } } }
+        public FormatFlags Flags { get { return mFlags; } set { if (mFlags != value) { mFlags = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(3)]
-        public UInt32 DisplayListUsage { get { return mDisplayListUsage; } set { if (mDisplayListUsage != value) { mDisplayListUsage = value; OnRCOLChanged(this, new EventArgs()); } } }
+        public UInt32 DisplayListUsage { get { return mDisplayListUsage; } set { if (mDisplayListUsage != value) { mDisplayListUsage = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(4)]
-        public Int32[] Buffer { get { return mBuffer; } set { if (mBuffer != value) { mBuffer = value; OnRCOLChanged(this, new EventArgs()); } } }
+        public Int32[] Buffer { get { return mBuffer; } set { if (mBuffer != value) { mBuffer = value; OnRCOLChanged(this, EventArgs.Empty); } } }
 
-        public string Value
-        {
-            get
-            {
-                return ValueBuilder;
-                /*
-                StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("Version:\t0x{0:X8}\n", mVersion);
-                sb.AppendFormat("Flags:\t{0}\n", this["Flags"]);
-                sb.AppendFormat("DisplayListUsage:\t0x{0:X8}\n", mDisplayListUsage);
-                sb.AppendFormat("Buffer[{0}]\n", mBuffer.Length);
-                return sb.ToString();
-                /**/
-            }
-        }
+        public string Value { get { return ValueBuilder; } }
         protected override List<string> ValueBuilderFields
         {
             get
@@ -186,7 +172,6 @@ namespace meshExpImp.ModelBlocks
                 return fields;
             }
         }
-        //public override AHandlerElement Clone(EventHandler handler) { return new IBUF(0, handler, this); }
 
         protected override void Parse(Stream s)
         {

@@ -41,7 +41,7 @@ namespace CatalogResource
         #endregion
 
         #region Constructors
-        protected CatalogResource(int APIversion, Stream s) : base(APIversion, s) { if (stream == null) { stream = this.UnParse(); OnResourceChanged(this, new EventArgs()); } stream.Position = 0; this.Parse(stream); }
+        protected CatalogResource(int APIversion, Stream s) : base(APIversion, s) { if (stream == null) { stream = this.UnParse(); OnResourceChanged(this, EventArgs.Empty); } stream.Position = 0; this.Parse(stream); }
         protected CatalogResource(int APIversion, uint version, Common common) : base(APIversion, null) { this.version = version; this.common = new Common(requestedApiVersion, OnResourceChanged, common); }
         #endregion
 
@@ -282,7 +282,6 @@ namespace CatalogResource
                 }
             }
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
-            //public override AHandlerElement Clone(EventHandler handler) { return new Common(requestedApiVersion, handler, this); }
             #endregion
 
             #region Sub-classes
@@ -433,21 +432,13 @@ namespace CatalogResource
 
             #region ContentFields
             [ElementPriority(0)]
-            public string VariableName { get { return variableName; } set { if (variableName != value) { variableName = value; handler(this, new EventArgs()); } } }
+            public string VariableName { get { return variableName; } set { if (variableName != value) { variableName = value; handler(this, EventArgs.Empty); } } }
 
             public virtual String Value
             {
                 get
                 {
                     return string.Join("; ", ValueBuilder.Split('\n')).Replace("VariableName: ", "");
-                    /*string s = "<value key=\"" + variableName + "\" value=\"";
-                    foreach (string f in this.ContentFields)
-                    {
-                        if (f.Equals("Value")) continue;
-                        if (f.Equals("VariableName")) continue;
-                        s += String.Format("{0},", this[f]);
-                    }
-                    return s.TrimEnd(',') + "\" />";/**/
                 }
             }
             #endregion
@@ -488,8 +479,6 @@ namespace CatalogResource
                 return tc.variableName.GetHashCode() ^ tc.stringValue.GetHashCode();
             }
 
-            //public override AHandlerElement Clone(EventHandler handler) { return new TC01_String(requestedApiVersion, handler, this); }
-
             public string Data { get { return stringValue; } set { if (stringValue != value) stringValue = value; OnElementChanged(); } }
         }
 
@@ -527,8 +516,6 @@ namespace CatalogResource
                 if (tc == null) return base.GetHashCode(obj);
                 return tc.variableName.GetHashCode() ^ tc.argb.GetHashCode();
             }
-
-            //public override AHandlerElement Clone(EventHandler handler) { return new TC02_ARGB(requestedApiVersion, handler, this); }
 
             [ElementPriority(1)]
             public UInt32 ARGB { get { return argb; } set { if (argb != value) { argb = value; OnElementChanged(); } } }
@@ -574,8 +561,6 @@ namespace CatalogResource
                 return tc.variableName.GetHashCode() ^ tc.tgiIndex.GetHashCode();
             }
 
-            //public override AHandlerElement Clone(EventHandler handler) { return new TC03_TGIIndex(requestedApiVersion, handler, this); }
-
             [TGIBlockListContentField("ParentTGIBlocks")]
             public byte TGIIndex { get { return tgiIndex; } set { if (tgiIndex != value) { tgiIndex = value; OnElementChanged(); } } }
         }
@@ -614,8 +599,6 @@ namespace CatalogResource
                 if (tc == null) return base.GetHashCode(obj);
                 return tc.variableName.GetHashCode() ^ tc.unknown1.GetHashCode();
             }
-
-            //public override AHandlerElement Clone(EventHandler handler) { return new TC04_Single(requestedApiVersion, handler, this); }
 
             public float Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnElementChanged(); } } }
         }
@@ -669,8 +652,6 @@ namespace CatalogResource
                 if (tc == null) return base.GetHashCode(obj);
                 return tc.variableName.GetHashCode() ^ tc.unknown1.GetHashCode() ^ tc.unknown2.GetHashCode();
             }
-
-            //public override AHandlerElement Clone(EventHandler handler) { return new TC05_XY(requestedApiVersion, handler, this); }
 
             public float Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnElementChanged(); } } }
             public float Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnElementChanged(); } } }
@@ -731,8 +712,6 @@ namespace CatalogResource
                 return tc.variableName.GetHashCode() ^ tc.unknown1.GetHashCode() ^ tc.unknown2.GetHashCode() ^ tc.unknown3.GetHashCode();
             }
 
-            //public override AHandlerElement Clone(EventHandler handler) { return new TC06_XYZ(requestedApiVersion, handler, this); }
-
             public float Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnElementChanged(); } } }
             public float Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnElementChanged(); } } }
             public float Unknown3 { get { return unknown3; } set { if (unknown3 != value) { unknown3 = value; OnElementChanged(); } } }
@@ -777,8 +756,6 @@ namespace CatalogResource
                 return tc.variableName.GetHashCode() ^ tc.unknown1.GetHashCode();
             }
 
-            //public override AHandlerElement Clone(EventHandler handler) { return new TC07_Boolean(requestedApiVersion, handler, this); }
-
             public bool Unknown1 { get { return unknown1 != 0; } set { if (Unknown1 != value) { unknown1 = (byte)(value ? 0x01 : 0x00); OnElementChanged(); } } }
         }
 
@@ -790,7 +767,6 @@ namespace CatalogResource
                 get { return _ParentTGIBlocks; }
                 set { if (_ParentTGIBlocks != value) { _ParentTGIBlocks = value; foreach (TC03_TGIIndex i in this.FindAll(e => e is TC03_TGIIndex)) i.ParentTGIBlocks = _ParentTGIBlocks; } }
             }
-            //public override List<string> ContentFields { get { List<string> res = GetContentFields(0, this.GetType()); res.Remove("ParentTGIBlocks"); return res; } }
 
             #region Constructors
             public ComplateList(EventHandler handler, DependentList<TGIBlock> ParentTGIBlocks = null)
@@ -811,7 +787,6 @@ namespace CatalogResource
             protected override void WriteElement(Stream s, ComplateElement element) { element.UnParse(s); }
             #endregion
 
-            //public override void Add() { throw new NotImplementedException(); }
             public override void Add(ComplateElement item)
             {
                 if (item is TC03_TGIIndex) (item as TC03_TGIIndex).ParentTGIBlocks = _ParentTGIBlocks;
@@ -963,8 +938,6 @@ namespace CatalogResource
 
             #region AHandlerElement
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
-
-            //public override AHandlerElement Clone(EventHandler handler) { return new MaterialBlock(requestedApiVersion, handler, this); }
             #endregion
 
             #region Content Fields
@@ -979,27 +952,7 @@ namespace CatalogResource
             [ElementPriority(5)]
             public MaterialBlockList MaterialBlocks { get { return mbList; } set { if (mbList != value) { mbList = value == null ? null : new MaterialBlockList(handler, value, _ParentTGIBlocks); OnElementChanged(); } } }
 
-            public String Value
-            {
-                get
-                {
-                    return ValueBuilder;
-                    /*System.Text.StringBuilder sb = new StringBuilder();
-                    string xmlType = mbList.Count > 0 ? "complate" : "pattern";
-                    sb.AppendFormat("<{0} Name=\"{1}\" ComplateXMLIndex=\"0x{2}\"", xmlType, name, complateXMLIndex.ToString("X2"));
-                    if (mbList.Count == 0) sb.Append(" variable=\"" + pattern + "\"");
-                    sb.AppendLine(">");
-
-                    for (int i = 0; i < complateList.Count; i++)
-                        sb.AppendLine("  " + complateList[i].Value);
-
-                    for (int i = 0; i < mbList.Count; i++)
-                        sb.AppendLine("  " + mbList[i].Value.Replace("\n", "\n  "));
-
-                    sb.AppendFormat("</{0}>", xmlType);
-                    return sb.ToString();/**/
-                }
-            }
+            public String Value { get { return ValueBuilder; } }
             #endregion
         }
 
@@ -1011,7 +964,6 @@ namespace CatalogResource
                 get { return _ParentTGIBlocks; }
                 set { if (_ParentTGIBlocks != value) { _ParentTGIBlocks = value; foreach (var i in this) i.ParentTGIBlocks = _ParentTGIBlocks; } }
             }
-            //public override List<string> ContentFields { get { List<string> res = GetContentFields(0, this.GetType()); res.Remove("ParentTGIBlocks"); return res; } }
 
             #region Constructors
             public MaterialBlockList(EventHandler handler, DependentList<TGIBlock> ParentTGIBlocks = null)
@@ -1167,8 +1119,6 @@ namespace CatalogResource
             public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
 
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
-
-            //public override AHandlerElement Clone(EventHandler handler) { return new Material(requestedApiVersion, handler, this); }
             #endregion
 
             #region Content Fields
@@ -1205,8 +1155,6 @@ namespace CatalogResource
             protected override Material CreateElement(Stream s) { return new Material(0, elementHandler, s); }
             protected override void WriteElement(Stream s, Material element) { element.UnParse(s); }
             #endregion
-
-            //public override void Add() { this.Add(new Material(0, null)); }
         }
 
         static class ComplateString
@@ -1422,9 +1370,9 @@ namespace CatalogResource
 
         #region Content Fields
         [ElementPriority(1)]
-        public uint Version { get { return version; } set { if (version != value) { version = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint Version { get { return version; } set { if (version != value) { version = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(11)]
-        public Common CommonBlock { get { return common; } set { if (common != value) { common = new Common(requestedApiVersion, OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public Common CommonBlock { get { return common; } set { if (common != value) { common = new Common(requestedApiVersion, OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
 
         public virtual String Value { get { return ValueBuilder; } }
         #endregion

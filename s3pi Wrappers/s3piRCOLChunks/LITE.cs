@@ -92,8 +92,6 @@ namespace s3pi.GenericRCOLResource
 
             return ms;
         }
-
-        //public override AHandlerElement Clone(EventHandler handler) { return new LITE(requestedApiVersion, handler, this); }
         #endregion
 
         #region Sub-types
@@ -222,8 +220,6 @@ namespace s3pi.GenericRCOLResource
                     return res;
                 }
             }
-
-            //public override AHandlerElement Clone(EventHandler handler) { return new LightSource(requestedApiVersion, handler, this); }
             #endregion
 
             #region IEquatable<LightSource> Members
@@ -280,8 +276,6 @@ namespace s3pi.GenericRCOLResource
                 public RGB(int APIversion, EventHandler handler, RGB basis) : base(APIversion, handler, basis.X, basis.Y, basis.Z) { }
                 public RGB(int APIversion, EventHandler handler, float x, float y, float z) : base(APIversion, handler, x, y, z) { }
                 #endregion
-
-                //public override AHandlerElement Clone(EventHandler handler) { return new RGB(requestedApiVersion, handler, this); }
 
                 public override List<string> ContentFields
                 {
@@ -607,8 +601,6 @@ namespace s3pi.GenericRCOLResource
 
             protected override void WriteElement(Stream s, LightSource element) { element.UnParse(s); }
             #endregion
-
-            //public override void Add() { this.Add(new LightSource(0, null)); }
         }
 
         public class Occluder : AHandlerElement, IEquatable<Occluder>
@@ -674,8 +666,6 @@ namespace s3pi.GenericRCOLResource
             /// The list of available field names on this API object
             /// </summary>
             public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
-
-            //public override AHandlerElement Clone(EventHandler handler) { return new Occluder(requestedApiVersion, handler, this); }
             #endregion
 
             #region IEquatable<Occluder> Members
@@ -753,8 +743,6 @@ namespace s3pi.GenericRCOLResource
 
             protected override void WriteElement(Stream s, Occluder element) { element.UnParse(s); }
             #endregion
-
-            //public override void Add() { this.Add(new Occluder(0, null)); }
         }
         #endregion
 

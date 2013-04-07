@@ -27,7 +27,6 @@ namespace NameMapResource
     /// <summary>
     /// A resource wrapper that understands 0x0166038C resources
     /// </summary>
-    //[ConstructorParameters(new object[] { (ulong)0, "" })]
     public class NameMapResource : AResource, IDictionary<ulong, string>, System.Collections.IDictionary
     {
         static bool checking = s3pi.Settings.Settings.Checking;
@@ -48,7 +47,7 @@ namespace NameMapResource
         /// </summary>
         /// <param name="APIversion">Requested API version</param>
         /// <param name="s">Data stream to use, or null to create from scratch</param>
-        public NameMapResource(int APIversion, Stream s) : base(APIversion, s) { if (stream == null) { stream = UnParse(); OnResourceChanged(this, new EventArgs()); } stream.Position = 0; Parse(stream); }
+        public NameMapResource(int APIversion, Stream s) : base(APIversion, s) { if (stream == null) { stream = UnParse(); OnResourceChanged(this, EventArgs.Empty); } stream.Position = 0; Parse(stream); }
 
         void Parse(Stream s)
         {
@@ -90,7 +89,7 @@ namespace NameMapResource
 
         [MinimumVersion(1)]
         [MaximumVersion(recommendedApiVersion)]
-        public uint Version { get { return version; } set { if (Version == value) return; version = value; OnResourceChanged(this, new EventArgs()); } }
+        public uint Version { get { return version; } set { if (Version == value) return; version = value; OnResourceChanged(this, EventArgs.Empty); } }
 
         public String Value { get { return ValueBuilder; } }
 
@@ -99,7 +98,7 @@ namespace NameMapResource
         public void Add(ulong key, string value)
         {
             data.Add(key, value);
-            OnResourceChanged(this, new EventArgs());
+            OnResourceChanged(this, EventArgs.Empty);
         }
 
         public bool ContainsKey(ulong key) { return data.ContainsKey(key); }
@@ -110,7 +109,7 @@ namespace NameMapResource
         {
             bool res = data.Remove(key);
             if (res)
-                OnResourceChanged(this, new EventArgs());
+                OnResourceChanged(this, EventArgs.Empty);
             return res;
         }
 
@@ -125,7 +124,7 @@ namespace NameMapResource
             {
                 if (data[key] == value) return;
                 data[key] = value;
-                OnResourceChanged(this, new EventArgs());
+                OnResourceChanged(this, EventArgs.Empty);
             }
         }
 
@@ -138,7 +137,7 @@ namespace NameMapResource
         public void Clear()
         {
             data.Clear();
-            OnResourceChanged(this, new EventArgs());
+            OnResourceChanged(this, EventArgs.Empty);
         }
 
         public bool Contains(KeyValuePair<ulong, string> item) { return data.ContainsKey(item.Key) && data[item.Key].Equals(item.Value); }

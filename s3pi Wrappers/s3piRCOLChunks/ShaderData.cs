@@ -390,8 +390,6 @@ namespace s3pi.GenericRCOLResource
         protected override int CountFromType { get { return 1; } }
         #endregion
 
-        //public override AHandlerElement Clone(EventHandler handler) { return new ElementFloat(requestedApiVersion, handler, this); }
-
         #region IEquatable<Entry> Members
 
         public override bool Equals(ShaderData other) { return base.Equals(other) && this.data == ((ElementFloat)other).data; }
@@ -427,8 +425,6 @@ namespace s3pi.GenericRCOLResource
         protected override DataType DataTypeFromType { get { return DataType.dtFloat; } }
         protected override int CountFromType { get { return 2; } }
         #endregion
-
-        //public override AHandlerElement Clone(EventHandler handler) { return new ElementFloat2(requestedApiVersion, handler, this); }
 
         #region IEquatable<Entry> Members
 
@@ -477,8 +473,6 @@ namespace s3pi.GenericRCOLResource
         protected override DataType DataTypeFromType { get { return DataType.dtFloat; } }
         protected override int CountFromType { get { return 3; } }
         #endregion
-
-        //public override AHandlerElement Clone(EventHandler handler) { return new ElementFloat3(requestedApiVersion, handler, this); }
 
         #region IEquatable<Entry> Members
 
@@ -532,8 +526,6 @@ namespace s3pi.GenericRCOLResource
         protected override int CountFromType { get { return 4; } }
         #endregion
 
-        //public override AHandlerElement Clone(EventHandler handler) { return new ElementFloat4(requestedApiVersion, handler, this); }
-
         #region IEquatable<Entry> Members
 
         public override bool Equals(ShaderData other)
@@ -585,8 +577,6 @@ namespace s3pi.GenericRCOLResource
         protected override DataType DataTypeFromType { get { return DataType.dtInt; } }
         protected override int CountFromType { get { return 1; } }
         #endregion
-
-        //public override AHandlerElement Clone(EventHandler handler) { return new ElementInt(requestedApiVersion, handler, this); }
 
         #region IEquatable<Entry> Members
 
@@ -669,8 +659,6 @@ namespace s3pi.GenericRCOLResource
         protected override int CountFromType { get { return 4; } }
         #endregion
 
-        //- try harder... // This appears to be needed because the reflection resolver didn't find the ctor with defaults.
-        //public override AHandlerElement Clone(EventHandler handler) { return new ElementTextureRef(requestedApiVersion, handler, this, _ParentTGIBlocks, _RCOLTag); }
         public override List<string> ContentFields
         {
             get
@@ -746,8 +734,6 @@ namespace s3pi.GenericRCOLResource
         protected override DataType DataTypeFromType { get { return DataType.dtTexture; } }
         protected override int CountFromType { get { return 5; } }
         #endregion
-
-        //public override AHandlerElement Clone(EventHandler handler) { return new ElementTextureKey(requestedApiVersion, handler, this); }
 
         #region IEquatable<Entry> Members
 
@@ -833,7 +819,6 @@ namespace s3pi.GenericRCOLResource
         protected override void WriteElement(Stream s, ShaderData element) { throw new NotImplementedException(); }
         #endregion
 
-        //public override void Add() { throw new NotSupportedException(); }
         public override void Add(ShaderData item)
         {
             if (item is ElementTextureRef) { var element = item as ElementTextureRef; element.ParentTGIBlocks = _ParentTGIBlocks; element.RCOLTag = _RCOLTag; }

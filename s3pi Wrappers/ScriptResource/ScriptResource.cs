@@ -51,7 +51,7 @@ namespace ScriptResource
         /// </summary>
         /// <param name="APIversion">Requested API version</param>
         /// <param name="s">Data stream to use, or null to create from scratch</param>
-        public ScriptResource(int APIversion, Stream s) : base(APIversion, s) { if (stream == null) { stream = UnParse(); OnResourceChanged(this, new EventArgs()); } stream.Position = 0; Parse(stream); }
+        public ScriptResource(int APIversion, Stream s) : base(APIversion, s) { if (stream == null) { stream = UnParse(); OnResourceChanged(this, EventArgs.Empty); } stream.Position = 0; Parse(stream); }
         #endregion
 
         #region Data I/O
@@ -158,11 +158,11 @@ namespace ScriptResource
 
         #region Content Fields
         [ElementPriority(1)]
-        public byte Version { get { return version; } set { if (version != value) { version = value; OnResourceChanged(this, new EventArgs()); } } }
+        public byte Version { get { return version; } set { if (version != value) { version = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(2)]
-        public string GameVersion { get { return gameVersion; } set { if (gameVersion != value) { gameVersion = value; OnResourceChanged(this, new EventArgs()); } } }
+        public string GameVersion { get { return gameVersion; } set { if (gameVersion != value) { gameVersion = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(3)]
-        public uint Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(99)]
         public BinaryReader Assembly
         {
@@ -178,7 +178,7 @@ namespace ScriptResource
                         ms.Write(buffer, 0, read);
                     cleardata = ms.ToArray();
                 }
-                OnResourceChanged(this, new EventArgs());
+                OnResourceChanged(this, EventArgs.Empty);
             }
         }
 

@@ -52,7 +52,7 @@ namespace NGMPHashMapResource
         public NGMPHashMapResource(int APIversion, Stream s)
             : base(APIversion, s)
         {
-            if (stream == null) { stream = UnParse(); OnResourceChanged(this, new EventArgs()); }
+            if (stream == null) { stream = UnParse(); OnResourceChanged(this, EventArgs.Empty); }
             stream.Position = 0;
             Parse(stream);
         }
@@ -108,7 +108,6 @@ namespace NGMPHashMapResource
             }
 
             #region AHandlerElement
-            //public override AHandlerElement Clone(EventHandler handler) { return new NGMPPair(requestedApiVersion, handler, this); }
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
             public override List<string> ContentFields { get { return GetContentFields(0, this.GetType()); } }
             #endregion
@@ -136,16 +135,15 @@ namespace NGMPHashMapResource
             #region DependentList<NGMPPair>
             protected override NGMPPair CreateElement(Stream s) { return new NGMPPair(0, elementHandler, s); }
             protected override void WriteElement(Stream s, NGMPPair element) { element.UnParse(s); }
-            //public override void Add() { Add(new NGMPPair(0, elementHandler)); }
             #endregion
         }
 
         [MinimumVersion(1)]
         [MaximumVersion(recommendedApiVersion)]
         [ElementPriority(1)]
-        public uint Version { get { return version; } set { if (version != value) { version = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint Version { get { return version; } set { if (version != value) { version = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(2)]
-        public NGMPPairList Data { get { return data; } set { if (!data.Equals(value)) { data = value == null ? null : new NGMPPairList(OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } } }
+        public NGMPPairList Data { get { return data; } set { if (!data.Equals(value)) { data = value == null ? null : new NGMPPairList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } } }
 
         public String Value { get { return ValueBuilder; } }
     }

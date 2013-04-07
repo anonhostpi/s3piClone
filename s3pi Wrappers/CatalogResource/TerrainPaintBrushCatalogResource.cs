@@ -177,12 +177,12 @@ namespace CatalogResource
         public TGIBlock BrushTexture
         {
             get { return brushTexture; }
-            set { if (brushTexture != value) { brushTexture = new TGIBlock(requestedApiVersion, OnResourceChanged, value); OnResourceChanged(this, new EventArgs()); } }
+            set { if (brushTexture != value) { brushTexture = new TGIBlock(requestedApiVersion, OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); } }
         }
         [ElementPriority(42)]
-        public TerrainType Terrain { get { if (version < 0x00000004) throw new InvalidOperationException(); return terrain; } set { if (version < 0x00000004) throw new InvalidOperationException(); if (terrain != value) { terrain = value; OnResourceChanged(this, new EventArgs()); } } }
+        public TerrainType Terrain { get { if (version < 0x00000004) throw new InvalidOperationException(); return terrain; } set { if (version < 0x00000004) throw new InvalidOperationException(); if (terrain != value) { terrain = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(43)]
-        public CategoryType Category { get { if (version < 0x00000004) throw new InvalidOperationException(); return category; } set { if (version < 0x00000004) throw new InvalidOperationException(); if (category != value) { category = value; OnResourceChanged(this, new EventArgs()); } } }
+        public CategoryType Category { get { if (version < 0x00000004) throw new InvalidOperationException(); return category; } set { if (version < 0x00000004) throw new InvalidOperationException(); if (category != value) { category = value; OnResourceChanged(this, EventArgs.Empty); } } }
         #endregion
     }
 }

@@ -1304,8 +1304,6 @@ namespace CatalogResource
             public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
 
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
-
-            //public override AHandlerElement Clone(EventHandler handler) { return new TopicRating(requestedApiVersion, handler, this); }
             #endregion
 
             #region Content Fields
@@ -1425,8 +1423,6 @@ namespace CatalogResource
 
             #region AHandlerElement
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
-
-            //public override AHandlerElement Clone(EventHandler handler) { return new MTDoor(requestedApiVersion, handler, this); }
             #endregion
 
             #region Content Fields
@@ -1480,148 +1476,148 @@ namespace CatalogResource
         #region Content Fields
         //--insert Version: ElementPriority(1)
         [ElementPriority(12)]
-        public MaterialList Materials { get { return materialList; } set { if (materialList != value) { materialList = value == null ? null : new MaterialList(OnResourceChanged, value); } OnResourceChanged(this, new EventArgs()); } }
+        public MaterialList Materials { get { return materialList; } set { if (materialList != value) { materialList = value == null ? null : new MaterialList(OnResourceChanged, value); } OnResourceChanged(this, EventArgs.Empty); } }
         [ElementPriority(13)]
         public string InstanceName
         {
             get { if (version < 0x00000016) throw new InvalidOperationException(); return instanceName; }
-            set { if (version < 0x00000016) throw new InvalidOperationException(); if (instanceName != value) { instanceName = value; OnResourceChanged(this, new EventArgs()); } }
+            set { if (version < 0x00000016) throw new InvalidOperationException(); if (instanceName != value) { instanceName = value; OnResourceChanged(this, EventArgs.Empty); } }
         }
         //--insert CommonBlock: ElementPriority(11)
         [ElementPriority(21), TGIBlockListContentField("TGIBlocks")]
-        public uint OBJKIndex { get { return objkIndex; } set { if (objkIndex != value) { objkIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint OBJKIndex { get { return objkIndex; } set { if (objkIndex != value) { objkIndex = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(22)]
-        public ObjectType ObjectTypeFlags { get { return objectTypeFlags; } set { if (objectTypeFlags != value) { objectTypeFlags = value; OnResourceChanged(this, new EventArgs()); } } }
+        public ObjectType ObjectTypeFlags { get { return objectTypeFlags; } set { if (objectTypeFlags != value) { objectTypeFlags = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(23)]
         public ObjectTypeExt ObjectTypeFlags2
         {
             get { if (version < 0x0000001a) throw new InvalidOperationException(); return objectTypeFlags2; }
-            set { if (version < 0x0000001a) throw new InvalidOperationException(); if (objectTypeFlags2 != value) { objectTypeFlags2 = value; OnResourceChanged(this, new EventArgs()); } }
+            set { if (version < 0x0000001a) throw new InvalidOperationException(); if (objectTypeFlags2 != value) { objectTypeFlags2 = value; OnResourceChanged(this, EventArgs.Empty); } }
         }
         [ElementPriority(24)]
-        public WallPlacement WallPlacementFlags { get { return wallPlacementFlags; } set { if (wallPlacementFlags != value) { wallPlacementFlags = value; OnResourceChanged(this, new EventArgs()); } } }
+        public WallPlacement WallPlacementFlags { get { return wallPlacementFlags; } set { if (wallPlacementFlags != value) { wallPlacementFlags = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(25)]
-        public Movement MovementFlags { get { return movementFlags; } set { if (movementFlags != value) { movementFlags = value; OnResourceChanged(this, new EventArgs()); } } }
+        public Movement MovementFlags { get { return movementFlags; } set { if (movementFlags != value) { movementFlags = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(26)]
-        public uint CutoutTilesPerLevel { get { return wallCutoutTilesPerLevel; } set { if (wallCutoutTilesPerLevel != value) { wallCutoutTilesPerLevel = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint CutoutTilesPerLevel { get { return wallCutoutTilesPerLevel; } set { if (wallCutoutTilesPerLevel != value) { wallCutoutTilesPerLevel = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(27)]
-        public uint Levels { get { return levels; } set { if (levels != value) { levels = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint Levels { get { return levels; } set { if (levels != value) { levels = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(28)]
-        public WallCutoutList WallCutouts { get { return wallCutoutList; } set { if (!wallCutoutList.Equals(value)) { wallCutoutList = value == null ? null : new WallCutoutList(OnResourceChanged, value, list); OnResourceChanged(this, new EventArgs()); } } }
+        public WallCutoutList WallCutouts { get { return wallCutoutList; } set { if (!wallCutoutList.Equals(value)) { wallCutoutList = value == null ? null : new WallCutoutList(OnResourceChanged, value, list); OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(29)]
-        public bool IsScriptEnabled { get { return isScriptEnabled; } set { if (IsScriptEnabled != value) { isScriptEnabled = value; OnResourceChanged(this, new EventArgs()); } } }
+        public bool IsScriptEnabled { get { return isScriptEnabled; } set { if (IsScriptEnabled != value) { isScriptEnabled = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(30), TGIBlockListContentField("TGIBlocks")]
-        public uint DiagonalIndex { get { return diagonalIndex; } set { if (diagonalIndex != value) { diagonalIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint DiagonalIndex { get { return diagonalIndex; } set { if (diagonalIndex != value) { diagonalIndex = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(31)]
-        public uint AmbienceTypeHash { get { return ambienceTypeHash; } set { if (ambienceTypeHash != value) { ambienceTypeHash = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint AmbienceTypeHash { get { return ambienceTypeHash; } set { if (ambienceTypeHash != value) { ambienceTypeHash = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(32)]
-        public RoomCategory RoomCategoryFlags { get { return roomCategoryFlags; } set { if (roomCategoryFlags != value) { roomCategoryFlags = value; OnResourceChanged(this, new EventArgs()); } } }
+        public RoomCategory RoomCategoryFlags { get { return roomCategoryFlags; } set { if (roomCategoryFlags != value) { roomCategoryFlags = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(33)]
-        public FunctionCategory FunctionCategoryFlags { get { return functionCategoryFlags; } set { if (functionCategoryFlags != value) { functionCategoryFlags = value; OnResourceChanged(this, new EventArgs()); } } }
+        public FunctionCategory FunctionCategoryFlags { get { return functionCategoryFlags; } set { if (functionCategoryFlags != value) { functionCategoryFlags = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(34)]
-        public FunctionSubCategory FunctionSubCategoryFlags { get { return functionSubCategoryFlags; } set { if (functionSubCategoryFlags != value) { functionSubCategoryFlags = value; OnResourceChanged(this, new EventArgs()); } } }
+        public FunctionSubCategory FunctionSubCategoryFlags { get { return functionSubCategoryFlags; } set { if (functionSubCategoryFlags != value) { functionSubCategoryFlags = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(35)]
         public FunctionSubCategory2 FunctionSubCategoryFlags2
         {
             get { if (version < 0x0000001c) throw new InvalidOperationException(); return functionSubCategoryFlags2; }
-            set { if (version < 0x0000001c) throw new InvalidOperationException(); if (functionSubCategoryFlags2 != value) { functionSubCategoryFlags2 = value; OnResourceChanged(this, new EventArgs()); } }
+            set { if (version < 0x0000001c) throw new InvalidOperationException(); if (functionSubCategoryFlags2 != value) { functionSubCategoryFlags2 = value; OnResourceChanged(this, EventArgs.Empty); } }
         }
         [ElementPriority(36)]
-        public RoomSubCategory RoomSubCategoryFlags { get { return roomSubCategoryFlags; } set { if (roomSubCategoryFlags != value) { roomSubCategoryFlags = value; OnResourceChanged(this, new EventArgs()); } } }
+        public RoomSubCategory RoomSubCategoryFlags { get { return roomSubCategoryFlags; } set { if (roomSubCategoryFlags != value) { roomSubCategoryFlags = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(37)]
-        public BuildCategory BuildCategoryFlags { get { return buildCategoryFlags; } set { if (buildCategoryFlags != value) { buildCategoryFlags = value; OnResourceChanged(this, new EventArgs()); } } }
+        public BuildCategory BuildCategoryFlags { get { return buildCategoryFlags; } set { if (buildCategoryFlags != value) { buildCategoryFlags = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(38), TGIBlockListContentField("TGIBlocks")]
-        public uint SurfaceCutoutDDSIndex { get { return surfaceCutoutDDSIndex; } set { if (surfaceCutoutDDSIndex != value) { surfaceCutoutDDSIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint SurfaceCutoutDDSIndex { get { return surfaceCutoutDDSIndex; } set { if (surfaceCutoutDDSIndex != value) { surfaceCutoutDDSIndex = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(39), TGIBlockListContentField("TGIBlocks")]
         public uint FloorCutoutDDSIndex
         {
             get { if (version < 0x00000017) throw new InvalidOperationException(); return floorCutoutDDSIndex; }
-            set { if (version < 0x00000017) throw new InvalidOperationException(); if (floorCutoutDDSIndex != value) { floorCutoutDDSIndex = value; OnResourceChanged(this, new EventArgs()); } }
+            set { if (version < 0x00000017) throw new InvalidOperationException(); if (floorCutoutDDSIndex != value) { floorCutoutDDSIndex = value; OnResourceChanged(this, EventArgs.Empty); } }
         }
         [ElementPriority(40)]
         public uint FloorCutoutLevelOffset
         {
             get { if (version < 0x00000017) throw new InvalidOperationException(); return floorCutoutLevelOffset; }
-            set { if (version < 0x00000017) throw new InvalidOperationException(); if (floorCutoutLevelOffset != value) { floorCutoutLevelOffset = value; OnResourceChanged(this, new EventArgs()); } }
+            set { if (version < 0x00000017) throw new InvalidOperationException(); if (floorCutoutLevelOffset != value) { floorCutoutLevelOffset = value; OnResourceChanged(this, EventArgs.Empty); } }
         }
         [ElementPriority(41)]
         public float FloorCutoutBoundsLength
         {
             get { if (version < 0x00000017) throw new InvalidOperationException(); return floorCutoutBoundsLength; }
-            set { if (version < 0x00000017) throw new InvalidOperationException(); if (floorCutoutBoundsLength != value) { floorCutoutBoundsLength = value; OnResourceChanged(this, new EventArgs()); } }
+            set { if (version < 0x00000017) throw new InvalidOperationException(); if (floorCutoutBoundsLength != value) { floorCutoutBoundsLength = value; OnResourceChanged(this, EventArgs.Empty); } }
         }
         [ElementPriority(42)]
         public float FloorCutoutBoundsWidth
         {
             get { if (version < 0x00000020) throw new InvalidOperationException(); return floorCutoutBoundsWidth; }
-            set { if (version < 0x00000020) throw new InvalidOperationException(); if (floorCutoutBoundsWidth != value) { floorCutoutBoundsWidth = value; OnResourceChanged(this, new EventArgs()); } }
+            set { if (version < 0x00000020) throw new InvalidOperationException(); if (floorCutoutBoundsWidth != value) { floorCutoutBoundsWidth = value; OnResourceChanged(this, EventArgs.Empty); } }
         }
         [ElementPriority(43)]
         public UIntList BuildableShellDisplayStateHashes
         {
             get { if (version < 0x00000018) throw new InvalidOperationException(); return buildableShellDisplayStateHashes; }
-            set { if (version < 0x00000018) throw new InvalidOperationException(); if (buildableShellDisplayStateHashes != value) { buildableShellDisplayStateHashes = value == null ? null : new UIntList(OnResourceChanged, value); } OnResourceChanged(this, new EventArgs()); }
+            set { if (version < 0x00000018) throw new InvalidOperationException(); if (buildableShellDisplayStateHashes != value) { buildableShellDisplayStateHashes = value == null ? null : new UIntList(OnResourceChanged, value); } OnResourceChanged(this, EventArgs.Empty); }
         }
         [ElementPriority(44), TGIBlockListContentField("TGIBlocks")]
         public uint LevelBelowOBJDIndex
         {
             get { if (version < 0x00000019) throw new InvalidOperationException(); return levelBelowOBJDIndex; }
-            set { if (version < 0x00000019) throw new InvalidOperationException(); if (levelBelowOBJDIndex != value) { levelBelowOBJDIndex = value; OnResourceChanged(this, new EventArgs()); } }
+            set { if (version < 0x00000019) throw new InvalidOperationException(); if (levelBelowOBJDIndex != value) { levelBelowOBJDIndex = value; OnResourceChanged(this, EventArgs.Empty); } }
         }
         [ElementPriority(45), TGIBlockListContentField("TGIBlocks")]
         public uint ProxyOBJDIndex
         {
             get { if (version < 0x0000001b) throw new InvalidOperationException(); return proxyOBJDIndex; }
-            set { if (version < 0x0000001b) throw new InvalidOperationException(); if (proxyOBJDIndex != value) { proxyOBJDIndex = value; OnResourceChanged(this, new EventArgs()); } }
+            set { if (version < 0x0000001b) throw new InvalidOperationException(); if (proxyOBJDIndex != value) { proxyOBJDIndex = value; OnResourceChanged(this, EventArgs.Empty); } }
         }
         [ElementPriority(46), TGIBlockListContentField("TGIBlocks")]
         public uint BlueprintXMLIndex
         {
             get { if (version < 0x0000001d) throw new InvalidOperationException(); return blueprintXMLIndex; }
-            set { if (version < 0x0000001d) throw new InvalidOperationException(); if (blueprintXMLIndex != value) { blueprintXMLIndex = value; OnResourceChanged(this, new EventArgs()); } }
+            set { if (version < 0x0000001d) throw new InvalidOperationException(); if (blueprintXMLIndex != value) { blueprintXMLIndex = value; OnResourceChanged(this, EventArgs.Empty); } }
         }
         [ElementPriority(47), TGIBlockListContentField("TGIBlocks")]
         public uint BlueprintIconIndex
         {
             get { if (version < 0x0000001e) throw new InvalidOperationException(); return blueprintIconIndex; }
-            set { if (version < 0x0000001e) throw new InvalidOperationException(); if (blueprintIconIndex != value) { blueprintIconIndex = value; OnResourceChanged(this, new EventArgs()); } }
+            set { if (version < 0x0000001e) throw new InvalidOperationException(); if (blueprintIconIndex != value) { blueprintIconIndex = value; OnResourceChanged(this, EventArgs.Empty); } }
         }
         [ElementPriority(48)]
         public float BlueprintIconOffsetMinX
         {
             get { if (version < 0x0000001f) throw new InvalidOperationException(); return blueprintIconOffsetMinX; }
-            set { if (version < 0x0000001f) throw new InvalidOperationException(); if (blueprintIconOffsetMinX != value) { blueprintIconOffsetMinX = value; OnResourceChanged(this, new EventArgs()); } }
+            set { if (version < 0x0000001f) throw new InvalidOperationException(); if (blueprintIconOffsetMinX != value) { blueprintIconOffsetMinX = value; OnResourceChanged(this, EventArgs.Empty); } }
         }
         [ElementPriority(49)]
         public float BlueprintIconOffsetMinZ
         {
             get { if (version < 0x0000001f) throw new InvalidOperationException(); return blueprintIconOffsetMinZ; }
-            set { if (version < 0x0000001f) throw new InvalidOperationException(); if (blueprintIconOffsetMinZ != value) { blueprintIconOffsetMinZ = value; OnResourceChanged(this, new EventArgs()); } }
+            set { if (version < 0x0000001f) throw new InvalidOperationException(); if (blueprintIconOffsetMinZ != value) { blueprintIconOffsetMinZ = value; OnResourceChanged(this, EventArgs.Empty); } }
         }
         [ElementPriority(50)]
         public float BlueprintIconOffsetMaxX
         {
             get { if (version < 0x0000001f) throw new InvalidOperationException(); return blueprintIconOffsetMaxX; }
-            set { if (version < 0x0000001f) throw new InvalidOperationException(); if (blueprintIconOffsetMaxX != value) { blueprintIconOffsetMaxX = value; OnResourceChanged(this, new EventArgs()); } }
+            set { if (version < 0x0000001f) throw new InvalidOperationException(); if (blueprintIconOffsetMaxX != value) { blueprintIconOffsetMaxX = value; OnResourceChanged(this, EventArgs.Empty); } }
         }
         [ElementPriority(51)]
         public float BlueprintIconOffsetMaxZ
         {
             get { if (version < 0x0000001f) throw new InvalidOperationException(); return blueprintIconOffsetMaxZ; }
-            set { if (version < 0x0000001f) throw new InvalidOperationException(); if (blueprintIconOffsetMaxZ != value) { blueprintIconOffsetMaxZ = value; OnResourceChanged(this, new EventArgs()); } }
+            set { if (version < 0x0000001f) throw new InvalidOperationException(); if (blueprintIconOffsetMaxZ != value) { blueprintIconOffsetMaxZ = value; OnResourceChanged(this, EventArgs.Empty); } }
         }
         [ElementPriority(52)]
-        public SlotPlacement SlotPlacementFlags { get { return slotPlacementFlags; } set { if (slotPlacementFlags != value) { slotPlacementFlags = value; OnResourceChanged(this, new EventArgs()); } } }
+        public SlotPlacement SlotPlacementFlags { get { return slotPlacementFlags; } set { if (slotPlacementFlags != value) { slotPlacementFlags = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(53)]
-        public string SurfaceType { get { return surfaceType; } set { if (surfaceType != value) { surfaceType = value; OnResourceChanged(this, new EventArgs()); } } }
+        public string SurfaceType { get { return surfaceType; } set { if (surfaceType != value) { surfaceType = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(54)]
-        public string SourceMaterial { get { return sourceMaterial; } set { if (sourceMaterial != value) { sourceMaterial = value; OnResourceChanged(this, new EventArgs()); } } }
+        public string SourceMaterial { get { return sourceMaterial; } set { if (sourceMaterial != value) { sourceMaterial = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(55)]
-        public Moodlet MoodletGiven { get { return moodletGiven; } set { if (moodletGiven != value) { moodletGiven = value; OnResourceChanged(this, new EventArgs()); } } }
+        public Moodlet MoodletGiven { get { return moodletGiven; } set { if (moodletGiven != value) { moodletGiven = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(56)]
-        public int MoodletScore { get { return moodletScore; } set { if (moodletScore != value) { moodletScore = value; OnResourceChanged(this, new EventArgs()); } } }
+        public int MoodletScore { get { return moodletScore; } set { if (moodletScore != value) { moodletScore = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(57)]
-        public uint Unknown21 { get { return unknown21; } set { if (unknown21 != value) { unknown21 = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint Unknown21 { get { return unknown21; } set { if (unknown21 != value) { unknown21 = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(58)]
         public TopicRating[] TopicRatings
         {
@@ -1629,11 +1625,11 @@ namespace CatalogResource
             set
             {
                 if (value.Length != this.topicRatings.Length) throw new ArgumentLengthException("TopicRatings", this.topicRatings.Length);
-                if (!topicRatings.Equals<TopicRating>(value)) { topicRatings = value == null ? null : (TopicRating[])value.Clone(); OnResourceChanged(this, new EventArgs()); }
+                if (!topicRatings.Equals<TopicRating>(value)) { topicRatings = value == null ? null : (TopicRating[])value.Clone(); OnResourceChanged(this, EventArgs.Empty); }
             }
         }
         [ElementPriority(59), TGIBlockListContentField("TGIBlocks")]
-        public uint FallbackIndex { get { return fallbackIndex; } set { if (fallbackIndex != value) { fallbackIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint FallbackIndex { get { return fallbackIndex; } set { if (fallbackIndex != value) { fallbackIndex = value; OnResourceChanged(this, EventArgs.Empty); } } }
 
         public override TGIBlockList TGIBlocks { get { return list; } set { if (list != value) { list = new TGIBlockList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); wallCutoutList.ParentTGIBlocks = list; } } }
         #endregion

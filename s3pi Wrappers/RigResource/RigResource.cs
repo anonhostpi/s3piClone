@@ -44,7 +44,7 @@ namespace RigResource
         IKChainList ikChains = null;//major >= 4
         #endregion
 
-        public RigResource(int APIversion, Stream s) : base(APIversion, s) { if (stream == null) { rigFormat = RigFormat.Clear; stream = UnParse(); OnResourceChanged(this, new EventArgs()); } stream.Position = 0; Parse(stream); }
+        public RigResource(int APIversion, Stream s) : base(APIversion, s) { if (stream == null) { rigFormat = RigFormat.Clear; stream = UnParse(); OnResourceChanged(this, EventArgs.Empty); } stream.Position = 0; Parse(stream); }
 
         #region Data I/O
         private void Parse(Stream s)
@@ -233,7 +233,6 @@ namespace RigResource
             #endregion
 
             #region AHandlerElement Members
-            //public override AHandlerElement Clone(EventHandler handler) { return new Bone(requestedApiVersion, handler, this); }
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
             public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
             #endregion
@@ -287,8 +286,6 @@ namespace RigResource
 
             protected override Bone CreateElement(Stream s) { return new Bone(0, elementHandler, s); }
             protected override void WriteElement(Stream s, Bone element) { element.UnParse(s); }
-
-            //public override void Add() { this.Add(new Bone(0, null)); }
         }
 
         public class IKElement : AHandlerElement, IEquatable<IKElement>
@@ -403,7 +400,6 @@ namespace RigResource
             #endregion
 
             #region AHandlerElement Members
-            //public override AHandlerElement Clone(EventHandler handler) { return new IKElement(requestedApiVersion, handler, this); }
             public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
             public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
             #endregion
@@ -491,8 +487,6 @@ namespace RigResource
 
             protected override IKElement CreateElement(Stream s) { return new IKElement(0, elementHandler, s); }
             protected override void WriteElement(Stream s, IKElement element) { element.UnParse(s); }
-
-            //public override void Add() { this.Add(new IKElement(0, null)); }
         }
 
         #endregion

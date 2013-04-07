@@ -111,21 +111,21 @@ namespace CatalogResource
         //--insert Version: ElementPriority(1)
         //--insert CommonBlock: ElementPriority(11)
         [ElementPriority(21)]
-        public byte FireplaceWidth { get { return fireplaceWidth; } set { if (fireplaceWidth != value) { fireplaceWidth = value; OnResourceChanged(this, new EventArgs()); } } }
+        public byte FireplaceWidth { get { return fireplaceWidth; } set { if (fireplaceWidth != value) { fireplaceWidth = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(22), TGIBlockListContentField("TGIBlocks")]
-        public uint MantleOBJDIndex { get { return mantle; } set { if (mantle != value) { mantle = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint MantleOBJDIndex { get { return mantle; } set { if (mantle != value) { mantle = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(23), TGIBlockListContentField("TGIBlocks")]
-        public uint ChimneyMantleOBJDIndex { get { return chimneyMantle; } set { if (chimneyMantle != value) { chimneyMantle = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint ChimneyMantleOBJDIndex { get { return chimneyMantle; } set { if (chimneyMantle != value) { chimneyMantle = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(24), TGIBlockListContentField("TGIBlocks")]
-        public uint ChimneyFullLevelOBJDIndex { get { return chimneyFullLevel; } set { if (chimneyFullLevel != value) { chimneyFullLevel = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint ChimneyFullLevelOBJDIndex { get { return chimneyFullLevel; } set { if (chimneyFullLevel != value) { chimneyFullLevel = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(25), TGIBlockListContentField("TGIBlocks")]
-        public uint ChimneyGroundLevelOBJDIndex { get { return chimneyGroundLevel; } set { if (chimneyGroundLevel != value) { chimneyGroundLevel = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint ChimneyGroundLevelOBJDIndex { get { return chimneyGroundLevel; } set { if (chimneyGroundLevel != value) { chimneyGroundLevel = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(26), TGIBlockListContentField("TGIBlocks")]
-        public uint ChimneyBodyOBJDIndex { get { return chimneyBody; } set { if (chimneyBody != value) { chimneyBody = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint ChimneyBodyOBJDIndex { get { return chimneyBody; } set { if (chimneyBody != value) { chimneyBody = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(27), TGIBlockListContentField("TGIBlocks")]
-        public uint ChimneyTopOBJDIndex { get { return chimneyTop; } set { if (chimneyTop != value) { chimneyTop = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint ChimneyTopOBJDIndex { get { return chimneyTop; } set { if (chimneyTop != value) { chimneyTop = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(28), TGIBlockListContentField("TGIBlocks")]
-        public uint ChimneyCapOBJDIndex { get { return chimneyCap; } set { if (chimneyCap != value) { chimneyCap = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint ChimneyCapOBJDIndex { get { return chimneyCap; } set { if (chimneyCap != value) { chimneyCap = value; OnResourceChanged(this, EventArgs.Empty); } } }
         //--insert TGIBlockList: no ElementPriority
         #endregion
     }

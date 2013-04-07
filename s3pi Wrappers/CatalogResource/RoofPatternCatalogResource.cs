@@ -95,11 +95,11 @@ namespace CatalogResource
         //--insert Version: ElementPriority(1)
         //--insert CommonBlock: ElementPriority(11)
         [ElementPriority(21), TGIBlockListContentField("TGIBlocks")]
-        public uint TopMaterialVPXYIndex { get { return topMaterialVPXYIndex; } set { if (topMaterialVPXYIndex != value) { topMaterialVPXYIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint TopMaterialVPXYIndex { get { return topMaterialVPXYIndex; } set { if (topMaterialVPXYIndex != value) { topMaterialVPXYIndex = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(22), TGIBlockListContentField("TGIBlocks")]
-        public uint UndersideMaterialVPXYIndex { get { return undersideMaterialVPXYIndex; } set { if (undersideMaterialVPXYIndex != value) { undersideMaterialVPXYIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint UndersideMaterialVPXYIndex { get { return undersideMaterialVPXYIndex; } set { if (undersideMaterialVPXYIndex != value) { undersideMaterialVPXYIndex = value; OnResourceChanged(this, EventArgs.Empty); } } }
         [ElementPriority(23), TGIBlockListContentField("TGIBlocks")]
-        public uint SideStripsMaterialVPXYIndex { get { return sideStripsMaterialVPXYIndex; } set { if (sideStripsMaterialVPXYIndex != value) { sideStripsMaterialVPXYIndex = value; OnResourceChanged(this, new EventArgs()); } } }
+        public uint SideStripsMaterialVPXYIndex { get { return sideStripsMaterialVPXYIndex; } set { if (sideStripsMaterialVPXYIndex != value) { sideStripsMaterialVPXYIndex = value; OnResourceChanged(this, EventArgs.Empty); } } }
         //--insert TGIBlockList: no ElementPriority
         #endregion
     }
