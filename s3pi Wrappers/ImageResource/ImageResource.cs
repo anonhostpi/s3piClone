@@ -29,6 +29,7 @@ namespace ImageResource
     /// <summary>
     /// A resource wrapper that understands images -- any that .Net supports with Image.FromStream()
     /// </summary>
+    [Obsolete("Deprecated.  Use Image.FromStream()")]
     public class ImageResource : AResource
     {
         const Int32 recommendedApiVersion = 1;

@@ -26,6 +26,7 @@ using s3pi.TextResource.Properties;
 
 namespace TextResource
 {
+    [Obsolete("Deprecated.  Use StreamReader().ReadToEnd()")]
     public class TextResource : AResource
     {
         const Int32 recommendedApiVersion = 1;
