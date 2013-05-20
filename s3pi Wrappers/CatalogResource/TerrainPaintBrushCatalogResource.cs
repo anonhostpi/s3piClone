@@ -24,7 +24,7 @@ using s3pi.Interfaces;
 
 namespace CatalogResource
 {
-    class TerrainPaintBrushCatalogResource : TerrainGeometryWaterBrushCatalogResource
+    public class TerrainPaintBrushCatalogResource : TerrainGeometryWaterBrushCatalogResource
     {
         #region Attributes
         TGIBlock brushTexture = null;
