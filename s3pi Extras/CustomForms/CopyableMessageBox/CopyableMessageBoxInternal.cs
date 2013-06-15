@@ -47,6 +47,8 @@ namespace System.Windows.Forms
             this.DialogResult = DialogResult.OK;
         }
 
+        protected override bool ScaleChildren { get { return false; } }
+
         Size ctlSize = new Size();
         void CopyableMessageBoxInternal_Layout(object sender, LayoutEventArgs e)
         {
