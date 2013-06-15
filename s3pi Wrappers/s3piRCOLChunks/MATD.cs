@@ -173,7 +173,7 @@ namespace s3pi.GenericRCOLResource
                 if (version < 0x00000103)
                 {
                     res.Remove("IsVideoSurface");
-                    res.Remove("Unknown2");
+                    res.Remove("IsPaintingSurface");
                     res.Remove("Mtnf");
                 }
                 else
