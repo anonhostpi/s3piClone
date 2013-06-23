@@ -27,6 +27,8 @@ namespace CASPartResource
     [Flags]
     public enum AgeFlags : byte
     {
+        None = 0,
+
         Baby = 0x01,
         Toddler = 0x02,//"Pre-schooler"?
         Child = 0x04,
@@ -35,108 +37,89 @@ namespace CASPartResource
         YoungAdult = 0x10,
         Adult = 0x20,
         Elder = 0x40,
-        Unknown07 = 0x80,
     }
 
     public enum SpeciesType : byte
     {
-        None = 0x00,
+        None = 0,
         Human = 0x1,
-        Horse = 0x2,
-        Cat = 0x3,
-        Dog = 0x4,
-        LittleDog = 0x5,
-        Deer = 0x6,
-        Raccoon = 0x7,
+        Horse,
+        Cat,
 
-        Unknown08 = 0x8,
-        Unknown09 = 0x9,
-        Unknown0A = 0xA,
-        Unknown0B = 0xB,
-        Unknown0C = 0xC,
-        Unknown0D = 0xD,
-        Unknown0E = 0xE,
-        Unknown0F = 0xF,
+        Dog,
+        LittleDog,
+        Deer,
+        Raccoon,
+
+        LargeBird,
+        SimWalkingDog,
+        SimWalkingLittleDog,
+        SimLeadingHorse,
+
+        Paddleboat,
+        WaterScooter,
+        Speedboat,
+        Rowboat,
+
+        HouseboatSmall = 0x41,
+        HouseboatMedium,
+        HouseboatLarge,
+
+        Shark,
+        Sailboat,
+        WindsurfBoard,
     }
 
     [Flags]
     public enum GenderFlags : byte
     {
+        None = 0,
+
         Male = 0x1,
         Female = 0x2,
-        Unknown2 = 0x4,
-        Unknown3 = 0x8,
     }
 
     [Flags]
-    public enum HandednessFlags : ushort
+    public enum HandednessFlags : byte
     {
-        Unknown00 = 0x0001,
-        Unknown01 = 0x0002,
-        Unknown02 = 0x0004,
-        Unknown03 = 0x0008,
+        None = 0,
 
-        //Handedness
-        LeftHanded = 0x0010,
-        RightHanded = 0x0020,
-        Unknown06 = 0x0040,
-        Unknown07 = 0x0080,
-
-        Unknown08 = 0x0100,
-        Unknown09 = 0x0200,
-        Unknown0A = 0x0400,
-        Unknown0B = 0x0800,
-
-        Unknown0C = 0x1000,
-        Unknown0D = 0x2000,
-        Unknown0E = 0x4000,
-        Unknown0F = 0x8000,
+        LeftHanded = 0x01,
+        RightHanded = 0x02,
     }
 
     public class AgeGenderFlags : AHandlerElement, IEquatable<AgeGenderFlags>
     {
+        static uint AgeMask = 0x0000007F;
+        static uint SpeciesMask = 0x0000CF00; // messy
+        static uint GenderMask = 0x00003000; // messy
+        static uint HandednessMask = 0x00300000;
+
         const int recommendedApiVersion = 1;
 
         #region Attributes
-        AgeFlags age;
-        SpeciesType species;
-        GenderFlags gender;
-        HandednessFlags handedness;
+        uint dword;
         #endregion
 
         #region Constructors
         public AgeGenderFlags(int APIversion, EventHandler handler) : base(APIversion, handler) { }
         public AgeGenderFlags(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
-        public AgeGenderFlags(int APIversion, EventHandler handler, AgeGenderFlags basis) : this(APIversion, handler, basis.age, basis.species, basis.handedness) { }
-        public AgeGenderFlags(int APIversion, EventHandler handler, AgeFlags age, SpeciesType speciesGender, HandednessFlags handedness)
+        public AgeGenderFlags(int APIversion, EventHandler handler, AgeGenderFlags basis) : base(APIversion, handler) { this.dword = basis.dword; }
+        public AgeGenderFlags(int APIversion, EventHandler handler, AgeFlags age, GenderFlags gender, SpeciesType species, HandednessFlags handedness)
             : base(APIversion, handler)
         {
-            this.age = age;
-            this.species = speciesGender;
-            this.handedness = handedness;
+            dword &= ~(AgeMask | SpeciesMask | GenderMask | HandednessMask);
+            dword |= (uint)age;
+            dword |= (uint)species << 8;
+            dword |= (uint)gender << 12;
+            dword |= (uint)handedness << 20;
         }
         #endregion
 
         #region Data I/O
-        void Parse(Stream s)
-        {
-            BinaryReader r = new BinaryReader(s);
-            age = (AgeFlags)r.ReadByte();
+        void Parse(Stream s) { dword = (new BinaryReader(s)).ReadUInt32(); }
 
-            byte speciesGender = r.ReadByte();
-            species = (SpeciesType)(speciesGender & 0x0f);
-            gender = (GenderFlags)(speciesGender >> 4);
-
-            handedness = (HandednessFlags)r.ReadUInt16();
-        }
-
-        public void UnParse(Stream s)
-        {
-            BinaryWriter w = new BinaryWriter(s);
-            w.Write((byte)age);
-            w.Write((byte)(((byte)gender << 4) | (byte)species));
-            w.Write((ushort)handedness);
-        }
+        public void UnParse(Stream s) { (new BinaryWriter(s)).Write(dword); }
         #endregion
 
         #region AHandlerElement Members
@@ -146,38 +129,33 @@ namespace CASPartResource
 
         #region IEquatable<Preset> Members
 
-        public bool Equals(AgeGenderFlags other)
-        {
-            return
-                this.age == other.age
-                && this.species == other.species
-                && this.handedness == other.handedness
-                ;
-        }
-        public override bool Equals(object obj)
-        {
-            return obj as AgeGenderFlags != null ? this.Equals(obj as AgeGenderFlags) : false;
-        }
-        public override int GetHashCode()
-        {
-            return
-                this.age.GetHashCode()
-                ^ this.species.GetHashCode()
-                ^ this.handedness.GetHashCode()
-                ;
-        }
+        public bool Equals(AgeGenderFlags other) { return this.dword == other.dword; }
+        public override bool Equals(object obj) { return obj as AgeGenderFlags != null ? this.Equals(obj as AgeGenderFlags) : false; }
+        public override int GetHashCode() { return this.dword.GetHashCode(); }
 
         #endregion
 
         #region Content Fields
         [ElementPriority(1)]
-        public AgeFlags Age { get { return age; } set { if (age != value) { age = value; OnElementChanged(); } } }
+        public AgeFlags Age {
+            get { return (AgeFlags)(dword & AgeMask); }
+            set { if (((uint)value & AgeMask) != (uint)value) throw new ArgumentOutOfRangeException(); if (Age != value) { dword &= ~AgeMask; dword |= (uint)value; OnElementChanged(); } }
+        }
         [ElementPriority(2)]
-        public SpeciesType Species { get { return species; } set { if ((byte)value > 0xf) throw new ArgumentOutOfRangeException(); if (species != value) { species = value; OnElementChanged(); } } }
+        public SpeciesType Species {
+            get { return (SpeciesType)((dword & SpeciesMask) >> 8); }
+            set { if (((uint)value & (SpeciesMask >> 8)) != (uint)value) throw new ArgumentOutOfRangeException(); if (Species != value) { dword &= ~AgeMask; dword |= (uint)value << 8; OnElementChanged(); } }
+        }
         [ElementPriority(3)]
-        public GenderFlags Gender { get { return gender; } set { if ((byte)value > 0xf) throw new ArgumentOutOfRangeException(); if (gender != value) { gender = value; OnElementChanged(); } } }
+        public GenderFlags Gender {
+            get { return (GenderFlags)((dword & GenderMask) >> 12); }
+            set { if (((uint)value & (GenderMask >> 12)) != (uint)value) throw new ArgumentOutOfRangeException(); if (Gender != value) { dword &= ~AgeMask; dword |= (uint)value << 12; OnElementChanged(); } }
+        }
         [ElementPriority(4)]
-        public HandednessFlags Handedness { get { return handedness; } set { if (handedness != value) { handedness = value; OnElementChanged(); } } }
+        public HandednessFlags Handedness {
+            get { return (HandednessFlags)((dword & HandednessMask) >> 20); }
+            set { if (((uint)value & (HandednessMask >> 20)) != (uint)value) throw new ArgumentOutOfRangeException(); if (Handedness != value) { dword &= ~AgeMask; dword |= (uint)value << 20; OnElementChanged(); } }
+        }
 
         public string Value { get { return "{ " + ValueBuilder.Replace("\n", "; ") + " }"; } }
         #endregion
