@@ -929,7 +929,7 @@ namespace CatalogResource
             for (int i = 0; i < topicRatings.Length; i++)
                 topicRatings[i] = new TopicRating(requestedApiVersion, OnResourceChanged, s);
             this.fallbackIndex = r.ReadUInt32();
-            if (this.version >= 0x00000021)
+            if (this.version >= 0x00000022)
             {
                 modularArchEndEastVPXYIndex = r.ReadUInt32();
                 modularArchEndWestVPXYIndex = r.ReadUInt32();
@@ -1039,7 +1039,7 @@ namespace CatalogResource
                 topicRatings[i].UnParse(s);
             }
             w.Write(fallbackIndex);
-            if (this.version >= 0x00000021)
+            if (this.version >= 0x00000022)
             {
                 w.Write(modularArchEndEastVPXYIndex);
                 w.Write(modularArchEndWestVPXYIndex);
@@ -2076,26 +2076,26 @@ namespace CatalogResource
         [ElementPriority(61), TGIBlockListContentField("TGIBlocks")]
         public uint ModularArchEndEastVPXYIndex
         {
-            get { if (version < 0x00000021) throw new InvalidOperationException(); return modularArchEndEastVPXYIndex; }
-            set { if (version < 0x00000021) throw new InvalidOperationException(); if (modularArchEndEastVPXYIndex != value) { modularArchEndEastVPXYIndex = value; OnResourceChanged(this, EventArgs.Empty); } }
+            get { if (version < 0x00000022) throw new InvalidOperationException(); return modularArchEndEastVPXYIndex; }
+            set { if (version < 0x00000022) throw new InvalidOperationException(); if (modularArchEndEastVPXYIndex != value) { modularArchEndEastVPXYIndex = value; OnResourceChanged(this, EventArgs.Empty); } }
         }
         [ElementPriority(62), TGIBlockListContentField("TGIBlocks")]
         public uint ModularArchEndWestVPXYIndex
         {
-            get { if (version < 0x00000021) throw new InvalidOperationException(); return modularArchEndWestVPXYIndex; }
-            set { if (version < 0x00000021) throw new InvalidOperationException(); if (modularArchEndWestVPXYIndex != value) { modularArchEndWestVPXYIndex = value; OnResourceChanged(this, EventArgs.Empty); } }
+            get { if (version < 0x00000022) throw new InvalidOperationException(); return modularArchEndWestVPXYIndex; }
+            set { if (version < 0x00000022) throw new InvalidOperationException(); if (modularArchEndWestVPXYIndex != value) { modularArchEndWestVPXYIndex = value; OnResourceChanged(this, EventArgs.Empty); } }
         }
         [ElementPriority(63), TGIBlockListContentField("TGIBlocks")]
         public uint ModularArchConnectVPXYIndex
         {
-            get { if (version < 0x00000021) throw new InvalidOperationException(); return modularArchConnectVPXYIndex; }
-            set { if (version < 0x00000021) throw new InvalidOperationException(); if (modularArchConnectVPXYIndex != value) { modularArchConnectVPXYIndex = value; OnResourceChanged(this, EventArgs.Empty); } }
+            get { if (version < 0x00000022) throw new InvalidOperationException(); return modularArchConnectVPXYIndex; }
+            set { if (version < 0x00000022) throw new InvalidOperationException(); if (modularArchConnectVPXYIndex != value) { modularArchConnectVPXYIndex = value; OnResourceChanged(this, EventArgs.Empty); } }
         }
         [ElementPriority(64), TGIBlockListContentField("TGIBlocks")]
         public uint ModularArchSingleVPXYIndex
         {
-            get { if (version < 0x00000021) throw new InvalidOperationException(); return modularArchSingleVPXYIndex; }
-            set { if (version < 0x00000021) throw new InvalidOperationException(); if (modularArchSingleVPXYIndex != value) { modularArchSingleVPXYIndex = value; OnResourceChanged(this, EventArgs.Empty); } }
+            get { if (version < 0x00000022) throw new InvalidOperationException(); return modularArchSingleVPXYIndex; }
+            set { if (version < 0x00000022) throw new InvalidOperationException(); if (modularArchSingleVPXYIndex != value) { modularArchSingleVPXYIndex = value; OnResourceChanged(this, EventArgs.Empty); } }
         }
 
         public override TGIBlockList TGIBlocks { get { return list; } set { if (list != value) { list = new TGIBlockList(OnResourceChanged, value); OnResourceChanged(this, EventArgs.Empty); wallCutoutList.ParentTGIBlocks = list; } } }
