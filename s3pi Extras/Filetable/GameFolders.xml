@@ -404,11 +404,11 @@
       </Folder>
     </Thumbnails>
   </game>
-    <game class="EP" rgversion="18">
-    <Name>Spare</Name>
-    <Longname>The Sims 3 Next Pack</Longname>
-    <GUID />
-    <DefaultInstallDir>Electronic Arts/The Sims 3 Whatever Next</DefaultInstallDir>
+  <game class="EP" rgversion="18">
+    <Name>IP</Name>
+    <Longname>The Sims 3 Island Paradise</Longname>
+    <GUID>{DB21639E-FE55-432C-BCA2-0C5249E3F79E}</GUID>
+    <DefaultInstallDir>Electronic Arts/The Sims 3 Island Paradise</DefaultInstallDir>
     <Suppressed>false</Suppressed>
     <GameContent>
       <Folder path="GameData/Shared/DeltaPackages">
@@ -418,6 +418,28 @@
     </GameContent>
     <DDSImages>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p19.package</Package>
+    </DDSImages>
+    <Thumbnails>
+      <Folder path="Thumbnails">
+        <Package isPatch="false" priority="0">AllThumbnails.package</Package>
+        <Package isPatch="false" priority="0">CasThumbnails.package</Package>
+      </Folder>
+    </Thumbnails>
+  </game>
+  <game class="EP" rgversion="19">
+    <Name>Spare</Name>
+    <Longname>The Sims 3 Next Pack</Longname>
+    <GUID />
+    <DefaultInstallDir>Electronic Arts/The Sims 3 Whatever Next</DefaultInstallDir>
+    <Suppressed>false</Suppressed>
+    <GameContent>
+      <Folder path="GameData/Shared/DeltaPackages">
+        <Package isPatch="true" priority="1">p20/DeltaBuild_p20.package</Package>
+      </Folder>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p20.package</Package>
+    </GameContent>
+    <DDSImages>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p20.package</Package>
     </DDSImages>
     <Thumbnails>
       <Folder path="Thumbnails">
