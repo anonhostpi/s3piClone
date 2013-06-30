@@ -49,7 +49,7 @@ namespace CASPartResource
         AgeGenderFlags gender;
         AgeGenderFlags species;
         AgeGenderFlags handedness;//version >= 0x09
-        ushort skinToneIndex;//byte if version < 0x15
+        short skinToneIndex;//byte if version < 0x15
         byte hairToneIndex;//version == 0x08
         float eyelashSlider;
         float muscleSlider;//version >= 0x11
@@ -134,7 +134,7 @@ namespace CASPartResource
                     handedness = new AgeGenderFlags(0, OnResourceChanged, s);
 
                 if (version >= 0x15)
-                    skinToneIndex = r.ReadUInt16();
+                    skinToneIndex = r.ReadInt16();
                 else
                     skinToneIndex = r.ReadByte();
 
@@ -196,8 +196,16 @@ namespace CASPartResource
                         throw new InvalidDataException(String.Format("Position of TGIBlock read: 0x{0:X8}, actual: 0x{1:X8}",
                             tgiPosn, s.Position));
 
-                byte count = r.ReadByte();
-                tgiBlocks = new CountedTGIBlockList(OnResourceChanged, "IGT", count, s);
+                if (version >= 0x15)
+                {
+                    short count = r.ReadInt16();
+                    tgiBlocks = new CountedTGIBlockList(OnResourceChanged, "IGT", count, s, ushort.MaxValue);
+                }
+                else
+                {
+                    byte count = r.ReadByte();
+                    tgiBlocks = new CountedTGIBlockList(OnResourceChanged, "IGT", count, s, byte.MaxValue);
+                }
 
                 caspEntries.ParentTGIBlocks = tgiBlocks;
                 faceEntries.ParentTGIBlocks = tgiBlocks;
@@ -338,7 +346,14 @@ namespace CASPartResource
                     w.Write(unknown13);
 
                 tgiPosn = s.Position;
-                w.Write((byte)tgiBlocks.Count);
+                if (version >= 0x15)
+                {
+                    w.Write((short)tgiBlocks.Count);
+                }
+                else
+                {
+                    w.Write((byte)tgiBlocks.Count);
+                }
                 tgiBlocks.UnParse(s);
 
                 end = s.Position;
@@ -529,8 +544,8 @@ namespace CASPartResource
             }
 
             #region Attributes
-            ushort txtc1index;//byte if version < 0x15
-            ushort txtc2index;//byte if version < 0x15
+            short txtc1index;//byte if version < 0x15
+            short txtc2index;//byte if version < 0x15
             #endregion
 
             #region Constructors
@@ -549,12 +564,12 @@ namespace CASPartResource
             public IndexPair(int APIversion, EventHandler handler, IndexPair basis, uint parentVersion, DependentList<TGIBlock> ParentTGIBlocks = null)
                 : this(APIversion, handler, basis.txtc1index, basis.txtc2index, parentVersion, ParentTGIBlocks ?? basis.ParentTGIBlocks) { }
             public IndexPair(int APIversion, EventHandler handler, byte txtc1index, byte txtc2index, uint parentVersion, DependentList<TGIBlock> ParentTGIBlocks = null)
-                : this(APIversion, handler, (ushort)txtc1index, (ushort)txtc2index, parentVersion, ParentTGIBlocks)
+                : this(APIversion, handler, (short)txtc1index, (short)txtc2index, parentVersion, ParentTGIBlocks)
             {
                 if (s3pi.Settings.Settings.Checking) if (parentVersion >= 0x15)
                         throw new InvalidOperationException(String.Format("IndexPair constructor requires Txtc1index and Txtc2index as ushort for SimOutfitResource version {0}", parentVersion));
             }
-            public IndexPair(int APIversion, EventHandler handler, ushort txtc1index, ushort txtc2index, uint parentVersion, DependentList<TGIBlock> ParentTGIBlocks = null)
+            public IndexPair(int APIversion, EventHandler handler, short txtc1index, short txtc2index, uint parentVersion, DependentList<TGIBlock> ParentTGIBlocks = null)
                 : base(APIversion, handler)
             {
                 if (s3pi.Settings.Settings.Checking && parentVersion < 0x15 && (!txtc1index.IsByteSized() || !txtc2index.IsByteSized()))
@@ -573,8 +588,8 @@ namespace CASPartResource
                 BinaryReader r = new BinaryReader(s);
                 if (_ParentVersion >= 0x00000015)
                 {
-                    txtc1index = r.ReadUInt16();
-                    txtc2index = r.ReadUInt16();
+                    txtc1index = r.ReadInt16();
+                    txtc2index = r.ReadInt16();
                 }
                 else
                 {
@@ -628,7 +643,7 @@ namespace CASPartResource
 
             #region Content Fields
             [ElementPriority(1), TGIBlockListContentField("ParentTGIBlocks")]
-            public ushort TXTC1Index
+            public short TXTC1Index
             {
                 get { return txtc1index; }
                 set
@@ -638,7 +653,7 @@ namespace CASPartResource
                 }
             }
             [ElementPriority(2), TGIBlockListContentField("ParentTGIBlocks")]
-            public ushort TXTC2Index
+            public short TXTC2Index
             {
                 get { return txtc2index; }
                 set
@@ -720,7 +735,7 @@ namespace CASPartResource
             const int recommendedApiVersion = 1;
 
             #region Attributes
-            ushort casPartIndex;//byte if version < 0x15
+            short casPartIndex;//byte if version < 0x15
             ClothingType clothing;//version >= 0x0E
             IndexPairList txtcIndexes;
             #endregion
@@ -744,12 +759,12 @@ namespace CASPartResource
                     throw new InvalidOperationException(String.Format("ClothingType must be specified for version {0}", ParentVersion));
             }
             public CASEntry(int APIversion, EventHandler handler, byte casPartIndex, ClothingType clothing, IEnumerable<IndexPair> ibe, uint ParentVersion, DependentList<TGIBlock> ParentTGIBlocks = null)
-                : this(APIversion, handler, (ushort)casPartIndex, clothing, ibe, ParentVersion, ParentTGIBlocks)
+                : this(APIversion, handler, (short)casPartIndex, clothing, ibe, ParentVersion, ParentTGIBlocks)
             {
                 if (s3pi.Settings.Settings.Checking && ParentVersion >= 0x15)
-                    throw new InvalidOperationException(String.Format("CasPartIndex must be ushort for version {0}", ParentVersion));
+                    throw new InvalidOperationException(String.Format("CasPartIndex must be short for version {0}", ParentVersion));
             }
-            public CASEntry(int APIversion, EventHandler handler, ushort casPartIndex, ClothingType clothing, IEnumerable<IndexPair> ibe, uint ParentVersion, DependentList<TGIBlock> ParentTGIBlocks = null)
+            public CASEntry(int APIversion, EventHandler handler, short casPartIndex, ClothingType clothing, IEnumerable<IndexPair> ibe, uint ParentVersion, DependentList<TGIBlock> ParentTGIBlocks = null)
                 : base(APIversion, handler)
             {
                 if (s3pi.Settings.Settings.Checking && ParentVersion < 0x15 && !casPartIndex.IsByteSized())
@@ -769,7 +784,7 @@ namespace CASPartResource
                 BinaryReader r = new BinaryReader(s);
                 if (_ParentVersion >= 0x15)
                 {
-                    casPartIndex = r.ReadUInt16();
+                    casPartIndex = r.ReadInt16();
                 }
                 else
                 {
@@ -841,7 +856,7 @@ namespace CASPartResource
 
             #region Content Fields
             [ElementPriority(1), TGIBlockListContentField("ParentTGIBlocks")]
-            public ushort CASPartIndex
+            public short CASPartIndex
             {
                 get { return casPartIndex; }
                 set
@@ -859,29 +874,7 @@ namespace CASPartResource
             [ElementPriority(3)]
             public IndexPairList TXTCIndexes { get { return txtcIndexes; } set { if (!txtcIndexes.Equals(value)) { txtcIndexes = value == null ? null : new IndexPairList(handler, value, _ParentVersion, _ParentTGIBlocks); OnElementChanged(); } } }
 
-            public string Value
-            {
-                get
-                {
-                    return ValueBuilder;
-                    /*
-                    System.Text.StringBuilder sb = new System.Text.StringBuilder();
-                    foreach (string field in ContentFields)
-                        if (field.Equals("Value")) continue;
-                        else if (field.Equals("TXTCIndexes"))
-                        {
-                            sb.Append("\n--- TXTCIndexes (" + txtcIndexes.Count.ToString("X") + ") ---");
-                            string fmt = "\n" + "  [{0:X" + txtcIndexes.Count.ToString("X").Length + "}]: {1}";
-                            for (int i = 0; i < txtcIndexes.Count; i++)
-                                sb.Append(String.Format(fmt, i, txtcIndexes[i]["Value"]));
-                            sb.Append("\n---");
-                        }
-                        else
-                            sb.Append(string.Format("{0}: {1}; ", field, this[field]));
-                    return sb.ToString().Trim();
-                    /**/
-                }
-            }
+            public string Value { get { return ValueBuilder; } }
             #endregion
         }
         public class CASEntryList : DependentList<CASEntry>
@@ -1180,7 +1173,7 @@ namespace CASPartResource
             }
 
             #region Attributes
-            ushort faceIndex;//byte if version < 0x15
+            short faceIndex;//byte if version < 0x15
             float unknown1;
             #endregion
 
@@ -1195,8 +1188,12 @@ namespace CASPartResource
             public FaceEntry(int APIversion, EventHandler handler, FaceEntry basis, uint parentVersion, DependentList<TGIBlock> ParentTGIBlocks = null)
                 : this(APIversion, handler, basis.faceIndex, basis.unknown1, parentVersion, ParentTGIBlocks) { }
             public FaceEntry(int APIversion, EventHandler handler, byte faceIndex, float unknown1, uint parentVersion, DependentList<TGIBlock> ParentTGIBlocks = null)
-                : this(APIversion, handler, (ushort)faceIndex, unknown1, parentVersion, ParentTGIBlocks) { }
-            public FaceEntry(int APIversion, EventHandler handler, ushort faceIndex, float unknown1, uint parentVersion, DependentList<TGIBlock> ParentTGIBlocks = null)
+                : this(APIversion, handler, (short)faceIndex, unknown1, parentVersion, ParentTGIBlocks)
+            {
+                if (s3pi.Settings.Settings.Checking && ParentVersion >= 0x15)
+                    throw new InvalidOperationException(String.Format("FaceIndex must be short for version {0}", ParentVersion));
+            }
+            public FaceEntry(int APIversion, EventHandler handler, short faceIndex, float unknown1, uint parentVersion, DependentList<TGIBlock> ParentTGIBlocks = null)
                 : this(APIversion, handler, parentVersion, ParentTGIBlocks)
             {
                 if (s3pi.Settings.Settings.Checking && parentVersion < 0x15 && faceIndex.IsByteSized())
@@ -1213,7 +1210,7 @@ namespace CASPartResource
                 BinaryReader r = new BinaryReader(s);
                 if (_ParentVersion >= 0x00000015)
                 {
-                    faceIndex = r.ReadUInt16();
+                    faceIndex = r.ReadInt16();
                 }
                 else
                 {
@@ -1275,7 +1272,7 @@ namespace CASPartResource
 
             #region Content Fields
             [ElementPriority(1), TGIBlockListContentField("ParentTGIBlocks")]
-            public ushort FaceIndex
+            public short FaceIndex
             {
                 get { return faceIndex; }
                 set
@@ -1480,7 +1477,7 @@ namespace CASPartResource
             set { if (version < 0x00000009) throw new InvalidOperationException(); if (handedness.Handedness != value) { handedness.Handedness = value; OnResourceChanged(this, EventArgs.Empty); } }
         }
         [ElementPriority(13), TGIBlockListContentField("TGIBlocks")]
-        public ushort SkinToneIndex
+        public short SkinToneIndex
         {
             get { if (version < 0x00000008) throw new InvalidOperationException(); return skinToneIndex; }
             set
@@ -1676,6 +1673,6 @@ namespace CASPartResource
 
     static class UInt16Extensions
     {
-        public static bool IsByteSized(this ushort value) { return (value & 0xFF) == value; }
+        public static bool IsByteSized(this short value) { return (value & 0xFF) == value; }
     }
 }
