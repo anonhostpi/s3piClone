@@ -144,17 +144,17 @@ namespace CASPartResource
         [ElementPriority(2)]
         public SpeciesType Species {
             get { return (SpeciesType)((dword & SpeciesMask) >> 8); }
-            set { if (((uint)value & (SpeciesMask >> 8)) != (uint)value) throw new ArgumentOutOfRangeException(); if (Species != value) { dword &= ~AgeMask; dword |= (uint)value << 8; OnElementChanged(); } }
+            set { if (((uint)value & (SpeciesMask >> 8)) != (uint)value) throw new ArgumentOutOfRangeException(); if (Species != value) { dword &= ~SpeciesMask; dword |= (uint)value << 8; OnElementChanged(); } }
         }
         [ElementPriority(3)]
         public GenderFlags Gender {
             get { return (GenderFlags)((dword & GenderMask) >> 12); }
-            set { if (((uint)value & (GenderMask >> 12)) != (uint)value) throw new ArgumentOutOfRangeException(); if (Gender != value) { dword &= ~AgeMask; dword |= (uint)value << 12; OnElementChanged(); } }
+            set { if (((uint)value & (GenderMask >> 12)) != (uint)value) throw new ArgumentOutOfRangeException(); if (Gender != value) { dword &= ~GenderMask; dword |= (uint)value << 12; OnElementChanged(); } }
         }
         [ElementPriority(4)]
         public HandednessFlags Handedness {
             get { return (HandednessFlags)((dword & HandednessMask) >> 20); }
-            set { if (((uint)value & (HandednessMask >> 20)) != (uint)value) throw new ArgumentOutOfRangeException(); if (Handedness != value) { dword &= ~AgeMask; dword |= (uint)value << 20; OnElementChanged(); } }
+            set { if (((uint)value & (HandednessMask >> 20)) != (uint)value) throw new ArgumentOutOfRangeException(); if (Handedness != value) { dword &= ~HandednessMask; dword |= (uint)value << 20; OnElementChanged(); } }
         }
 
         public string Value { get { return "{ " + ValueBuilder.Replace("\n", "; ") + " }"; } }
