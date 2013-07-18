@@ -1389,10 +1389,27 @@ namespace CatalogResource
         #endregion
 
         #region Constructors
-        public CatalogResourceTGIBlockList(int APIversion, Stream s) : base(APIversion, s) { }
+        public CatalogResourceTGIBlockList(int APIversion, Stream s) : base(APIversion, s)
+        {
+            // http://private/s3pi/index.php?topic=1368.0
+            // As index values are defaulted to zero, we should have a zeroth entry.
+            if (list == null || list.Count == 0)
+            {
+                list = new TGIBlockList(OnResourceChanged);
+                list.Add();
+            }
+        }
         public CatalogResourceTGIBlockList(int APIversion, uint version, Common common, IEnumerable<TGIBlock> tgibl) : base(APIversion, version, common)
         {
-            this.list = tgibl == null ? null : new TGIBlockList(OnResourceChanged, tgibl);
+            // http://private/s3pi/index.php?topic=1368.0
+            // As index values are defaulted to zero, we should have a zeroth entry.
+            if (tgibl == null)
+                list = new TGIBlockList(OnResourceChanged);
+            else
+                list = new TGIBlockList(OnResourceChanged, tgibl);
+
+            if (list.Count == 0)
+                list.Add();
         }
         #endregion
 
@@ -1418,7 +1435,14 @@ namespace CatalogResource
 
         protected virtual void UnParse(Stream s)
         {
-            if (list == null) list = new TGIBlockList(OnResourceChanged);
+            // http://private/s3pi/index.php?topic=1368.0
+            // As index values are defaulted to zero, we should have a zeroth entry.
+            // By now, we really should have something, though...
+            if (list == null || list.Count == 0)
+            {
+                list = new TGIBlockList(OnResourceChanged);
+                list.Add();
+            }
             list.UnParse(s, pos);
         }
         #endregion
