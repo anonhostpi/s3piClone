@@ -67,6 +67,9 @@ namespace s3pi.GenericRCOLResource
 
         public enum AnimationPriority : uint
         {
+            Default = 0xfffffffe,//-2,
+            Broadcast = 0xffffffff,//-1,
+            Unset = 0,
             Low = 6000,
             LowPlus = 8000,
             Normal = 10000,
@@ -81,6 +84,17 @@ namespace s3pi.GenericRCOLResource
             Ultra = 50000,
             UltraPlus = 55000,
             LookAt = 60000,
+        }
+
+        public enum AwarenessLevel
+        {
+            ThoughtBubble,
+            OverlayFace,
+            OverlayHead,
+            OverlayBothArms,
+            OverlayUpperbody,
+            OverlayNone,
+            Unset
         }
 
         public class ChunkReferenceList : DependentList<GenericRCOLResource.ChunkReference>
@@ -122,6 +136,16 @@ namespace s3pi.GenericRCOLResource
     {
         const string TAG = "S_SM";
 
+        [Flags]
+        public enum Flags : uint
+        {
+            Default = 0x01,
+            UnilateralActor = 0x01,
+            PinAllResources = 0x02,
+            BlendMotionAccumulation = 0x04,
+            HoldAllPoses = 0x08
+        }
+
         #region Attributes
         uint version = 0x0202;
         uint nameHash;
@@ -130,9 +154,9 @@ namespace s3pi.GenericRCOLResource
         ChunkReferenceList stateIndexes;
         AnimationList animations;
         //0xDEADBEEF
-        uint properties;
-        uint automationPriority;
-        uint unknown1;
+        Flags properties;
+        AnimationPriority automationPriority;
+        AwarenessLevel awarenessOverlayLevel;
         uint unknown2;
         uint unknown3;
         uint unknown4;
@@ -145,7 +169,7 @@ namespace s3pi.GenericRCOLResource
         public JazzStateMachine(int APIversion, EventHandler handler, JazzStateMachine basis)
             : this(APIversion, handler
             , basis.version, basis.nameHash, basis.actorDefinitionIndexes, basis.propertyDefinitionIndexes, basis.stateIndexes, basis.animations
-            , basis.properties, basis.automationPriority, basis.unknown1, basis.unknown2, basis.unknown3, basis.unknown4, basis.unknown5
+            , basis.properties, basis.automationPriority, basis.awarenessOverlayLevel, basis.unknown2, basis.unknown3, basis.unknown4, basis.unknown5
             )
         { }
         public JazzStateMachine(int APIversion, EventHandler handler
@@ -155,9 +179,9 @@ namespace s3pi.GenericRCOLResource
             , IEnumerable<GenericRCOLResource.ChunkReference> propertyDefinitionIndexes
             , IEnumerable<GenericRCOLResource.ChunkReference> stateIndexes
             , IEnumerable<Animation> animations
-            , uint properties
-            , uint automationPriority
-            , uint unknown1
+            , Flags properties
+            , AnimationPriority automationPriority
+            , AwarenessLevel awarenessOverlayLevel
             , uint unknown2
             , uint unknown3
             , uint unknown4
@@ -173,7 +197,7 @@ namespace s3pi.GenericRCOLResource
             this.animations = new AnimationList(handler, animations);
             this.properties = properties;
             this.automationPriority = automationPriority;
-            this.unknown1 = unknown1;
+            this.awarenessOverlayLevel = awarenessOverlayLevel;
             this.unknown2 = unknown2;
             this.unknown3 = unknown3;
             this.unknown4 = unknown4;
@@ -200,9 +224,9 @@ namespace s3pi.GenericRCOLResource
             this.stateIndexes = new ChunkReferenceList(handler, s);
             this.animations = new AnimationList(handler, s);
             DEADBEEF.Parse(s);
-            this.properties = r.ReadUInt32();
-            this.automationPriority = r.ReadUInt32();
-            this.unknown1 = r.ReadUInt32();
+            this.properties = (Flags)r.ReadUInt32();
+            this.automationPriority = (AnimationPriority)r.ReadUInt32();
+            this.awarenessOverlayLevel = (AwarenessLevel)r.ReadUInt32();
             this.unknown2 = r.ReadUInt32();
             this.unknown3 = r.ReadUInt32();
             this.unknown4 = r.ReadUInt32();
@@ -225,9 +249,9 @@ namespace s3pi.GenericRCOLResource
             if (animations == null) animations = new AnimationList(handler);
             animations.UnParse(ms);
             DEADBEEF.UnParse(ms);
-            w.Write(properties);
-            w.Write(automationPriority);
-            w.Write(unknown1);
+            w.Write((uint)properties);
+            w.Write((uint)automationPriority);
+            w.Write((uint)awarenessOverlayLevel);
             w.Write(unknown2);
             w.Write(unknown3);
             w.Write(unknown4);
@@ -341,11 +365,11 @@ namespace s3pi.GenericRCOLResource
         [ElementPriority(16)]
         public AnimationList Animations { get { return animations; } set { if (animations != value) { animations = new AnimationList(OnRCOLChanged, value); OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(17)]
-        public uint Properties { get { return properties; } set { if (properties != value) { properties = value; OnRCOLChanged(this, EventArgs.Empty); } } }
+        public Flags Properties { get { return properties; } set { if (properties != value) { properties = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(18)]
-        public uint AutomationPriority { get { return automationPriority; } set { if (automationPriority != value) { automationPriority = value; OnRCOLChanged(this, EventArgs.Empty); } } }
+        public AnimationPriority AutomationPriority { get { return automationPriority; } set { if (automationPriority != value) { automationPriority = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(19)]
-        public uint Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
+        public AwarenessLevel AwarenessOverlayLevel { get { return awarenessOverlayLevel; } set { if (awarenessOverlayLevel != value) { awarenessOverlayLevel = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(20)]
         public uint Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(21)]
@@ -363,13 +387,28 @@ namespace s3pi.GenericRCOLResource
     {
         const string TAG = "S_St";
 
+        [Flags]
+        public enum Flags : uint
+        {
+            None = 0x0000,
+            Public = 0x0001,
+            Entry = 0x0002,
+            Exit = 0x0004,
+            Loop = 0x0008,
+            OneShot = 0x0010,
+            OneShotHold = 0x0020,
+            Synchronized = 0x0040,
+            Join = 0x0080,
+            Explicit = 0x0100
+        }
+
         #region Attributes
         uint version = 0x0101;
         uint nameHash;
-        uint flags;
+        Flags flags;
         GenericRCOLResource.ChunkReference decisionGraphIndex;
         ChunkReferenceList outboundStateIndexes;
-        uint unknown1;
+        AwarenessLevel awarenessOverlayLevel;
         #endregion
 
         #region Constructors
@@ -382,16 +421,16 @@ namespace s3pi.GenericRCOLResource
             , basis.flags
             , basis.decisionGraphIndex
             , basis.outboundStateIndexes
-            , basis.unknown1
+            , basis.awarenessOverlayLevel
             )
         { }
         public JazzState(int APIversion, EventHandler handler
             , uint version
             , uint nameHash
-            , uint flags
+            , Flags flags
             , GenericRCOLResource.ChunkReference decisionGraphIndex
             , ChunkReferenceList outboundStateIndexes
-            , uint unknown1
+            , AwarenessLevel awarenessOverlayLevel
             )
             : base(APIversion, handler, null)
         {
@@ -400,7 +439,7 @@ namespace s3pi.GenericRCOLResource
             this.flags = flags;
             this.decisionGraphIndex = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, decisionGraphIndex);
             this.outboundStateIndexes = new ChunkReferenceList(handler, outboundStateIndexes);
-            this.unknown1 = unknown1;
+            this.awarenessOverlayLevel = awarenessOverlayLevel;
         }
         #endregion
 
@@ -418,10 +457,10 @@ namespace s3pi.GenericRCOLResource
             BinaryReader r = new BinaryReader(s);
             this.version = r.ReadUInt32();
             this.nameHash = r.ReadUInt32();
-            this.flags = r.ReadUInt32();
+            this.flags = (Flags)r.ReadUInt32();
             this.decisionGraphIndex = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, s);
             this.outboundStateIndexes = new ChunkReferenceList(handler, s);
-            this.unknown1 = r.ReadUInt32();
+            this.awarenessOverlayLevel = (AwarenessLevel)r.ReadUInt32();
         }
 
         public override Stream UnParse()
@@ -431,12 +470,12 @@ namespace s3pi.GenericRCOLResource
 
             w.Write(version);
             w.Write(nameHash);
-            w.Write(flags);
+            w.Write((uint)flags);
             if (decisionGraphIndex == null) decisionGraphIndex = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, 0);
             decisionGraphIndex.UnParse(ms);
             if (outboundStateIndexes == null) outboundStateIndexes = new ChunkReferenceList(handler);
             outboundStateIndexes.UnParse(ms);
-            w.Write(unknown1);
+            w.Write((uint)awarenessOverlayLevel);
 
             return ms;
         }
@@ -452,11 +491,11 @@ namespace s3pi.GenericRCOLResource
         [ElementPriority(13)]
         public GenericRCOLResource.ChunkReference DecisionGraphIndex { get { return decisionGraphIndex; } set { if (decisionGraphIndex != value) { decisionGraphIndex = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(14)]
-        public uint Flags { get { return flags; } set { if (flags != value) { flags = value; OnRCOLChanged(this, EventArgs.Empty); } } }
+        public Flags Properties { get { return flags; } set { if (flags != value) { flags = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(15)]
         public ChunkReferenceList OutboundStateIndexes { get { return outboundStateIndexes; } set { if (outboundStateIndexes != value) { outboundStateIndexes = new ChunkReferenceList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(16)]
-        public uint Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
+        public AwarenessLevel AwarenessOverlayLevel { get { return awarenessOverlayLevel; } set { if (awarenessOverlayLevel != value) { awarenessOverlayLevel = value; OnRCOLChanged(this, EventArgs.Empty); } } }
 
         public string Value { get { return ValueBuilder; } }
         #endregion
@@ -708,6 +747,34 @@ namespace s3pi.GenericRCOLResource
     #endregion
 
     #region Decision Graph Node Chunks
+    [Flags]
+    public enum JazzAnimationFlags : uint
+    {
+        TimingNormal = 0x00,
+        Default = 0x01,
+        AtEnd = 0x01,
+        LoopAsNeeded = 0x02,
+        OverridePriority = 0x04,
+        Mirror = 0x08,
+        OverrideMirror = 0x10,
+        OverrideTiming0 = 0x20,
+        OverrideTiming1 = 0x40,
+        TimingMaster = 0x20,
+        TimingSlave = 0x40,
+        TimingIgnored = 0x60,
+        TimingMask = 0x60,
+        Interruptible = 0x80,
+        ForceBlend = 0x100,
+        UseTimingPriority = 0x200,
+        UseTimingPriorityAsClockMaster = 0x400,
+        BaseClipIsSocial = 0x800,
+        AdditiveClipIsSocial = 0x1000,
+        BaseClipIsObjectOnly = 0x2000,
+        AdditiveClipIsObjectOnly = 0x4000,
+        HoldPose = 0x8000,
+        BlendMotionAccumulation = 0x10000
+    }
+
     public class JazzPlayAnimationNode : JazzChunk
     {
         const string TAG = "Play";
@@ -723,23 +790,21 @@ namespace s3pi.GenericRCOLResource
         ActorSlotList actorSlots;
         ActorSuffixList actorSuffixes;
         //0xDEADBEEF
-        uint unknown4;
-        uint unknown5;
-        uint unknown6;
-        uint unknown7;
+        TGIBlock additiveClipResource;
         string animation = "";
         //followed by padding to next DWORD
-        uint unknown8;
+        string additiveAnimation = "";
+        //followed by padding to next DWORD
         //0xDEADBEEF
-        uint animationNodeFlags;
-        AnimationPriority animationPriority1;
-        uint unknown9;
+        JazzAnimationFlags animationNodeFlags;
+        AnimationPriority animationPriority;
+        float unknown9;
         float blendInTime;
-        float unknown10;
+        float blendOutTime;
         float unknown11;
-        float unknown12;
+        float speed;
         GenericRCOLResource.ChunkReference actorDefinitionIndex;
-        AnimationPriority animationPriority2;
+        AnimationPriority timingPriority;
         uint unknown13;
         uint unknown14;
         uint unknown15;
@@ -764,21 +829,18 @@ namespace s3pi.GenericRCOLResource
             , basis.unknown3
             , basis.actorSlots
             , basis.actorSuffixes
-            , basis.unknown4
-            , basis.unknown5
-            , basis.unknown6
-            , basis.unknown7
+            , basis.additiveClipResource
             , basis.animation
-            , basis.unknown8
+            , basis.additiveAnimation
             , basis.animationNodeFlags
-            , basis.animationPriority1
+            , basis.animationPriority
             , basis.unknown9
             , basis.blendInTime
-            , basis.unknown10
+            , basis.blendOutTime
             , basis.unknown11
-            , basis.unknown12
+            , basis.speed
             , basis.actorDefinitionIndex
-            , basis.animationPriority2
+            , basis.timingPriority
             , basis.unknown13
             , basis.unknown14
             , basis.unknown15
@@ -797,21 +859,18 @@ namespace s3pi.GenericRCOLResource
             , uint unknown3
             , IEnumerable<ActorSlot> actorSlots
             , IEnumerable<ActorSuffix> actorSuffixes
-            , uint unknown4
-            , uint unknown5
-            , uint unknown6
-            , uint unknown7
+            , IResourceKey additiveClipResource
             , string animation
-            , uint unknown8
-            , uint animationNodeFlags
-            , AnimationPriority animationPriority1
-            , uint unknown9
+            , string additiveAnimation
+            , JazzAnimationFlags animationNodeFlags
+            , AnimationPriority animationPriority
+            , float unknown9
             , float blendInTime
-            , float unknown10
+            , float blendOutTime
             , float unknown11
-            , float unknown12
+            , float speed
             , GenericRCOLResource.ChunkReference actorDefinitionIndex
-            , AnimationPriority animationPriority2
+            , AnimationPriority timingPriority
             , uint unknown13
             , uint unknown14
             , uint unknown15
@@ -830,21 +889,18 @@ namespace s3pi.GenericRCOLResource
             this.unknown3 = unknown3;
             this.actorSlots = actorSlots == null ? null : new ActorSlotList(handler, actorSlots);
             this.actorSuffixes = actorSuffixes == null ? null : new ActorSuffixList(handler, actorSuffixes);
-            this.unknown4 = unknown4;
-            this.unknown5 = unknown5;
-            this.unknown6 = unknown6;
-            this.unknown7 = unknown7;
+            this.additiveClipResource = new TGIBlock(requestedApiVersion, handler, "ITG", additiveClipResource);
             this.animation = animation;
-            this.unknown8 = unknown8;
+            this.additiveAnimation = additiveAnimation;
             this.animationNodeFlags = animationNodeFlags;
-            this.animationPriority1 = animationPriority1;
+            this.animationPriority = animationPriority;
             this.unknown9 = unknown9;
             this.blendInTime = blendInTime;
-            this.unknown10 = unknown10;
+            this.blendOutTime = blendOutTime;
             this.unknown11 = unknown11;
-            this.unknown12 = unknown12;
+            this.speed = speed;
             this.actorDefinitionIndex = actorDefinitionIndex;
-            this.animationPriority2 = animationPriority2;
+            this.timingPriority = timingPriority;
             this.unknown13 = unknown13;
             this.unknown14 = unknown14;
             this.unknown15 = unknown15;
@@ -879,24 +935,23 @@ namespace s3pi.GenericRCOLResource
             this.actorSlots = new ActorSlotList(handler, actorSlotCount, s);
             this.actorSuffixes = new ActorSuffixList(handler, s);
             DEADBEEF.Parse(s);
-            this.unknown4 = r.ReadUInt32();
-            this.unknown5 = r.ReadUInt32();
-            this.unknown6 = r.ReadUInt32();
-            this.unknown7 = r.ReadUInt32();
+            this.additiveClipResource = new TGIBlock(requestedApiVersion, handler, "ITG", s);
             this.animation = System.Text.Encoding.Unicode.GetString(r.ReadBytes(r.ReadInt32() * 2));
             if (this.animation.Length > 0) r.ReadUInt16();
             ExpectZero(s);
-            this.unknown8 = r.ReadUInt32();
+            this.additiveAnimation = System.Text.Encoding.Unicode.GetString(r.ReadBytes(r.ReadInt32() * 2));
+            if (this.additiveAnimation.Length > 0) r.ReadUInt16();
+            ExpectZero(s);
             DEADBEEF.Parse(s);
-            this.animationNodeFlags = r.ReadUInt32();
-            this.animationPriority1 = (AnimationPriority)r.ReadUInt32();
-            this.unknown9 = r.ReadUInt32();
+            this.animationNodeFlags = (JazzAnimationFlags)r.ReadUInt32();
+            this.animationPriority = (AnimationPriority)r.ReadUInt32();
+            this.unknown9 = r.ReadSingle();
             this.blendInTime = r.ReadSingle();
-            this.unknown10 = r.ReadSingle();
+            this.blendOutTime = r.ReadSingle();
             this.unknown11 = r.ReadSingle();
-            this.unknown12 = r.ReadSingle();
+            this.speed = r.ReadSingle();
             this.actorDefinitionIndex = new GenericRCOLResource.ChunkReference(requestedAPIversion, handler, s);
-            this.animationPriority2 = (AnimationPriority)r.ReadUInt32();
+            this.timingPriority = (AnimationPriority)r.ReadUInt32();
             this.unknown13 = r.ReadUInt32();
             this.unknown14 = r.ReadUInt32();
             this.unknown15 = r.ReadUInt32();
@@ -927,26 +982,27 @@ namespace s3pi.GenericRCOLResource
             if (actorSuffixes == null) actorSuffixes = new ActorSuffixList(handler);
             actorSuffixes.UnParse(ms);
             DEADBEEF.UnParse(ms);
-            w.Write(unknown4);
-            w.Write(unknown5);
-            w.Write(unknown6);
-            w.Write(unknown7);
+            if (additiveClipResource == null) additiveClipResource = new TGIBlock(requestedApiVersion, handler, "ITG");
+            additiveClipResource.UnParse(ms);
             w.Write(animation.Length);
             w.Write(System.Text.Encoding.Unicode.GetBytes(animation));
             if (this.animation.Length > 0) w.Write((UInt16)0);
             PadZero(ms);
-            w.Write(unknown8);
+            w.Write(additiveAnimation.Length);
+            w.Write(System.Text.Encoding.Unicode.GetBytes(additiveAnimation));
+            if (this.additiveAnimation.Length > 0) w.Write((UInt16)0);
+            PadZero(ms);
             DEADBEEF.UnParse(ms);
-            w.Write(animationNodeFlags);
-            w.Write((uint)animationPriority1);
+            w.Write((uint)animationNodeFlags);
+            w.Write((uint)animationPriority);
             w.Write(unknown9);
             w.Write(blendInTime);
-            w.Write(unknown10);
+            w.Write(blendOutTime);
             w.Write(unknown11);
-            w.Write(unknown12);
+            w.Write(speed);
             if (actorDefinitionIndex == null) actorDefinitionIndex = new GenericRCOLResource.ChunkReference(requestedAPIversion, handler, 0);
             actorDefinitionIndex.UnParse(ms);
-            w.Write((uint)animationPriority2);
+            w.Write((uint)timingPriority);
             w.Write(unknown13);
             w.Write(unknown14);
             w.Write(unknown15);
@@ -968,8 +1024,8 @@ namespace s3pi.GenericRCOLResource
         public class ActorSlot : AHandlerElement, IEquatable<ActorSlot>
         {
             #region Attributes
-            uint unknown1;
-            uint unknown2;
+            uint chainId;
+            uint slotId;
             uint actorNameHash;
             uint slotNameHash;
             #endregion
@@ -979,23 +1035,23 @@ namespace s3pi.GenericRCOLResource
             public ActorSlot(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
             public ActorSlot(int APIversion, EventHandler handler, ActorSlot basis)
                 : this(APIversion, handler
-                , basis.unknown1
-                , basis.unknown2
+                , basis.chainId
+                , basis.slotId
                 , basis.actorNameHash
                 , basis.slotNameHash
                 )
             {
             }
             public ActorSlot(int APIversion, EventHandler handler
-                , uint unknown1
-                , uint unknown2
+                , uint chainId
+                , uint slotId
                 , uint actorNameHash
                 , uint slotNameHash
                 )
                 : base(APIversion, handler)
             {
-                this.unknown1 = unknown1;
-                this.unknown2 = unknown2;
+                this.chainId = chainId;
+                this.slotId = slotId;
                 this.actorNameHash = actorNameHash;
                 this.slotNameHash = slotNameHash;
             }
@@ -1005,8 +1061,8 @@ namespace s3pi.GenericRCOLResource
             void Parse(Stream s)
             {
                 BinaryReader r = new BinaryReader(s);
-                unknown1 = r.ReadUInt32();
-                unknown2 = r.ReadUInt32();
+                chainId = r.ReadUInt32();
+                slotId = r.ReadUInt32();
                 actorNameHash = r.ReadUInt32();
                 slotNameHash = r.ReadUInt32();
             }
@@ -1014,8 +1070,8 @@ namespace s3pi.GenericRCOLResource
             internal void UnParse(Stream s)
             {
                 BinaryWriter w = new BinaryWriter(s);
-                w.Write(unknown1);
-                w.Write(unknown2);
+                w.Write(chainId);
+                w.Write(slotId);
                 w.Write(actorNameHash);
                 w.Write(slotNameHash);
             }
@@ -1030,15 +1086,15 @@ namespace s3pi.GenericRCOLResource
             #region IEquatable<Animation>
             public bool Equals(ActorSlot other)
             {
-                return unknown1.Equals(other.unknown1) && unknown2.Equals(other.unknown2) && actorNameHash.Equals(other.actorNameHash) && slotNameHash.Equals(other.slotNameHash);
+                return chainId.Equals(other.chainId) && slotId.Equals(other.slotId) && actorNameHash.Equals(other.actorNameHash) && slotNameHash.Equals(other.slotNameHash);
             }
             #endregion
 
             #region ContentFields
             [ElementPriority(1)]
-            public uint Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnElementChanged(); } } }
+            public uint ChainId { get { return chainId; } set { if (chainId != value) { chainId = value; OnElementChanged(); } } }
             [ElementPriority(2)]
-            public uint Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnElementChanged(); } } }
+            public uint SlotId { get { return slotId; } set { if (slotId != value) { slotId = value; OnElementChanged(); } } }
             [ElementPriority(3)]
             public uint ActorNameHash { get { return actorNameHash; } set { if (actorNameHash != value) { actorNameHash = value; OnElementChanged(); } } }
             [ElementPriority(4)]
@@ -1166,35 +1222,29 @@ namespace s3pi.GenericRCOLResource
         [ElementPriority(18)]
         public ActorSuffixList ActorSuffixes { get { return actorSuffixes; } set { if (actorSuffixes != value) { actorSuffixes = value == null ? null : new ActorSuffixList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(19)]
-        public uint Unknown4 { get { return unknown4; } set { if (unknown4 != value) { unknown4 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
-        [ElementPriority(20)]
-        public uint Unknown5 { get { return unknown5; } set { if (unknown5 != value) { unknown5 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
-        [ElementPriority(21)]
-        public uint Unknown6 { get { return unknown6; } set { if (unknown6 != value) { unknown6 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
-        [ElementPriority(22)]
-        public uint Unknown7 { get { return unknown7; } set { if (unknown7 != value) { unknown7 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
+        public IResourceKey AdditiveClipResource { get { return additiveClipResource; } set { if (additiveClipResource != value) { additiveClipResource = new TGIBlock(requestedApiVersion, handler, "ITG", value); OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(23)]
         public string Animation { get { return animation; } set { if (animation != value) { animation = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(24)]
-        public uint Unknown8 { get { return unknown8; } set { if (unknown8 != value) { unknown8 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
+        public string AdditiveAnimation { get { return additiveAnimation; } set { if (additiveAnimation != value) { additiveAnimation = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(25)]
-        public uint AnimationNodeFlags { get { return animationNodeFlags; } set { if (animationNodeFlags != value) { animationNodeFlags = value; OnRCOLChanged(this, EventArgs.Empty); } } }
+        public JazzAnimationFlags AnimationNodeFlags { get { return animationNodeFlags; } set { if (animationNodeFlags != value) { animationNodeFlags = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(26)]
-        public AnimationPriority AnimationPriority1 { get { return animationPriority1; } set { if (animationPriority1 != value) { animationPriority1 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
+        public AnimationPriority AnimationPriority1 { get { return animationPriority; } set { if (animationPriority != value) { animationPriority = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(27)]
-        public uint Unknown9 { get { return unknown9; } set { if (unknown9 != value) { unknown9 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
+        public float Unknown9 { get { return unknown9; } set { if (unknown9 != value) { unknown9 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(28)]
         public float BlendInTime { get { return blendInTime; } set { if (blendInTime != value) { blendInTime = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(29)]
-        public float Unknown10 { get { return unknown10; } set { if (unknown10 != value) { unknown10 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
+        public float BlendOutTime { get { return blendOutTime; } set { if (blendOutTime != value) { blendOutTime = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(30)]
         public float Unknown11 { get { return unknown11; } set { if (unknown11 != value) { unknown11 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(31)]
-        public float Unknown12 { get { return unknown12; } set { if (unknown12 != value) { unknown12 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
+        public float Speed { get { return speed; } set { if (speed != value) { speed = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(32)]
         public GenericRCOLResource.ChunkReference ActorDefinitionIndex { get { return actorDefinitionIndex; } set { if (actorDefinitionIndex != value) { actorDefinitionIndex = new GenericRCOLResource.ChunkReference(requestedAPIversion, handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(33)]
-        public AnimationPriority AnimationPriority2 { get { return animationPriority2; } set { if (animationPriority2 != value) { animationPriority2 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
+        public AnimationPriority TimingPriority { get { return timingPriority; } set { if (timingPriority != value) { timingPriority = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(34)]
         public uint Unknown13 { get { return unknown13; } set { if (unknown13 != value) { unknown13 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(35)]
@@ -1218,11 +1268,18 @@ namespace s3pi.GenericRCOLResource
     {
         const string TAG = "Rand";
 
+        [Flags]
+        public enum Flags : uint
+        {
+            None = 0x00,
+            AvoidRepeats = 0x01
+        }
+
         #region Attributes
         uint version = 0x0101;
         OutcomeList outcomes;
         //0xDEADBEEF
-        uint flags;
+        Flags flags;
         //'/DGN'
         #endregion
 
@@ -1239,7 +1296,7 @@ namespace s3pi.GenericRCOLResource
         public JazzRandomNode(int APIversion, EventHandler handler
             , uint version
             , IEnumerable<Outcome> outcomes
-            , uint flags
+            , Flags flags
             )
             : base(APIversion, handler, null)
         {
@@ -1264,7 +1321,7 @@ namespace s3pi.GenericRCOLResource
             this.version = r.ReadUInt32();
             this.outcomes = new OutcomeList(handler, s);
             DEADBEEF.Parse(s);
-            this.flags = r.ReadUInt32();
+            this.flags = (Flags)r.ReadUInt32();
             CloseDGN.Parse(s);
         }
 
@@ -1277,7 +1334,7 @@ namespace s3pi.GenericRCOLResource
             if (outcomes == null) outcomes = new OutcomeList(handler);
             outcomes.UnParse(ms);
             DEADBEEF.UnParse(ms);
-            w.Write(flags);
+            w.Write((uint)flags);
             CloseDGN.UnParse(ms);
 
             return ms;
@@ -1374,11 +1431,11 @@ namespace s3pi.GenericRCOLResource
         [ElementPriority(12)]
         public OutcomeList Outcomes { get { return outcomes; } set { if (outcomes != value) { outcomes = new OutcomeList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(13)]
-        public uint Flags { get { return flags; } set { if (flags != value) { flags = value; OnRCOLChanged(this, EventArgs.Empty); } } }
+        public Flags Properties { get { return flags; } set { if (flags != value) { flags = value; OnRCOLChanged(this, EventArgs.Empty); } } }
 
         public string Value { get { return ValueBuilder; } }
         #endregion
-   }
+    }
 
     public class JazzSelectOnParameterNode : JazzChunk
     {
@@ -1539,7 +1596,7 @@ namespace s3pi.GenericRCOLResource
         [ElementPriority(11)]
         public uint Version { get { return version; } set { if (version != value) { version = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(12)]
-        public GenericRCOLResource.ChunkReference ParameterDefinitionIndex { get { return parameterDefinitionIndex; } set { if (parameterDefinitionIndex != value) { parameterDefinitionIndex =new GenericRCOLResource.ChunkReference(requestedAPIversion, handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
+        public GenericRCOLResource.ChunkReference ParameterDefinitionIndex { get { return parameterDefinitionIndex; } set { if (parameterDefinitionIndex != value) { parameterDefinitionIndex = new GenericRCOLResource.ChunkReference(requestedAPIversion, handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(13)]
         public MatchList Matches { get { return matches; } set { if (matches != value) { matches = new MatchList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
 
@@ -1547,18 +1604,164 @@ namespace s3pi.GenericRCOLResource
         #endregion
     }
 
-#if UNDEF
     public class JazzSelectOnDestinationNode : JazzChunk
     {
-        const string TAG = "S_PD";
+        const string TAG = "DG00";
 
         #region Attributes
-        uint version = 0x0100;
-        uint nameHash;
-        uint defaultValue;
+        uint version = 0x0101;
+        MatchList matches;
+        //0xDEADBEEF
+        //'/DGN'
+        #endregion
+
+        #region Constructors
+        public JazzSelectOnDestinationNode(int APIversion, EventHandler handler) : base(APIversion, handler, null) { }
+        public JazzSelectOnDestinationNode(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler, s) { }
+        public JazzSelectOnDestinationNode(int APIversion, EventHandler handler, JazzSelectOnDestinationNode basis)
+            : this(APIversion, handler
+            , basis.version
+            , basis.matches
+            )
+        { }
+        public JazzSelectOnDestinationNode(int APIversion, EventHandler handler
+            , uint version
+            , IEnumerable<Match> matches
+            )
+            : base(APIversion, handler, null)
+        {
+            this.version = version;
+            this.matches = new MatchList(handler, matches);
+        }
+        #endregion
+
+        #region ARCOLBlock
+        [ElementPriority(2)]
+        public override string Tag { get { return TAG; } }
+
+        [ElementPriority(3)]
+        public override uint ResourceType { get { return 0x02EEDBA5; } }
+
+        protected override void Parse(Stream s)
+        {
+            base.Parse(s);
+
+            BinaryReader r = new BinaryReader(s);
+            this.version = r.ReadUInt32();
+            this.matches = new MatchList(handler, s);
+            DEADBEEF.Parse(s);
+            CloseDGN.Parse(s);
+        }
+
+        public override Stream UnParse()
+        {
+            Stream ms = base.UnParse();
+            BinaryWriter w = new BinaryWriter(ms);
+
+            w.Write(version);
+            if (matches == null) matches = new MatchList(handler);
+            matches.UnParse(ms);
+            DEADBEEF.UnParse(ms);
+            CloseDGN.UnParse(ms);
+
+            return ms;
+        }
+
+        // public override AHandlerElement Clone(EventHandler handler) { return new JazzSelectOnParameterNode(requestedApiVersion, handler, this); }
+        #endregion
+
+        #region Sub-types
+        public class Match : AHandlerElement, IEquatable<Match>
+        {
+            #region Attributes
+            GenericRCOLResource.ChunkReference stateIndex;
+            ChunkReferenceList decisionGraphIndexes;
+            #endregion
+
+            #region Constructors
+            public Match(int APIversion, EventHandler handler) : base(APIversion, handler) { }
+            public Match(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
+            public Match(int APIversion, EventHandler handler, Match basis)
+                : this(APIversion, handler
+                , basis.stateIndex
+                , basis.decisionGraphIndexes
+                )
+            {
+            }
+            public Match(int APIversion, EventHandler handler
+                , GenericRCOLResource.ChunkReference stateIndex
+                , IEnumerable<GenericRCOLResource.ChunkReference> decisionGraphIndexes
+                )
+                : base(APIversion, handler)
+            {
+                this.stateIndex = stateIndex;
+                this.decisionGraphIndexes = new ChunkReferenceList(handler, decisionGraphIndexes);
+            }
+            #endregion
+
+            #region Data I/O
+            void Parse(Stream s)
+            {
+                stateIndex = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, s);
+                decisionGraphIndexes = new ChunkReferenceList(handler, s);
+            }
+
+            internal void UnParse(Stream s)
+            {
+                if (stateIndex == null) stateIndex = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, 0);
+                stateIndex.UnParse(s);
+                if (decisionGraphIndexes == null) decisionGraphIndexes = new ChunkReferenceList(handler);
+                decisionGraphIndexes.UnParse(s);
+            }
+            #endregion
+
+            #region AHandlerElement
+            // public override AHandlerElement Clone(EventHandler handler) { return new Match(requestedApiVersion, handler, this); }
+            public override int RecommendedApiVersion { get { return recommendedApiVersion; } }
+            public override List<string> ContentFields { get { return AApiVersionedFields.GetContentFields(requestedApiVersion, this.GetType()); } }
+            #endregion
+
+            #region IEquatable<Animation>
+            public bool Equals(Match other)
+            {
+                return stateIndex.Equals(other.stateIndex) && decisionGraphIndexes.Equals(other.decisionGraphIndexes);
+            }
+            #endregion
+
+            #region ContentFields
+            [ElementPriority(1)]
+            public GenericRCOLResource.ChunkReference StateIndex { get { return stateIndex; } set { if (stateIndex != value) { stateIndex = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, value); OnElementChanged(); } } }
+            [ElementPriority(2)]
+            public ChunkReferenceList DecisionGraphIndexes { get { return decisionGraphIndexes; } set { if (decisionGraphIndexes != value) { decisionGraphIndexes = new ChunkReferenceList(handler, value); OnElementChanged(); } } }
+
+            public string Value { get { return ValueBuilder; } }
+            #endregion
+        }
+        public class MatchList : DependentList<Match>
+        {
+            #region Constructors
+            public MatchList(EventHandler handler) : base(handler) { }
+            public MatchList(EventHandler handler, IEnumerable<Match> basis) : base(handler, basis) { }
+            public MatchList(EventHandler handler, Stream s) : base(handler, s) { }
+            #endregion
+
+            #region DependentList<Outcome>
+            protected override Match CreateElement(Stream s) { return new Match(0, handler, s); }
+
+            protected override void WriteElement(Stream s, Match element) { element.UnParse(s); }
+            #endregion
+        }
+        #endregion
+
+        #region ContentFields
+        [ElementPriority(11)]
+        public uint Version { get { return version; } set { if (version != value) { version = value; OnRCOLChanged(this, EventArgs.Empty); } } }
+        [ElementPriority(12)]
+        public MatchList Matches { get { return matches; } set { if (matches != value) { matches = new MatchList(handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
+
+        public string Value { get { return ValueBuilder; } }
         #endregion
     }
-#endif
 
     public class JazzNextStateNode : JazzChunk
     {
@@ -1566,7 +1769,7 @@ namespace s3pi.GenericRCOLResource
 
         #region Attributes
         uint version = 0x0101;
-        uint stateIndex;
+        GenericRCOLResource.ChunkReference stateIndex;
         //'/DGN'
         #endregion
 
@@ -1581,7 +1784,7 @@ namespace s3pi.GenericRCOLResource
         { }
         public JazzNextStateNode(int APIversion, EventHandler handler
             , uint version
-            , uint stateIndex
+            , GenericRCOLResource.ChunkReference stateIndex
             )
             : base(APIversion, handler, null)
         {
@@ -1603,7 +1806,7 @@ namespace s3pi.GenericRCOLResource
 
             BinaryReader r = new BinaryReader(s);
             this.version = r.ReadUInt32();
-            this.stateIndex = r.ReadUInt32();
+            this.stateIndex = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, s);
             CloseDGN.Parse(s);
         }
 
@@ -1613,7 +1816,8 @@ namespace s3pi.GenericRCOLResource
             BinaryWriter w = new BinaryWriter(ms);
 
             w.Write(version);
-            w.Write(stateIndex);
+            if (stateIndex == null) stateIndex = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, 0);
+            stateIndex.UnParse(ms);
             CloseDGN.UnParse(ms);
 
             return ms;
@@ -1626,7 +1830,7 @@ namespace s3pi.GenericRCOLResource
         [ElementPriority(11)]
         public uint Version { get { return version; } set { if (version != value) { version = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(12)]
-        public uint StateIndex { get { return stateIndex; } set { if (stateIndex != value) { stateIndex = value; OnRCOLChanged(this, EventArgs.Empty); } } }
+        public GenericRCOLResource.ChunkReference StateIndex { get { return stateIndex; } set { if (stateIndex != value) { stateIndex = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
 
         public string Value { get { return ValueBuilder; } }
         #endregion
@@ -1639,7 +1843,7 @@ namespace s3pi.GenericRCOLResource
         #region Attributes
         uint version = 0x0100;
         GenericRCOLResource.ChunkReference actorDefinitionIndex;
-        uint unknown1;
+        GenericRCOLResource.ChunkReference parameterDefinitionIndex;
         TGIBlock propResource;
         uint unknown2;
         uint unknown3;
@@ -1657,20 +1861,20 @@ namespace s3pi.GenericRCOLResource
             : this(APIversion, handler
             , basis.version
             , basis.actorDefinitionIndex
-            , basis.unknown1
+            , basis.parameterDefinitionIndex
             , basis.propResource
             , basis.unknown2
             , basis.unknown3
             , basis.unknown4
             , basis.unknown5
-            //, basis.unknown6
+                //, basis.unknown6
             , basis.decisionGraphIndexes
             )
         { }
         public JazzCreatePropNode(int APIversion, EventHandler handler
             , uint version
             , GenericRCOLResource.ChunkReference actorDefinitionIndex
-            , uint unknown1
+            , GenericRCOLResource.ChunkReference parameterDefinitionIndex
             , IResourceKey propResource
             , uint unknown2
             , uint unknown3
@@ -1683,7 +1887,7 @@ namespace s3pi.GenericRCOLResource
         {
             this.version = version;
             this.actorDefinitionIndex = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, actorDefinitionIndex);
-            this.unknown1 = unknown1;
+            this.parameterDefinitionIndex = parameterDefinitionIndex;
             this.propResource = new TGIBlock(requestedApiVersion, handler, "ITG", propResource);
             this.unknown2 = unknown2;
             this.unknown3 = unknown3;
@@ -1709,7 +1913,7 @@ namespace s3pi.GenericRCOLResource
 
             this.version = r.ReadUInt32();
             this.actorDefinitionIndex = new GenericRCOLResource.ChunkReference(requestedAPIversion, handler, s);
-            this.unknown1 = r.ReadUInt32();
+            this.parameterDefinitionIndex = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, s);
             this.propResource = new TGIBlock(requestedApiVersion, handler, "ITG", s);
             this.unknown2 = r.ReadUInt32();
             this.unknown3 = r.ReadUInt32();
@@ -1728,7 +1932,8 @@ namespace s3pi.GenericRCOLResource
             w.Write(version);
             if (actorDefinitionIndex == null) actorDefinitionIndex = new GenericRCOLResource.ChunkReference(requestedAPIversion, handler, 0);
             actorDefinitionIndex.UnParse(ms);
-            w.Write(unknown1);
+            if (parameterDefinitionIndex == null) parameterDefinitionIndex = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, 0);
+            parameterDefinitionIndex.UnParse(ms);
             if (propResource == null) propResource = new TGIBlock(requestedAPIversion, handler, "ITG");
             propResource.UnParse(ms);
             w.Write(unknown2);
@@ -1752,7 +1957,7 @@ namespace s3pi.GenericRCOLResource
         [ElementPriority(12)]
         public GenericRCOLResource.ChunkReference ActorDefinitionIndex { get { return actorDefinitionIndex; } set { if (actorDefinitionIndex != value) { actorDefinitionIndex = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(13)]
-        public uint Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
+        public GenericRCOLResource.ChunkReference ParameterDefinitionIndex { get { return parameterDefinitionIndex; } set { if (parameterDefinitionIndex != value) { parameterDefinitionIndex = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(14)]
         public IResourceKey PropResource { get { return propResource; } set { if (propResource != value) { propResource = new TGIBlock(requestedApiVersion, handler, "ITG", value); OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(15)]
@@ -1778,7 +1983,7 @@ namespace s3pi.GenericRCOLResource
 
         #region Attributes
         uint version = 0x0100;
-        uint actorDefinitionIndex;
+        GenericRCOLResource.ChunkReference actorDefinitionIndex;
         ActorOperation actorOp;
         uint operand;
         uint unknown1;
@@ -1805,7 +2010,7 @@ namespace s3pi.GenericRCOLResource
         { }
         public JazzActorOperationNode(int APIversion, EventHandler handler
             , uint version
-            , uint actorDefinitionIndex
+            , GenericRCOLResource.ChunkReference actorDefinitionIndex
             , ActorOperation actorOp
             , uint operand
             , uint unknown1
@@ -1839,7 +2044,7 @@ namespace s3pi.GenericRCOLResource
 
             BinaryReader r = new BinaryReader(s);
             this.version = r.ReadUInt32();
-            this.actorDefinitionIndex = r.ReadUInt32();
+            this.actorDefinitionIndex = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, s);
             this.actorOp = (ActorOperation)r.ReadUInt32();
             this.operand = r.ReadUInt32();
             this.unknown1 = r.ReadUInt32();
@@ -1855,7 +2060,8 @@ namespace s3pi.GenericRCOLResource
             BinaryWriter w = new BinaryWriter(ms);
 
             w.Write(version);
-            w.Write(actorDefinitionIndex);
+            if (this.actorDefinitionIndex == null) this.actorDefinitionIndex = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, 0);
+            this.actorDefinitionIndex.UnParse(ms);
             w.Write((uint)actorOp);
             w.Write(operand);
             w.Write(unknown1);
@@ -1883,7 +2089,7 @@ namespace s3pi.GenericRCOLResource
         [ElementPriority(11)]
         public uint Version { get { return version; } set { if (version != value) { version = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(12)]
-        public uint ActorDefinitionIndex { get { return actorDefinitionIndex; } set { if (actorDefinitionIndex != value) { actorDefinitionIndex = value; OnRCOLChanged(this, EventArgs.Empty); } } }
+        public GenericRCOLResource.ChunkReference ActorDefinitionIndex { get { return actorDefinitionIndex; } set { if (actorDefinitionIndex != value) { actorDefinitionIndex = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(13)]
         public ActorOperation ActorOp { get { return actorOp; } set { if (actorOp != value) { actorOp = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(14)]
@@ -1907,15 +2113,15 @@ namespace s3pi.GenericRCOLResource
 
         #region Attributes
         uint version = 0x0104;
-        uint animationFlags;
-        AnimationPriority animationPriority1;
-        uint unknown1;
-        float unknown2;
-        float unknown3;
+        JazzAnimationFlags animationFlags;
+        AnimationPriority animationPriority;
+        float unknown1;
+        float blendInTime;
+        float blendOutTime;
         float unknown4;
-        float unknown5;
+        float speed;
         GenericRCOLResource.ChunkReference actorDefinitionIndex;
-        AnimationPriority animationPriority2;
+        AnimationPriority timingPriority;
         uint unknown6;
         uint unknown7;
         uint unknown8;
@@ -1934,14 +2140,14 @@ namespace s3pi.GenericRCOLResource
             : this(APIversion, handler
             , basis.version
             , basis.animationFlags
-            , basis.animationPriority1
+            , basis.animationPriority
             , basis.unknown1
-            , basis.unknown2
-            , basis.unknown3
+            , basis.blendInTime
+            , basis.blendOutTime
             , basis.unknown4
-            , basis.unknown5
+            , basis.speed
             , basis.actorDefinitionIndex
-            , basis.animationPriority2
+            , basis.timingPriority
             , basis.unknown6
             , basis.unknown7
             , basis.unknown8
@@ -1953,15 +2159,15 @@ namespace s3pi.GenericRCOLResource
         { }
         public JazzStopAnimationNode(int APIversion, EventHandler handler
             , uint version
-            , uint animationFlags
-            , AnimationPriority animationPriority1
-            , uint unknown1
-            , float unknown2
-            , float unknown3
+            , JazzAnimationFlags animationFlags
+            , AnimationPriority animationPriority
+            , float unknown1
+            , float blendInTime
+            , float blendOutTime
             , float unknown4
-            , float unknown5
+            , float speed
             , GenericRCOLResource.ChunkReference actorDefinitionIndex
-            , AnimationPriority animationPriority2
+            , AnimationPriority timingPriority
             , uint unknown6
             , uint unknown7
             , uint unknown8
@@ -1974,14 +2180,14 @@ namespace s3pi.GenericRCOLResource
         {
             this.version = version;
             this.animationFlags = animationFlags;
-            this.animationPriority1 = animationPriority1;
+            this.animationPriority = animationPriority;
             this.unknown1 = unknown1;
-            this.unknown2 = unknown2;
-            this.unknown3 = unknown3;
+            this.blendInTime = blendInTime;
+            this.blendOutTime = blendOutTime;
             this.unknown4 = unknown4;
-            this.unknown5 = unknown5;
+            this.speed = speed;
             this.actorDefinitionIndex = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, actorDefinitionIndex);
-            this.animationPriority2 = animationPriority2;
+            this.timingPriority = timingPriority;
             this.unknown6 = unknown6;
             this.unknown7 = unknown7;
             this.unknown8 = unknown8;
@@ -2006,15 +2212,15 @@ namespace s3pi.GenericRCOLResource
             BinaryReader r = new BinaryReader(s);
 
             this.version = r.ReadUInt32();
-            this.animationFlags = r.ReadUInt32();
-            this.animationPriority1 = (AnimationPriority)r.ReadUInt32();
-            this.unknown1 = r.ReadUInt32();
-            this.unknown2 = r.ReadSingle();
-            this.unknown3 = r.ReadSingle();
+            this.animationFlags = (JazzAnimationFlags)r.ReadUInt32();
+            this.animationPriority = (AnimationPriority)r.ReadUInt32();
+            this.unknown1 = r.ReadSingle();
+            this.blendInTime = r.ReadSingle();
+            this.blendOutTime = r.ReadSingle();
             this.unknown4 = r.ReadSingle();
-            this.unknown5 = r.ReadSingle();
+            this.speed = r.ReadSingle();
             this.actorDefinitionIndex = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, s);
-            this.animationPriority2 = (AnimationPriority)r.ReadUInt32();
+            this.timingPriority = (AnimationPriority)r.ReadUInt32();
             this.unknown6 = r.ReadUInt32();
             this.unknown7 = r.ReadUInt32();
             this.unknown8 = r.ReadUInt32();
@@ -2032,16 +2238,16 @@ namespace s3pi.GenericRCOLResource
             BinaryWriter w = new BinaryWriter(ms);
 
             w.Write(version);
-            w.Write(animationFlags);
-            w.Write((uint)animationPriority1);
+            w.Write((uint)animationFlags);
+            w.Write((uint)animationPriority);
             w.Write(unknown1);
-            w.Write(unknown2);
-            w.Write(unknown3);
+            w.Write(blendInTime);
+            w.Write(blendOutTime);
             w.Write(unknown4);
-            w.Write(unknown5);
+            w.Write(speed);
             if (actorDefinitionIndex == null) actorDefinitionIndex = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, 0);
             actorDefinitionIndex.UnParse(ms);
-            w.Write((uint)animationPriority2);
+            w.Write((uint)timingPriority);
             w.Write(unknown6);
             w.Write(unknown7);
             w.Write(unknown8);
@@ -2063,23 +2269,23 @@ namespace s3pi.GenericRCOLResource
         [ElementPriority(11)]
         public uint Version { get { return version; } set { if (version != value) { version = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(12)]
-        public uint AnimationFlags { get { return animationFlags; } set { if (animationFlags != value) { animationFlags = value; OnRCOLChanged(this, EventArgs.Empty); } } }
+        public JazzAnimationFlags AnimationFlags { get { return animationFlags; } set { if (animationFlags != value) { animationFlags = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(13)]
-        public AnimationPriority AnimationPriority1 { get { return animationPriority1; } set { if (animationPriority1 != value) { animationPriority1 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
+        public AnimationPriority AnimationPriority1 { get { return animationPriority; } set { if (animationPriority != value) { animationPriority = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(14)]
-        public uint Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
+        public float Unknown1 { get { return unknown1; } set { if (unknown1 != value) { unknown1 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(15)]
-        public float Unknown2 { get { return unknown2; } set { if (unknown2 != value) { unknown2 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
+        public float BlendInTime { get { return blendInTime; } set { if (blendInTime != value) { blendInTime = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(16)]
-        public float Unknown3 { get { return unknown3; } set { if (unknown3 != value) { unknown3 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
+        public float BlendOutTime { get { return blendOutTime; } set { if (blendOutTime != value) { blendOutTime = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(17)]
         public float Unknown4 { get { return unknown4; } set { if (unknown4 != value) { unknown4 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(18)]
-        public float Unknown5 { get { return unknown5; } set { if (unknown5 != value) { unknown5 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
+        public float Speed { get { return speed; } set { if (speed != value) { speed = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(19)]
         public GenericRCOLResource.ChunkReference ActorDefinitionIndex { get { return actorDefinitionIndex; } set { if (actorDefinitionIndex != value) { actorDefinitionIndex = new GenericRCOLResource.ChunkReference(requestedApiVersion, handler, value); OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(20)]
-        public AnimationPriority AnimationPriority2 { get { return animationPriority2; } set { if (animationPriority2 != value) { animationPriority2 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
+        public AnimationPriority TimingPriority { get { return timingPriority; } set { if (timingPriority != value) { timingPriority = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(21)]
         public uint Unknown6 { get { return unknown6; } set { if (unknown6 != value) { unknown6 = value; OnRCOLChanged(this, EventArgs.Empty); } } }
         [ElementPriority(22)]
