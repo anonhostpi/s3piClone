@@ -62,6 +62,7 @@
 0x0589DC45  THUM   .png
 0x0589DC46  THUM   .png
 0x0589DC47  THUM   .png
+0x0591B1AF  UPST   .usercastpreset
 0x05B17698  THUM   .png
 0x05B17699  THUM   .png
 0x05B1769A  THUM   .png

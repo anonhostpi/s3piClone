@@ -170,6 +170,10 @@
       <Project>{264DE8C9-33D0-451E-9067-8BA0CF2BFACE}</Project>
       <Name>TxtcResource</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\s3pi Wrappers\UserCAStPresetResource\UserCAStPresetResource.csproj">
+      <Project>{ffd7447b-fe8c-4fd6-9e5b-7b960dcb2a9c}</Project>
+      <Name>UserCAStPresetResource</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CreateAssemblyVersion\CreateAssemblyVersion.csproj">
       <Project>{114622FB-D6BF-4EA7-9BB9-FB06B5A01212}</Project>
       <Name>CreateAssemblyVersion</Name>
