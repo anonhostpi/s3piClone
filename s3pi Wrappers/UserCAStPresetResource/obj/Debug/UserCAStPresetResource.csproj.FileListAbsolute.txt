@@ -1,5 +1,0 @@
-S:\Sims3\Tools\WorkingProjects\s3pi Wrappers\UserCAStPresetResource\bin\Debug\s3pi.UserCAStPreset.dll
-S:\Sims3\Tools\WorkingProjects\s3pi Wrappers\UserCAStPresetResource\bin\Debug\s3pi.UserCAStPreset.pdb
-S:\Sims3\Tools\WorkingProjects\s3pi Wrappers\UserCAStPresetResource\obj\Debug\s3pi.UserCAStPreset.dll
-S:\Sims3\Tools\WorkingProjects\s3pi Wrappers\UserCAStPresetResource\obj\Debug\s3pi.UserCAStPreset.pdb
-S:\Sims3\Tools\WorkingProjects\s3pi Wrappers\UserCAStPresetResource\obj\Debug\UserCAStPresetResource.csprojResolveAssemblyReference.cache
