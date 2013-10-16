@@ -426,11 +426,11 @@
       </Folder>
     </Thumbnails>
   </game>
-  <game class="EP" rgversion="19">
-    <Name>Spare</Name>
-    <Longname>The Sims 3 Next Pack</Longname>
-    <GUID />
-    <DefaultInstallDir>Electronic Arts/The Sims 3 Whatever Next</DefaultInstallDir>
+  <game class="SP" rgversion="19">
+    <Name>MVS</Name>
+    <Longname>The Sims 3 Movie Stuff</Longname>
+    <GUID>{D0087539-3C57-44E0-BEE7-D779D546CBE1}</GUID>
+    <DefaultInstallDir>Electronic Arts/The Sims 3 Movie Stuff</DefaultInstallDir>
     <Suppressed>false</Suppressed>
     <GameContent>
       <Folder path="GameData/Shared/DeltaPackages">
@@ -440,6 +440,50 @@
     </GameContent>
     <DDSImages>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p20.package</Package>
+    </DDSImages>
+    <Thumbnails>
+      <Folder path="Thumbnails">
+        <Package isPatch="false" priority="0">AllThumbnails.package</Package>
+        <Package isPatch="false" priority="0">CasThumbnails.package</Package>
+      </Folder>
+    </Thumbnails>
+  </game>
+  <game class="EP" rgversion="20">
+    <Name>ITF</Name>
+    <Longname>The Sims 3 Into The Future</Longname>
+    <GUID />
+    <DefaultInstallDir>Electronic Arts/The Sims 3 Into The Future</DefaultInstallDir>
+    <Suppressed>false</Suppressed>
+    <GameContent>
+      <Folder path="GameData/Shared/DeltaPackages">
+        <Package isPatch="true" priority="1">p21/DeltaBuild_p21.package</Package>
+      </Folder>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p21.package</Package>
+    </GameContent>
+    <DDSImages>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p21.package</Package>
+    </DDSImages>
+    <Thumbnails>
+      <Folder path="Thumbnails">
+        <Package isPatch="false" priority="0">AllThumbnails.package</Package>
+        <Package isPatch="false" priority="0">CasThumbnails.package</Package>
+      </Folder>
+    </Thumbnails>
+  </game>
+  <game class="EP" rgversion="21">
+    <Name>Spare</Name>
+    <Longname>The Sims 3 Next Pack</Longname>
+    <GUID />
+    <DefaultInstallDir>Electronic Arts/The Sims 3 Whatever Next</DefaultInstallDir>
+    <Suppressed>false</Suppressed>
+    <GameContent>
+      <Folder path="GameData/Shared/DeltaPackages">
+        <Package isPatch="true" priority="1">p22/DeltaBuild_p22.package</Package>
+      </Folder>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p22.package</Package>
+    </GameContent>
+    <DDSImages>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p22.package</Package>
     </DDSImages>
     <Thumbnails>
       <Folder path="Thumbnails">
