@@ -451,7 +451,7 @@
   <game class="EP" rgversion="20">
     <Name>ITF</Name>
     <Longname>The Sims 3 Into The Future</Longname>
-    <GUID />
+    <GUID>{A0BBD6C7-B546-4048-B33A-F21F5C9F5B09}</GUID>
     <DefaultInstallDir>Electronic Arts/The Sims 3 Into The Future</DefaultInstallDir>
     <Suppressed>false</Suppressed>
     <GameContent>
@@ -492,5 +492,4 @@
       </Folder>
     </Thumbnails>
   </game>
-
 </gamefolders>
