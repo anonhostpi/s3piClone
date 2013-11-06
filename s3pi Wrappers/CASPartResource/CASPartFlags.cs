@@ -27,8 +27,6 @@ namespace CASPartResource
     [Flags]
     public enum AgeFlags : byte
     {
-        None = 0,
-
         Baby = 0x01,
         Toddler = 0x02,//"Pre-schooler"?
         Child = 0x04,
@@ -73,8 +71,6 @@ namespace CASPartResource
     [Flags]
     public enum GenderFlags : byte
     {
-        None = 0,
-
         Male = 0x1,
         Female = 0x2,
     }
@@ -82,8 +78,6 @@ namespace CASPartResource
     [Flags]
     public enum HandednessFlags : byte
     {
-        None = 0,
-
         LeftHanded = 0x01,
         RightHanded = 0x02,
     }
@@ -137,22 +131,26 @@ namespace CASPartResource
 
         #region Content Fields
         [ElementPriority(1)]
-        public AgeFlags Age {
+        public AgeFlags Age
+        {
             get { return (AgeFlags)(dword & AgeMask); }
             set { if (((uint)value & AgeMask) != (uint)value) throw new ArgumentOutOfRangeException(); if (Age != value) { dword &= ~AgeMask; dword |= (uint)value; OnElementChanged(); } }
         }
         [ElementPriority(2)]
-        public SpeciesType Species {
+        public SpeciesType Species
+        {
             get { return (SpeciesType)((dword & SpeciesMask) >> 8); }
             set { if (((uint)value & (SpeciesMask >> 8)) != (uint)value) throw new ArgumentOutOfRangeException(); if (Species != value) { dword &= ~SpeciesMask; dword |= (uint)value << 8; OnElementChanged(); } }
         }
         [ElementPriority(3)]
-        public GenderFlags Gender {
+        public GenderFlags Gender
+        {
             get { return (GenderFlags)((dword & GenderMask) >> 12); }
             set { if (((uint)value & (GenderMask >> 12)) != (uint)value) throw new ArgumentOutOfRangeException(); if (Gender != value) { dword &= ~GenderMask; dword |= (uint)value << 12; OnElementChanged(); } }
         }
         [ElementPriority(4)]
-        public HandednessFlags Handedness {
+        public HandednessFlags Handedness
+        {
             get { return (HandednessFlags)((dword & HandednessMask) >> 20); }
             set { if (((uint)value & (HandednessMask >> 20)) != (uint)value) throw new ArgumentOutOfRangeException(); if (Handedness != value) { dword &= ~HandednessMask; dword |= (uint)value << 20; OnElementChanged(); } }
         }
@@ -368,7 +366,7 @@ namespace CASPartResource
         Weathering = 0x0000001D,
         EarringL = 0x0000001E,
         EarringR = 0x0000001F,
-        
+
         ArmBand = 0x00000020,
         Tattoo = 0x00000021,
         TattooTemplate = 0x00000022,
