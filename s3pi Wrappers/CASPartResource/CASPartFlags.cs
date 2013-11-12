@@ -214,7 +214,7 @@ namespace CASPartResource
         Unknown11 = 0x00020000,
         Outerwear = 0x00040000,
         //CategoryMask = 0x0007FFFF,
-        Unknown13 = 0x00080000,
+        Plumbotwear = 0x00080000,
 
         //"Extended" flags
         ValidForMaternity = 0x00100000,
