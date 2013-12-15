@@ -528,9 +528,8 @@ namespace s3pi.Filetable
                 else
                     path = UserInstallDir;
                 if (Directory.Exists(path))
-                    foreach (PackageTag p in GetPackages(xFolder, path))
-                        if (p.Priority >= 0)
-                            yield return p;
+                    foreach (PackageTag p in GetPackages(xFolder, path).Where(p => p.Priority >= 0))
+                        yield return p;
             }
             if (Directory.Exists(UserInstallDir))
                 foreach (PackageTag p in GetPackages(xRoot, UserInstallDir))
