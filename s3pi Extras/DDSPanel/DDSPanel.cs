@@ -192,13 +192,6 @@ namespace System.Windows.Forms
         }
 
         /// <summary>
-        /// When true, indicates the DDS image is encoded with an alpha channel.
-        /// </summary>
-        [ReadOnly(true), Description("When true, indicates the DDS image is encoded with an alpha channel.")]
-        [Obsolete("Use AlphaDepth instead")]
-        public bool HasAlphaChannel { get { return loaded && ddsFile.HasAlphaChannel; } }
-
-        /// <summary>
         /// The number of alpha channel bits per pixel in the encoded DDS image or the DXT compression mode.
         /// </summary>
         [DefaultValue(8), Description("The number of alpha channel bits per pixel in the encoded DDS image or the DXT compression mode.")]
@@ -282,49 +275,6 @@ namespace System.Windows.Forms
         #endregion
 
         #region Methods
-        /// <summary>
-        /// Return the image size and an indication of presence of an alpha channel
-        /// for a DDS image in a stream.
-        /// </summary>
-        /// <param name="stream"><see cref="Stream"/> containing a DDS-encoded image.</param>
-        /// <param name="imageSize">(out) Size of DDS image.</param>
-        /// <param name="hasAlphaChannel">(out) True if DDS image has an alpha channel.</param>
-        [Obsolete("Use alternative overload for alphaDepth.")]
-        public void DDSInfo(Stream stream, out Size imageSize, out bool hasAlphaChannel)
-        {
-            DdsFile dds = new DdsFile();
-            dds.GetInfo(stream);
-            imageSize = new Size(dds.Size.Width, dds.Size.Height);
-            hasAlphaChannel = dds.HasAlphaChannel;
-        }
-
-        /// <summary>
-        /// Return the image size and an indication of presence of an alpha channel
-        /// for a DDS image in a stream.
-        /// </summary>
-        /// <param name="stream"><see cref="Stream"/> containing a DDS-encoded image.</param>
-        /// <param name="imageSize">(out) Size of DDS image.</param>
-        /// <param name="alphaDepth">(out) The number of alpha channel bits per pixel.</param>
-        public void DDSInfo(Stream stream, out Size imageSize, out int alphaDepth)
-        {
-            DdsFile dds = new DdsFile();
-            dds.GetInfo(stream);
-            imageSize = new Size(dds.Size.Width, dds.Size.Height);
-            alphaDepth = dds.AlphaDepth;
-        }
-
-        /// <summary>
-        /// Return the header for a DDS image in a stream.
-        /// </summary>
-        /// <param name="stream"><see cref="Stream"/> containing a DDS-encoded image.</param>
-        /// <returns>Contains the dds header information.</returns>
-        public DdsFile.DdsHeader DDSInfo(Stream stream)
-        {
-            DdsFile dds = new DdsFile();
-            dds.GetInfo(stream);
-            return dds.ddsHeader;
-        }
-
         /// <summary>
         /// Load a DDS image from a <see cref="System.IO.Stream"/>;
         /// if <paramref name="supportHSV"/> is passed and true (default is false), the image will
