@@ -1,1 +1,2 @@
-DirectoryIndex Index.aspx
+ErrorDocument 404 /peter/Help/Index.html
+DirectoryIndex Index.html
