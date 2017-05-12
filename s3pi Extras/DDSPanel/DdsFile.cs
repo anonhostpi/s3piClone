@@ -1156,8 +1156,8 @@ namespace System.Drawing
         /// <param name="supportHSV">When true, create an HSVa-encoded version of the image.</param>
         public void CreateImage(uint argb, int width, int height, bool supportHSV)
         {
-            width = width;
-            height = height;
+            this.width = width;
+            this.height = height;
             useBlockCompression = true;
             useLuminence = false;
             alphaDepth = 5;
@@ -1202,8 +1202,8 @@ namespace System.Drawing
         /// <param name="supportHSV">When true, create an HSVa-encoded version of the image.</param>
         public void CreateImage(DdsFile image, int width, int height, bool supportHSV)
         {
-            width = width;
-            height = height;
+            this.width = width;
+            this.height = height;
             useBlockCompression = image.useBlockCompression;
             useLuminence = image.useLuminence;
             alphaDepth = image.alphaDepth;
