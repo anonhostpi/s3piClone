@@ -258,7 +258,7 @@ namespace s3pi.Interfaces
         public virtual void AddRange(IEnumerable<T> collection)
         {
             int newElements = new List<T>(collection).Count;
-            if (maxSize >= 0 && Count >= maxSize - newElements) throw new InvalidOperationException();
+            if (maxSize >= 0 && Count > maxSize - newElements) throw new InvalidOperationException();
 
             //Note that the following is required to allow for implementation specific processing on items added to the list:
             EventHandler h = handler;
