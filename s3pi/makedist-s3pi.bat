@@ -6,7 +6,7 @@ rem -%ConfigurationName%
 set src=%TargetName%-Source
 set help=..\s3pi Doc\Help\s3piHelp.chm
 
-set out=S:\Sims3\Tools\s3pi\s3pi\
+set out=S:\Sims3\Tools\builds\%TargetName%\
 
 set mydate=%date: =0%
 set dd=%mydate:~0,2%
