@@ -113,7 +113,7 @@ namespace s3pi.GenericRCOLResource
                 : this(APIversion, handler
                 , LightSourceType.Unknown
                 , new Vertex(APIversion, handler, 0f, 0f, 0f)
-                , new RGB (APIversion, handler, 0f, 0f, 0f)
+                , new RGB(APIversion, handler, 0f, 0f, 0f)
                 , 0f
                 , LightSourceTypeFactory.create(APIversion, handler,
                     LightSourceType.Unknown,
@@ -235,7 +235,7 @@ namespace s3pi.GenericRCOLResource
             }
 
             #endregion
-            
+
             #region Sub-types
             public class RGB : Vertex
             {
@@ -350,7 +350,7 @@ namespace s3pi.GenericRCOLResource
             public class GeneralLightSourceType : AbstractLightSourceType
             {
                 #region Attributes
-                Single[] lightSourceData;
+                Single[] lightSourceData;// 24
                 #endregion
 
                 #region Constructors
@@ -386,15 +386,18 @@ namespace s3pi.GenericRCOLResource
                 public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
                 #endregion
 
+                #region Content Fields
                 [ElementPriority(1)]
                 public float[] LightSourceData
                 {
                     get { return (float[])lightSourceData.Clone(); ; }
-                    set {
+                    set
+                    {
                         if (value.Length != this.lightSourceData.Length) throw new ArgumentLengthException("LightSourceData", this.lightSourceData.Length);
                         if (!lightSourceData.Equals<float>(value)) { lightSourceData = value == null ? null : (float[])value.Clone(); this.OnElementChanged(); }
                     }
                 }
+                #endregion
 
                 public string Value { get { return ValueBuilder; } }
             }
@@ -402,10 +405,10 @@ namespace s3pi.GenericRCOLResource
             public class SpotLightSourceType : AbstractLightSourceType
             {
                 #region Attributes
-                Vertex location;
-                Single falloffAngle;
-                Single blurScale;
-                Single[] unusedLightSourceData;
+                Vertex location;// 24 - 3
+                Single falloffAngle; // 21 - 1
+                Single blurScale;// 20 - 1
+                Single[] unusedLightSourceData;// 19
                 #endregion
 
                 #region Constructors
@@ -436,7 +439,8 @@ namespace s3pi.GenericRCOLResource
                     , Single falloffAngle
                     , Single blurScale
                     , IEnumerable<Single> unusedLightSourceData
-                    ) : base(APIversion, handler)
+                    )
+                    : base(APIversion, handler)
                 {
                     this.location = new Vertex(APIversion, handler, location);
                     this.falloffAngle = falloffAngle;
@@ -474,6 +478,7 @@ namespace s3pi.GenericRCOLResource
                 public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
                 #endregion
 
+                #region Content Fields
                 [ElementPriority(1)]
                 public Vertex At { get { return location; } set { if (!location.Equals(value)) { location = new Vertex(requestedApiVersion, handler, value); OnElementChanged(); } } }
                 [ElementPriority(2)]
@@ -490,6 +495,7 @@ namespace s3pi.GenericRCOLResource
                         if (!unusedLightSourceData.Equals<float>(value)) { unusedLightSourceData = value == null ? null : (float[])value.Clone(); this.OnElementChanged(); }
                     }
                 }
+                #endregion
 
                 public string Value { get { return ValueBuilder; } }
             }
@@ -497,12 +503,12 @@ namespace s3pi.GenericRCOLResource
             public class LampShadeLightSourceType : AbstractLightSourceType
             {
                 #region Attributes
-                Vertex location;
-                Single falloffAngle;
-                Single shadeLightRigMultiplier;
-                Single bottomAngle;
-                RGB shadeColor;
-                Single[] unusedLightSourceData;
+                Vertex location;// 24 - 3
+                Single falloffAngle;// 21 - 1
+                Single shadeLightRigMultiplier;// 20 - 1
+                Single bottomAngle;// 19 - 1
+                RGB shadeColor;// 18 - 3
+                Single[] unusedLightSourceData;// 15
                 #endregion
 
                 #region Constructors
@@ -586,6 +592,7 @@ namespace s3pi.GenericRCOLResource
                 public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
                 #endregion
 
+                #region Content Fields
                 [ElementPriority(1)]
                 public Vertex At { get { return location; } set { if (!location.Equals(value)) { location = new Vertex(requestedApiVersion, handler, value); OnElementChanged(); } } }
                 [ElementPriority(2)]
@@ -606,6 +613,7 @@ namespace s3pi.GenericRCOLResource
                         if (!unusedLightSourceData.Equals<float>(value)) { unusedLightSourceData = value == null ? null : (float[])value.Clone(); this.OnElementChanged(); }
                     }
                 }
+                #endregion
 
                 public string Value { get { return ValueBuilder; } }
             }
@@ -613,10 +621,10 @@ namespace s3pi.GenericRCOLResource
             public class TubeLightSourceType : AbstractLightSourceType
             {
                 #region Attributes
-                Vertex location;
-                Single tubeLength;
-                Single blurScale;
-                Single[] unusedLightSourceData;
+                Vertex location;// 24 - 3
+                Single tubeLength;// 21 - 1
+                Single blurScale;// 20 - 1
+                Single[] unusedLightSourceData;// 19
                 #endregion
 
                 #region Constructors
@@ -647,7 +655,8 @@ namespace s3pi.GenericRCOLResource
                     , Single tubeLength
                     , Single blurScale
                     , IEnumerable<Single> unusedLightSourceData
-                    ) : base(APIversion, handler)
+                    )
+                    : base(APIversion, handler)
                 {
                     this.location = new Vertex(APIversion, handler, location);
                     this.tubeLength = tubeLength;
@@ -685,6 +694,7 @@ namespace s3pi.GenericRCOLResource
                 public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
                 #endregion
 
+                #region Content Fields
                 [ElementPriority(1)]
                 public Vertex At { get { return location; } set { if (!location.Equals(value)) { location = new Vertex(requestedApiVersion, handler, value); OnElementChanged(); } } }
                 [ElementPriority(2)]
@@ -701,6 +711,7 @@ namespace s3pi.GenericRCOLResource
                         if (!unusedLightSourceData.Equals<float>(value)) { unusedLightSourceData = value == null ? null : (float[])value.Clone(); this.OnElementChanged(); }
                     }
                 }
+                #endregion
 
                 public string Value { get { return ValueBuilder; } }
             }
@@ -708,13 +719,13 @@ namespace s3pi.GenericRCOLResource
             public class SquareWindowLightSourceType : AbstractLightSourceType
             {
                 #region Attributes
-                Vertex location;
-                Vertex right;
-                Single width;
-                Single height;
-                Single falloffAngle;
-                Single windowTopBottomAngle;
-                Single[] unusedLightSourceData;
+                Vertex location;// 24 - 3
+                Vertex right;// 21 - 3
+                Single width;// 18 - 1
+                Single height;// 17 - 1
+                Single falloffAngle;// 16 - 1
+                Single windowTopBottomAngle;// 15 - 1
+                Single[] unusedLightSourceData;// 14
                 #endregion
 
                 #region Constructors
@@ -757,7 +768,8 @@ namespace s3pi.GenericRCOLResource
                     , Single falloffAngle
                     , Single windowTopBottomAngle
                     , IEnumerable<Single> unusedLightSourceData
-                    ) : base(APIversion, handler)
+                    )
+                    : base(APIversion, handler)
                 {
                     this.location = new Vertex(APIversion, handler, location);
                     this.right = new Vertex(APIversion, handler, right);
@@ -766,8 +778,8 @@ namespace s3pi.GenericRCOLResource
                     this.falloffAngle = falloffAngle;
                     this.windowTopBottomAngle = windowTopBottomAngle;
                     this.unusedLightSourceData = unusedLightSourceData.ToArray();
-                    if (this.unusedLightSourceData.Length != 17)
-                        throw new ArgumentException("Must provide 17 values", "unusedLightSourceData");
+                    if (this.unusedLightSourceData.Length != 14)
+                        throw new ArgumentException("Must provide 14 values", "unusedLightSourceData");
                 }
                 public SquareWindowLightSourceType(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
                 #endregion
@@ -804,6 +816,7 @@ namespace s3pi.GenericRCOLResource
                 public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
                 #endregion
 
+                #region Content Fields
                 [ElementPriority(1)]
                 public Vertex At { get { return location; } set { if (!location.Equals(value)) { location = new Vertex(requestedApiVersion, handler, value); OnElementChanged(); } } }
                 [ElementPriority(2)]
@@ -826,6 +839,7 @@ namespace s3pi.GenericRCOLResource
                         if (!unusedLightSourceData.Equals<float>(value)) { unusedLightSourceData = value == null ? null : (float[])value.Clone(); this.OnElementChanged(); }
                     }
                 }
+                #endregion
 
                 public string Value { get { return ValueBuilder; } }
             }
@@ -833,10 +847,10 @@ namespace s3pi.GenericRCOLResource
             public class CircularWindowLightSourceType : AbstractLightSourceType
             {
                 #region Attributes
-                Vertex location;
-                Vertex right;
-                Single radius;
-                Single[] unusedLightSourceData;
+                Vertex location;// 24 - 3
+                Vertex right;// 21 - 3
+                Single radius;// 18 - 1
+                Single[] unusedLightSourceData;// 17
                 #endregion
 
                 #region Constructors
@@ -867,14 +881,15 @@ namespace s3pi.GenericRCOLResource
                     , Vertex right
                     , Single radius
                     , IEnumerable<Single> unusedLightSourceData
-                    ) : base(APIversion, handler)
+                    )
+                    : base(APIversion, handler)
                 {
                     this.location = new Vertex(APIversion, handler, location);
                     this.right = new Vertex(APIversion, handler, right);
                     this.radius = radius;
                     this.unusedLightSourceData = unusedLightSourceData.ToArray();
-                    if (this.unusedLightSourceData.Length != 19)
-                        throw new ArgumentException("Must provide 19 values", "unusedLightSourceData");
+                    if (this.unusedLightSourceData.Length != 17)
+                        throw new ArgumentException("Must provide 17 values", "unusedLightSourceData");
                 }
                 public CircularWindowLightSourceType(int APIversion, EventHandler handler, Stream s) : base(APIversion, handler) { Parse(s); }
                 #endregion
@@ -886,7 +901,7 @@ namespace s3pi.GenericRCOLResource
                     this.location = new Vertex(requestedApiVersion, handler, s);
                     this.right = new Vertex(requestedApiVersion, handler, s);
                     this.radius = r.ReadSingle();
-                    this.unusedLightSourceData = new Single[19];
+                    this.unusedLightSourceData = new Single[17];
                     for (int i = 0; i < unusedLightSourceData.Length; unusedLightSourceData[i++] = r.ReadSingle()) { }
                 }
 
@@ -905,6 +920,7 @@ namespace s3pi.GenericRCOLResource
                 public override List<string> ContentFields { get { return GetContentFields(requestedApiVersion, this.GetType()); } }
                 #endregion
 
+                #region Content Fields
                 [ElementPriority(1)]
                 public Vertex At { get { return location; } set { if (!location.Equals(value)) { location = new Vertex(requestedApiVersion, handler, value); OnElementChanged(); } } }
                 [ElementPriority(2)]
@@ -921,11 +937,12 @@ namespace s3pi.GenericRCOLResource
                         if (!unusedLightSourceData.Equals<float>(value)) { unusedLightSourceData = value == null ? null : (float[])value.Clone(); this.OnElementChanged(); }
                     }
                 }
+                #endregion
 
                 public string Value { get { return ValueBuilder; } }
             }
             #endregion
-            
+
             #region Content Fields
             [ElementPriority(1)]
             public LightSourceType LightType
